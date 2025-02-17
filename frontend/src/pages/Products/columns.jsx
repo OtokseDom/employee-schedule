@@ -3,37 +3,59 @@ import { ArrowUpDown } from "lucide-react";
 // Define your columns without TypeScript types
 export const columns = [
 	{
-		id: "Highlight",
-		accessorKey: "product.highlight",
+		id: "name",
+		accessorKey: "product_variation.name",
 		header: ({ column }) => {
 			return (
 				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-					Highlight <ArrowUpDown className="ml-2 h-4 w-4" />
+					Name <ArrowUpDown className="ml-2 h-4 w-4" />
 				</button>
 			);
 		},
 	},
 	{
-		id: "Specification",
-		accessorKey: "product.specification",
+		id: "short_name",
+		accessorKey: "product_variation.short_name",
 		header: ({ column }) => {
 			return (
 				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-					Specification <ArrowUpDown className="ml-2 h-4 w-4" />
+					Short Name <ArrowUpDown className="ml-2 h-4 w-4" />
 				</button>
 			);
 		},
 	},
 	{
-		id: "Description",
-		accessorKey: "product.description",
-		// header: "Amount",
+		id: "sku",
+		accessorKey: "product_variation.SKU",
 		header: ({ column }) => {
 			return (
 				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-					Description <ArrowUpDown className="ml-2 h-4 w-4" />
+					SKU <ArrowUpDown className="ml-2 h-4 w-4" />
 				</button>
 			);
 		},
 	},
+	// {
+	// 	id: "Specification",
+	// 	accessorKey: "product.specification",
+	// 	header: ({ column }) => {
+	// 		return (
+	// 			<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+	// 				Specification <ArrowUpDown className="ml-2 h-4 w-4" />
+	// 			</button>
+	// 		);
+	// 	},
+	// },
+	// {
+	// 	id: "Description",
+	// 	accessorKey: "product.description",
+	// 	// header: "Amount",
+	// 	header: ({ column }) => {
+	// 		return (
+	// 			<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+	// 				Description <ArrowUpDown className="ml-2 h-4 w-4" />
+	// 			</button>
+	// 		);
+	// 	},
+	// },
 ];
