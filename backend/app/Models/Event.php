@@ -13,8 +13,4 @@ class Event extends Model
         "description",
         "color"
     ];
-    // public function schedules()
-    // {
-    //     return $this->hasMany(schedule::class);
-    // }
 }
