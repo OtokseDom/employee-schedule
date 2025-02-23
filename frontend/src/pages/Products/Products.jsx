@@ -2,9 +2,7 @@ import axiosClient from "@/axios.client";
 // import { columns } from "../components/ui/columns";
 import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
-import { ArrowUpDown } from "lucide-react";
 import { columns } from "./columns";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export default function Products() {
 	const [products, setProducts] = useState([]);

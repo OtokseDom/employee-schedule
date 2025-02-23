@@ -1,4 +1,5 @@
-import { Box, Calendar, ChevronDown, ChevronUp, Home, Inbox, MoonStar, Search, Settings, Sun, User2, Workflow } from "lucide-react";
+import { ChevronUp, Home, MoonStar, Sun, User2, Calendar } from "lucide-react";
+import logo from "../assets/logo.png";
 
 import {
 	Sidebar,
@@ -11,15 +12,10 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarMenuSubItem,
-	SidebarMenuSub,
-	SidebarMenuBadge,
-	SidebarMenuSkeleton,
 	SidebarSeparator,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosClient from "@/axios.client";
@@ -32,32 +28,12 @@ const items = [
 		icon: Home,
 	},
 	{
-		title: "Users",
-		url: "/users",
-		icon: Inbox,
-	},
-	{
-		title: "Products",
-		url: "/products",
-		icon: Box,
-	},
-	{
-		title: "Calendar",
-		url: "#",
+		title: "Schedules",
+		url: "/schedule",
 		icon: Calendar,
 	},
-	{
-		title: "Search",
-		url: "#",
-		icon: Search,
-	},
-	{
-		title: "Settings",
-		url: "#",
-		icon: Settings,
-	},
 ];
-export function AppSidebar({ setUser, setToken }) {
+export function AppSidebar({ user, setUser, setToken }) {
 	// Darkmode set session
 	const [theme, setTheme] = useState(() => {
 		const savedMode = sessionStorage.getItem("theme");
@@ -94,26 +70,10 @@ export function AppSidebar({ setUser, setToken }) {
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
 				<SidebarMenu>
-					<SidebarTrigger className="hidden md:flex" />
-
-					<SidebarMenuItem>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<SidebarMenuButton>
-									<Workflow /> Select Workspace
-									<ChevronDown className="ml-auto" />
-								</SidebarMenuButton>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-								<DropdownMenuItem>
-									<span>Acme Inc</span>
-								</DropdownMenuItem>
-								<DropdownMenuItem>
-									<span>Acme Corp.</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</SidebarMenuItem>
+					<div className="flex justify-between">
+						<img src={logo} className="overflow-hidden transition-all w-20" alt="logo" />
+						<SidebarTrigger className="hidden md:flex w-8 h-8" />
+					</div>
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarSeparator />
@@ -134,33 +94,6 @@ export function AppSidebar({ setUser, setToken }) {
 									</SidebarMenuItem>
 								</Link>
 							))}
-						</SidebarMenu>
-						<SidebarMenu>
-							<Collapsible defaultOpen className="group/collapsible">
-								<SidebarMenuItem>
-									<CollapsibleTrigger asChild>
-										<SidebarMenuButton>
-											<ChevronDown /> Settings
-										</SidebarMenuButton>
-									</CollapsibleTrigger>
-									<CollapsibleContent>
-										<SidebarMenuSub>
-											{/* <SidebarMenuSubItem /> */}
-											{items.map((item) => (
-												<SidebarMenuItem key={item.title}>
-													<SidebarMenuButton asChild>
-														<a href={item.url}>
-															<item.icon />
-															<span>{item.title}</span>
-														</a>
-													</SidebarMenuButton>
-												</SidebarMenuItem>
-											))}
-										</SidebarMenuSub>
-									</CollapsibleContent>
-									<SidebarMenuBadge>24</SidebarMenuBadge>
-								</SidebarMenuItem>
-							</Collapsible>
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
@@ -184,7 +117,7 @@ export function AppSidebar({ setUser, setToken }) {
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<SidebarMenuButton>
-									<User2 /> Username
+									<User2 /> {user.name}
 									<ChevronUp className="ml-auto" />
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
