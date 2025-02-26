@@ -22,11 +22,18 @@ class UpdateScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'event_id' => 'required|integer|exists:events,id',
-            'employee_id' => 'required|integer|exists:employees,id',
-            'shift_start' => 'required|date_format:Y-m-d H:i:s',
-            'shift_end' => 'required|date_format:Y-m-d H:i:s',
-            'status' => 'required|string',
+            'event_id' => 'required|exists:events,id',
+            'employee_id' => 'required|exists:employees,id',
+            'date' => 'required|date_format:Y-m-d',
+            'shift_start' => 'required|date_format:H:i:s',
+            'shift_end' => 'required|date_format:H:i:s|after:shift_start', // Ensure shift_end is a valid time and after shift_start
+            'status' => 'required|in:Pending,Completed,In Progress,Cancelled',
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'shift_end.after' => 'The shift end time must be after the shift start time.',
         ];
     }
 }

@@ -18,6 +18,7 @@ class ScheduleResource extends JsonResource
             'id' => $this->id,
             'employee_id' => $this->employee_id,
             'event_id' => $this->event_id,
+            'date' => $this->date,
             'shift_start' => $this->shift_start,
             'shift_end' => $this->shift_end,
             'status' => $this->status,

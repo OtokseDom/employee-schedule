@@ -12,6 +12,7 @@ class Schedule extends Model
     protected $fillable = [
         "event_id",
         "employee_id",
+        "date",
         "shift_start",
         "shift_end",
         "status"

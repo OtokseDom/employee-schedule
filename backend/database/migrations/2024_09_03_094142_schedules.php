@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('event_id');
             $table->unsignedBigInteger('employee_id');
-            $table->dateTime('shift_start');
-            $table->dateTime('shift_end');
+            $table->dateTime('date');
+            $table->time('shift_start');
+            $table->time('shift_end');
             $table->string('status');
             $table->timestamps();
 
