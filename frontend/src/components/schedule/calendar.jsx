@@ -16,51 +16,26 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "../ui/label";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
+import { Skeleton } from "../ui/skeleton";
+import CalendarCell from "./CalendarCell";
 // import { toast } from "sonner";
 
 const formSchema = z.object({
-	employee: z.string(),
-	event: z.string(),
+	employee: z.number(),
+	event: z.number(),
 	shift_start: z.date(),
 	shift_end: z.date(),
 });
 
-export default function CalendarSchedule() {
-	// CALENDAR Schedule
-	const sampleEvent = {
-		"2025-02-25": {
-			employee: "Elizabeth Keen",
-			event: "Meeting with the team of professionals",
-			color: "green",
-			shift_start: new Date("2025-02-25 12:23"),
-			shift_end: new Date("2025-02-25 15:24"),
-		},
-		"2025-02-10": {
-			employee: "John Doe",
-			event: "Meeting with the team of professionals",
-			color: "red",
-			shift_start: new Date("2025-02-25 12:23"),
-			shift_end: new Date("2025-02-25 15:23"),
-		},
-		"2025-02-14": {
-			employee: "John Doe",
-			event: "Meeting with the team of professionals Meeting with the team of professionals Meeting with the team of professionals",
-			color: "blue",
-			shift_start: new Date("2025-02-25 12:23"),
-			shift_end: new Date("2025-02-25 15:23"),
-		},
-		"2025-02-11": {
-			employee: "John Doe",
-			event: "Meeting with the team of professionals",
-			color: "yellow",
-			shift_start: new Date("2025-02-25 12:23"),
-			shift_end: new Date("2025-02-25 15:23"),
-		},
-	};
+export default function CalendarSchedule({ employees, events, schedules, loading }) {
+	// TODO: calendar will show schedule of selected employee
+	// TODO: opening modal not getting schdule data
+
 	const [currentMonth, setCurrentMonth] = useState(new Date());
-	const [events, setEvents] = useState(sampleEvent);
+	// const [schedules, setSchedules] = useState(sampleSchedules);
 	const [selectedDate, setSelectedDate] = useState(null);
-	const [modalData, setModalData] = useState({ employee: undefined, event: undefined, shift_start: undefined, shift_end: undefined });
+	const [modalData, setModalData] = useState({ employee: 0, event: 0, shift_start: undefined, shift_end: undefined });
 	const [hoveredEvent, setHoveredEvent] = useState(null);
 	const startDate = startOfWeek(startOfMonth(currentMonth));
 	const endDate = endOfWeek(endOfMonth(currentMonth));
@@ -72,24 +47,30 @@ export default function CalendarSchedule() {
 		day = addDays(day, 1);
 	}
 
+	const matchingSchedule = (date) => {
+		if (Array.isArray(schedules)) {
+			return schedules.find((schedule) => format(schedule.date, "yyyy-MM-dd") === date);
+		}
+		return null;
+	};
+
 	const openModal = (date) => {
+		console.log(modalData);
 		setSelectedDate(date);
-		setModalData(events[date] || { employee: undefined, event: undefined, shift_start: undefined, shift_end: undefined });
+		setModalData(schedules[date] || { employee: 0, event: 0, shift_start: undefined, shift_end: undefined });
 	};
 
 	const closeModal = () => {
 		setSelectedDate(null);
-		setModalData({ employee: undefined, event: undefined, shift_start: undefined, shift_end: undefined });
+		setModalData({ employee: 0, event: 0, shift_start: undefined, shift_end: undefined });
 	};
 
 	// Calendar Input
-	const [date, setDate] = useState();
-
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			employee: modalData?.employee || undefined,
-			event: modalData?.event || undefined,
+			employee: modalData?.employee || 0,
+			event: modalData?.event || 0,
 			shift_start: modalData?.shift_start || undefined,
 			shift_end: modalData?.shift_end || undefined,
 		},
@@ -97,8 +78,8 @@ export default function CalendarSchedule() {
 
 	useEffect(() => {
 		form.reset({
-			employee: modalData?.employee || undefined,
-			event: modalData?.event || undefined,
+			employee: modalData?.employee || 0,
+			event: modalData?.event || 0,
 			shift_start: modalData?.shift_start || undefined,
 			shift_end: modalData?.shift_end || undefined,
 		});
@@ -140,33 +121,38 @@ export default function CalendarSchedule() {
 					</div>
 				))}
 				{days.map((date, index) => {
-					const event = events[format(date, "yyyy-MM-dd")];
+					const formattedSchedules = matchingSchedule(format(date, "yyyy-MM-dd"));
+					const status = formattedSchedules?.status;
+					let color = "";
+
+					switch (status) {
+						case "Pending":
+							color = "yellow";
+							break;
+						case "In Progress":
+							color = "blue";
+							break;
+						case "Completed":
+							color = "green";
+							break;
+						case "Cancelled":
+							color = "red";
+							break;
+						default:
+							color = "gray";
+							break;
+					}
 					return (
-						<div
+						<CalendarCell
 							key={index}
-							className={`bg-${events[format(date, "yyyy-MM-dd")]?.color}-100 text-${events[format(date, "yyyy-MM-dd")]?.color}-900
-							border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-gray-300 rounded-lg relative `}
-							onClick={() => openModal(format(date, "yyyy-MM-dd"))}
-							onMouseEnter={() => setHoveredEvent(event)}
-							onMouseLeave={() => setHoveredEvent(null)}
-						>
-							<div className="text-sm font-bold">{format(date, "d")}</div>
-							{event && (
-								<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-									<span className=" font-black">{events[format(date, "yyyy-MM-dd")].employee}</span>:{" "}
-									{events[format(date, "yyyy-MM-dd")].event}
-								</div>
-							)}
-							{hoveredEvent === event && event && (
-								<div
-									className={`bg-${events[format(date, "yyyy-MM-dd")]?.color}-100 text-${
-										events[format(date, "yyyy-MM-dd")]?.color
-									}-900 absolute left-0 top-full mt-1 bg-white shadow-lg p-2 text-xs w-40 z-10 rounded`}
-								>
-									<strong>{event.employee}</strong>: {event.event}
-								</div>
-							)}
-						</div>
+							color={color}
+							loading={loading}
+							formattedSchedules={formattedSchedules}
+							hoveredEvent={hoveredEvent}
+							setHoveredEvent={setHoveredEvent}
+							openModal={openModal}
+							date={date}
+						/>
 					);
 				})}
 			</div>
@@ -184,9 +170,31 @@ export default function CalendarSchedule() {
 										return (
 											<FormItem>
 												<FormLabel>Employee</FormLabel>
-												<FormControl>
-													<Input placeholder="Employee" {...field} value={field.value ?? ""} />
-												</FormControl>
+												<Select onValueChange={field.onChange} defaultValue={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															{/* <SelectValue placeholder="Select an employee" /> */}
+															<SelectValue placeholder="Select an employee">
+																{modalData.employee && !field.value
+																	? employees.find((emp) => emp.id == modalData.employee)?.name
+																	: field.value
+																	? employees.find((emp) => emp.id == field.value)?.name
+																	: "Select an employee"}
+															</SelectValue>
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{Array.isArray(employees) && employees.length > 0 ? (
+															employees?.map((employee) => (
+																<SelectItem key={employee.id} value={employee.id}>
+																	{employee.name}
+																</SelectItem>
+															))
+														) : (
+															<SelectItem disabled>No employees available</SelectItem>
+														)}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										);

@@ -7,6 +7,8 @@ import CalendarSchedule from "@/components/schedule/calendar";
 
 export default function Schedules() {
 	const [employees, setEmployees] = useState([]);
+	const [events, setEvents] = useState([]);
+	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -15,18 +17,26 @@ export default function Schedules() {
 		// 	showAlert();
 		// }
 	}, []);
-	const fetchData = () => {
+	const fetchData = async () => {
 		setLoading(true);
-		axiosClient
-			.get("/employee")
-			.then(({ data }) => {
-				setEmployees(data.employees);
-				setLoading(false);
-			})
-			.catch((e) => {
-				console.log(e);
-				setLoading(false);
-			});
+		try {
+			// Make both API calls concurrently using Promise.all
+			const [employeeResponse, eventResponse, scheduleResponse] = await Promise.all([
+				axiosClient.get("/employee"),
+				axiosClient.get("/event"),
+				axiosClient.get("/schedule"),
+			]);
+
+			// Set the data after both requests succeed
+			setEmployees(employeeResponse.data.employees);
+			setEvents(eventResponse.data.events);
+			setSchedules(scheduleResponse.data.schedules);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
 	};
 	return (
 		<div className="flex flex-col lg:flex-row gap-2 w-screen md:w-full">
@@ -42,7 +52,7 @@ export default function Schedules() {
 					<h1 className=" font-extrabold text-3xl">Schedules</h1>
 					<p>List of Schedules</p>
 				</div>
-				<CalendarSchedule />
+				<CalendarSchedule employees={employees} events={events} schedules={schedules} loading={loading} />
 			</div>
 		</div>
 	);
