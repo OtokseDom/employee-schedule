@@ -29,7 +29,6 @@ const formSchema = z.object({
 });
 
 export default function CalendarSchedule({ employees, events, schedules, loading }) {
-	// TODO: calendar will show schedule of selected employee
 	// TODO: opening modal not getting schdule data
 
 	const [currentMonth, setCurrentMonth] = useState(new Date());

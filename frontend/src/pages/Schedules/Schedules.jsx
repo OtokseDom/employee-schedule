@@ -10,13 +10,12 @@ export default function Schedules() {
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [selectedEmployee, setSelectedEmployee] = useState(employees[0]?.id);
 
 	useEffect(() => {
 		fetchData();
-		// if (alert.session !== 0) {
-		// 	showAlert();
-		// }
-	}, []);
+	}, [selectedEmployee]);
+
 	const fetchData = async () => {
 		setLoading(true);
 		try {
@@ -24,13 +23,13 @@ export default function Schedules() {
 			const [employeeResponse, eventResponse, scheduleResponse] = await Promise.all([
 				axiosClient.get("/employee"),
 				axiosClient.get("/event"),
-				axiosClient.get("/schedule"),
+				axiosClient.get(`/schedule-by-employee/${selectedEmployee}`),
 			]);
 
 			// Set the data after both requests succeed
 			setEmployees(employeeResponse.data.employees);
 			setEvents(eventResponse.data.events);
-			setSchedules(scheduleResponse.data.schedules);
+			setSchedules(scheduleResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -45,7 +44,7 @@ export default function Schedules() {
 					<h1 className=" font-extrabold text-3xl">Employees</h1>
 					<p>List of all employees</p>
 				</div>
-				<DataTable columns={columns} data={employees} loading={loading} />
+				<DataTable columns={columns} data={employees} loading={loading} setSelectedEmployee={setSelectedEmployee} sample={employees[0]?.id} />
 			</div>
 			<div className="lg:order-2 order-1 w-screen md:w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10">
 				<div className="flex flex-col ml-4 md:ml-0">

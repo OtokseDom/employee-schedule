@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
 use App\Http\Resources\ScheduleResource;
+use App\Http\Resources\ScheduleByEmployeeResource;
 use App\Models\Schedule;
 
 class ScheduleController extends Controller
@@ -45,5 +46,15 @@ class ScheduleController extends Controller
     {
         $schedule->delete();
         return response()->json(['message' => 'Schedule successfully deleted'], 200);
+    }
+
+    public function getScheduleByEmployee($employeeId)
+    {
+        $schedules = Schedule::where('employee_id', $employeeId)
+            ->with(['employee:id,name,position,dob', 'event:id,name,description,color'])
+            ->orderBy("id", "ASC")
+            ->get();
+
+        return ScheduleResource::collection($schedules);
     }
 }

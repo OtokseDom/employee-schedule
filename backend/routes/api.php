@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* ---------------------------- Master Relations ---------------------------- */
     Route::apiResource('/product-units', ProductUnitController::class);
+    Route::get('/schedule-by-employee/{employeeId}', [ScheduleController::class, 'getScheduleByEmployee']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);

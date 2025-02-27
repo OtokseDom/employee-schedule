@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, loading }) {
+export function DataTable({ columns, data, loading, setSelectedEmployee, sample }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -33,6 +33,15 @@ export function DataTable({ columns, data, loading }) {
 			columnVisibility,
 		},
 	});
+	useEffect(() => {
+		if (sample) {
+			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === sample);
+			if (defaultRow) {
+				defaultRow.toggleSelected();
+				setSelectedEmployee(defaultRow.original.id);
+			}
+		}
+	}, [sample]);
 
 	return (
 		<div className="w-full">
@@ -100,7 +109,18 @@ export function DataTable({ columns, data, loading }) {
 					<TableBody>
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+								<TableRow
+									key={row.id}
+									data-state={row.getIsSelected() && "selected"}
+									// to select only 1 row at a time
+									onClick={() => {
+										if (!row.getIsSelected(true)) {
+											table.toggleAllRowsSelected(false);
+											row.toggleSelected();
+										}
+										setSelectedEmployee(row.original.id);
+									}}
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
