@@ -6,7 +6,6 @@ import Calendar from "@/components/schedule/calendar";
 import CalendarSchedule from "@/components/schedule/calendar";
 import { columnsEvent } from "./columns-event";
 import { DataTableEvents } from "./data-table-events";
-// TODO: Add status field in schedule form
 export default function Schedules() {
 	const [employees, setEmployees] = useState([]);
 	const [events, setEvents] = useState([]);

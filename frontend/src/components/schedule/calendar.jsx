@@ -35,13 +35,15 @@ const formSchema = z.object({
 	event_id: z.coerce.number(),
 	shift_start: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "Invalid time format (HH:MM:SS)"),
 	shift_end: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "Invalid time format (HH:MM:SS)"),
+	status: z.string(),
 });
 
 export default function CalendarSchedule({ employees, events, schedules, setSchedules, loading, setLoading, selectedEmployee }) {
 	// TODO: opening modal not getting schdule data
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(null);
-	const [modalData, setModalData] = useState({ event: 0, shift_start: undefined, shift_end: undefined });
+	const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+	const [modalData, setModalData] = useState({ event: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
 	const [hoveredEvent, setHoveredEvent] = useState(null);
 	const startDate = startOfWeek(startOfMonth(currentMonth));
 	const endDate = endOfWeek(endOfMonth(currentMonth));
@@ -63,17 +65,19 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 	const openModal = (date) => {
 		const schedule = schedules.find((schedule) => format(schedule.date, "yyyy-MM-dd") === date);
 		setSelectedDate(date);
+		setSelectedScheduleId(schedule?.id);
 		setModalData(
 			schedule
-				? { event_id: schedule?.event_id, shift_start: schedule?.shift_start, shift_end: schedule?.shift_end }
+				? { event_id: schedule?.event_id, shift_start: schedule?.shift_start, shift_end: schedule?.shift_end, status: schedule?.status }
 				: { event_id: 0, shift_start: undefined, shift_end: undefined }
 		);
 	};
 
 	const closeModal = () => {
+		setSelectedScheduleId(null);
 		setSelectedDate(null);
 		setMessage({ code: null, message: null });
-		setModalData({ event_id: 0, shift_start: undefined, shift_end: undefined });
+		setModalData({ event_id: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
 	};
 
 	// Calendar Input
@@ -91,6 +95,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 			event_id: modalData?.event_id || 0,
 			shift_start: modalData?.shift_start || undefined,
 			shift_end: modalData?.shift_end || undefined,
+			status: modalData?.status || "Select a status",
 		});
 	}, [modalData, form]);
 
@@ -110,11 +115,11 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 
 	const handleSubmit = async (form) => {
 		setLoading(true);
-		const newForm = { ...form, employee_id: selectedEmployee?.id, date: selectedDate, status: "Pending" };
+		const newForm = { ...form, employee_id: selectedEmployee?.id, date: selectedDate };
 		try {
 			let scheduleResponse;
-			if (modalData?.event_id > 0) {
-				scheduleResponse = await axiosClient.put(`/schedule/${selectedEmployee?.id}`, newForm);
+			if (selectedScheduleId) {
+				scheduleResponse = await axiosClient.put(`/schedule/${selectedScheduleId}`, newForm);
 				const updatedSchedule = scheduleResponse.data;
 				// Update one object from schedules array based on the updated schedule
 				const updatedSchedules = schedules.map((schedule) => (schedule.id === updatedSchedule.id ? updatedSchedule : schedule));
@@ -126,10 +131,33 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 				// Add one object from schedules array based on the added schedule
 				const updatedSchedules = [...schedules, updatedSchedule];
 				setSchedules(updatedSchedules);
+				setSelectedScheduleId(updatedSchedule?.id);
+				// set modal data to be able to update it after adding
+				setModalData(newForm);
 				setMessage({ message: "Successfully Added!" });
 			}
 		} catch (e) {
-			setMessage({ code: e.status, message: e.response.data.message });
+			setMessage({ code: e.status, message: e.response?.data?.message });
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+		// Reset the message after 5 seconds
+		setTimeout(() => {
+			setMessage({ code: null, message: null });
+		}, 5000); // 5000 milliseconds = 5 seconds
+	};
+	const handleDelete = async () => {
+		setLoading(true);
+		try {
+			let scheduleResponse;
+			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`);
+			setSchedules(scheduleResponse.data);
+			setMessage({ message: "Successfully Deleted!" });
+			setSelectedScheduleId(null);
+		} catch (e) {
+			setMessage({ code: e.status, message: e.response?.data?.message });
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
@@ -399,7 +427,40 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 										);
 									}}
 								/>
-								{message.code == 422 ? (
+								<FormField
+									control={form.control}
+									name="status"
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>Status</FormLabel>
+												<Select onValueChange={field.onChange} defaultValue={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder="Select a Status">{field.value ?? "Select a status"}</SelectValue>
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														<SelectItem value="Pending" className="text-yellow-300">
+															Pending
+														</SelectItem>
+														<SelectItem value="In Progress" className="text-blue-300">
+															In Progress
+														</SelectItem>
+														<SelectItem value="Completed" className="text-green-300">
+															Completed
+														</SelectItem>
+														<SelectItem value="Cancelled" className="text-red-300">
+															Cancelled
+														</SelectItem>
+													</SelectContent>
+												</Select>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								{message.code == 422 || message.code == 400 ? (
 									<div className="flex justify-center text-red-500">{message.message}</div>
 								) : (
 									<div className="flex justify-center text-green-500">{message.message}</div>
@@ -409,9 +470,16 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 									<Button onClick={closeModal} type="button" variant="secondary">
 										Cancel
 									</Button>
-									<Button type="submit" disabled={loading}>
-										{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
-									</Button>
+									<div className="flex gap-2">
+										{selectedScheduleId && (
+											<Button onClick={handleDelete} type="button" variant="destructive">
+												Delete
+											</Button>
+										)}
+										<Button type="submit" disabled={loading}>
+											{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+										</Button>
+									</div>
 								</div>
 							</form>
 						</Form>
