@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,10 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EmployeeForm from "./EmployeeForm";
+import EventForm from "./EventForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, loading, setSelectedEmployee, sample }) {
+export function DataTableEvents({ columns, data, loading }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -33,15 +33,6 @@ export function DataTable({ columns, data, loading, setSelectedEmployee, sample 
 			columnVisibility,
 		},
 	});
-	useEffect(() => {
-		if (sample) {
-			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === sample);
-			if (defaultRow) {
-				defaultRow.toggleSelected();
-				setSelectedEmployee(defaultRow.original);
-			}
-		}
-	}, [sample]);
 
 	return (
 		<div className="w-full">
@@ -55,13 +46,13 @@ export function DataTable({ columns, data, loading, setSelectedEmployee, sample 
 				<div className="flex gap-2 ml-auto">
 					<Sheet modal={false}>
 						<SheetTrigger asChild>
-							<Button variant="">Add Employee</Button>
+							<Button variant="">Add Event</Button>
 						</SheetTrigger>
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>Add Employee</SheetTitle>
+								<SheetTitle>Add Event</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm />
+							<EventForm />
 						</SheetContent>
 					</Sheet>
 					{/* <Link to="/products/add">
@@ -114,11 +105,10 @@ export function DataTable({ columns, data, loading, setSelectedEmployee, sample 
 									data-state={row.getIsSelected() && "selected"}
 									// to select only 1 row at a time
 									onClick={() => {
-										if (!row.getIsSelected(true)) {
-											table.toggleAllRowsSelected(false);
-											row.toggleSelected();
-										}
-										setSelectedEmployee(row.original);
+										// if (!row.getIsSelected(true)) {
+										// 	table.toggleAllRowsSelected(false);
+										// 	row.toggleSelected();
+										// }
 									}}
 								>
 									{row.getVisibleCells().map((cell) => (

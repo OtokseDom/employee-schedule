@@ -9,6 +9,7 @@ import { SidebarContextProvider } from "./contexts/SidebarContextProvider";
 import { ScrollContextProvider } from "./contexts/ScrollContextProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+	// Strict mode rerenders everything twice to detect side effects
 	<React.StrictMode>
 		<AuthContextProvider>
 			<SidebarContextProvider>

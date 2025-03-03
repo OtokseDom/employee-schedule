@@ -1,8 +1,10 @@
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
 export default function CalendarCell({ color, loading, formattedSchedules, date, hoveredEvent, setHoveredEvent, openModal }) {
+	const shiftStart = formattedSchedules?.shift_start ? parse(formattedSchedules.shift_start, "HH:mm:ss", new Date()) : null;
+	const shiftEnd = formattedSchedules?.shift_end ? parse(formattedSchedules.shift_end, "HH:mm:ss", new Date()) : null;
 	return color == "yellow" ? (
 		<div
 			className={`bg-yellow-100 text-yellow-900
@@ -12,30 +14,29 @@ export default function CalendarCell({ color, loading, formattedSchedules, date,
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
 			{loading ? (
-				<div className="flex flex-col space-y-3 w-full">
-					<div className="flex flex-row justify-between">
-						<Skeleton className="h-4 w-1/5" />
-						<Skeleton className="h-4 w-3/5" />
+				<div className="flex flex-col space-y-1 md:space-y-3 w-full">
+					<div className="flex flex-row justify-between gap-1">
+						<Skeleton className="h-4 w-full md:w-1/5" />
+						<Skeleton className="h-4 w-full md:w-3/5" />
 					</div>
-					<Skeleton className="h-4 w-2/5 md:w-full" />
-					<Skeleton className="h-4 w-2/5 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
 				</div>
 			) : (
 				<>
 					<div className="text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.employee?.name}</span>: {formattedSchedules?.shift_start} -{" "}
-							{formattedSchedules?.shift_end}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>:{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
 						<div
 							className={`bg-yellow-100 text-yellow-900 absolute left-0 top-full mt-1 bg-foreground text-background shadow-lg p-2 text-xs w-40 z-10 rounded`}
 						>
-							<strong>{formattedSchedules?.employee?.name}</strong>: {formattedSchedules?.event?.name}
+							<strong>{formattedSchedules?.event?.name}</strong>
 							<br />
-							{formattedSchedules?.shift_start} - {formattedSchedules?.shift_end}
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 							<br />({formattedSchedules?.event?.description})
 						</div>
 					)}
@@ -51,30 +52,30 @@ export default function CalendarCell({ color, loading, formattedSchedules, date,
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
 			{loading ? (
-				<div className="flex flex-col space-y-3 w-full">
-					<div className="flex flex-row justify-between">
-						<Skeleton className="h-4 w-1/5" />
-						<Skeleton className="h-4 w-3/5" />
+				<div className="flex flex-col space-y-1 md:space-y-3 w-full">
+					<div className="flex flex-row justify-between gap-1">
+						<Skeleton className="h-4 w-full md:w-1/5" />
+						<Skeleton className="h-4 w-full md:w-3/5" />
 					</div>
-					<Skeleton className="h-4 w-2/5 md:w-full" />
-					<Skeleton className="h-4 w-2/5 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
 				</div>
 			) : (
 				<>
 					<div className="text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.employee?.name}</span>: {formattedSchedules?.shift_start} -{" "}
-							{formattedSchedules?.shift_end}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
+							{format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
 						<div
 							className={`bg-red-100 text-red-900 absolute left-0 top-full mt-1 bg-foreground text-background shadow-lg p-2 text-xs w-40 z-10 rounded`}
 						>
-							<strong>{formattedSchedules?.employee?.name}</strong>: {formattedSchedules?.event?.name}
+							<strong>{formattedSchedules?.event?.name}</strong>
 							<br />
-							{formattedSchedules?.shift_start} - {formattedSchedules?.shift_end}
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 							<br />({formattedSchedules?.event?.description})
 						</div>
 					)}
@@ -90,30 +91,30 @@ export default function CalendarCell({ color, loading, formattedSchedules, date,
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
 			{loading ? (
-				<div className="flex flex-col space-y-3 w-full">
-					<div className="flex flex-row justify-between">
-						<Skeleton className="h-4 w-1/5" />
-						<Skeleton className="h-4 w-3/5" />
+				<div className="flex flex-col space-y-1 md:space-y-3 w-full">
+					<div className="flex flex-row justify-between gap-1">
+						<Skeleton className="h-4 w-full md:w-1/5" />
+						<Skeleton className="h-4 w-full md:w-3/5" />
 					</div>
-					<Skeleton className="h-4 w-2/5 md:w-full" />
-					<Skeleton className="h-4 w-2/5 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
 				</div>
 			) : (
 				<>
 					<div className="text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.employee?.name}</span>: {formattedSchedules?.shift_start} -{" "}
-							{formattedSchedules?.shift_end}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
+							{format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
 						<div
 							className={`bg-green-100 text-green-900 absolute left-0 top-full mt-1 bg-foreground text-background shadow-lg p-2 text-xs w-40 z-10 rounded`}
 						>
-							<strong>{formattedSchedules?.employee?.name}</strong>: {formattedSchedules?.event?.name}
+							<strong>{formattedSchedules?.event?.name}</strong>
 							<br />
-							{formattedSchedules?.shift_start} - {formattedSchedules?.shift_end}
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 							<br />({formattedSchedules?.event?.description})
 						</div>
 					)}
@@ -129,30 +130,30 @@ export default function CalendarCell({ color, loading, formattedSchedules, date,
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
 			{loading ? (
-				<div className="flex flex-col space-y-3 w-full">
-					<div className="flex flex-row justify-between">
-						<Skeleton className="h-4 w-1/5" />
-						<Skeleton className="h-4 w-3/5" />
+				<div className="flex flex-col space-y-1 md:space-y-3 w-full">
+					<div className="flex flex-row justify-between gap-1">
+						<Skeleton className="h-4 w-full md:w-1/5" />
+						<Skeleton className="h-4 w-full md:w-3/5" />
 					</div>
-					<Skeleton className="h-4 w-2/5 md:w-full" />
-					<Skeleton className="h-4 w-2/5 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
 				</div>
 			) : (
 				<>
 					<div className="text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.employee?.name}</span>: {formattedSchedules?.shift_start} -{" "}
-							{formattedSchedules?.shift_end}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
+							{format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
 						<div
 							className={`bg-blue-100 text-blue-900 absolute left-0 top-full mt-1 bg-foreground text-background shadow-lg p-2 text-xs w-40 z-10 rounded`}
 						>
-							<strong>{formattedSchedules?.employee?.name}</strong>: {formattedSchedules?.event?.name}
+							<strong>{formattedSchedules?.event?.name}</strong>
 							<br />
-							{formattedSchedules?.shift_start} - {formattedSchedules?.shift_end}
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 							<br />({formattedSchedules?.event?.description})
 						</div>
 					)}
@@ -167,28 +168,28 @@ export default function CalendarCell({ color, loading, formattedSchedules, date,
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
 			{loading ? (
-				<div className="flex flex-col space-y-3 w-full">
-					<div className="flex flex-row justify-between">
-						<Skeleton className="h-4 w-1/5" />
-						<Skeleton className="h-4 w-3/5" />
+				<div className="flex flex-col space-y-1 md:space-y-3 w-full">
+					<div className="flex flex-row justify-between gap-1">
+						<Skeleton className="h-4 w-full md:w-1/5" />
+						<Skeleton className="h-4 w-full md:w-3/5" />
 					</div>
-					<Skeleton className="h-4 w-2/5 md:w-full" />
-					<Skeleton className="h-4 w-2/5 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
+					<Skeleton className="h-4 md:w-full" />
 				</div>
 			) : (
 				<>
 					<div className="text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.employee?.name}</span>: {formattedSchedules?.shift_start} -{" "}
-							{formattedSchedules?.shift_end}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
+							{format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
 						<div className={` absolute left-0 top-full mt-1 bg-foreground text-background shadow-lg p-2 text-xs w-40 z-10 rounded`}>
-							<strong>{formattedSchedules?.employee?.name}</strong>: {formattedSchedules?.event?.name}
+							<strong>{formattedSchedules?.event?.name}</strong>
 							<br />
-							{formattedSchedules?.shift_start} - {formattedSchedules?.shift_end}
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 							<br />({formattedSchedules?.event?.description})
 						</div>
 					)}

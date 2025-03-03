@@ -37,7 +37,6 @@ class ScheduleResource extends JsonResource
                 return [
                     'name' => $this->event->name,
                     'description' => $this->event->description,
-                    'color' => $this->event->color,
                 ];
             }),
         ];

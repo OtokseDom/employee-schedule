@@ -14,7 +14,7 @@ class ScheduleController extends Controller
     public function index()
     {
         // $schedules = Schedule::orderBy("id", "DESC")->paginate(10);
-        $schedules = Schedule::with(['employee:id,name,position,dob', 'event:id,name,description,color'])->orderBy("id", "DESC")->get();
+        $schedules = Schedule::with(['employee:id,name,position,dob', 'event:id,name,description'])->orderBy("id", "DESC")->get();
 
         return response(compact('schedules'));
     }
@@ -23,7 +23,11 @@ class ScheduleController extends Controller
     {
         $data = $request->validated();
 
-        $schedules = Schedule::create($data);
+        $schedule = Schedule::create($data);
+        // Fetch the schedule with its relations
+        $schedules = Schedule::with(['employee:id,name,position,dob', 'event:id,name,description'])
+            ->findOrFail($schedule->id);
+
         return response(new ScheduleResource($schedules), 201);
     }
 
@@ -38,8 +42,11 @@ class ScheduleController extends Controller
     {
         $data = $request->validated();
         $schedule->update($data);
+        // Fetch the updated schedule again with the related models
+        $updatedSchedule = Schedule::with(['employee:id,name,position,dob', 'event:id,name,description'])
+            ->findOrFail($schedule->id); // Get the schedule by id to include the relations
 
-        return new ScheduleResource($schedule);
+        return response(new ScheduleResource($updatedSchedule), 200);
     }
 
     public function destroy(Schedule $schedule)
@@ -51,7 +58,7 @@ class ScheduleController extends Controller
     public function getScheduleByEmployee($employeeId)
     {
         $schedules = Schedule::where('employee_id', $employeeId)
-            ->with(['employee:id,name,position,dob', 'event:id,name,description,color'])
+            ->with(['employee:id,name,position,dob', 'event:id,name,description'])
             ->orderBy("id", "ASC")
             ->get();
 

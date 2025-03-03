@@ -38,7 +38,6 @@ class EventFactory extends Factory
         return [
             'name' => fake()->randomElement($tasks),
             'description' => fake()->sentence(),
-            'color' => fake()->colorName()
         ];
     }
 }

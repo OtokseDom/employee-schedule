@@ -17,9 +17,9 @@ class UserSeeder extends Seeder
 
         \App\Models\User::factory()->create([
             'name' => "Dominic Escoto",
-            'email' => "imjohndominic08@gmail.com",
+            'email' => "dom@gmail.com",
             'email_verified_at' => now(),
-            'password' => 'admin123', // password
+            'password' => '1', // password
             'remember_token' => Str::random(10),
         ]);
     }
