@@ -50,7 +50,7 @@ export const columnsEvent = ({ handleDelete }) => [
 						{/* <DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>Copy payment ID</DropdownMenuItem>
 						<DropdownMenuSeparator /> */}
-						<DropdownMenuItem>Update Employee</DropdownMenuItem>
+						<DropdownMenuItem>Update Event</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleDelete("event", event.id)}>Delete Event</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

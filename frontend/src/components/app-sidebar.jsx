@@ -22,11 +22,11 @@ import axiosClient from "@/axios.client";
 
 // Menu items.
 const items = [
-	{
-		title: "Dashboard",
-		url: "/dashboard",
-		icon: Home,
-	},
+	// {
+	// 	title: "Dashboard",
+	// 	url: "/dashboard",
+	// 	icon: Home,
+	// },
 	{
 		title: "Schedules",
 		url: "/schedule",

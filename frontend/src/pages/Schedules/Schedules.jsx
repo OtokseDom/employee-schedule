@@ -41,7 +41,8 @@ export default function Schedules() {
 			setLoading(false);
 		}
 	};
-
+	// TODO: Add validation before deletion of event and employee
+	// TODO: delete schedule reselects employee which loads different calendar schedule
 	const handleDelete = async (table, id) => {
 		setLoading(true);
 		try {

@@ -28,6 +28,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "../ui/label";
 import CalendarCell from "./CalendarCell";
 import axiosClient from "@/axios.client";
+import { useToast } from "@/contexts/ToastContextProvider";
 // import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -45,10 +46,11 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 	const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 	const [modalData, setModalData] = useState({ event: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
 	const [hoveredEvent, setHoveredEvent] = useState(null);
+	const showToast = useToast();
+
 	const startDate = startOfWeek(startOfMonth(currentMonth));
 	const endDate = endOfWeek(endOfMonth(currentMonth));
 	const days = [];
-	const [message, setMessage] = useState({ code: null, message: null });
 	let day = startDate;
 	while (day <= endDate) {
 		days.push(day);
@@ -76,7 +78,6 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 	const closeModal = () => {
 		setSelectedScheduleId(null);
 		setSelectedDate(null);
-		setMessage({ code: null, message: null });
 		setModalData({ event_id: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
 	};
 
@@ -124,7 +125,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 				// Update one object from schedules array based on the updated schedule
 				const updatedSchedules = schedules.map((schedule) => (schedule.id === updatedSchedule.id ? updatedSchedule : schedule));
 				setSchedules(updatedSchedules);
-				setMessage({ message: "Successfully Updated!" });
+				showToast("Success!", "Schedule updated.", 3000);
 			} else {
 				scheduleResponse = await axiosClient.post(`/schedule`, newForm);
 				const updatedSchedule = scheduleResponse.data;
@@ -134,19 +135,15 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 				setSelectedScheduleId(updatedSchedule?.id);
 				// set modal data to be able to update it after adding
 				setModalData(newForm);
-				setMessage({ message: "Successfully Added!" });
+				showToast("Success!", "Schedule added.", 3000);
 			}
 		} catch (e) {
-			setMessage({ code: e.status, message: e.response?.data?.message });
+			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
 		}
-		// Reset the message after 5 seconds
-		setTimeout(() => {
-			setMessage({ code: null, message: null });
-		}, 5000); // 5000 milliseconds = 5 seconds
 	};
 	const handleDelete = async () => {
 		setLoading(true);
@@ -154,19 +151,15 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 			let scheduleResponse;
 			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`);
 			setSchedules(scheduleResponse.data);
-			setMessage({ message: "Successfully Deleted!" });
+			showToast("Success!", "Schedule deleted.", 3000);
 			setSelectedScheduleId(null);
 		} catch (e) {
-			setMessage({ code: e.status, message: e.response?.data?.message });
+			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
 		}
-		// Reset the message after 5 seconds
-		setTimeout(() => {
-			setMessage({ code: null, message: null });
-		}, 5000); // 5000 milliseconds = 5 seconds
 	};
 
 	return (
@@ -460,24 +453,19 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 										);
 									}}
 								/>
-								{message.code == 422 || message.code == 400 ? (
-									<div className="flex justify-center text-red-500">{message.message}</div>
-								) : (
-									<div className="flex justify-center text-green-500">{message.message}</div>
-								)}
-
 								<div className="flex justify-between">
 									<Button onClick={closeModal} type="button" variant="secondary">
 										Cancel
 									</Button>
 									<div className="flex gap-2">
+										{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}
 										{selectedScheduleId && (
-											<Button onClick={handleDelete} type="button" variant="destructive">
+											<Button onClick={handleDelete} type="button" variant="destructive" disabled={loading}>
 												Delete
 											</Button>
 										)}
 										<Button type="submit" disabled={loading}>
-											{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+											Submit
 										</Button>
 									</div>
 								</div>
