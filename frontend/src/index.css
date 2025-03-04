@@ -238,6 +238,22 @@ table > tbody > tr > td {
 	}
 }
 
+/* toast styles.css */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateX(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.animate-fadeIn {
+	animation: fadeIn 0.3s ease-out;
+}
+
 @layer base {
 	.light {
 		--background: 0 0% 100%;

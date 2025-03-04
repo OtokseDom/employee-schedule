@@ -1,12 +1,14 @@
 import axiosClient from "@/axios.client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import Calendar from "@/components/schedule/calendar";
 import CalendarSchedule from "@/components/schedule/calendar";
 import { columnsEvent } from "./columns-event";
 import { DataTableEvents } from "./data-table-events";
+import { useToast } from "@/contexts/ToastContextProvider";
+
 export default function Schedules() {
+	const showToast = useToast();
 	const [employees, setEmployees] = useState([]);
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
@@ -67,7 +69,17 @@ export default function Schedules() {
 						</div>
 					)}
 					<div className={`${selectedTab == 2 && "hidden"}`}>
-						<DataTable columns={columns} data={employees} loading={loading} setSelectedEmployee={setSelectedEmployee} sample={employees[0]?.id} />
+						<button onClick={() => showToast("Success!", "Your action was completed.", 3000)} className="px-4 py-2 bg-blue-500 text-white rounded">
+							Show Toast (5s)
+						</button>
+						<DataTable
+							columns={columns}
+							data={employees}
+							setEmployees={setEmployees}
+							loading={loading}
+							setSelectedEmployee={setSelectedEmployee}
+							sample={employees[0]?.id}
+						/>
 					</div>
 					<div className={`${selectedTab == 1 && "hidden"}`}>
 						<DataTableEvents columns={columnsEvent} data={events} loading={loading} />

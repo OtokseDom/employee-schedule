@@ -7,17 +7,23 @@ import { AuthContextProvider } from "./contexts/AuthContextProvider";
 import { ThemeProvider } from "@material-tailwind/react";
 import { SidebarContextProvider } from "./contexts/SidebarContextProvider";
 import { ScrollContextProvider } from "./contexts/ScrollContextProvider";
+import { ToastProvider } from "@radix-ui/react-toast";
+import { ToastContextProvider } from "./contexts/ToastContextProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	// Strict mode rerenders everything twice to detect side effects
 	<React.StrictMode>
 		<AuthContextProvider>
 			<SidebarContextProvider>
-				<ScrollContextProvider>
-					<ThemeProvider>
-						<RouterProvider router={router} />
-					</ThemeProvider>
-				</ScrollContextProvider>
+				<ToastProvider swipeDirection="right">
+					<ToastContextProvider>
+						<ScrollContextProvider>
+							<ThemeProvider>
+								<RouterProvider router={router} />
+							</ThemeProvider>
+						</ScrollContextProvider>
+					</ToastContextProvider>
+				</ToastProvider>
 			</SidebarContextProvider>
 		</AuthContextProvider>
 	</React.StrictMode>

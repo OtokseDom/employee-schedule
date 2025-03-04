@@ -26,7 +26,7 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EmployeeForm() {
+export default function EmployeeForm({ setEmployees }) {
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
 	const [year, setYear] = useState(date ? date.getFullYear() : new Date().getFullYear());
@@ -84,7 +84,24 @@ export default function EmployeeForm() {
 		},
 	});
 
-	const handleSubmit = (form) => {
+	const handleSubmit = async (form) => {
+		setLoading(true);
+		try {
+			const employeeResponse = await axiosClient.post(`/employee`, form).data;
+			const updatedSchedule = scheduleResponse.data;
+			setSchedules(updatedSchedules);
+			setMessage({ message: "Successfully Updated!" });
+		} catch (e) {
+			setMessage({ code: e.status, message: e.response?.data?.message });
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+		// Reset the message after 5 seconds
+		setTimeout(() => {
+			setMessage({ code: null, message: null });
+		}, 5000); // 5000 milliseconds = 5 seconds
 		console.log({ ...form });
 	};
 	return (

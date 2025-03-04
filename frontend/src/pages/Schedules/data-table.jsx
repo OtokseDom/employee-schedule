@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, loading, setSelectedEmployee, sample }) {
+export function DataTable({ columns, data, setEmployees, loading, setSelectedEmployee, sample }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -61,7 +61,7 @@ export function DataTable({ columns, data, loading, setSelectedEmployee, sample 
 							<SheetHeader>
 								<SheetTitle>Add Employee</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm />
+							<EmployeeForm setEmployees={setEmployees} />
 						</SheetContent>
 					</Sheet>
 					{/* <Link to="/products/add">
