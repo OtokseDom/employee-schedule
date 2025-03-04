@@ -6,6 +6,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import axiosClient from "@/axios.client";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/contexts/ToastContextProvider";
 
 const formSchema = z.object({
 	name: z.string({
@@ -16,7 +19,8 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EventForm() {
+export default function EventForm({ data, setEvents, loading, setLoading, setIsOpen }) {
+	const showToast = useToast();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -25,8 +29,23 @@ export default function EventForm() {
 		},
 	});
 
-	const handleSubmit = (form) => {
-		console.log({ ...form });
+	const handleSubmit = async (form) => {
+		setLoading(true);
+		try {
+			const eventResponse = await axiosClient.post(`/event`, form);
+			const addedEvent = eventResponse.data;
+			// Insert added event in events array
+			const updatedEvents = [addedEvent, ...data];
+			setEvents(updatedEvents);
+			showToast("Success!", "Event added.", 3000);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000);
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+			setIsOpen(false);
+		}
 	};
 	return (
 		<Form {...form}>
@@ -61,7 +80,9 @@ export default function EventForm() {
 						);
 					}}
 				/>
-				<Button type="submit">Submit</Button>
+				<Button type="submit" disabled={loading}>
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+				</Button>
 			</form>
 		</Form>
 	);

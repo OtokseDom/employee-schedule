@@ -13,7 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, setEmployees, loading, setSelectedEmployee, sample }) {
+export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, sample }) {
+	const [isOpen, setIsOpen] = useState(false);
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -53,7 +54,7 @@ export function DataTable({ columns, data, setEmployees, loading, setSelectedEmp
 					className="max-w-sm"
 				/>
 				<div className="flex gap-2 ml-auto">
-					<Sheet modal={false}>
+					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>
 							<Button variant="">Add Employee</Button>
 						</SheetTrigger>
@@ -61,12 +62,9 @@ export function DataTable({ columns, data, setEmployees, loading, setSelectedEmp
 							<SheetHeader>
 								<SheetTitle>Add Employee</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm setEmployees={setEmployees} />
+							<EmployeeForm data={data} setEmployees={setEmployees} loading={loading} setLoading={setLoading} setIsOpen={setIsOpen} />
 						</SheetContent>
 					</Sheet>
-					{/* <Link to="/products/add">
-						<Button variant="">Add Product</Button>
-					</Link> */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline">Columns</Button>

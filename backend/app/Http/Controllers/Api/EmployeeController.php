@@ -41,6 +41,8 @@ class EmployeeController extends Controller
     public function destroy(Employee $employee)
     {
         $employee->delete();
-        return response()->json(['message' => 'Employee successfully deleted'], 200);
+        // Fetch the updated employee again
+        $employees = Employee::orderBy("id", "DESC")->get();
+        return response(EmployeeResource::collection($employees), 200);
     }
 }

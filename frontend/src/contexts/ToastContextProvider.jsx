@@ -21,7 +21,7 @@ export function ToastContextProvider({ children }) {
 			{children}
 			<Toast.Provider swipeDirection="right">
 				<Toast.Root
-					className="border border-foreground bg-background text-foreground w-64 p-4 rounded shadow-lg fixed top-4 right-4 animate-fadeIn"
+					className="border border-foreground bg-background text-foreground w-64 p-4 rounded shadow-lg fixed top-4 right-4 animate-fadeIn	z-[999]"
 					open={toast.open}
 					onOpenChange={(open) => setToast((prev) => ({ ...prev, open }))}
 					duration={toast.duration}

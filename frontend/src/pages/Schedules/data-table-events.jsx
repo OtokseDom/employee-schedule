@@ -13,7 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EventForm from "./EventForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTableEvents({ columns, data, loading }) {
+export function DataTableEvents({ columns, data, setEvents, loading, setLoading }) {
+	const [isOpen, setIsOpen] = useState(false);
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -44,7 +45,7 @@ export function DataTableEvents({ columns, data, loading }) {
 					className="max-w-sm"
 				/>
 				<div className="flex gap-2 ml-auto">
-					<Sheet modal={false}>
+					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>
 							<Button variant="">Add Event</Button>
 						</SheetTrigger>
@@ -52,7 +53,7 @@ export function DataTableEvents({ columns, data, loading }) {
 							<SheetHeader>
 								<SheetTitle>Add Event</SheetTitle>
 							</SheetHeader>
-							<EventForm />
+							<EventForm data={data} setEvents={setEvents} loading={loading} setLoading={setLoading} setIsOpen={setIsOpen} />
 						</SheetContent>
 					</Sheet>
 					{/* <Link to="/products/add">

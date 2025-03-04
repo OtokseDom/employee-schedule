@@ -41,6 +41,8 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         $event->delete();
-        return response()->json(['message' => 'Event successfully deleted'], 200);
+        // Fetch the updated event again
+        $events = Event::orderBy("name", "ASC")->get();
+        return response(EventResource::collection($events), 200);
     }
 }

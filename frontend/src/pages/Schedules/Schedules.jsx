@@ -13,7 +13,7 @@ export default function Schedules() {
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState(employees[0]);
+	const [selectedEmployee, setSelectedEmployee] = useState(employees[0] || null);
 	const [selectedTab, setSelectedTab] = useState(1);
 
 	useEffect(() => {
@@ -35,6 +35,27 @@ export default function Schedules() {
 			setEvents(eventResponse.data.events);
 			setSchedules(scheduleResponse.data.data);
 		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+	};
+
+	const handleDelete = async (table, id) => {
+		setLoading(true);
+		try {
+			if (table == "employee") {
+				const employeeResponse = await axiosClient.delete(`/employee/${id}`);
+				setEmployees(employeeResponse.data);
+				showToast("Success!", "Employee deleted.", 3000);
+			} else if (table == "event") {
+				const eventResponse = await axiosClient.delete(`/event/${id}`);
+				setEmployees(eventResponse.data);
+				showToast("Success!", "Event deleted.", 3000);
+			}
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
@@ -69,20 +90,24 @@ export default function Schedules() {
 						</div>
 					)}
 					<div className={`${selectedTab == 2 && "hidden"}`}>
-						<button onClick={() => showToast("Success!", "Your action was completed.", 3000)} className="px-4 py-2 bg-blue-500 text-white rounded">
-							Show Toast (5s)
-						</button>
 						<DataTable
-							columns={columns}
+							columns={columns({ handleDelete })}
 							data={employees}
 							setEmployees={setEmployees}
 							loading={loading}
+							setLoading={setLoading}
 							setSelectedEmployee={setSelectedEmployee}
 							sample={employees[0]?.id}
 						/>
 					</div>
 					<div className={`${selectedTab == 1 && "hidden"}`}>
-						<DataTableEvents columns={columnsEvent} data={events} loading={loading} />
+						<DataTableEvents
+							columns={columnsEvent({ handleDelete })}
+							data={events}
+							setEvents={setEvents}
+							loading={loading}
+							setLoading={setLoading}
+						/>
 					</div>
 				</div>
 			</div>

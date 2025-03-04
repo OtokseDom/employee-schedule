@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Calendar
 import { format, startOfYear, endOfYear, eachMonthOfInterval } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useMemo, useState } from "react";
+import { useToast } from "@/contexts/ToastContextProvider";
+import axiosClient from "@/axios.client";
 
 const formSchema = z.object({
 	name: z.string({
@@ -26,7 +28,8 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EmployeeForm({ setEmployees }) {
+export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen }) {
+	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
 	const [year, setYear] = useState(date ? date.getFullYear() : new Date().getFullYear());
@@ -85,24 +88,26 @@ export default function EmployeeForm({ setEmployees }) {
 	});
 
 	const handleSubmit = async (form) => {
+		const formattedData = {
+			...form,
+			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
+		};
 		setLoading(true);
 		try {
-			const employeeResponse = await axiosClient.post(`/employee`, form).data;
-			const updatedSchedule = scheduleResponse.data;
-			setSchedules(updatedSchedules);
-			setMessage({ message: "Successfully Updated!" });
+			const employeeResponse = await axiosClient.post(`/employee`, formattedData);
+			const addedEmployee = employeeResponse.data;
+			// Insert added employee in employees array
+			const updatedEmployees = [addedEmployee, ...data];
+			setEmployees(updatedEmployees);
+			showToast("Success!", "Employee added.", 3000);
 		} catch (e) {
-			setMessage({ code: e.status, message: e.response?.data?.message });
+			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
+			setIsOpen(false);
 		}
-		// Reset the message after 5 seconds
-		setTimeout(() => {
-			setMessage({ code: null, message: null });
-		}, 5000); // 5000 milliseconds = 5 seconds
-		console.log({ ...form });
 	};
 	return (
 		<Form {...form}>
@@ -209,7 +214,9 @@ export default function EmployeeForm({ setEmployees }) {
 						);
 					}}
 				/>
-				<Button type="submit">Submit</Button>
+				<Button type="submit" disabled={loading}>
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+				</Button>
 			</form>
 		</Form>
 	);
