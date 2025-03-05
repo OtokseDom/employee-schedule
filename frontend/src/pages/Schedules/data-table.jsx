@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -13,10 +13,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, sample, isOpen, setIsOpen }) {
+export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, firstRow, isOpen, setIsOpen, deleted, setDeleted }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
+	const [previousRow, setPreviousRow] = useState(null);
 	const table = useReactTable({
 		data,
 		columns,
@@ -33,16 +34,29 @@ export function DataTable({ columns, data, setEmployees, loading, setLoading, se
 			columnVisibility,
 		},
 	});
+	const prevFirstRowRef = useRef(null);
+	// TODO: when first emp is selected, adding new employee removes selected indicator
+	// TODO: When any emp is selected, deeleting first emplyee removes selected indicator
 	useEffect(() => {
-		if (sample) {
-			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === sample);
-			if (defaultRow) {
-				table.toggleAllRowsSelected(false);
-				defaultRow.toggleSelected();
-				setSelectedEmployee(defaultRow.original);
-			}
+		if (firstRow !== prevFirstRowRef.current) {
+			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === firstRow);
+			console.log("first row changed");
+			setSelectedEmployee(defaultRow?.original);
+			table.toggleAllRowsSelected(false);
+			defaultRow?.toggleSelected();
+			prevFirstRowRef.current = firstRow; // Update the reference
 		}
-	}, [sample]);
+		if (deleted) {
+			console.log("deleted something");
+			const firstRow = table.getRowModel().rows[0];
+			if (firstRow) {
+				table.toggleAllRowsSelected(false);
+				firstRow.toggleSelected();
+				setSelectedEmployee(firstRow.original);
+			}
+			setDeleted(false);
+		}
+	}, [firstRow, deleted]);
 
 	return (
 		<div className="w-full">
