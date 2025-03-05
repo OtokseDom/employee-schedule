@@ -40,7 +40,6 @@ const formSchema = z.object({
 });
 
 export default function CalendarSchedule({ employees, events, schedules, setSchedules, loading, setLoading, selectedEmployee }) {
-	// TODO: opening modal not getting schdule data
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(null);
 	const [selectedScheduleId, setSelectedScheduleId] = useState(null);
@@ -149,7 +148,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 		setLoading(true);
 		try {
 			let scheduleResponse;
-			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`);
+			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedEmployee);
 			setSchedules(scheduleResponse.data);
 			showToast("Success!", "Schedule deleted.", 3000);
 			setSelectedScheduleId(null);

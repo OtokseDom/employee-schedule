@@ -13,7 +13,7 @@ export default function Schedules() {
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState(employees[0] || null);
+	const [selectedEmployee, setSelectedEmployee] = useState(employees[0]);
 	const [selectedTab, setSelectedTab] = useState(1);
 
 	useEffect(() => {

@@ -69,8 +69,13 @@ class ScheduleController extends Controller
     public function destroy(Schedule $schedule)
     {
         $schedule->delete();
-        // Fetch the updated schedule again with the related models
-        $schedules = Schedule::with(['employee:id,name,position,dob', 'event:id,name,description'])->get(); // Get the schedule by id to include the relations
+        // Fetch the updated schedule again with the related models. Select schedule of currently selected employee
+
+        $employeeId = $schedule->employee_id; // Get the employee ID before deleting
+        $schedules = Schedule::where('employee_id', $employeeId)
+            ->with(['employee:id,name,position,dob', 'event:id,name,description'])
+            ->orderBy("id", "ASC")
+            ->get();
         return response(ScheduleResource::collection($schedules), 200);
     }
 
