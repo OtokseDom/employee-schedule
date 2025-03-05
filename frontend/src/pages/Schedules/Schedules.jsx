@@ -13,8 +13,9 @@ export default function Schedules() {
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState(employees[0]);
+	const [selectedEmployee, setSelectedEmployee] = useState(employees[0] || null);
 	const [selectedTab, setSelectedTab] = useState(1);
+	const [isOpen, setIsOpen] = useState(false);
 
 	useEffect(() => {
 		fetchData();
@@ -49,6 +50,7 @@ export default function Schedules() {
 			if (table == "employee") {
 				const employeeResponse = await axiosClient.delete(`/employee/${id}`);
 				setEmployees(employeeResponse.data);
+				setSelectedEmployee(employeeResponse.data[0]);
 				showToast("Success!", "Employee deleted.", 3000);
 			} else if (table == "event") {
 				const eventResponse = await axiosClient.delete(`/event/${id}`);
@@ -92,13 +94,15 @@ export default function Schedules() {
 					)}
 					<div className={`${selectedTab == 2 && "hidden"}`}>
 						<DataTable
-							columns={columns({ handleDelete })}
+							columns={columns({ handleDelete, setIsOpen })}
 							data={employees}
 							setEmployees={setEmployees}
 							loading={loading}
 							setLoading={setLoading}
 							setSelectedEmployee={setSelectedEmployee}
 							sample={employees[0]?.id}
+							isOpen={isOpen}
+							setIsOpen={setIsOpen}
 						/>
 					</div>
 					<div className={`${selectedTab == 1 && "hidden"}`}>

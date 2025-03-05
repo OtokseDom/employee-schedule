@@ -10,7 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-export const columns = ({ handleDelete }) => [
+export const columns = ({ handleDelete, setIsOpen }) => [
 	{
 		id: "name",
 		accessorKey: "name",
@@ -50,7 +50,7 @@ export const columns = ({ handleDelete }) => [
 						{/* <DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>Copy payment ID</DropdownMenuItem>
 						<DropdownMenuSeparator /> */}
-						<DropdownMenuItem>Update Employee</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setIsOpen(true)}>Update Employee</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleDelete("employee", employee.id)}>Delete Employee</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

@@ -148,7 +148,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 		setLoading(true);
 		try {
 			let scheduleResponse;
-			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedEmployee);
+			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedEmployee?.id);
 			setSchedules(scheduleResponse.data);
 			showToast("Success!", "Schedule deleted.", 3000);
 			setSelectedScheduleId(null);

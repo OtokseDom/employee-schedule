@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/event', EventController::class);
 
     /* ---------------------------- Master Relations ---------------------------- */
-    Route::apiResource('/product-units', ProductUnitController::class);
     Route::get('/schedule-by-employee/{employeeId}', [ScheduleController::class, 'getScheduleByEmployee']);
 });
 

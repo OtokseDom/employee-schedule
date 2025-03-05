@@ -13,8 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, sample }) {
-	const [isOpen, setIsOpen] = useState(false);
+export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, sample, isOpen, setIsOpen }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -38,6 +37,7 @@ export function DataTable({ columns, data, setEmployees, loading, setLoading, se
 		if (sample) {
 			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === sample);
 			if (defaultRow) {
+				table.toggleAllRowsSelected(false);
 				defaultRow.toggleSelected();
 				setSelectedEmployee(defaultRow.original);
 			}
