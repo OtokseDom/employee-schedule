@@ -201,16 +201,22 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 							break;
 					}
 					return (
-						<CalendarCell
+						<div
 							key={index}
-							color={color}
-							loading={loading}
-							formattedSchedules={formattedSchedules}
-							hoveredEvent={hoveredEvent}
-							setHoveredEvent={setHoveredEvent}
-							openModal={openModal}
-							date={date}
-						/>
+							className={`${
+								format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "outline-dashed outline-5 outline-green-300 rounded-xl" : ""
+							}`}
+						>
+							<CalendarCell
+								color={color}
+								loading={loading}
+								formattedSchedules={formattedSchedules}
+								hoveredEvent={hoveredEvent}
+								setHoveredEvent={setHoveredEvent}
+								openModal={openModal}
+								date={date}
+							/>
+						</div>
 					);
 				})}
 			</div>
