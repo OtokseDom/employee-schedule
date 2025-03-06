@@ -16,6 +16,7 @@ export default function Schedules() {
 	const [selectedEmployee, setSelectedEmployee] = useState(employees[0] || null);
 	const [selectedTab, setSelectedTab] = useState(1);
 	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenEvent, setIsOpenEvent] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
@@ -26,6 +27,10 @@ export default function Schedules() {
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);
+
+	useEffect(() => {
+		if (!isOpenEvent) setUpdateData({});
+	}, [isOpenEvent]);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -114,15 +119,21 @@ export default function Schedules() {
 							setDeleted={setDeleted}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
+							fetchData={fetchData}
 						/>
 					</div>
 					<div className={`${selectedTab == 1 && "hidden"}`}>
 						<DataTableEvents
-							columns={columnsEvent({ handleDelete })}
+							columns={columnsEvent({ handleDelete, setIsOpenEvent, setUpdateData })}
 							data={events}
 							setEvents={setEvents}
 							loading={loading}
 							setLoading={setLoading}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
+							isOpenEvent={isOpenEvent}
+							setIsOpenEvent={setIsOpenEvent}
+							fetchData={fetchData}
 						/>
 					</div>
 				</div>

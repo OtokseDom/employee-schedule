@@ -28,7 +28,7 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen, updateData, setUpdateData }) {
+export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
@@ -108,17 +108,16 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 		try {
 			if (!updateData) {
 				const employeeResponse = await axiosClient.post(`/employee`, formattedData);
-				const addedEmployee = employeeResponse.data;
-				// Insert added employee in employees array
-				const updatedEmployees = [addedEmployee, ...data];
-				setEmployees(updatedEmployees);
+				fetchData();
+				// const addedEmployee = employeeResponse.data;
+				// // Insert added employee in employees array. Will not reload calendar
+				// const updatedEmployees = [addedEmployee, ...data];
+				// setEmployees(updatedEmployees);
 				showToast("Success!", "Employee added.", 3000);
 			} else {
-				const employeeResponse = await axiosClient.put(`/employee/${updateData?.id}`, formattedData);
-				const addedEmployee = employeeResponse.data;
-				// Insert added employee in employees array
-				const updatedEmployees = [addedEmployee, ...data];
-				setEmployees(updatedEmployees);
+				await axiosClient.put(`/employee/${updateData?.id}`, formattedData);
+				// fetch data to load employee table and calendar
+				fetchData();
 				showToast("Success!", "Employee updated.", 3000);
 			}
 		} catch (e) {

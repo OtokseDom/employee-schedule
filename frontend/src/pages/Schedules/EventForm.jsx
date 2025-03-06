@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { useEffect } from "react";
 
 const formSchema = z.object({
 	name: z.string({
@@ -19,7 +20,7 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EventForm({ data, setEvents, loading, setLoading, setIsOpen }) {
+export default function EventForm({ data, setEvents, loading, setLoading, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
 	const showToast = useToast();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -29,22 +30,38 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 		},
 	});
 
+	useEffect(() => {
+		if (updateData) {
+			const { name, description } = updateData;
+			form.reset({
+				name,
+				description,
+			});
+		}
+	}, [updateData, form]);
+
 	const handleSubmit = async (form) => {
 		setLoading(true);
 		try {
-			const eventResponse = await axiosClient.post(`/event`, form);
-			const addedEvent = eventResponse.data;
-			// Insert added event in events array
-			const updatedEvents = [addedEvent, ...data];
-			setEvents(updatedEvents);
-			showToast("Success!", "Event added.", 3000);
+			if (!updateData) {
+				const eventResponse = await axiosClient.post(`/event`, form);
+				const addedEvent = eventResponse.data;
+				// Insert added event in events array
+				const updatedEvents = [addedEvent, ...data];
+				setEvents(updatedEvents);
+				showToast("Success!", "Event added.", 3000);
+			} else {
+				await axiosClient.put(`/event/${updateData?.id}`, form);
+				fetchData();
+				showToast("Success!", "Event updated.", 3000);
+			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
-			// Always stop loading when done
+			setUpdateData({});
 			setLoading(false);
-			setIsOpen(false);
+			setIsOpenEvent(false);
 		}
 	};
 	return (
@@ -81,7 +98,7 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {updateData ? "Update" : "Submit"}
 				</Button>
 			</form>
 		</Form>

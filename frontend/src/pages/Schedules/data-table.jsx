@@ -27,6 +27,7 @@ export function DataTable({
 	setDeleted,
 	updateData,
 	setUpdateData,
+	fetchData,
 }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -59,7 +60,6 @@ export function DataTable({
 			prevFirstRowRef.current = firstRow; // Update the reference
 		}
 		if (deleted) {
-			console.log("deleted something");
 			const firstRow = table.getRowModel().rows[0];
 			if (firstRow) {
 				table.toggleAllRowsSelected(false);
@@ -96,6 +96,7 @@ export function DataTable({
 								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}
+								fetchData={fetchData}
 							/>
 						</SheetContent>
 					</Sheet>

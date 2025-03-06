@@ -13,8 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EventForm from "./EventForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTableEvents({ columns, data, setEvents, loading, setLoading }) {
-	const [isOpen, setIsOpen] = useState(false);
+export function DataTableEvents({ columns, data, setEvents, loading, setLoading, isOpenEvent, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -45,7 +44,7 @@ export function DataTableEvents({ columns, data, setEvents, loading, setLoading 
 					className="max-w-sm"
 				/>
 				<div className="flex gap-2 ml-auto">
-					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
+					<Sheet open={isOpenEvent} onOpenChange={setIsOpenEvent} modal={false}>
 						<SheetTrigger asChild>
 							<Button variant="">Add Event</Button>
 						</SheetTrigger>
@@ -53,7 +52,16 @@ export function DataTableEvents({ columns, data, setEvents, loading, setLoading 
 							<SheetHeader>
 								<SheetTitle>Add Event</SheetTitle>
 							</SheetHeader>
-							<EventForm data={data} setEvents={setEvents} loading={loading} setLoading={setLoading} setIsOpen={setIsOpen} />
+							<EventForm
+								data={data}
+								setEvents={setEvents}
+								loading={loading}
+								setLoading={setLoading}
+								setIsOpenEvent={setIsOpenEvent}
+								updateData={updateData}
+								setUpdateData={setUpdateData}
+								fetchData={fetchData}
+							/>
 						</SheetContent>
 					</Sheet>
 					{/* <Link to="/products/add">
