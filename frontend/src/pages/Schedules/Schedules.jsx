@@ -17,10 +17,15 @@ export default function Schedules() {
 	const [selectedTab, setSelectedTab] = useState(1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [deleted, setDeleted] = useState(false);
+	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
 		fetchData();
 	}, [selectedEmployee]);
+
+	useEffect(() => {
+		if (!isOpen) setUpdateData({});
+	}, [isOpen]);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -96,7 +101,7 @@ export default function Schedules() {
 					)}
 					<div className={`${selectedTab == 2 && "hidden"}`}>
 						<DataTable
-							columns={columns({ handleDelete, setIsOpen })}
+							columns={columns({ handleDelete, setIsOpen, setUpdateData })}
 							data={employees}
 							setEmployees={setEmployees}
 							loading={loading}
@@ -107,6 +112,8 @@ export default function Schedules() {
 							setIsOpen={setIsOpen}
 							deleted={deleted}
 							setDeleted={setDeleted}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
 						/>
 					</div>
 					<div className={`${selectedTab == 1 && "hidden"}`}>

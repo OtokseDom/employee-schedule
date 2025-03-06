@@ -13,11 +13,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, setEmployees, loading, setLoading, setSelectedEmployee, firstRow, isOpen, setIsOpen, deleted, setDeleted }) {
+export function DataTable({
+	columns,
+	data,
+	setEmployees,
+	loading,
+	setLoading,
+	setSelectedEmployee,
+	firstRow,
+	isOpen,
+	setIsOpen,
+	deleted,
+	setDeleted,
+	updateData,
+	setUpdateData,
+}) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
-	const [previousRow, setPreviousRow] = useState(null);
 	const table = useReactTable({
 		data,
 		columns,
@@ -40,7 +53,6 @@ export function DataTable({ columns, data, setEmployees, loading, setLoading, se
 	useEffect(() => {
 		if (firstRow !== prevFirstRowRef.current) {
 			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === firstRow);
-			console.log("first row changed");
 			setSelectedEmployee(defaultRow?.original);
 			table.toggleAllRowsSelected(false);
 			defaultRow?.toggleSelected();
@@ -76,7 +88,15 @@ export function DataTable({ columns, data, setEmployees, loading, setLoading, se
 							<SheetHeader>
 								<SheetTitle>Add Employee</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm data={data} setEmployees={setEmployees} loading={loading} setLoading={setLoading} setIsOpen={setIsOpen} />
+							<EmployeeForm
+								data={data}
+								setEmployees={setEmployees}
+								loading={loading}
+								setLoading={setLoading}
+								setIsOpen={setIsOpen}
+								updateData={updateData}
+								setUpdateData={setUpdateData}
+							/>
 						</SheetContent>
 					</Sheet>
 					<DropdownMenu>

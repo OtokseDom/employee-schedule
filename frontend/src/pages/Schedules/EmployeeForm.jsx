@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Calendar
-import { format, startOfYear, endOfYear, eachMonthOfInterval } from "date-fns";
+import { format, startOfYear, endOfYear, eachMonthOfInterval, parseISO } from "date-fns";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,7 +28,7 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen }) {
+export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen, updateData, setUpdateData }) {
 	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
@@ -87,6 +87,18 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 		},
 	});
 
+	useEffect(() => {
+		if (updateData) {
+			const { name, position, dob } = updateData;
+			form.reset({
+				name,
+				position,
+				dob: dob ? parseISO(dob) : undefined,
+			});
+			setDate(dob ? parseISO(dob) : undefined);
+		}
+	}, [updateData, form]);
+
 	const handleSubmit = async (form) => {
 		const formattedData = {
 			...form,
@@ -94,21 +106,31 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 		};
 		setLoading(true);
 		try {
-			const employeeResponse = await axiosClient.post(`/employee`, formattedData);
-			const addedEmployee = employeeResponse.data;
-			// Insert added employee in employees array
-			const updatedEmployees = [addedEmployee, ...data];
-			setEmployees(updatedEmployees);
-			showToast("Success!", "Employee added.", 3000);
+			if (!updateData) {
+				const employeeResponse = await axiosClient.post(`/employee`, formattedData);
+				const addedEmployee = employeeResponse.data;
+				// Insert added employee in employees array
+				const updatedEmployees = [addedEmployee, ...data];
+				setEmployees(updatedEmployees);
+				showToast("Success!", "Employee added.", 3000);
+			} else {
+				const employeeResponse = await axiosClient.put(`/employee/${updateData?.id}`, formattedData);
+				const addedEmployee = employeeResponse.data;
+				// Insert added employee in employees array
+				const updatedEmployees = [addedEmployee, ...data];
+				setEmployees(updatedEmployees);
+				showToast("Success!", "Employee updated.", 3000);
+			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
-			// Always stop loading when done
+			setUpdateData({});
 			setLoading(false);
 			setIsOpen(false);
 		}
 	};
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
@@ -200,13 +222,6 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 											disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
 											initialFocus
 										/>
-										{/* <Calendar
-											mode="single"
-											selected={field.value}
-											onSelect={(date) => field.onChange(date)}
-											disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-											initialFocus
-										/> */}
 									</PopoverContent>
 								</Popover>
 								<FormMessage />
@@ -215,7 +230,7 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {updateData ? "Update" : "Submit"}
 				</Button>
 			</form>
 		</Form>
