@@ -29,7 +29,8 @@ import { Label } from "../ui/label";
 import CalendarCell from "./CalendarCell";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
-// import { toast } from "sonner";
+import WeekView from "./WeekView";
+import { Skeleton } from "../ui/skeleton";
 
 const formSchema = z.object({
 	// coerce ensures that even if it's a string, it will convert it to a number.
@@ -41,10 +42,12 @@ const formSchema = z.object({
 
 export default function CalendarSchedule({ employees, events, schedules, setSchedules, loading, setLoading, selectedEmployee }) {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
+	const [currentWeek, setCurrentWeek] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(null);
 	const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 	const [modalData, setModalData] = useState({ event: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
 	const [hoveredEvent, setHoveredEvent] = useState(null);
+	const [viewMode, setViewMode] = useState("month"); // "month" or "week"
 	const showToast = useToast();
 
 	const startDate = startOfWeek(startOfMonth(currentMonth));
@@ -162,67 +165,105 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 	};
 
 	return (
-		<div className="p-1 md:p-4 max-w-3xl mx-auto mt-5">
-			<div className="flex justify-between mb-4">
-				<button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 border rounded">
-					Prev
-				</button>
-				<h2 className="text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
-				<button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 border rounded">
-					Next
-				</button>
+		<div className="p-1 md:p-4 mx-auto mt-5">
+			<div className="flex gap-2 mb-4">
+				<Button variant={`${viewMode === "month" ? "" : "outline"}`} onClick={() => setViewMode("month")} disabled={loading}>
+					Month View
+				</Button>
+				<Button variant={`${viewMode === "week" ? "" : "outline"}`} onClick={() => setViewMode("week")} disabled={loading}>
+					Week View
+				</Button>
 			</div>
-			<div className="bg-background text-foreground grid grid-cols-7 gap-0 md:gap-1  rounded-lg p-2 md:p-8 mt-10 text-xs sm:text-base">
-				{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-					<div key={d} className="text-center font-semibold my-4">
-						{d}
-					</div>
-				))}
-				{days.map((date, index) => {
-					const formattedSchedules = matchingSchedule(format(date, "yyyy-MM-dd"));
-					const status = formattedSchedules?.status;
-					let color = "";
+			<div className="flex justify-between mb-4">
+				<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+					Prev
+				</Button>
+				<h2 className="text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
+				<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+					Next
+				</Button>
+			</div>
+			<div className=" max-w-full min-h-[700px] max-h-[700px] overflow-auto border border-foreground rounded-xl">
+				{viewMode === "month" ? (
+					<div className="bg-background text-foreground grid grid-cols-7 gap-0 md:gap-1 rounded-lg p-2 md:p-8 mt-10 text-xs sm:text-base">
+						{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+							<div key={d} className="text-center font-semibold my-4">
+								{d}
+							</div>
+						))}
+						{days.map((date, index) => {
+							const formattedSchedules = matchingSchedule(format(date, "yyyy-MM-dd"));
+							const status = formattedSchedules?.status;
+							let color = "";
 
-					switch (status) {
-						case "Pending":
-							color = "yellow";
-							break;
-						case "In Progress":
-							color = "blue";
-							break;
-						case "Completed":
-							color = "green";
-							break;
-						case "Cancelled":
-							color = "red";
-							break;
-						default:
-							color = "gray";
-							break;
-					}
-					return (
-						<div
-							key={index}
-							className={`${
-								format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "outline-dashed outline-5 outline-green-300 rounded-xl" : ""
-							}`}
-						>
-							<CalendarCell
-								color={color}
+							switch (status) {
+								case "Pending":
+									color = "yellow";
+									break;
+								case "In Progress":
+									color = "blue";
+									break;
+								case "Completed":
+									color = "green";
+									break;
+								case "Cancelled":
+									color = "red";
+									break;
+								default:
+									color = "gray";
+									break;
+							}
+							return (
+								<div
+									key={index}
+									className={`${
+										format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd")
+											? "outline-dashed outline-5 outline-green-300 rounded-xl"
+											: ""
+									}`}
+								>
+									<CalendarCell
+										color={color}
+										loading={loading}
+										formattedSchedules={formattedSchedules}
+										hoveredEvent={hoveredEvent}
+										setHoveredEvent={setHoveredEvent}
+										openModal={openModal}
+										date={date}
+									/>
+								</div>
+							);
+						})}
+					</div>
+				) : (
+					<>
+						{!loading ? (
+							<WeekView
+								currentWeek={currentWeek}
+								schedules={schedules}
 								loading={loading}
-								formattedSchedules={formattedSchedules}
+								openModal={openModal}
 								hoveredEvent={hoveredEvent}
 								setHoveredEvent={setHoveredEvent}
-								openModal={openModal}
-								date={date}
 							/>
-						</div>
-					);
-				})}
+						) : (
+							<div className="flex flex-col space-1 md:space-y-3 w-full">
+								{Array.from({ length: 26 }).map((_, i) => (
+									<div key={i} className="flex flex-row gap-2">
+										<Skeleton className="h-4 w-1/5" />
+										<Skeleton className="h-4 w-1/5" />
+										<Skeleton className="h-4 w-1/5" />
+										<Skeleton className="h-4 w-1/5" />
+										<Skeleton className="h-4 w-1/5" />
+									</div>
+								))}
+							</div>
+						)}
+					</>
+				)}
 			</div>
-
 			{selectedDate && (
-				<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-4">
+				<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-4 z-50">
 					<div className="bg-background p-6 rounded shadow-lg w-full max-w-md">
 						<h3 className="text-lg font-bold mb-2">
 							Event on {format(selectedDate, "MMMM d, yyyy")} for {selectedEmployee?.name}

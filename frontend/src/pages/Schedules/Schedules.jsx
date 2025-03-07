@@ -138,7 +138,7 @@ export default function Schedules() {
 					</div>
 				</div>
 			</div>
-			<div className="lg:order-2 order-1 w-screen md:w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10">
+			<div className="lg:order-2 order-1 w-screen md:w-full bg-card overflow-auto h-full text-card-foreground border border-border rounded-md container p-4 md:p-10">
 				<div className="flex flex-col ml-4 md:ml-0">
 					<h1 className=" font-extrabold text-3xl">Schedules</h1>
 					<p>List of Schedules</p>
