@@ -11,6 +11,8 @@ import {
 	endOfYear,
 	eachMonthOfInterval,
 	parse,
+	subWeeks,
+	addWeeks,
 } from "date-fns";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -174,15 +176,27 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 					Week View
 				</Button>
 			</div>
-			<div className="flex justify-between mb-4">
-				<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-					Prev
-				</Button>
-				<h2 className="text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
-				<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-					Next
-				</Button>
-			</div>
+			{viewMode == "month" ? (
+				<div className="flex justify-between mb-4">
+					<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+						Prev
+					</Button>
+					<h2 className="text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
+					<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+						Next
+					</Button>
+				</div>
+			) : (
+				<div className="flex justify-between mb-4">
+					<Button variant="outline" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
+						Prev
+					</Button>
+					<h2 className="text-xl font-bold text-center">{format(currentWeek, "MMMM yyyy")}</h2>
+					<Button variant="outline" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
+						Next
+					</Button>
+				</div>
+			)}
 			<div className=" max-w-full min-h-[700px] max-h-[700px] overflow-auto border border-foreground rounded-xl">
 				{viewMode === "month" ? (
 					<div className="bg-background text-foreground grid grid-cols-7 gap-0 md:gap-1 rounded-lg p-2 md:p-8 mt-10 text-xs sm:text-base">
