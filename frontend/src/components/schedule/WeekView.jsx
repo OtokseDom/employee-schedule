@@ -64,7 +64,7 @@ export default function WeekView({ currentWeek, schedules, loading, openModal, h
 
 	const hours = Array.from({ length: maxTime.getHours() - minTime.getHours() + 1 }, (_, i) => addHours(minTime, i));
 	return (
-		<div className="bg-background text-foreground grid grid-cols-8 gap-0 md:gap-1 rounded-lg p-2 md:p-8 mt-10 text-sm min-w-[1000px] relative">
+		<div className="bg-background text-foreground grid grid-cols-8 rounded-lg p-2 md:p-8 mt-10 text-sm min-w-[1000px] relative">
 			<div className="col-span-1 sticky left-0 bg-background z-10 mt-20">
 				{hours.map((hour, index) => (
 					<div key={index} className="h-12 border-t bg-background border-gray-200 text-center">
@@ -104,8 +104,13 @@ export default function WeekView({ currentWeek, schedules, loading, openModal, h
 								break;
 						}
 						return (
-							<div key={index} className="col-span-1 border-b border-foreground relative">
-								<div className="text-center font-semibold my-4">
+							<div
+								key={index}
+								className={`col-span-1 border-b border-foreground relative  ${
+									format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "bg-secondary" : ""
+								}`}
+							>
+								<div className={` text-center font-semibold my-4`}>
 									{format(date, "MMM d")}
 									<br />
 									{format(date, "EEEE")}
