@@ -1,0 +1,38 @@
+{
+    "task": {
+        "category": "Development",
+        "title": "Implement Authentication",
+        "description": "Develop the authentication module using Laravel.",
+        "expected_output": "User authentication should be functional.",
+        "assignee_id": 1,
+        "status": "In Progress",
+        "start_date": "2023-10-01",
+        "end_date": "2023-10-10",
+        "time_estimate": 40.5,
+        "time_taken": 20.0,
+        "delay": 0.0,
+        "delay_reason": null,
+        "performance_rating": 85,
+        "remarks": "Work is progressing as planned."
+    },
+    "task_history": {
+        "task_id": 1,
+        "status": "In Progress",
+        "changed_by": 2,
+        "changed_at": "2023-10-05 10:00:00",
+        "remarks": "Task status updated to In Progress."
+    },
+    "performance_report": {
+        "user_id": 1,
+        "average_rating": 4.5,
+        "total_tasks": 10,
+        "tasks_on_time": 8,
+        "tasks_delayed": 1,
+        "tasks_pending": 1,
+        "tasks_completed": 8,
+        "tasks_in_progress": 1,
+        "tasks_cancelled": 0,
+        "tasks_on_hold": 0,
+        "assessment_date": "2023-10-10"
+    }
+}
