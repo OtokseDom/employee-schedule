@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             ScheduleSeeder::class,
             UserSeeder::class,
+            TaskSeeder::class,
+            TaskHistorySeeder::class,
+            PerformanceReportSeeder::class,
         ]);
     }
 }

@@ -26,13 +26,14 @@ class SignupRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:55',
+            'role' => 'required|string',
             'email' => 'required|email',
             'password' => [
                 'required',
                 'confirmed',
                 Password::min(8)
-                ->letters()
-                ->symbols()
+                    ->letters()
+                    ->symbols()
             ]
         ];
     }
