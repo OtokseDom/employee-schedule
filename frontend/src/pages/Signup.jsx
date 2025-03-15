@@ -19,6 +19,7 @@ export default function Signup() {
 		e.preventDefault();
 		const payload = {
 			name: nameRef.current.value,
+			role: "Employee",
 			email: emailRef.current.value,
 			password: passwordRef.current.value,
 			password_confirmation: passwordConfiramtionRef.current.value,
