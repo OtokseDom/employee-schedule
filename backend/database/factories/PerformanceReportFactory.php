@@ -20,8 +20,10 @@ class PerformanceReportFactory extends Factory
      */
     public function definition()
     {
+        $userIds = User::pluck('id')->toArray();
+
         return [
-            'user_id' => User::factory(),
+            'user_id' => $this->faker->randomElement($userIds),
             'average_rating' => $this->faker->randomFloat(2, 0, 5),
             'total_tasks' => $this->faker->numberBetween(0, 100),
             'tasks_on_time' => $this->faker->numberBetween(0, 100),

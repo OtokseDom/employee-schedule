@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
@@ -17,6 +17,8 @@ class UserSeeder extends Seeder
 
         \App\Models\User::factory()->create([
             'name' => "Admin User",
+            'dob' => Carbon::parse('2000-11-08'),
+            'position' => "Software Engineer",
             'role' => "Superadmin",
             'email' => "admin@demo.com", //dom@gmail.com
             'email_verified_at' => now(),

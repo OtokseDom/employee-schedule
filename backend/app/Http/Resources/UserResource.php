@@ -18,6 +18,8 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'position' => $this->position,
+            'dob' => $this->dob,
             'role' => $this->role,
             'email' => $this->email,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),

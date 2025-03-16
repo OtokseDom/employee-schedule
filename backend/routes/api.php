@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PerformanceReportController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskHistoryController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
+    Route::apiResource('/user', UserController::class);
     Route::apiResource('/schedule', ScheduleController::class);
     Route::apiResource('/employee', EmployeeController::class);
     Route::apiResource('/event', EventController::class);

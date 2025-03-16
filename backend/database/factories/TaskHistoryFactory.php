@@ -21,10 +21,11 @@ class TaskHistoryFactory extends Factory
      */
     public function definition()
     {
+        $userIds = User::pluck('id')->toArray();
         return [
             'task_id' => Task::factory(),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
-            'changed_by' => User::factory(),
+            'changed_by' => $this->faker->randomElement($userIds),
             'changed_at' => $this->faker->dateTime,
             'remarks' => $this->faker->paragraph,
         ];

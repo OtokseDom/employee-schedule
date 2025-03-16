@@ -32,6 +32,8 @@ class UserFactory extends Factory
         ];
         return [
             'name' => fake()->name(),
+            'dob' => fake()->date(),
+            'position' => fake()->jobTitle(),
             'role' => fake()->randomElement($roles),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
