@@ -11,10 +11,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
-	const handleUpdateEmployee = (employee) => {
+export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
+	const handleUpdateUser = (user) => {
 		setIsOpen(true);
-		setUpdateData(employee);
+		setUpdateData(user);
 	};
 
 	return [
@@ -25,6 +25,28 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
 						Name <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+		},
+		{
+			id: "role",
+			accessorKey: "role",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Role <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+		},
+		{
+			id: "email",
+			accessorKey: "email",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Email <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
 			},
@@ -43,7 +65,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 		{
 			id: "actions",
 			cell: ({ row }) => {
-				const employee = row.original;
+				const user = row.original;
 
 				return (
 					<DropdownMenu>
@@ -54,8 +76,8 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => handleUpdateEmployee(employee)}>Update Employee</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete("employee", employee.id)}>Delete Employee</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleUpdateUser(user)}>Update User</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleDelete("user", user.id)}>Delete User</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				);

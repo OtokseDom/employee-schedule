@@ -11,6 +11,8 @@ export default function Signup() {
 
 	const nameRef = useRef();
 	const emailRef = useRef();
+	const positionRef = useRef();
+	const dobRef = useRef();
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
 
@@ -21,6 +23,8 @@ export default function Signup() {
 			name: nameRef.current.value,
 			role: "Employee",
 			email: emailRef.current.value,
+			position: positionRef.current.value,
+			dob: dobRef.current.value,
 			password: passwordRef.current.value,
 			password_confirmation: passwordConfiramtionRef.current.value,
 		};
@@ -57,6 +61,8 @@ export default function Signup() {
 					)}
 					<input className="bg-background text-foreground" ref={nameRef} type="text" placeholder="Full Name" />
 					<input className="bg-background text-foreground" ref={emailRef} type="email" placeholder="Email" />
+					<input className="bg-background text-foreground" ref={positionRef} type="text" placeholder="Position" />
+					<input className="bg-background text-foreground" ref={dobRef} type="date" placeholder="Date of Birth" />
 					<input className="bg-background text-foreground" ref={passwordRef} type="password" placeholder="Password" />
 					<input className="bg-background text-foreground" ref={passwordConfiramtionRef} type="password" placeholder="Password Confirmation" />
 					<button className="btn btn-block flex justify-center">{loading && <Loader2 className="animate-spin mr-5 -ml-11" />} Sign Up</button>

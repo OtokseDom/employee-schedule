@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'role' => fake()->randomElement($roles),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$Q5xkjOGTDwB3YOGprqu2N.FbPA5QgKE.E5pKP4DdCYeFpxSFGzFQm', // password: admin123
+            'password' => '$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW', // password: admin123
             'remember_token' => Str::random(10),
         ];
     }

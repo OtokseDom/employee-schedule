@@ -28,6 +28,8 @@ class SignupRequest extends FormRequest
             'name' => 'required|string|max:55',
             'role' => 'required|string',
             'email' => 'required|email',
+            'position' => 'required|string',
+            'dob' => 'required|date',
             'password' => [
                 'required',
                 'confirmed',

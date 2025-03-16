@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Employee;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,10 +25,10 @@ class ScheduleFactory extends Factory
     {
         return [
             'event_id' => Event::inRandomOrder()->value('id'), // Get a random existing Event ID
-            'employee_id' => Employee::inRandomOrder()->value('id'), // Get a random existing Employee ID
+            'user_id' => User::inRandomOrder()->value('id'), // Get a random existing User ID
             'shift_start' => "08:00:00",
             'shift_end' => "15:00:00",
-            'date' => fake()->dateTimeBetween('2025-01-01', '2025-03-31'),
+            'date' => fake()->dateTimeBetween('2025-03-01', '2025-03-31'),
             'status' => fake()->randomElement(["Pending", "Completed", "In Progress", "Cancelled"])
         ];
     }

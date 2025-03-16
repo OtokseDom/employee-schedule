@@ -18,7 +18,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
-    Route::apiResource('/user', UserController::class);
+    // Route::apiResource('/user-auth', UserController::class); //somehow implicit route is not working
+    Route::get('/user-auth', [UserController::class, 'index']);
+    Route::post('/user-auth', [UserController::class, 'store']);
+    Route::get('/user-auth/{user}', [UserController::class, 'show']);
+    Route::put('/user-auth/{user}', [UserController::class, 'update']);
+    Route::put('/user-auth/{user}', [UserController::class, 'update']);
+    Route::delete('/user-auth/{user}', [UserController::class, 'destroy']);
     Route::apiResource('/schedule', ScheduleController::class);
     Route::apiResource('/employee', EmployeeController::class);
     Route::apiResource('/event', EventController::class);
@@ -27,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/performance-report', PerformanceReportController::class);
 
     /* ---------------------------- Master Relations ---------------------------- */
-    Route::get('/schedule-by-employee/{employeeId}', [ScheduleController::class, 'getScheduleByEmployee']);
+    Route::get('/schedule-by-user/{userId}', [ScheduleController::class, 'getScheduleByUser']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);

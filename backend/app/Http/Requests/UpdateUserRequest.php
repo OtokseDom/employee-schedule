@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
             'role' => 'required|in:Superadmin,Admin,Manager,Employee',
             'position' => 'required|string|max:255',
             'dob' => 'required|date_format:Y-m-d',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:users,email,' . $this->user->id, // Ignore the current user's email
             'password' => 'required|string|min:8',
         ];
     }

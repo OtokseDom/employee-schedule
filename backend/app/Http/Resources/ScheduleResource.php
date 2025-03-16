@@ -16,7 +16,7 @@ class ScheduleResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'employee_id' => $this->employee_id,
+            'user_id' => $this->user_id,
             'event_id' => $this->event_id,
             'date' => $this->date,
             'shift_start' => $this->shift_start,
@@ -24,13 +24,15 @@ class ScheduleResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
-            // 'employee' => new EmployeeResource($this->whenLoaded('employee')),
+            // 'user' => new EmployeeResource($this->whenLoaded('user')),
             // For SHOW function
-            'employee' => $this->whenLoaded('employee', function () {
+            'user' => $this->whenLoaded('user', function () {
                 return [
-                    'name' => $this->employee->name,
-                    'position' => $this->employee->position,
-                    'dob' => $this->employee->dob,
+                    'name' => $this->user->name,
+                    'position' => $this->user->position,
+                    'dob' => $this->user->dob,
+                    'role' => $this->user->role,
+                    'email' => $this->user->email,
                 ];
             }),
             'event' => $this->whenLoaded('event', function () {

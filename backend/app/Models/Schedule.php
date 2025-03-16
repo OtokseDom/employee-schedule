@@ -11,7 +11,7 @@ class Schedule extends Model
     // use HasFactory;
     protected $fillable = [
         "event_id",
-        "employee_id",
+        "user_id",
         "date",
         "shift_start",
         "shift_end",
@@ -21,8 +21,8 @@ class Schedule extends Model
     {
         return $this->belongsTo(Event::class);
     }
-    public function employee()
+    public function user()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 }

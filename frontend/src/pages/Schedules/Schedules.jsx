@@ -1,19 +1,19 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useRef, useState } from "react";
-import { columns } from "./columns";
-import { DataTable } from "./data-table";
 import CalendarSchedule from "@/components/schedule/calendar";
 import { columnsEvent } from "./columns-event";
 import { DataTableEvents } from "./data-table-events";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { DataTableUsers } from "./data-table-users";
+import { columnsUser } from "./columns-user";
 
 export default function Schedules() {
 	const showToast = useToast();
-	const [employees, setEmployees] = useState([]);
+	const [users, setUsers] = useState([]);
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState(employees[0] || null);
+	const [selectedUser, setSelectedUser] = useState(users[0] || null);
 	const [selectedTab, setSelectedTab] = useState(1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenEvent, setIsOpenEvent] = useState(false);
@@ -22,7 +22,7 @@ export default function Schedules() {
 
 	useEffect(() => {
 		fetchData();
-	}, [selectedEmployee]);
+	}, [selectedUser]);
 
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -36,14 +36,14 @@ export default function Schedules() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const [employeeResponse, eventResponse, scheduleResponse] = await Promise.all([
-				axiosClient.get("/employee"),
+			const [userResponse, eventResponse, scheduleResponse] = await Promise.all([
+				axiosClient.get("/user-auth"),
 				axiosClient.get("/event"),
-				axiosClient.get(`/schedule-by-employee/${selectedEmployee?.id}`),
+				axiosClient.get(`/schedule-by-user/${selectedUser?.id}`),
 			]);
 			// Prevent re-renders if data is the same
 			// Set the data after both requests succeed
-			setEmployees(employeeResponse.data.employees);
+			setUsers(userResponse.data.users);
 			setEvents(eventResponse.data.events);
 			setSchedules(scheduleResponse.data.data);
 		} catch (e) {
@@ -53,20 +53,20 @@ export default function Schedules() {
 			setLoading(false);
 		}
 	};
-	// TODO: Add validation before deletion of event and employee
-	// TODO: delete schedule reselects employee which loads different calendar schedule
+	// TODO: Add validation before deletion of event and user
+	// TODO: delete schedule reselects user which loads different calendar schedule
 	const handleDelete = async (table, id) => {
 		setLoading(true);
 		try {
-			if (table == "employee") {
-				const employeeResponse = await axiosClient.delete(`/employee/${id}`);
+			if (table == "user") {
+				const userResponse = await axiosClient.delete(`/user-auth/${id}`);
 				setDeleted(true);
-				setEmployees(employeeResponse.data);
-				setSelectedEmployee(employeeResponse.data[0]);
-				showToast("Success!", "Employee deleted.", 3000);
+				setUsers(userResponse.data);
+				setSelectedUser(userResponse.data[0]);
+				showToast("Success!", "User deleted.", 3000);
 			} else if (table == "event") {
 				const eventResponse = await axiosClient.delete(`/event/${id}`);
-				setEmployees(eventResponse.data);
+				setUsers(eventResponse.data);
 				showToast("Success!", "Event deleted.", 3000);
 			}
 		} catch (e) {
@@ -84,8 +84,8 @@ export default function Schedules() {
 					{selectedTab == 1 ? (
 						<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
 							<div>
-								<h1 className=" font-extrabold text-3xl">Employees</h1>
-								<p>List of all employees</p>
+								<h1 className=" font-extrabold text-3xl">Users</h1>
+								<p>List of all users</p>
 							</div>
 							<div className="flex flex-col items-end opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(2)}>
 								<h1 className=" font-extrabold text-3xl">Events</h1>
@@ -95,8 +95,8 @@ export default function Schedules() {
 					) : (
 						<div className="flex flex-row justify-between ml-4 md:ml-0">
 							<div className="opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(1)}>
-								<h1 className=" font-extrabold text-3xl">Employees</h1>
-								<p className="underline">View list of all employees</p>
+								<h1 className=" font-extrabold text-3xl">Users</h1>
+								<p className="underline">View list of all users</p>
 							</div>
 							<div className="flex flex-col items-end hover:cursor-pointer">
 								<h1 className=" font-extrabold text-3xl">Events</h1>
@@ -105,14 +105,14 @@ export default function Schedules() {
 						</div>
 					)}
 					<div className={`${selectedTab == 2 && "hidden"}`}>
-						<DataTable
-							columns={columns({ handleDelete, setIsOpen, setUpdateData })}
-							data={employees}
-							setEmployees={setEmployees}
+						<DataTableUsers
+							columns={columnsUser({ handleDelete, setIsOpen, setUpdateData })}
+							data={users}
+							setUsers={setUsers}
 							loading={loading}
 							setLoading={setLoading}
-							setSelectedEmployee={setSelectedEmployee}
-							firstRow={employees[0]?.id}
+							setSelectedUser={setSelectedUser}
+							firstRow={users[0]?.id}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
 							deleted={deleted}
@@ -144,13 +144,13 @@ export default function Schedules() {
 					<p>List of Schedules</p>
 				</div>
 				<CalendarSchedule
-					employees={employees}
+					users={users}
 					events={events}
 					schedules={schedules}
 					setSchedules={setSchedules}
 					loading={loading}
 					setLoading={setLoading}
-					selectedEmployee={selectedEmployee}
+					selectedUser={selectedUser}
 				/>
 			</div>
 		</div>

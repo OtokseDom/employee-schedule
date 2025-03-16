@@ -20,14 +20,13 @@ class TaskFactory extends Factory
      */
     public function definition()
     {
-        $userIds = User::pluck('id')->toArray();
 
         return [
             'category' => $this->faker->word,
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,
-            'assignee_id' => $this->faker->randomElement($userIds),
+            'assignee_id' => User::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'start_date' => $this->faker->date,
             'end_date' => $this->faker->date,

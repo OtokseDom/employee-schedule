@@ -23,7 +23,7 @@ class StoreScheduleRequest extends FormRequest
     {
         return [
             'event_id' => 'required|exists:events,id',
-            'employee_id' => 'required|exists:employees,id',
+            'user_id' => 'required|exists:users,id',
             'date' => 'required|date_format:Y-m-d',
             'shift_start' => 'required|date_format:H:i:s',
             'shift_end' => 'required|date_format:H:i:s|after:shift_start', // Ensure shift_end is a valid time and after shift_start

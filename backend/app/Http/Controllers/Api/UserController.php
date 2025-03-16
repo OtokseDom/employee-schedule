@@ -22,6 +22,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $users = User::create($data);
+
         return response(new UserResource($users), 201);
     }
 
@@ -34,7 +35,6 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $user->update($data);
-
         return new UserResource($user);
     }
 

@@ -26,9 +26,15 @@ const formSchema = z.object({
 	dob: z.date({
 		required_error: "Birthday is required.",
 	}),
+	role: z.string({
+		required_error: "Role is required.",
+	}),
+	email: z.string({
+		required_error: "Email is required.",
+	}),
 });
 
-export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function UserForm({ data, setUsers, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
@@ -84,16 +90,20 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 			name: "",
 			position: "",
 			dob: undefined,
+			role: "",
+			email: "",
 		},
 	});
 
 	useEffect(() => {
 		if (updateData) {
-			const { name, position, dob } = updateData;
+			const { name, position, dob, role, email } = updateData;
 			form.reset({
 				name,
 				position,
 				dob: dob ? parseISO(dob) : undefined,
+				role,
+				email,
 			});
 			setDate(dob ? parseISO(dob) : undefined);
 		}
@@ -103,22 +113,19 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 		const formattedData = {
 			...form,
 			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
+			password: "$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW", //password: admin123
 		};
 		setLoading(true);
 		try {
-			if (!updateData) {
-				const employeeResponse = await axiosClient.post(`/employee`, formattedData);
+			if (Object.keys(updateData).length === 0) {
+				await axiosClient.post(`/user-auth`, formattedData);
 				fetchData();
-				// const addedEmployee = employeeResponse.data;
-				// // Insert added employee in employees array. Will not reload calendar
-				// const updatedEmployees = [addedEmployee, ...data];
-				// setEmployees(updatedEmployees);
-				showToast("Success!", "Employee added.", 3000);
+				showToast("Success!", "User added.", 3000);
 			} else {
-				await axiosClient.put(`/employee/${updateData?.id}`, formattedData);
-				// fetch data to load employee table and calendar
+				await axiosClient.put(`/user-auth/${updateData?.id}`, formattedData);
+				// fetch data to load user table and calendar
 				fetchData();
-				showToast("Success!", "Employee updated.", 3000);
+				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000);
@@ -141,7 +148,58 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 							<FormItem>
 								<FormLabel>Name</FormLabel>
 								<FormControl>
-									<Input placeholder="Employee name" {...field} />
+									<Input placeholder="User name" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="role"
+					render={({ field }) => {
+						const roles = [
+							{ id: 1, name: "Superadmin" },
+							{ id: 2, name: "Admin" },
+							{ id: 3, name: "Manager" },
+							{ id: 4, name: "Employee" },
+						];
+						return (
+							<FormItem>
+								<FormLabel>Role</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={updateData?.role || field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a role"></SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(roles) && roles.length > 0 ? (
+											roles?.map((role) => (
+												<SelectItem key={role?.id} value={role?.name}>
+													{role?.name}
+												</SelectItem>
+											))
+										) : (
+											<SelectItem disabled>No roles available</SelectItem>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="email"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input placeholder="Email" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -156,7 +214,7 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 							<FormItem>
 								<FormLabel>Position</FormLabel>
 								<FormControl>
-									<Input placeholder="Employee position" {...field} />
+									<Input placeholder="User position" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>

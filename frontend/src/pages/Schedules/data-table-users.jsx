@@ -10,16 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EmployeeForm from "./EmployeeForm";
+import Userform from "./Userform";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({
+export function DataTableUsers({
 	columns,
 	data,
-	setEmployees,
+	setUsers,
 	loading,
 	setLoading,
-	setSelectedEmployee,
+	setSelectedUser,
 	firstRow,
 	isOpen,
 	setIsOpen,
@@ -49,12 +49,12 @@ export function DataTable({
 		},
 	});
 	const prevFirstRowRef = useRef(null);
-	// TODO: when first emp is selected, adding new employee removes selected indicator
-	// TODO: When any emp is selected, deeleting first emplyee removes selected indicator
+	// TODO: when first user is selected, adding new user removes selected indicator
+	// TODO: When any user is selected, deeleting first user removes selected indicator
 	useEffect(() => {
 		if (firstRow !== prevFirstRowRef.current) {
 			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === firstRow);
-			setSelectedEmployee(defaultRow?.original);
+			setSelectedUser(defaultRow?.original);
 			table.toggleAllRowsSelected(false);
 			defaultRow?.toggleSelected();
 			prevFirstRowRef.current = firstRow; // Update the reference
@@ -64,7 +64,7 @@ export function DataTable({
 			if (firstRow) {
 				table.toggleAllRowsSelected(false);
 				firstRow.toggleSelected();
-				setSelectedEmployee(firstRow.original);
+				setSelectedUser(firstRow.original);
 			}
 			setDeleted(false);
 		}
@@ -82,15 +82,15 @@ export function DataTable({
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>
-							<Button variant="">Add Employee</Button>
+							<Button variant="">Add User</Button>
 						</SheetTrigger>
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>Add Employee</SheetTitle>
+								<SheetTitle>Add User</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm
+							<Userform
 								data={data}
-								setEmployees={setEmployees}
+								setUsers={setUsers}
 								loading={loading}
 								setLoading={setLoading}
 								setIsOpen={setIsOpen}
@@ -151,7 +151,7 @@ export function DataTable({
 											table.toggleAllRowsSelected(false);
 											row.toggleSelected();
 										}
-										setSelectedEmployee(row.original);
+										setSelectedUser(row.original);
 									}}
 								>
 									{row.getVisibleCells().map((cell) => (

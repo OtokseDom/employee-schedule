@@ -42,7 +42,7 @@ const formSchema = z.object({
 	status: z.string(),
 });
 
-export default function CalendarSchedule({ employees, events, schedules, setSchedules, loading, setLoading, selectedEmployee }) {
+export default function CalendarSchedule({ users, events, schedules, setSchedules, loading, setLoading, selectedUser }) {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [currentWeek, setCurrentWeek] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(null);
@@ -120,7 +120,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 
 	const handleSubmit = async (form) => {
 		setLoading(true);
-		const newForm = { ...form, employee_id: selectedEmployee?.id, date: selectedDate };
+		const newForm = { ...form, user_id: selectedUser?.id, date: selectedDate };
 		try {
 			let scheduleResponse;
 			if (selectedScheduleId) {
@@ -153,7 +153,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 		setLoading(true);
 		try {
 			let scheduleResponse;
-			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedEmployee?.id);
+			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedUser?.id);
 			setSchedules(scheduleResponse.data);
 			showToast("Success!", "Schedule deleted.", 3000);
 			setSelectedScheduleId(null);
@@ -280,7 +280,7 @@ export default function CalendarSchedule({ employees, events, schedules, setSche
 				<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-4 z-50">
 					<div className="bg-background p-6 rounded shadow-lg w-full max-w-md">
 						<h3 className="text-lg font-bold mb-2">
-							Event on {format(selectedDate, "MMMM d, yyyy")} for {selectedEmployee?.name}
+							Event on {format(selectedDate, "MMMM d, yyyy")} for {selectedUser?.name}
 						</h3>
 						<Form {...form}>
 							<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
