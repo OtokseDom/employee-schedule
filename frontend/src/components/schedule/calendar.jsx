@@ -231,9 +231,7 @@ export default function CalendarSchedule({ users, events, schedules, setSchedule
 								<div
 									key={index}
 									className={`${
-										format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd")
-											? "outline-dashed outline-5 outline-green-300 rounded-xl"
-											: ""
+										format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "outline outline-5 outline-foreground rounded-lg" : ""
 									}`}
 								>
 									<CalendarCell

@@ -1,4 +1,4 @@
-import { ChevronUp, Home, MoonStar, Sun, User2, Calendar } from "lucide-react";
+import { ChevronUp, Home, MoonStar, Sun, User2, Calendar, ClipboardList } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -22,15 +22,15 @@ import axiosClient from "@/axios.client";
 
 // Menu items.
 const items = [
-	// {
-	// 	title: "Dashboard",
-	// 	url: "/dashboard",
-	// 	icon: Home,
-	// },
 	{
 		title: "Schedules",
 		url: "/schedule",
 		icon: Calendar,
+	},
+	{
+		title: "Task Tracker",
+		url: "/task",
+		icon: ClipboardList,
 	},
 ];
 export function AppSidebar({ user, setUser, setToken }) {
@@ -66,6 +66,9 @@ export function AppSidebar({ user, setUser, setToken }) {
 		});
 	};
 	const [currentPath, setCurrentPath] = useState(location.pathname);
+	useEffect(() => {
+		setCurrentPath(location.pathname);
+	}, []);
 	return (
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
