@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Userform from "./Userform";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 // Convert the DataTable component to JavaScript
 export function DataTableUsers({
@@ -29,6 +30,8 @@ export function DataTableUsers({
 	setUpdateData,
 	fetchData,
 }) {
+	const { user } = useAuthContext();
+
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -81,9 +84,11 @@ export function DataTableUsers({
 				/>
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-						<SheetTrigger asChild>
-							<Button variant="">Add User</Button>
-						</SheetTrigger>
+						{user?.role === "Superadmin" && (
+							<SheetTrigger asChild>
+								<Button variant="">Add User</Button>
+							</SheetTrigger>
+						)}
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
 								<SheetTitle>Add User</SheetTitle>

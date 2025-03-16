@@ -1,72 +1,63 @@
 "use client";
-import { ArrowUpDown } from "lucide-react";
-import { MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
+	const { user } = useAuthContext();
+
 	const handleUpdateUser = (user) => {
 		setIsOpen(true);
 		setUpdateData(user);
 	};
 
-	return [
+	// Define the base columns
+	const columns = [
 		{
 			id: "name",
 			accessorKey: "name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Name <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Name <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
 		},
 		{
 			id: "role",
 			accessorKey: "role",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Role <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Role <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
 		},
 		{
 			id: "email",
 			accessorKey: "email",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Email <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Email <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
 		},
 		{
 			id: "position",
 			accessorKey: "position",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Position <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Position <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
 		},
-		{
+	];
+
+	// Add Actions column only if user is Superadmin
+	if (user.role === "Superadmin") {
+		columns.push({
 			id: "actions",
 			cell: ({ row }) => {
-				const user = row.original;
-
+				const userRow = row.original;
 				return (
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
@@ -76,12 +67,14 @@ export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => handleUpdateUser(user)}>Update User</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete("user", user.id)}>Delete User</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleUpdateUser(userRow)}>Update User</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleDelete("user", userRow.id)}>Delete User</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				);
 			},
-		},
-	];
+		});
+	}
+
+	return columns;
 };
