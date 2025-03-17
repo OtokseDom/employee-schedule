@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 const formSchema = z.object({
 	name: z.string({
@@ -35,6 +36,7 @@ const formSchema = z.object({
 });
 
 export default function UserForm({ data, setUsers, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { user, setUser } = useAuthContext();
 	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());
@@ -122,9 +124,10 @@ export default function UserForm({ data, setUsers, loading, setLoading, setIsOpe
 				fetchData();
 				showToast("Success!", "User added.", 3000);
 			} else {
-				await axiosClient.put(`/user-auth/${updateData?.id}`, formattedData);
+				const userResponse = await axiosClient.put(`/user-auth/${updateData?.id}`, formattedData);
 				// fetch data to load user table and calendar
 				fetchData();
+				if (user.id === userResponse.data.data.id) setUser(userResponse.data.data);
 				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {
