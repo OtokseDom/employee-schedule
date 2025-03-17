@@ -20,11 +20,6 @@ export default function WeekView({ currentWeek, schedules, loading, openModal, h
 		const endMinutes = shiftEnd.getMinutes();
 		const durationMinutes = endHour * 60 + endMinutes - (startHour * 60 + startMinutes) - (startMinutes + endMinutes); //- (startMinutes + endMinutes) is for offset
 
-		console.log("start hour: " + startHour);
-		console.log("start mins: " + startMinutes);
-		console.log("end hour: " + endHour);
-		console.log("end mins: " + endMinutes);
-		console.log("duration: " + durationMinutes);
 		return {
 			top: `${startHour * 50 + (startMinutes / 60) * 50}px`, // Each hour is 50px high, calculate top position considering minutes
 			height: `${(durationMinutes / 60) * 50}px`, // Duration in minutes converted to height in pixels
