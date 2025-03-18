@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('expected_output')->nullable();
-            $table->foreignId('assignee_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');;
+            $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');;
             $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold'])->default('pending');
             $table->date('start_date');
             $table->date('end_date');
