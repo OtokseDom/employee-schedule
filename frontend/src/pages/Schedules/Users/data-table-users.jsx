@@ -127,6 +127,12 @@ export function DataTableUsers({
 								})}
 						</DropdownMenuContent>
 					</DropdownMenu>
+					<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+						<ChevronLeft />
+					</Button>
+					<Button variant="outline" size="" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+						<ChevronRight />
+					</Button>
 				</div>
 			</div>
 			<div className="rounded-md">

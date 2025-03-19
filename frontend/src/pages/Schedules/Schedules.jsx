@@ -19,6 +19,10 @@ export default function Schedules() {
 	const [isOpenEvent, setIsOpenEvent] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+	// Refs to store previous values
+	const prevUsersRef = useRef([]);
+	const prevEventsRef = useRef([]);
+	const prevSchedulesRef = useRef([]);
 	useEffect(() => {
 		fetchData();
 	}, [selectedUser]);

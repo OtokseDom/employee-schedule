@@ -10,10 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EventForm from "./EventForm";
+import TaskForm from "./TaskForm";
 
 // Convert the DataTable component to JavaScript
-export function DataTableEvents({ columns, data, setEvents, loading, setLoading, isOpenEvent, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+export function DataTableTasks({ columns, data, setTasks, loading, setLoading, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -38,26 +38,26 @@ export function DataTableEvents({ columns, data, setEvents, loading, setLoading,
 		<div className="w-full">
 			<div className="flex py-4">
 				<Input
-					placeholder={"filter name..."}
-					value={table.getColumn("name")?.getFilterValue() || ""}
-					onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+					placeholder={"filter title..."}
+					value={table.getColumn("title")?.getFilterValue() || ""}
+					onChange={(task) => table.getColumn("title")?.setFilterValue(task.target.value)}
 					className="max-w-sm"
 				/>
 				<div className="flex gap-2 ml-auto">
-					<Sheet open={isOpenEvent} onOpenChange={setIsOpenEvent} modal={false}>
+					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>
-							<Button variant="">Add Event</Button>
+							<Button variant="">Add Task</Button>
 						</SheetTrigger>
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>Add Event</SheetTitle>
+								<SheetTitle>Add Task</SheetTitle>
 							</SheetHeader>
-							<EventForm
+							<TaskForm
 								data={data}
-								setEvents={setEvents}
+								setTasks={setTasks}
 								loading={loading}
 								setLoading={setLoading}
-								setIsOpenEvent={setIsOpenEvent}
+								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}
 								fetchData={fetchData}
