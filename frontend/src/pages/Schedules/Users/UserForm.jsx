@@ -290,7 +290,7 @@ export default function UserForm({ data, setUsers, loading, setLoading, setIsOpe
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {updateData ? "Update" : "Submit"}
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>

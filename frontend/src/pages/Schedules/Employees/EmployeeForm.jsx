@@ -106,7 +106,7 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 		};
 		setLoading(true);
 		try {
-			if (!updateData) {
+			if (Object.keys(updateData).length === 0) {
 				const employeeResponse = await axiosClient.post(`/employee`, formattedData);
 				fetchData();
 				// const addedEmployee = employeeResponse.data;
@@ -229,7 +229,7 @@ export default function EmployeeForm({ data, setEmployees, loading, setLoading, 
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {updateData ? "Update" : "Submit"}
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>

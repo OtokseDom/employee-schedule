@@ -43,7 +43,8 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 	const handleSubmit = async (form) => {
 		setLoading(true);
 		try {
-			if (!updateData) {
+			if (Object.keys(updateData).length === 0) {
+				console.log("add");
 				const eventResponse = await axiosClient.post(`/event`, form);
 				const addedEvent = eventResponse.data;
 				// Insert added event in events array
@@ -51,6 +52,7 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 				setEvents(updatedEvents);
 				showToast("Success!", "Event added.", 3000);
 			} else {
+				console.log("update");
 				await axiosClient.put(`/event/${updateData?.id}`, form);
 				fetchData();
 				showToast("Success!", "Event updated.", 3000);
@@ -98,7 +100,7 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {updateData ? "Update" : "Submit"}
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>

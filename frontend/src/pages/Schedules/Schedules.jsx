@@ -1,11 +1,11 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useRef, useState } from "react";
 import CalendarSchedule from "@/components/schedule/calendar";
-import { columnsEvent } from "./columns-event";
-import { DataTableEvents } from "./data-table-events";
+import { columnsEvent } from "./Events/columns-event";
+import { DataTableEvents } from "./Events/data-table-events";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableUsers } from "./data-table-users";
-import { columnsUser } from "./columns-user";
+import { DataTableUsers } from "./Users/data-table-users";
+import { columnsUser } from "./Users/columns-user";
 
 export default function Schedules() {
 	const showToast = useToast();
@@ -19,7 +19,6 @@ export default function Schedules() {
 	const [isOpenEvent, setIsOpenEvent] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
-
 	useEffect(() => {
 		fetchData();
 	}, [selectedUser]);
