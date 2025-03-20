@@ -11,12 +11,33 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TaskForm from "./TaskForm";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({ columns, data, setTasks, loading, setLoading, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
-	const [columnVisibility, setColumnVisibility] = useState([]);
+	const [selectedColumn, setSelectedColumn] = useState(null);
+	const [filterValue, setFilterValue] = useState("");
+
+	// Select what column to filter
+	const handleColumnChange = (columnId) => {
+		setSelectedColumn(columnId);
+		setFilterValue("");
+	};
+	// Apply filter as value changes
+	const handleFilterChange = (value) => {
+		setFilterValue(value);
+		if (selectedColumn) {
+			table.getColumn(selectedColumn)?.setFilterValue(value);
+		}
+	};
+	const [columnVisibility, setColumnVisibility] = useState({
+		"expected output": false,
+		"time estimate": false,
+		delay: false,
+		remarks: false,
+	});
 	const table = useReactTable({
 		data,
 		columns,
@@ -37,12 +58,33 @@ export function DataTableTasks({ columns, data, setTasks, loading, setLoading, i
 	return (
 		<div className="w-full">
 			<div className="flex py-4">
-				<Input
-					placeholder={"filter title..."}
-					value={table.getColumn("title")?.getFilterValue() || ""}
-					onChange={(task) => table.getColumn("title")?.setFilterValue(task.target.value)}
-					className="max-w-sm"
-				/>
+				<div className="flex flex-row gap-4">
+					{/* Input field to enter filter value */}
+					<Input
+						type="text"
+						placeholder={selectedColumn ? `Filter by ${selectedColumn}` : "Select a column first"}
+						value={filterValue}
+						onChange={(e) => handleFilterChange(e.target.value)}
+						disabled={!selectedColumn} // Disable until a column is selected
+						className="max-w-sm"
+					/>
+					{/* Dropdown Menu for selecting column */}
+					<Select onValueChange={handleColumnChange}>
+						<SelectTrigger className="w-60 capitalize">
+							<SelectValue placeholder="Select Column" />
+						</SelectTrigger>
+						<SelectContent>
+							{table
+								.getAllColumns()
+								.filter((col) => col.getCanFilter())
+								.map((col) => (
+									<SelectItem key={col.id} value={col.id} className="capitalize">
+										{col.id}
+									</SelectItem>
+								))}
+						</SelectContent>
+					</Select>
+				</div>
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>

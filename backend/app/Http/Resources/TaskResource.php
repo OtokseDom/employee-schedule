@@ -36,6 +36,8 @@ class TaskResource extends JsonResource
                 return [
                     'name' => $this->assignee->name,
                     'email' => $this->assignee->email,
+                    'role' => $this->assignee->role,
+                    'position' => $this->assignee->position,
                 ];
             }),
         ];

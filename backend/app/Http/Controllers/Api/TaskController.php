@@ -12,7 +12,7 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::with(['assignee:id,name,email'])->orderBy('id', 'DESC')->get();
+        $tasks = Task::with(['assignee:id,name,email,role,position'])->orderBy('id', 'DESC')->get();
         return TaskResource::collection($tasks);
     }
 
@@ -25,14 +25,14 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        $task->load(['assignee:id,name,email']);
+        $task->load(['assignee:id,name,email,role,position']);
         return new TaskResource($task);
     }
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $task->update($request->validated());
-        $task->load(['assignee:id,name,email']);
+        $task->load(['assignee:id,name,email,role,position']);
         return new TaskResource($task);
     }
 

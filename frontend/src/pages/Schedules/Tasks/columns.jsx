@@ -10,6 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
 export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) => {
 	const handleUpdate = (task) => {
 		setIsOpenEvent(true);
@@ -17,6 +18,28 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 	};
 
 	return [
+		{
+			id: "assignee",
+			accessorKey: "assignee.name",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			cell: ({ row }) => {
+				const assignee = row.original.assignee;
+
+				return (
+					<div>
+						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
+						<br />
+						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
+					</div>
+				);
+			},
+		},
 		{
 			id: "category",
 			accessorKey: "category",
@@ -38,37 +61,15 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 					</button>
 				);
 			},
-		},
-		{
-			id: "description",
-			accessorKey: "description",
-			header: ({ column }) => {
+			cell: ({ row }) => {
+				const title = row.original.title;
+				const description = row.original.description;
 				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Description <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-		},
-		{
-			id: "expected output",
-			accessorKey: "expected_output",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Expected Output <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-		},
-		{
-			id: "assignee",
-			accessorKey: "assignee.name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
+					<div className="">
+						{title}
+						<br />
+						<span className="text-sm text-gray-500">{description}</span>
+					</div>
 				);
 			},
 		},
@@ -79,6 +80,37 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
 						Status <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			cell: ({ row }) => {
+				const status = row.original.status;
+
+				// Define color classes based on status value
+				const statusColors = {
+					Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
+					"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
+					Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
+					Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
+					Delayed: "bg-red-100 border border-red-800 border-2 text-red-800",
+					"On Hold": "bg-red-100 border border-red-800 border-2 text-red-800",
+				};
+
+				return (
+					<div className={`px-2 py-1 min-w-28 text-center rounded-2xl text-sm font-medium ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
+						{status.replace("_", " ")}
+					</div>
+				);
+			},
+		},
+		{
+			id: "expected output",
+			accessorKey: "expected_output",
+			meta: { hidden: true },
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Expected Output <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
 			},
@@ -93,6 +125,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 					</button>
 				);
 			},
+			accessorFn: (row) => (row.start_date ? format(new Date(row.start_date), "MMM-dd yyyy") : ""),
 		},
 		{
 			id: "end date",
@@ -104,6 +137,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 					</button>
 				);
 			},
+			accessorFn: (row) => (row.end_date ? format(new Date(row.end_date), "MMM-dd yyyy") : ""),
 		},
 		{
 			id: "time estimate",
@@ -111,7 +145,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 			header: ({ column }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Time Estimate <ArrowUpDown className="ml-2 h-4 w-4" />
+						Time Estimate (hrs) <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
 			},
@@ -122,7 +156,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 			header: ({ column }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Time Taken <ArrowUpDown className="ml-2 h-4 w-4" />
+						Time Taken (hrs) <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
 			},
