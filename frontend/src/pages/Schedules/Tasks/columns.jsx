@@ -65,7 +65,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 				const title = row.original.title;
 				const description = row.original.description;
 				return (
-					<div className="">
+					<div className="min-w-52">
 						{title}
 						<br />
 						<span className="text-sm text-gray-500">{description}</span>
@@ -203,6 +203,10 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 						Remarks <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
+			},
+			cell: ({ row }) => {
+				const remarks = row.original.remarks;
+				return <div className="min-w-52">{remarks}</div>;
 			},
 		},
 		{
