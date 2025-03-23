@@ -1,8 +1,8 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
-import { columnsEvent } from "./Tasks/columns";
+import { columnsTask } from "./TaskDataTable/columns";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableTasks } from "./Tasks/data-table";
+import { DataTableTasks } from "./TaskDataTable/data-table";
 
 export default function Tasks() {
 	const showToast = useToast();
@@ -53,7 +53,7 @@ export default function Tasks() {
 				<p>View list of all tasks</p>
 			</div>
 			<DataTableTasks
-				columns={columnsEvent({ handleDelete, setIsOpen, setUpdateData })}
+				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
 				data={tasks}
 				setTasks={setTasks}
 				loading={loading}

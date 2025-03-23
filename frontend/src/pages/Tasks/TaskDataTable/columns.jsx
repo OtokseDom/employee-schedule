@@ -11,9 +11,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) => {
+export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const handleUpdate = (task) => {
-		setIsOpenEvent(true);
+		setIsOpen(true);
 		setUpdateData(task);
 	};
 

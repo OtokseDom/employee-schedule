@@ -7,7 +7,7 @@ import Signup from "./pages/Signup";
 import GuestLayout from "./components/GuestLayout";
 import AdminLayout from "./components/AdminLayout";
 import Schedules from "./pages/Schedules/Schedules";
-import Tasks from "./pages/Schedules/Tasks";
+import Tasks from "./pages/Tasks/Tasks";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
