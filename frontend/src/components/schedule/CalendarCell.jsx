@@ -1,8 +1,10 @@
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
 import { format, parse } from "date-fns";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
-export default function CalendarCell({ color, loading, formattedSchedules, date, hoveredEvent, setHoveredEvent, openModal }) {
+export default function CalendarCell({ color, formattedSchedules, date, hoveredEvent, setHoveredEvent, openModal }) {
+	const { loading } = useLoadContext();
 	const shiftStart = formattedSchedules?.shift_start ? parse(formattedSchedules.shift_start, "HH:mm:ss", new Date()) : null;
 	const shiftEnd = formattedSchedules?.shift_end ? parse(formattedSchedules.shift_end, "HH:mm:ss", new Date()) : null;
 	return color == "yellow" ? (

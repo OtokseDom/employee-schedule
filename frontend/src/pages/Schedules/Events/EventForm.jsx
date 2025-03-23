@@ -10,6 +10,7 @@ import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useEffect } from "react";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 const formSchema = z.object({
 	name: z.string({
@@ -20,7 +21,8 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EventForm({ data, setEvents, loading, setLoading, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+export default function EventForm({ data, setEvents, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
 		resolver: zodResolver(formSchema),

@@ -33,6 +33,7 @@ import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
 import WeekView from "./WeekView";
 import { Skeleton } from "../ui/skeleton";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 const formSchema = z.object({
 	// coerce ensures that even if it's a string, it will convert it to a number.
@@ -42,7 +43,8 @@ const formSchema = z.object({
 	status: z.string(),
 });
 
-export default function CalendarSchedule({ users, events, schedules, setSchedules, loading, setLoading, selectedUser }) {
+export default function CalendarSchedule({ users, events, schedules, setSchedules, selectedUser }) {
+	const { loading, setLoading } = useLoadContext();
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [currentWeek, setCurrentWeek] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState(null);

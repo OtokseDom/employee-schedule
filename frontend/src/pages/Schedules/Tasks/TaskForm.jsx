@@ -71,6 +71,36 @@ export default function EventForm({ data, setEvents, loading, setLoading, setIsO
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
 				<FormField
 					control={form.control}
+					name="assignee_id"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Assignee</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select an assignee"></SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(events) && events.length > 0 ? (
+											events?.map((event) => (
+												<SelectItem key={event?.id} value={event?.id}>
+													{event?.name}
+												</SelectItem>
+											))
+										) : (
+											<SelectItem disabled>No events available</SelectItem>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
 					name="name"
 					render={({ field }) => {
 						return (

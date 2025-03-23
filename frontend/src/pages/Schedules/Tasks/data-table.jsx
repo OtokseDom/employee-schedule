@@ -12,9 +12,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TaskForm from "./TaskForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
-export function DataTableTasks({ columns, data, setTasks, loading, setLoading, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
@@ -97,8 +99,6 @@ export function DataTableTasks({ columns, data, setTasks, loading, setLoading, i
 							<TaskForm
 								data={data}
 								setTasks={setTasks}
-								loading={loading}
-								setLoading={setLoading}
 								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}

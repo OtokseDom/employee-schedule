@@ -12,14 +12,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Userform from "./Userform";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
 export function DataTableUsers({
 	columns,
 	data,
 	setUsers,
-	loading,
-	setLoading,
 	setSelectedUser,
 	firstRow,
 	isOpen,
@@ -30,6 +29,7 @@ export function DataTableUsers({
 	setUpdateData,
 	fetchData,
 }) {
+	const { loading, setLoading } = useLoadContext();
 	const { user } = useAuthContext();
 
 	const [sorting, setSorting] = useState([]);
@@ -96,8 +96,6 @@ export function DataTableUsers({
 							<Userform
 								data={data}
 								setUsers={setUsers}
-								loading={loading}
-								setLoading={setLoading}
 								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}

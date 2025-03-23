@@ -68,6 +68,4 @@ export default function Tasks() {
 	);
 }
 // php artisan make:controller Api/UserTaskController --model=UserTask --requests --resource --api
-// TODO: refactor task, remove user relation
-// TODO: add UserTask table for user-task relation
 // TODO: update task form

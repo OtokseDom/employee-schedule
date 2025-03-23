@@ -11,9 +11,11 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventForm from "./EventForm";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
-export function DataTableEvents({ columns, data, setEvents, loading, setLoading, isOpenEvent, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+export function DataTableEvents({ columns, data, setEvents, isOpenEvent, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -55,8 +57,6 @@ export function DataTableEvents({ columns, data, setEvents, loading, setLoading,
 							<EventForm
 								data={data}
 								setEvents={setEvents}
-								loading={loading}
-								setLoading={setLoading}
 								setIsOpenEvent={setIsOpenEvent}
 								updateData={updateData}
 								setUpdateData={setUpdateData}

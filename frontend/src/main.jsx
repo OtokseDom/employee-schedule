@@ -9,6 +9,7 @@ import { SidebarContextProvider } from "./contexts/SidebarContextProvider";
 import { ScrollContextProvider } from "./contexts/ScrollContextProvider";
 import { ToastProvider } from "@radix-ui/react-toast";
 import { ToastContextProvider } from "./contexts/ToastContextProvider";
+import { LoadContextProvider } from "./contexts/LoadContextProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	// Strict mode rerenders everything twice to detect side effects
@@ -18,9 +19,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 				<ToastProvider swipeDirection="right">
 					<ToastContextProvider>
 						<ScrollContextProvider>
-							<ThemeProvider>
-								<RouterProvider router={router} />
-							</ThemeProvider>
+							<LoadContextProvider>
+								<ThemeProvider>
+									<RouterProvider router={router} />
+								</ThemeProvider>
+							</LoadContextProvider>
 						</ScrollContextProvider>
 					</ToastContextProvider>
 				</ToastProvider>

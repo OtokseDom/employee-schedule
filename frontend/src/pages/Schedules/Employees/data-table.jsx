@@ -11,14 +11,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmployeeForm from "./EmployeeForm";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
 export function DataTable({
 	columns,
 	data,
 	setEmployees,
-	loading,
-	setLoading,
 	setSelectedEmployee,
 	firstRow,
 	isOpen,
@@ -29,6 +28,7 @@ export function DataTable({
 	setUpdateData,
 	fetchData,
 }) {
+	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -91,8 +91,6 @@ export function DataTable({
 							<EmployeeForm
 								data={data}
 								setEmployees={setEmployees}
-								loading={loading}
-								setLoading={setLoading}
 								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}

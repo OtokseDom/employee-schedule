@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
 import { Loader2 } from "lucide-react";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Signup() {
+	const { loading, setLoading } = useLoadContext();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
-	const [loading, setLoading] = useState(false);
 
 	const nameRef = useRef();
 	const emailRef = useRef();

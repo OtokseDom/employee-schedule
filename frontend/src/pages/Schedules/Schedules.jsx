@@ -6,13 +6,16 @@ import { DataTableEvents } from "./Events/data-table-events";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableUsers } from "./Users/data-table-users";
 import { columnsUser } from "./Users/columns-user";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Schedules() {
+	const { loading, setLoading } = useLoadContext();
+
 	const showToast = useToast();
 	const [users, setUsers] = useState([]);
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(false);
 	const [selectedUser, setSelectedUser] = useState(users[0] || null);
 	const [selectedTab, setSelectedTab] = useState(1);
 	const [isOpen, setIsOpen] = useState(false);
@@ -112,8 +115,6 @@ export default function Schedules() {
 							columns={columnsUser({ handleDelete, setIsOpen, setUpdateData })}
 							data={users}
 							setUsers={setUsers}
-							loading={loading}
-							setLoading={setLoading}
 							setSelectedUser={setSelectedUser}
 							firstRow={users[0]?.id}
 							isOpen={isOpen}
@@ -130,8 +131,6 @@ export default function Schedules() {
 							columns={columnsEvent({ handleDelete, setIsOpenEvent, setUpdateData })}
 							data={events}
 							setEvents={setEvents}
-							loading={loading}
-							setLoading={setLoading}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpenEvent={isOpenEvent}
@@ -146,15 +145,7 @@ export default function Schedules() {
 					<h1 className=" font-extrabold text-3xl">Schedules</h1>
 					<p>List of Schedules</p>
 				</div>
-				<CalendarSchedule
-					users={users}
-					events={events}
-					schedules={schedules}
-					setSchedules={setSchedules}
-					loading={loading}
-					setLoading={setLoading}
-					selectedUser={selectedUser}
-				/>
+				<CalendarSchedule users={users} events={events} schedules={schedules} setSchedules={setSchedules} selectedUser={selectedUser} />
 			</div>
 		</div>
 	);

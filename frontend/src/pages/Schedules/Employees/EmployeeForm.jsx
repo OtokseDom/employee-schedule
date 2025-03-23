@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 const formSchema = z.object({
 	name: z.string({
@@ -28,7 +29,8 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EmployeeForm({ data, setEmployees, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function EmployeeForm({ data, setEmployees, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [date, setDate] = useState();
 	const [month, setMonth] = useState(date ? date.getMonth() : new Date().getMonth());

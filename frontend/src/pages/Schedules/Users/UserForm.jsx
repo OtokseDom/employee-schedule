@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 const formSchema = z.object({
 	name: z.string({
@@ -35,7 +36,8 @@ const formSchema = z.object({
 	}),
 });
 
-export default function UserForm({ data, setUsers, loading, setLoading, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function UserForm({ data, setUsers, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const { user, setUser } = useAuthContext();
 	const showToast = useToast();
 	const [date, setDate] = useState();

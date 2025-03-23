@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import axiosClient from "../axios.client";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import { Loader2 } from "lucide-react";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Login() {
+	const { loading, setLoading } = useLoadContext();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
 	const emailRef = useRef();
 	const passwordRef = useRef();
-	const [loading, setLoading] = useState(false);
 
 	const onsubmit = (e) => {
 		setLoading(true);
