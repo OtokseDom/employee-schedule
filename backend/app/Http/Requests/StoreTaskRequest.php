@@ -29,13 +29,32 @@ class StoreTaskRequest extends FormRequest
             'assignee_id' => 'nullable|exists:users,id',
             'status' => 'required|in:Pending,In Progress,Completed,Delayed,Cancelled,On Hold',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
             'time_estimate' => 'nullable|numeric',
             'time_taken' => 'nullable|numeric',
             'delay' => 'nullable|numeric',
             'delay_reason' => 'nullable|string',
             'performance_rating' => 'nullable|integer|min:0|max:100',
             'remarks' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'category.required' => 'Category is required.',
+            'title.required' => 'Title is required.',
+            'status.required' => 'Status is required.',
+            'start_date.required' => 'Start date is required.',
+            'end_date.after_or_equal' => 'End date must be after or equal to start date.',
+            'performance_rating.min' => 'Performance rating must be at least 0.',
+            'performance_rating.max' => 'Performance rating may not be greater than 100.',
+            // ...other custom messages...
         ];
     }
 }

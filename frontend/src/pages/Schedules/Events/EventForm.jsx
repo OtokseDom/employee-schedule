@@ -13,11 +13,11 @@ import { useEffect } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 const formSchema = z.object({
-	name: z.string({
-		required_error: "Name is required.",
+	name: z.string().refine((data) => data.trim() !== "", {
+		message: "Name is required.",
 	}),
-	description: z.string({
-		required_error: "Description is required.",
+	description: z.string().refine((data) => data.trim() !== "", {
+		message: "Description is required.",
 	}),
 });
 
@@ -46,7 +46,6 @@ export default function EventForm({ data, setEvents, setIsOpenEvent, updateData,
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
-				console.log("add");
 				const eventResponse = await axiosClient.post(`/event`, form);
 				const addedEvent = eventResponse.data;
 				// Insert added event in events array
@@ -54,7 +53,6 @@ export default function EventForm({ data, setEvents, setIsOpenEvent, updateData,
 				setEvents(updatedEvents);
 				showToast("Success!", "Event added.", 3000);
 			} else {
-				console.log("update");
 				await axiosClient.put(`/event/${updateData?.id}`, form);
 				fetchData();
 				showToast("Success!", "Event updated.", 3000);
