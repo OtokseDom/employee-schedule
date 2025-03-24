@@ -8,7 +8,7 @@ const SidebarContext = createContext({
 export const SidebarContextProvider = ({ children }) => {
 	const [expanded, setExpanded] = useState(() => {
 		const savedMode = sessionStorage.getItem("expanded");
-		return savedMode ? JSON.parse(savedMode) : false; // Default to false if nothing is saved
+		return savedMode ? JSON.parse(savedMode) : true; // Default to false if nothing is saved
 	});
 
 	return (

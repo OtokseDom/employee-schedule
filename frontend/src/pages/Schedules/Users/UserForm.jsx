@@ -85,7 +85,7 @@ export default function UserForm({ data, setUsers, setIsOpen, updateData, setUpd
 				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});

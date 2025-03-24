@@ -144,11 +144,12 @@ export default function CalendarSchedule({ users, events, schedules, setSchedule
 				showToast("Success!", "Schedule added.", 3000);
 			}
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 7000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
+			closeModal();
 		}
 	};
 	const handleDelete = async () => {
@@ -160,7 +161,7 @@ export default function CalendarSchedule({ users, events, schedules, setSchedule
 			showToast("Success!", "Schedule deleted.", 3000);
 			setSelectedScheduleId(null);
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 7000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
@@ -291,15 +292,11 @@ export default function CalendarSchedule({ users, events, schedules, setSchedule
 										return (
 											<FormItem>
 												<FormLabel>Event</FormLabel>
-												<Select onValueChange={field.onChange} defaultValue={field.value}>
+												<Select onValueChange={field.onChange} defaultValue={modalData?.event_id || field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue placeholder="Select an event">
-																{modalData.event_id && !field.value
-																	? events.find((event) => event?.id == modalData.event)?.name
-																	: field.value
-																	? events.find((event) => event?.id == field.value)?.name
-																	: "Select an event"}
+																{field.value ? events.find((event) => event?.id == field.value)?.name : "Select an event"}
 															</SelectValue>
 														</SelectTrigger>
 													</FormControl>

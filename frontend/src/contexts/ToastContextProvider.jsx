@@ -10,10 +10,11 @@ export function ToastContextProvider({ children }) {
 		title: "",
 		description: "",
 		duration: 3000, // Default duration (3 sec)
+		status: "success",
 	});
 
-	const showToast = (title, description, duration = 3000) => {
-		setToast({ open: true, title, description, duration });
+	const showToast = (title, description, duration = 3000, status = "success") => {
+		setToast({ open: true, title, description, duration, status });
 	};
 
 	return (
@@ -21,13 +22,21 @@ export function ToastContextProvider({ children }) {
 			{children}
 			<Toast.Provider swipeDirection="right">
 				<Toast.Root
-					className="border border-foreground bg-background text-foreground w-64 p-4 rounded shadow-lg fixed top-4 right-4 animate-fadeIn	z-[999]"
+					className={`border ${
+						toast.status == "success" ? "border-green-500" : toast.status == "fail" ? "border-red-800" : "border-foreground"
+					} bg-background text-foreground w-64 p-4 rounded shadow-lg fixed top-4 right-4 animate-fadeIn z-[999]`}
 					open={toast.open}
 					onOpenChange={(open) => setToast((prev) => ({ ...prev, open }))}
 					duration={toast.duration}
 				>
 					<div className="flex flex-row justify-between mb-2">
-						<Toast.Title className="font-bold">{toast.title}</Toast.Title>
+						<Toast.Title
+							className={`font-bold ${
+								toast.status == "success" ? "text-green-500" : toast.status == "fail" ? "text-red-800" : "text-foreground"
+							}`}
+						>
+							{toast.title}
+						</Toast.Title>
 						<Toast.Action asChild altText="Close">
 							<button className="ml-4 text-foreground">
 								<X size={16} />

@@ -123,7 +123,7 @@ export default function EmployeeForm({ data, setEmployees, setIsOpen, updateData
 				showToast("Success!", "Employee updated.", 3000);
 			}
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});

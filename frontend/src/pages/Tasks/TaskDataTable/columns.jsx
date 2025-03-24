@@ -227,7 +227,7 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 						<DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>Copy payment ID</DropdownMenuItem>
 						<DropdownMenuSeparator /> */}
 							<DropdownMenuItem onClick={() => handleUpdate(task)}>Update Task</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete("task", task.id)}>Delete Task</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleDelete(task.id)}>Delete Task</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				);

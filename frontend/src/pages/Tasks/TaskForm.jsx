@@ -16,7 +16,7 @@ import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
 
 const formSchema = z.object({
-	assignee_id: z.string({
+	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
 	category: z.string().refine((data) => data.trim() !== "", {
@@ -66,9 +66,11 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 			status: undefined,
 		},
 	});
+
 	useEffect(() => {
 		fetchUsers();
 	}, [isOpen]);
+
 	const fetchUsers = async () => {
 		setLoading(true);
 		try {
@@ -103,22 +105,22 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				status,
 			} = updateData;
 			form.reset({
-				title,
-				description,
-				assignee_id,
-				category,
-				expected_output,
+				title: title || "",
+				description: description || "",
+				assignee_id: assignee_id || undefined,
+				category: category || "",
+				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
 				end_date: end_date ? parseISO(end_date) : undefined,
-				time_estimate,
-				delay,
-				delay_reason,
-				performance_rating,
-				remarks,
-				status,
+				time_estimate: time_estimate || "",
+				delay: delay || "",
+				delay_reason: delay_reason || "",
+				performance_rating: performance_rating || "",
+				remarks: remarks || "",
+				status: status || undefined,
 			});
 		}
-	}, [updateData, form]);
+	}, [updateData, form, users]);
 
 	const handleSubmit = async (formData) => {
 		setLoading(true);
@@ -134,6 +136,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 			};
 
 			if (Object.keys(updateData).length === 0) {
+				console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
@@ -146,7 +149,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				setUpdateData({});
 			}
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 			if (e.response?.data?.errors) {
 				const backendErrors = e.response.data.errors;
@@ -172,23 +175,19 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
+								<Select onValueChange={field.onChange} defaultValue={updateData?.assignee_id || field.value}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select an assignee">
-												{updateData.id && !field.value
-													? users.find((user) => user?.id == updateData.user)?.name
-													: field.value
-													? users.find((user) => user?.id == field.value)?.name
-													: "Select an assignee"}
+												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
 											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
 										{Array.isArray(users) && users.length > 0 ? (
-											users?.map((user) => (
-												<SelectItem key={user?.id} value={user?.id}>
-													{user?.name}
+											users.map((user) => (
+												<SelectItem key={user.id} value={user.id}>
+													{user.name}
 												</SelectItem>
 											))
 										) : (
@@ -360,6 +359,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 							{ id: 3, name: "Completed" },
 							{ id: 4, name: "Delayed" },
 							{ id: 5, name: "On Hold" },
+							{ id: 6, name: "Cancelled" },
 						];
 						return (
 							<FormItem>

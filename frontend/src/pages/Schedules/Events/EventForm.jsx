@@ -58,7 +58,7 @@ export default function EventForm({ data, setEvents, setIsOpenEvent, updateData,
 				showToast("Success!", "Event updated.", 3000);
 			}
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});

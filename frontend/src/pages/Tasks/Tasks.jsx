@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { columnsTask } from "./TaskDataTable/columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./TaskDataTable/data-table";
-
+// TODO: Update and delete task
 export default function Tasks() {
 	const showToast = useToast();
 	const [tasks, setTasks] = useState([]);
@@ -35,11 +35,11 @@ export default function Tasks() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const taskResponse = await axiosClient.delete(`/task/${id}`);
-			setUsers(taskResponse.data);
+			await axiosClient.delete(`/task/${id}`);
+			fetchData();
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
