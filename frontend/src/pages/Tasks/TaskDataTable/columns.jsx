@@ -11,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
@@ -215,21 +216,36 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 				const task = row.original;
 
 				return (
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0">
-								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{/* <DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>Copy payment ID</DropdownMenuItem>
-						<DropdownMenuSeparator /> */}
-							<DropdownMenuItem onClick={() => handleUpdate(task)}>Update Task</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete(task.id)}>Delete Task</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<Dialog>
+						<DropdownMenu modal={false}>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">Open menu</span>
+									<MoreHorizontal className="h-4 w-4" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem onClick={() => handleUpdate(task)}>Update Task</DropdownMenuItem>
+								<DropdownMenuItem>
+									<DialogTrigger>Delete Task</DialogTrigger>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Are you absolutely sure?</DialogTitle>
+								<DialogDescription>This action cannot be undone.</DialogDescription>
+							</DialogHeader>
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button type="button" variant="secondary">
+										Close
+									</Button>
+								</DialogClose>
+								<Button onClick={() => handleDelete(task.id)}>Yes, delete</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				);
 			},
 		},
