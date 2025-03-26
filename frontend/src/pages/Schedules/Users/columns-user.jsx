@@ -3,6 +3,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
@@ -59,18 +60,43 @@ export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			cell: ({ row }) => {
 				const userRow = row.original;
 				return (
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0">
-								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => handleUpdateUser(userRow)}>Update User</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete("user", userRow.id)}>Delete User</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<Dialog>
+						<DropdownMenu modal={false}>
+							<DropdownMenuTrigger
+								asChild
+								onClick={(event) => event.stopPropagation()} // Prevent row click
+							>
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">Open menu</span>
+									<MoreHorizontal className="h-4 w-4" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(userRow)}>
+									Update User
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={(event) => event.stopPropagation()} // Prevent row click
+								>
+									<DialogTrigger>Delete User</DialogTrigger>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Are you absolutely sure?</DialogTitle>
+								<DialogDescription>This action cannot be undone.</DialogDescription>
+							</DialogHeader>
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button type="button" variant="secondary">
+										Close
+									</Button>
+								</DialogClose>
+								<Button onClick={() => handleDelete("user", userRow.id)}>Yes, delete</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				);
 			},
 		});

@@ -225,7 +225,9 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								<DropdownMenuItem onClick={() => handleUpdate(task)}>Update Task</DropdownMenuItem>
+								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdate(task)}>
+									Update Task
+								</DropdownMenuItem>
 								<DropdownMenuItem>
 									<DialogTrigger>Delete Task</DialogTrigger>
 								</DropdownMenuItem>

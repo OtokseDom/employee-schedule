@@ -10,6 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) => {
 	const handleUpdateEvent = (event) => {
 		setIsOpenEvent(true);
@@ -44,21 +45,38 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 				const event = row.original;
 
 				return (
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0">
-								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{/* <DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>Copy payment ID</DropdownMenuItem>
-						<DropdownMenuSeparator /> */}
-							<DropdownMenuItem onClick={() => handleUpdateEvent(event)}>Update Event</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDelete("event", event.id)}>Delete Event</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<Dialog>
+						<DropdownMenu modal={false}>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">Open menu</span>
+									<MoreHorizontal className="h-4 w-4" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateEvent(event)}>
+									Update Event
+								</DropdownMenuItem>
+								<DropdownMenuItem>
+									<DialogTrigger>Delete Event</DialogTrigger>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Are you absolutely sure?</DialogTitle>
+								<DialogDescription>This action cannot be undone.</DialogDescription>
+							</DialogHeader>
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button type="button" variant="secondary">
+										Close
+									</Button>
+								</DialogClose>
+								<Button onClick={() => handleDelete("event", event.id)}>Yes, delete</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				);
 			},
 		},
