@@ -152,6 +152,7 @@ export function DataTableUsers({
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
 								<TableRow
+									className="cursor-pointer"
 									key={row.id}
 									data-state={row.getIsSelected() && "selected"}
 									// to select only 1 row at a time
