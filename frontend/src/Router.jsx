@@ -8,6 +8,7 @@ import GuestLayout from "./components/GuestLayout";
 import AdminLayout from "./components/AdminLayout";
 import Schedules from "./pages/Schedules/Schedules";
 import Tasks from "./pages/Tasks/Tasks";
+import UserProfile from "./pages/UserProfiles/UserProfile";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -16,9 +17,9 @@ const router = createBrowserRouter([
 		element: <AdminLayout />,
 		children: [
 			{ path: "/", element: <Navigate to="/schedule" /> },
-			{ path: "/dashboard", element: <Dashboard /> },
 			{ path: "/schedule", element: <Schedules /> },
 			{ path: "/task", element: <Tasks /> },
+			{ path: "/profile", element: <UserProfile /> },
 		],
 	},
 	{

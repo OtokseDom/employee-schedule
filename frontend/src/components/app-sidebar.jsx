@@ -23,7 +23,7 @@ import axiosClient from "@/axios.client";
 // Menu items.
 const items = [
 	{
-		title: "Schedules",
+		title: "User Schedules",
 		url: "/schedule",
 		icon: Calendar,
 	},

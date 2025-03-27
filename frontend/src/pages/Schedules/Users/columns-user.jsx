@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
@@ -72,6 +73,9 @@ export const columnsUser = ({ handleDelete, setIsOpen, setUpdateData }) => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
+								<DropdownMenuItem className="cursor-pointer">
+									<Link to={`/profile`}>View Profile</Link>
+								</DropdownMenuItem>
 								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(userRow)}>
 									Update User
 								</DropdownMenuItem>

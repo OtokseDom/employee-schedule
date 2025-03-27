@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { columnsTask } from "./TaskDataTable/columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./TaskDataTable/data-table";
-// TODO: Update and delete task
+
 export default function Tasks() {
 	const showToast = useToast();
 	const [tasks, setTasks] = useState([]);
@@ -31,7 +31,7 @@ export default function Tasks() {
 			setLoading(false);
 		}
 	};
-	// TODO: Add validation before deletion of task
+
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
@@ -67,5 +67,3 @@ export default function Tasks() {
 		</div>
 	);
 }
-// php artisan make:controller Api/UserTaskController --model=UserTask --requests --resource --api
-// TODO: update task form
