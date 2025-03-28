@@ -180,17 +180,15 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<div className="flex items-center justify-center">
 										{loading ? (
 											<div className="flex flex-col space-y-3 w-full">
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
+												<Skeleton className="h-24 w-2/5 md:w-full" />
 											</div>
 										) : (
 											"No Results."

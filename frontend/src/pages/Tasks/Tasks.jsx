@@ -56,8 +56,6 @@ export default function Tasks() {
 				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
 				data={tasks}
 				setTasks={setTasks}
-				loading={loading}
-				setLoading={setLoading}
 				updateData={updateData}
 				setUpdateData={setUpdateData}
 				isOpen={isOpen}

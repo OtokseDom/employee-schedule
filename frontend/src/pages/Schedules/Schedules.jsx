@@ -16,23 +16,24 @@ export default function Schedules() {
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
 	// const [loading, setLoading] = useState(false);
-	const [selectedUser, setSelectedUser] = useState(users[0] || null);
+	const [selectedUser, setSelectedUser] = useState(users || null);
 	const [selectedTab, setSelectedTab] = useState(1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenEvent, setIsOpenEvent] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+
 	useEffect(() => {
-		fetchData();
+		if (selectedUser) {
+			fetchData();
+		}
 	}, [selectedUser]);
 
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
-	}, [isOpen]);
-
-	useEffect(() => {
-		if (!isOpenEvent) setUpdateData({});
-	}, [isOpenEvent]);
+		if (!isOpen && !isOpenEvent) {
+			setUpdateData({});
+		}
+	}, [isOpen, isOpenEvent]);
 
 	const fetchData = async () => {
 		setLoading(true);
