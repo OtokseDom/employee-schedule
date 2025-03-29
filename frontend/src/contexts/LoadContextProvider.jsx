@@ -7,7 +7,6 @@ const LoadContext = createContext({
 // Create context provider
 export const LoadContextProvider = ({ children }) => {
 	const [loading, setLoading] = useState(false);
-
 	return (
 		<LoadContext.Provider
 			value={{

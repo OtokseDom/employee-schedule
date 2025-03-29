@@ -149,7 +149,21 @@ export function DataTableUsers({
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ? (
+						{loading ? (
+							// Show skeleton while loading
+							<TableRow>
+								<TableCell colSpan={columns.length} className="h-24">
+									<div className="flex items-center justify-center">
+										<div className="flex flex-col space-y-3 w-full">
+											{Array.from({ length: 6 }).map((_, i) => (
+												<Skeleton key={i} className="h-24 w-2/5 md:w-full" />
+											))}
+										</div>
+									</div>
+								</TableCell>
+							</TableRow>
+						) : table.getRowModel().rows.length ? (
+							// Show table data if available
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									className="cursor-pointer"
@@ -170,23 +184,10 @@ export function DataTableUsers({
 								</TableRow>
 							))
 						) : (
+							// Show "No Results" only if data has finished loading and is truly empty
 							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24">
-									<div className="flex items-center justify-center">
-										{loading ? (
-											<div className="flex flex-col space-y-3 w-full">
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-												<Skeleton className="h-24 w-2/5 md:w-full" />
-											</div>
-										) : (
-											"No Results."
-										)}
-									</div>
+								<TableCell colSpan={columns.length} className="h-24 text-center">
+									No Results.
 								</TableCell>
 							</TableRow>
 						)}

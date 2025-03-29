@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { columnsTask } from "./TaskDataTable/columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./TaskDataTable/data-table";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Tasks() {
+	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [tasks, setTasks] = useState([]);
-	const [loading, setLoading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});

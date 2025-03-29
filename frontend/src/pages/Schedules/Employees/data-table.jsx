@@ -138,7 +138,29 @@ export function DataTable({
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ? (
+						{loading ? (
+							// Show skeleton while loading
+							<TableRow>
+								<TableCell colSpan={columns.length} className="h-24">
+									<div className="flex items-center justify-center">
+										<div className="flex flex-col space-y-3 w-full">
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+											<Skeleton className="h-4 w-1/3 md:w-3/4" />
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+											<Skeleton className="h-4 w-1/3 md:w-3/4" />
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+											<Skeleton className="h-4 w-1/3 md:w-3/4" />
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+											<Skeleton className="h-4 w-1/3 md:w-3/4" />
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+											<Skeleton className="h-4 w-1/3 md:w-3/4" />
+											<Skeleton className="h-4 w-2/5 md:w-full" />
+										</div>
+									</div>
+								</TableCell>
+							</TableRow>
+						) : table.getRowModel().rows.length ? (
+							// Show table data if available
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
@@ -158,27 +180,10 @@ export function DataTable({
 								</TableRow>
 							))
 						) : (
+							// Show "No Results" only if data has finished loading and is truly empty
 							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24">
-									<div className="flex items-center justify-center">
-										{loading ? (
-											<div className="flex flex-col space-y-3 w-full">
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-												<Skeleton className="h-4 w-1/3 md:w-3/4" />
-												<Skeleton className="h-4 w-2/5 md:w-full" />
-											</div>
-										) : (
-											"No Results."
-										)}
-									</div>
+								<TableCell colSpan={columns.length} className="h-24 text-center">
+									No Results.
 								</TableCell>
 							</TableRow>
 						)}
