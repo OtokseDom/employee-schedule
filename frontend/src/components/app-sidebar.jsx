@@ -25,11 +25,13 @@ const items = [
 	{
 		title: "User Schedules",
 		url: "/schedule",
+		childUrl: "/profile",
 		icon: Calendar,
 	},
 	{
 		title: "Task Tracker",
 		url: "/task",
+		childUrl: "",
 		icon: ClipboardList,
 	},
 ];
@@ -88,7 +90,10 @@ export function AppSidebar({ user, setUser, setToken }) {
 							{items.map((item) => (
 								<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
 									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
+										<SidebarMenuButton
+											isActive={currentPath.startsWith(item.url) || (item.childUrl && currentPath.startsWith(item.childUrl))}
+											asChild
+										>
 											<span>
 												<item.icon />
 												{item.title}
