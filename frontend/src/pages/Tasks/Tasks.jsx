@@ -7,8 +7,8 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
-	const showToast = useToast();
 	const [tasks, setTasks] = useState([]);
+	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});

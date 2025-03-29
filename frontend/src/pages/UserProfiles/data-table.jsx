@@ -19,8 +19,8 @@ export function DataTable({ columns, data }) {
 		getPaginationRowModel: getPaginationRowModel(),
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
+		// onColumnFiltersChange: setColumnFilters,
+		// getFilteredRowModel: getFilteredRowModel(),
 		state: {
 			sorting,
 			columnFilters,
@@ -29,15 +29,15 @@ export function DataTable({ columns, data }) {
 
 	return (
 		<div>
-			<div className="flex justify-end py-4">
+			{/* <div className="flex justify-end py-4">
 				<Input
 					placeholder={"filter email..."}
 					value={table.getColumn("email")?.getFilterValue() || ""}
 					onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
 					className="max-w-sm"
 				/>
-			</div>
-			<div className="rounded-md">
+			</div> */}
+			<div className="rounded-md mt-4">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (

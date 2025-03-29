@@ -74,7 +74,7 @@ export function DataTableUsers({
 	}, [firstRow, deleted]);
 
 	return (
-		<div className="w-full">
+		<div className="w-full scrollbar-custom">
 			<div className="flex py-4">
 				<Input
 					placeholder={"filter name..."}

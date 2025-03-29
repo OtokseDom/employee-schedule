@@ -83,61 +83,59 @@ export default function Schedules() {
 	return (
 		<div className="flex flex-col lg:flex-row gap-2 w-screen md:w-full">
 			<div className="lg:order-1 order-2 lg:w-1/2 w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-				<div>
-					{selectedTab == 1 ? (
-						<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
-							<div>
-								<h1 className=" font-extrabold text-3xl">Users</h1>
-								<p>List of all users</p>
-							</div>
-							<div className="flex flex-col items-end opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(2)}>
-								<h1 className=" font-extrabold text-3xl">Events</h1>
-								<p className="underline">View list of all events</p>
-							</div>
+				{selectedTab == 1 ? (
+					<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
+						<div>
+							<h1 className=" font-extrabold text-3xl">Users</h1>
+							<p>List of all users</p>
 						</div>
-					) : (
-						<div className="flex flex-row justify-between ml-4 md:ml-0">
-							<div className="opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(1)}>
-								<h1 className=" font-extrabold text-3xl">Users</h1>
-								<p className="underline">View list of all users</p>
-							</div>
-							<div className="flex flex-col items-end hover:cursor-pointer">
-								<h1 className=" font-extrabold text-3xl">Events</h1>
-								<p>List of all events</p>
-							</div>
+						<div className="flex flex-col items-end opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(2)}>
+							<h1 className=" font-extrabold text-3xl">Events</h1>
+							<p className="underline">View list of all events</p>
 						</div>
-					)}
-					<div className={`${selectedTab == 2 && "hidden"}`}>
-						<DataTableUsers
-							columns={columnsUser({ handleDelete, setIsOpen, setUpdateData })}
-							data={users}
-							setUsers={setUsers}
-							setSelectedUser={setSelectedUser}
-							firstRow={users[0]?.id}
-							isOpen={isOpen}
-							setIsOpen={setIsOpen}
-							deleted={deleted}
-							setDeleted={setDeleted}
-							updateData={updateData}
-							setUpdateData={setUpdateData}
-							fetchData={fetchData}
-						/>
 					</div>
-					<div className={`${selectedTab == 1 && "hidden"}`}>
-						<DataTableEvents
-							columns={columnsEvent({ handleDelete, setIsOpenEvent, setUpdateData })}
-							data={events}
-							setEvents={setEvents}
-							updateData={updateData}
-							setUpdateData={setUpdateData}
-							isOpenEvent={isOpenEvent}
-							setIsOpenEvent={setIsOpenEvent}
-							fetchData={fetchData}
-						/>
+				) : (
+					<div className="flex flex-row justify-between ml-4 md:ml-0">
+						<div className="opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(1)}>
+							<h1 className=" font-extrabold text-3xl">Users</h1>
+							<p className="underline">View list of all users</p>
+						</div>
+						<div className="flex flex-col items-end hover:cursor-pointer">
+							<h1 className=" font-extrabold text-3xl">Events</h1>
+							<p>List of all events</p>
+						</div>
 					</div>
+				)}
+				<div className={`${selectedTab == 2 && "hidden"}`}>
+					<DataTableUsers
+						columns={columnsUser({ handleDelete, setIsOpen, setUpdateData })}
+						data={users}
+						setUsers={setUsers}
+						setSelectedUser={setSelectedUser}
+						firstRow={users[0]?.id}
+						isOpen={isOpen}
+						setIsOpen={setIsOpen}
+						deleted={deleted}
+						setDeleted={setDeleted}
+						updateData={updateData}
+						setUpdateData={setUpdateData}
+						fetchData={fetchData}
+					/>
+				</div>
+				<div className={`${selectedTab == 1 && "hidden"}`}>
+					<DataTableEvents
+						columns={columnsEvent({ handleDelete, setIsOpenEvent, setUpdateData })}
+						data={events}
+						setEvents={setEvents}
+						updateData={updateData}
+						setUpdateData={setUpdateData}
+						isOpenEvent={isOpenEvent}
+						setIsOpenEvent={setIsOpenEvent}
+						fetchData={fetchData}
+					/>
 				</div>
 			</div>
-			<div className="lg:order-2 order-1 w-screen md:w-full bg-card overflow-auto h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+			<div className="lg:order-2 order-1 w-screen md:w-full bg-card overflow-auto scrollbar-custom h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 				<div className="flex flex-col ml-4 md:ml-0">
 					<h1 className=" font-extrabold text-3xl">Schedules</h1>
 					<p>List of Schedules</p>

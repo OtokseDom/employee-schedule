@@ -344,3 +344,29 @@ table > tbody > tr > td {
 		@apply bg-sidebar text-foreground;
 	}
 }
+
+@layer utilities {
+	.scrollbar-custom {
+		scrollbar-width: thin; /* For Firefox */
+		scrollbar-color: hsl(var(--secondary)) hsl(var(--background));
+	}
+
+	.scrollbar-custom::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	.scrollbar-custom::-webkit-scrollbar-track {
+		background: hsl(var(--background)); /* Use the Tailwind CSS variable */
+		border-radius: 10px;
+	}
+
+	.scrollbar-custom::-webkit-scrollbar-thumb {
+		background: hsl(var(--foreground)); /* Thumb color */
+		border-radius: 10px;
+	}
+
+	.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--foreground)); /* Slightly transparent on hover */
+	}
+}

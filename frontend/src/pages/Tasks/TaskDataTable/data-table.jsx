@@ -55,10 +55,9 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 			columnVisibility,
 		},
 	});
-
 	return (
-		<div className="w-full">
-			<div className="flex py-4">
+		<div className="w-full scrollbar-custom">
+			<div className="flex flex-col md:flex-row justify-between py-4">
 				<div className="flex flex-row gap-4">
 					{/* Input field to enter filter value */}
 					<Input
@@ -86,57 +85,61 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 						</SelectContent>
 					</Select>
 				</div>
-				<div className="flex gap-2 ml-auto">
-					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-						<SheetTrigger asChild>
-							<Button variant="">Add Task</Button>
-						</SheetTrigger>
-						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
-							<SheetHeader>
-								<SheetTitle>Add Task</SheetTitle>
-							</SheetHeader>
-							<TaskForm
-								data={data}
-								setTasks={setTasks}
-								isOpen={isOpen}
-								setIsOpen={setIsOpen}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-							/>
-						</SheetContent>
-					</Sheet>
-					{/* <Link to="/products/add">
+				<div className="flex flex-row justify-between gap-2">
+					<div className="flex gap-2">
+						<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
+							<SheetTrigger asChild>
+								<Button variant="">Add Task</Button>
+							</SheetTrigger>
+							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+								<SheetHeader>
+									<SheetTitle>Add Task</SheetTitle>
+								</SheetHeader>
+								<TaskForm
+									data={data}
+									setTasks={setTasks}
+									isOpen={isOpen}
+									setIsOpen={setIsOpen}
+									updateData={updateData}
+									setUpdateData={setUpdateData}
+									fetchData={fetchData}
+								/>
+							</SheetContent>
+						</Sheet>
+						{/* <Link to="/products/add">
 						<Button variant="">Add Product</Button>
 					</Link> */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="outline">Columns</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{table
-								.getAllColumns()
-								.filter((column) => column.getCanHide())
-								.map((column) => {
-									return (
-										<DropdownMenuCheckboxItem
-											key={column.id}
-											className="capitalize"
-											checked={column.getIsVisible()}
-											onCheckedChange={(value) => column.toggleVisibility(!!value)}
-										>
-											{column.id}
-										</DropdownMenuCheckboxItem>
-									);
-								})}
-						</DropdownMenuContent>
-					</DropdownMenu>
-					<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-						<ChevronLeft />
-					</Button>
-					<Button variant="outline" size="" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-						<ChevronRight />
-					</Button>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="outline">Columns</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{table
+									.getAllColumns()
+									.filter((column) => column.getCanHide())
+									.map((column) => {
+										return (
+											<DropdownMenuCheckboxItem
+												key={column.id}
+												className="capitalize"
+												checked={column.getIsVisible()}
+												onCheckedChange={(value) => column.toggleVisibility(!!value)}
+											>
+												{column.id}
+											</DropdownMenuCheckboxItem>
+										);
+									})}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+					<div className="flex gap-2">
+						<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+							<ChevronLeft />
+						</Button>
+						<Button variant="outline" size="" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+							<ChevronRight />
+						</Button>
+					</div>
 				</div>
 			</div>
 			<div className="rounded-md">
