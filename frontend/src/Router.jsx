@@ -20,6 +20,7 @@ const router = createBrowserRouter([
 			{ path: "/schedule", element: <Schedules /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/profile", element: <UserProfile /> },
+			{ path: "/profile/:slug", element: <UserProfile /> },
 			// TODO: Add user master page
 		],
 	},

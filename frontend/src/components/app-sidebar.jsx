@@ -1,4 +1,4 @@
-import { ChevronUp, Home, MoonStar, Sun, User2, Calendar, ClipboardList } from "lucide-react";
+import { ChevronUp, Home, MoonStar, Sun, User2, Calendar, ClipboardList, Users2 } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -25,14 +25,17 @@ const items = [
 	{
 		title: "User Schedules",
 		url: "/schedule",
-		childUrl: "/profile",
 		icon: Calendar,
 	},
 	{
 		title: "Task Tracker",
 		url: "/task",
-		childUrl: "",
 		icon: ClipboardList,
+	},
+	{
+		title: "Users",
+		url: "/profile",
+		icon: Users2,
 	},
 ];
 export function AppSidebar({ user, setUser, setToken }) {
@@ -90,10 +93,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 							{items.map((item) => (
 								<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
 									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton
-											isActive={currentPath.startsWith(item.url) || (item.childUrl && currentPath.startsWith(item.childUrl))}
-											asChild
-										>
+										<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
 											<span>
 												<item.icon />
 												{item.title}
