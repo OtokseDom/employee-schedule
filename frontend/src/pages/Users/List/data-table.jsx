@@ -13,11 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import UserForm from "../form";
+import { Link, useNavigate } from "react-router-dom";
 
 // Convert the DataTable component to JavaScript
 export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user } = useAuthContext();
+	const navigate = useNavigate();
 
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -131,7 +133,11 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow className="cursor-pointer" key={row.id}>
+								<TableRow
+									className="cursor-pointer"
+									key={row.id}
+									onClick={() => navigate(`/profile/${row.original.id}`)} // Redirect on row click
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}

@@ -27,7 +27,7 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
-
+	// TODO: create show user API
 	return (
 		<>
 			{/* TODO: Mobile responsive */}
