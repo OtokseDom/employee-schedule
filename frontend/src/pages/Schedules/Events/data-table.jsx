@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,28 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import Userform from "./Userform";
-import { useAuthContext } from "@/contexts/AuthContextProvider";
+import EventForm from "./form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
-export function DataTableUsers({
-	columns,
-	data,
-	setUsers,
-	setSelectedUser,
-	firstRow,
-	isOpen,
-	setIsOpen,
-	deleted,
-	setDeleted,
-	updateData,
-	setUpdateData,
-	fetchData,
-}) {
+export function DataTableEvents({ columns, data, setEvents, isOpenEvent, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
-	const { user } = useAuthContext();
-
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -51,27 +35,6 @@ export function DataTableUsers({
 			columnVisibility,
 		},
 	});
-	const prevFirstRowRef = useRef(null);
-	// TODO: when first user is selected, adding new user removes selected indicator
-	// TODO: When any user is selected, deeleting first user removes selected indicator
-	useEffect(() => {
-		if (firstRow !== prevFirstRowRef.current) {
-			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === firstRow);
-			setSelectedUser(defaultRow?.original);
-			table.toggleAllRowsSelected(false);
-			defaultRow?.toggleSelected();
-			prevFirstRowRef.current = firstRow; // Update the reference
-		}
-		if (deleted) {
-			const firstRow = table.getRowModel().rows[0];
-			if (firstRow) {
-				table.toggleAllRowsSelected(false);
-				firstRow.toggleSelected();
-				setSelectedUser(firstRow.original);
-			}
-			setDeleted(false);
-		}
-	}, [firstRow, deleted]);
 
 	return (
 		<div className="w-full scrollbar-custom">
@@ -83,26 +46,27 @@ export function DataTableUsers({
 					className="max-w-sm"
 				/>
 				<div className="flex gap-2 ml-auto">
-					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-						{user?.role === "Superadmin" && (
-							<SheetTrigger asChild>
-								<Button variant="">Add User</Button>
-							</SheetTrigger>
-						)}
+					<Sheet open={isOpenEvent} onOpenChange={setIsOpenEvent} modal={false}>
+						<SheetTrigger asChild>
+							<Button variant="">Add Event</Button>
+						</SheetTrigger>
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>Add User</SheetTitle>
+								<SheetTitle>Add Event</SheetTitle>
 							</SheetHeader>
-							<Userform
+							<EventForm
 								data={data}
-								setUsers={setUsers}
-								setIsOpen={setIsOpen}
+								setEvents={setEvents}
+								setIsOpenEvent={setIsOpenEvent}
 								updateData={updateData}
 								setUpdateData={setUpdateData}
 								fetchData={fetchData}
 							/>
 						</SheetContent>
 					</Sheet>
+					{/* <Link to="/products/add">
+						<Button variant="">Add Product</Button>
+					</Link> */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline">Columns</Button>
@@ -166,16 +130,14 @@ export function DataTableUsers({
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
 								<TableRow
-									className="cursor-pointer"
 									key={row.id}
 									data-state={row.getIsSelected() && "selected"}
 									// to select only 1 row at a time
 									onClick={() => {
-										if (!row.getIsSelected(true)) {
-											table.toggleAllRowsSelected(false);
-											row.toggleSelected();
-										}
-										setSelectedUser(row.original);
+										// if (!row.getIsSelected(true)) {
+										// 	table.toggleAllRowsSelected(false);
+										// 	row.toggleSelected();
+										// }
 									}}
 								>
 									{row.getVisibleCells().map((cell) => (

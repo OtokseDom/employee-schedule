@@ -12,7 +12,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-import TaskForm from "../TaskForm";
+import TaskForm from "../form";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {

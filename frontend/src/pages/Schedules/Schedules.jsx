@@ -1,11 +1,11 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useRef, useState } from "react";
 import CalendarSchedule from "@/components/schedule/calendar";
-import { columnsEvent } from "./Events/columns-event";
-import { DataTableEvents } from "./Events/data-table-events";
+import { columnsEvent } from "./Events/columns";
+import { DataTableEvents } from "./Events/data-table";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableUsers } from "./Users/data-table-users";
-import { columnsUser } from "./Users/columns-user";
+import { DataTableUsers } from "./Users/data-table";
+import { columnsUser } from "./Users/columns";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Schedules() {
@@ -34,7 +34,7 @@ export default function Schedules() {
 			setUpdateData({});
 		}
 	}, [isOpen, isOpenEvent]);
-
+	// TODO: Separate API calls
 	const fetchData = async () => {
 		setLoading(true);
 		try {

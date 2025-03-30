@@ -1,8 +1,8 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
-import { columnsTask } from "./TaskDataTable/columns";
+import { columnsTask } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableTasks } from "./TaskDataTable/data-table";
+import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Tasks() {

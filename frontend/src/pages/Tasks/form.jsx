@@ -72,14 +72,14 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	}, [isOpen]);
 
 	const fetchUsers = async () => {
-		setLoading(true);
+		// setLoading(true);
 		try {
 			const userResponse = await axiosClient.get("/user-auth");
 			setUsers(userResponse.data.users);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			setLoading(false);
+			// setLoading(false);
 		}
 	};
 
