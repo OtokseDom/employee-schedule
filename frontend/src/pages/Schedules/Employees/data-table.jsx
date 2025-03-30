@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EmployeeForm from "./EmployeeForm";
+import EmployeeForm from "./form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
