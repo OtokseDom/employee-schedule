@@ -7,8 +7,9 @@ import Signup from "./pages/Signup";
 import GuestLayout from "./components/GuestLayout";
 import AdminLayout from "./components/AdminLayout";
 import Schedules from "./pages/Schedules/Schedules";
-import UserProfile from "./pages/Users/Show";
-import Tasks from "./pages/Tasks/List";
+import UserProfile from "./pages/Users/Show/index";
+import Tasks from "./pages/Tasks/List/index";
+import Users from "./pages/Users/List/index";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -19,7 +20,7 @@ const router = createBrowserRouter([
 			{ path: "/", element: <Navigate to="/schedule" /> },
 			{ path: "/schedule", element: <Schedules /> },
 			{ path: "/task", element: <Tasks /> },
-			{ path: "/profile", element: <UserProfile /> },
+			{ path: "/profile", element: <Users /> },
 			{ path: "/profile/:slug", element: <UserProfile /> },
 			// TODO: Add user master page
 		],

@@ -23,7 +23,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user-auth', [UserController::class, 'store']);
     Route::get('/user-auth/{user}', [UserController::class, 'show']);
     Route::put('/user-auth/{user}', [UserController::class, 'update']);
-    Route::put('/user-auth/{user}', [UserController::class, 'update']);
     Route::delete('/user-auth/{user}', [UserController::class, 'destroy']);
     Route::apiResource('/schedule', ScheduleController::class);
     Route::apiResource('/employee', EmployeeController::class);
