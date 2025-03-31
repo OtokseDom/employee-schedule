@@ -1,11 +1,8 @@
 import axiosClient from "@/axios.client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CalendarSchedule from "@/components/schedule/calendar";
-import { columnsEvent } from "./Events/columns";
-import { DataTableEvents } from "./Events/data-table";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableUsers } from "./Users/data-table";
-import { columnsUser } from "./Users/columns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Schedules() {
@@ -15,132 +12,83 @@ export default function Schedules() {
 	const [users, setUsers] = useState([]);
 	const [events, setEvents] = useState([]);
 	const [schedules, setSchedules] = useState([]);
-	// const [loading, setLoading] = useState(false);
 	const [selectedUser, setSelectedUser] = useState(users || null);
-	const [selectedTab, setSelectedTab] = useState(1);
-	const [isOpen, setIsOpen] = useState(false);
-	const [isOpenEvent, setIsOpenEvent] = useState(false);
-	const [deleted, setDeleted] = useState(false);
-	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
-		if (selectedUser) {
-			fetchData();
-		}
+		fetchUsers();
+		fetchEvents();
+	}, []);
+
+	useEffect(() => {
+		if (selectedUser.id) fetchSchedule();
 	}, [selectedUser]);
 
-	useEffect(() => {
-		if (!isOpen && !isOpenEvent) {
-			setUpdateData({});
-		}
-	}, [isOpen, isOpenEvent]);
-	// TODO: Separate API calls
-	const fetchData = async () => {
+	const fetchUsers = async () => {
 		setLoading(true);
 		try {
-			// Make both API calls concurrently using Promise.all
-			const [userResponse, eventResponse, scheduleResponse] = await Promise.all([
-				axiosClient.get("/user-auth"),
-				axiosClient.get("/event"),
-				axiosClient.get(`/schedule-by-user/${selectedUser?.id}`),
-			]);
-			// Prevent re-renders if data is the same
-			// Set the data after both requests succeed
+			const userResponse = await axiosClient.get("/user-auth");
 			setUsers(userResponse.data.users);
-			setEvents(eventResponse.data.events);
+			setSelectedUser(userResponse.data.users[0]);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchSchedule = async () => {
+		setLoading(true);
+		try {
+			const scheduleResponse = await axiosClient.get(`/schedule-by-user/${selectedUser?.id}`);
 			setSchedules(scheduleResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
-	// TODO: Add validation before deletion of event and user
-	// TODO: delete schedule reselects user which loads different calendar schedule
-	const handleDelete = async (table, id) => {
+	const fetchEvents = async () => {
 		setLoading(true);
 		try {
-			if (table == "user") {
-				const userResponse = await axiosClient.delete(`/user-auth/${id}`);
-				setDeleted(true);
-				setUsers(userResponse.data);
-				setSelectedUser(userResponse.data[0]);
-				showToast("Success!", "User deleted.", 3000);
-			} else if (table == "event") {
-				const eventResponse = await axiosClient.delete(`/event/${id}`);
-				setUsers(eventResponse.data);
-				showToast("Success!", "Event deleted.", 3000);
-			}
+			const eventResponse = await axiosClient.get(`/event`);
+			setEvents(eventResponse.data.events);
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
 			console.error("Error fetching data:", e);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
 	return (
-		<div className="flex flex-col lg:flex-row justify-center gap-2 w-screen md:w-full">
-			<div className="lg:order-1 order-2 lg:w-1/2 w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-				{selectedTab == 1 ? (
-					<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
-						<div>
-							<h1 className=" font-extrabold text-3xl">Users</h1>
-							<p>List of all users</p>
-						</div>
-						<div className="flex flex-col items-end opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(2)}>
-							<h1 className=" font-extrabold text-3xl">Events</h1>
-							<p className="underline">View list of all events</p>
-						</div>
-					</div>
-				) : (
-					<div className="flex flex-row justify-between ml-4 md:ml-0">
-						<div className="opacity-40 hover:opacity-100 hover:cursor-pointer" onClick={() => setSelectedTab(1)}>
-							<h1 className=" font-extrabold text-3xl">Users</h1>
-							<p className="underline">View list of all users</p>
-						</div>
-						<div className="flex flex-col items-end hover:cursor-pointer">
-							<h1 className=" font-extrabold text-3xl">Events</h1>
-							<p>List of all events</p>
-						</div>
-					</div>
-				)}
-				<div className={`${selectedTab == 2 && "hidden"}`}>
-					<DataTableUsers
-						columns={columnsUser({ handleDelete, setIsOpen, setUpdateData })}
-						data={users}
-						setUsers={setUsers}
-						setSelectedUser={setSelectedUser}
-						firstRow={users[0]?.id}
-						isOpen={isOpen}
-						setIsOpen={setIsOpen}
-						deleted={deleted}
-						setDeleted={setDeleted}
-						updateData={updateData}
-						setUpdateData={setUpdateData}
-						fetchData={fetchData}
-					/>
+		<div className="flex flex-col xl:flex-row justify-center gap-2 w-screen md:w-full">
+			<div className="xl:order-2 order-1 w-screen md:w-full bg-card overflow-auto scrollbar-custom h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+				<h1 className=" font-extrabold text-3xl">Schedules</h1>
+				<div className="flex flex-row justify-start items-center gap-2 mt-2 w-full">
+					<span>Schedule of </span>
+					<span className="min-w-80">
+						<Select
+							onValueChange={(value) => {
+								const selected = users.find((user) => user.id === value);
+								setSelectedUser(selected);
+							}}
+							value={selectedUser?.id || ""}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a user"></SelectValue>
+							</SelectTrigger>
+							<SelectContent>
+								{Array.isArray(users) && users.length > 0 ? (
+									users?.map((user) => (
+										<SelectItem key={user?.id} value={user?.id}>
+											{user?.name}
+										</SelectItem>
+									))
+								) : (
+									<SelectItem disabled>No users available</SelectItem>
+								)}
+							</SelectContent>
+						</Select>
+					</span>
 				</div>
-				<div className={`${selectedTab == 1 && "hidden"}`}>
-					<DataTableEvents
-						columns={columnsEvent({ handleDelete, setIsOpenEvent, setUpdateData })}
-						data={events}
-						setEvents={setEvents}
-						updateData={updateData}
-						setUpdateData={setUpdateData}
-						isOpenEvent={isOpenEvent}
-						setIsOpenEvent={setIsOpenEvent}
-						fetchData={fetchData}
-					/>
-				</div>
-			</div>
-			<div className="lg:order-2 order-1 w-screen md:w-full bg-card overflow-auto scrollbar-custom h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-				<div className="flex flex-col ml-4 md:ml-0">
-					<h1 className=" font-extrabold text-3xl">Schedules</h1>
-					<p>List of Schedules</p>
-				</div>
-				<CalendarSchedule users={users} events={events} schedules={schedules} setSchedules={setSchedules} selectedUser={selectedUser} />
+				<CalendarSchedule events={events} schedules={schedules} setSchedules={setSchedules} selectedUser={selectedUser} />
 			</div>
 		</div>
 	);

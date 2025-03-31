@@ -1,4 +1,4 @@
-import { ChevronUp, Home, MoonStar, Sun, User2, Calendar, ClipboardList, Users2 } from "lucide-react";
+import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -23,12 +23,17 @@ import axiosClient from "@/axios.client";
 // Menu items.
 const items = [
 	{
-		title: "User Schedules",
+		title: "Schedules",
 		url: "/schedule",
+		icon: CalendarClock,
+	},
+	{
+		title: "Events",
+		url: "/event",
 		icon: Calendar,
 	},
 	{
-		title: "Task Tracker",
+		title: "Tasks",
 		url: "/task",
 		icon: ClipboardList,
 	},

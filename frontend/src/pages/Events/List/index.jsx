@@ -1,27 +1,29 @@
 import axiosClient from "@/axios.client";
-import React, { useEffect, useRef, useState } from "react";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import React, { useEffect, useState } from "react";
+import { columnsEvent } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { DataTableEvents } from "./data-table";
 
-export default function Users() {
+export default function Events() {
 	const { loading, setLoading } = useLoadContext();
+	const [events, setEvents] = useState([]);
 	const showToast = useToast();
-	const [users, setUsers] = useState([]);
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
+		if (!isOpen) setUpdateData({});
+	}, [isOpen]);
+	useEffect(() => {
 		fetchData();
 	}, []);
-
 	const fetchData = async () => {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const userResponse = await axiosClient.get("/user-auth");
-			setUsers(userResponse.data.users);
+			const eventResponse = await axiosClient.get("/event");
+			setEvents(eventResponse.data.events);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -33,11 +35,11 @@ export default function Users() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user-auth/${id}`);
+			await axiosClient.delete(`/event/${id}`);
 			fetchData();
-			showToast("Success!", "User deleted.", 3000);
+			showToast("Success!", "Event deleted.", 3000);
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
@@ -47,18 +49,17 @@ export default function Users() {
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 			<div>
-				<h1 className=" font-extrabold text-3xl">Users</h1>
-				<p>List of all users</p>
+				<h1 className=" font-extrabold text-3xl">Events</h1>
+				<p>View list of all events</p>
 			</div>
-
-			<DataTable
-				columns={columns({ handleDelete, setIsOpen, setUpdateData })}
-				data={users}
-				setUsers={setUsers}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
+			<DataTableEvents
+				columns={columnsEvent({ handleDelete, setIsOpen, setUpdateData })}
+				data={events}
+				setEvents={setEvents}
 				updateData={updateData}
 				setUpdateData={setUpdateData}
+				isOpen={isOpen}
+				setIsOpen={setIsOpen}
 				fetchData={fetchData}
 			/>
 		</div>

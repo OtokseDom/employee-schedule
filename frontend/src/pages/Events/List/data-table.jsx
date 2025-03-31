@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,24 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EmployeeForm from "./form";
+import EventForm from "../form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({
-	columns,
-	data,
-	setEmployees,
-	setSelectedEmployee,
-	firstRow,
-	isOpen,
-	setIsOpen,
-	deleted,
-	setDeleted,
-	updateData,
-	setUpdateData,
-	fetchData,
-}) {
+export function DataTableEvents({ columns, data, setEvents, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -48,30 +35,9 @@ export function DataTable({
 			columnVisibility,
 		},
 	});
-	const prevFirstRowRef = useRef(null);
-	// TODO: when first emp is selected, adding new employee removes selected indicator
-	// TODO: When any emp is selected, deeleting first emplyee removes selected indicator
-	useEffect(() => {
-		if (firstRow !== prevFirstRowRef.current) {
-			const defaultRow = table.getRowModel().rows.find((row) => row.original.id === firstRow);
-			setSelectedEmployee(defaultRow?.original);
-			table.toggleAllRowsSelected(false);
-			defaultRow?.toggleSelected();
-			prevFirstRowRef.current = firstRow; // Update the reference
-		}
-		if (deleted) {
-			const firstRow = table.getRowModel().rows[0];
-			if (firstRow) {
-				table.toggleAllRowsSelected(false);
-				firstRow.toggleSelected();
-				setSelectedEmployee(firstRow.original);
-			}
-			setDeleted(false);
-		}
-	}, [firstRow, deleted]);
 
 	return (
-		<div className="w-full">
+		<div className="w-full scrollbar-custom">
 			<div className="flex py-4">
 				<Input
 					placeholder={"filter name..."}
@@ -82,15 +48,15 @@ export function DataTable({
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						<SheetTrigger asChild>
-							<Button variant="">Add Employee</Button>
+							<Button variant="">Add Event</Button>
 						</SheetTrigger>
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>Add Employee</SheetTitle>
+								<SheetTitle>Add Event</SheetTitle>
 							</SheetHeader>
-							<EmployeeForm
+							<EventForm
 								data={data}
-								setEmployees={setEmployees}
+								setEvents={setEvents}
 								setIsOpen={setIsOpen}
 								updateData={updateData}
 								setUpdateData={setUpdateData}
@@ -98,6 +64,9 @@ export function DataTable({
 							/>
 						</SheetContent>
 					</Sheet>
+					{/* <Link to="/products/add">
+						<Button variant="">Add Product</Button>
+					</Link> */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline">Columns</Button>
@@ -120,6 +89,12 @@ export function DataTable({
 								})}
 						</DropdownMenuContent>
 					</DropdownMenu>
+					<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+						<ChevronLeft />
+					</Button>
+					<Button variant="outline" size="" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+						<ChevronRight />
+					</Button>
 				</div>
 			</div>
 			<div className="rounded-md">
@@ -144,17 +119,9 @@ export function DataTable({
 								<TableCell colSpan={columns.length} className="h-24">
 									<div className="flex items-center justify-center">
 										<div className="flex flex-col space-y-3 w-full">
-											<Skeleton className="h-4 w-2/5 md:w-full" />
-											<Skeleton className="h-4 w-1/3 md:w-3/4" />
-											<Skeleton className="h-4 w-2/5 md:w-full" />
-											<Skeleton className="h-4 w-1/3 md:w-3/4" />
-											<Skeleton className="h-4 w-2/5 md:w-full" />
-											<Skeleton className="h-4 w-1/3 md:w-3/4" />
-											<Skeleton className="h-4 w-2/5 md:w-full" />
-											<Skeleton className="h-4 w-1/3 md:w-3/4" />
-											<Skeleton className="h-4 w-2/5 md:w-full" />
-											<Skeleton className="h-4 w-1/3 md:w-3/4" />
-											<Skeleton className="h-4 w-2/5 md:w-full" />
+											{Array.from({ length: 6 }).map((_, i) => (
+												<Skeleton key={i} className="h-24 w-2/5 md:w-full" />
+											))}
 										</div>
 									</div>
 								</TableCell>
@@ -167,11 +134,10 @@ export function DataTable({
 									data-state={row.getIsSelected() && "selected"}
 									// to select only 1 row at a time
 									onClick={() => {
-										if (!row.getIsSelected(true)) {
-											table.toggleAllRowsSelected(false);
-											row.toggleSelected();
-										}
-										setSelectedEmployee(row.original);
+										// if (!row.getIsSelected(true)) {
+										// 	table.toggleAllRowsSelected(false);
+										// 	row.toggleSelected();
+										// }
 									}}
 								>
 									{row.getVisibleCells().map((cell) => (

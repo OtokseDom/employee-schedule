@@ -11,9 +11,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) => {
+export const columnsEvent = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const handleUpdateEvent = (event) => {
-		setIsOpenEvent(true);
+		setIsOpen(true);
 		setUpdateData(event);
 	};
 	return [
@@ -73,7 +73,7 @@ export const columnsEvent = ({ handleDelete, setIsOpenEvent, setUpdateData }) =>
 										Close
 									</Button>
 								</DialogClose>
-								<Button onClick={() => handleDelete("event", event.id)}>Yes, delete</Button>
+								<Button onClick={() => handleDelete(event.id)}>Yes, delete</Button>
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>

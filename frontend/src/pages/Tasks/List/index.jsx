@@ -48,7 +48,7 @@ export default function Tasks() {
 		}
 	};
 	return (
-		<div className="w-screen bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 			<div>
 				<h1 className=" font-extrabold text-3xl">Tasks</h1>
 				<p>View list of all tasks</p>

@@ -21,7 +21,7 @@ const formSchema = z.object({
 	}),
 });
 
-export default function EventForm({ data, setEvents, setIsOpenEvent, updateData, setUpdateData, fetchData }) {
+export default function EventForm({ data, setEvents, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -63,7 +63,7 @@ export default function EventForm({ data, setEvents, setIsOpenEvent, updateData,
 		} finally {
 			setUpdateData({});
 			setLoading(false);
-			setIsOpenEvent(false);
+			setIsOpen(false);
 		}
 	};
 	return (

@@ -10,6 +10,7 @@ import Schedules from "./pages/Schedules/Schedules";
 import UserProfile from "./pages/Users/Show/index";
 import Tasks from "./pages/Tasks/List/index";
 import Users from "./pages/Users/List/index";
+import Events from "./pages/Events/List/index";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/", element: <Navigate to="/schedule" /> },
 			{ path: "/schedule", element: <Schedules /> },
+			{ path: "/event", element: <Events /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/profile", element: <Users /> },
 			{ path: "/profile/:slug", element: <UserProfile /> },

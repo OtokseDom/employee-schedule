@@ -43,7 +43,7 @@ const formSchema = z.object({
 	status: z.string(),
 });
 
-export default function CalendarSchedule({ users, events, schedules, setSchedules, selectedUser }) {
+export default function CalendarSchedule({ events, schedules, setSchedules, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -171,7 +171,7 @@ export default function CalendarSchedule({ users, events, schedules, setSchedule
 
 	return (
 		<div className="p-1 md:p-4 mx-auto mt-5">
-			<div className="flex gap-2 mb-4">
+			<div className="flex justify-between gap-2 mb-4">
 				<Button variant={`${viewMode === "month" ? "" : "outline"}`} onClick={() => setViewMode("month")} disabled={loading}>
 					Month View
 				</Button>
