@@ -9,7 +9,8 @@ import { Link } from "react-router-dom";
 export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
 
-	const handleUpdateUser = (user) => {
+	const handleUpdateUser = (user, event) => {
+		event.stopPropagation();
 		setIsOpen(true);
 		setUpdateData(user);
 	};
@@ -65,7 +66,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger
 								asChild
-								// onClick={(event) => event.stopPropagation()} // Prevent row click
+								onClick={(event) => event.stopPropagation()} // Prevent row click
 							>
 								<Button variant="ghost" className="h-8 w-8 p-0">
 									<span className="sr-only">Open menu</span>
@@ -76,17 +77,15 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 								<DropdownMenuItem className="cursor-pointer">
 									<Link to={`/profile/` + userRow.id}>View Profile</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(userRow)}>
+								<DropdownMenuItem className="cursor-pointer" onClick={(event) => handleUpdateUser(userRow, event)}>
 									Update User
 								</DropdownMenuItem>
-								<DropdownMenuItem
-								// onClick={(event) => event.stopPropagation()} // Prevent row click
-								>
+								<DropdownMenuItem onClick={(event) => event.stopPropagation()}>
 									<DialogTrigger>Delete User</DialogTrigger>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-						<DialogContent>
+						<DialogContent onClick={(event) => event.stopPropagation()}>
 							<DialogHeader>
 								<DialogTitle>Are you absolutely sure?</DialogTitle>
 								<DialogDescription>This action cannot be undone.</DialogDescription>
