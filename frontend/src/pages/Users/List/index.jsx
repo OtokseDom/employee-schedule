@@ -45,26 +45,22 @@ export default function Users() {
 		}
 	};
 	return (
-		<div className="flex flex-col lg:flex-row gap-2 w-screen md:w-full">
-			<div className="w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-				<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
-					<div>
-						<h1 className=" font-extrabold text-3xl">Users</h1>
-						<p>List of all users</p>
-					</div>
-				</div>
-
-				<DataTable
-					columns={columns({ handleDelete, setIsOpen, setUpdateData })}
-					data={users}
-					setUsers={setUsers}
-					isOpen={isOpen}
-					setIsOpen={setIsOpen}
-					updateData={updateData}
-					setUpdateData={setUpdateData}
-					fetchData={fetchData}
-				/>
+		<div className="w-screen bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+			<div>
+				<h1 className=" font-extrabold text-3xl">Users</h1>
+				<p>List of all users</p>
 			</div>
+
+			<DataTable
+				columns={columns({ handleDelete, setIsOpen, setUpdateData })}
+				data={users}
+				setUsers={setUsers}
+				isOpen={isOpen}
+				setIsOpen={setIsOpen}
+				updateData={updateData}
+				setUpdateData={setUpdateData}
+				fetchData={fetchData}
+			/>
 		</div>
 	);
 }

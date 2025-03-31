@@ -81,7 +81,7 @@ export default function Schedules() {
 		}
 	};
 	return (
-		<div className="flex flex-col lg:flex-row gap-2 w-screen md:w-full">
+		<div className="flex flex-col lg:flex-row justify-center gap-2 w-screen md:w-full">
 			<div className="lg:order-1 order-2 lg:w-1/2 w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 				{selectedTab == 1 ? (
 					<div className="flex flex-row justify-between ml-4 md:ml-0 hover:cursor-pointer">
