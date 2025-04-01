@@ -28,7 +28,6 @@ export default function UserProfile() {
 		}
 	};
 	// TODO: create show user API
-	// TODO: Mobile responsive
 	return (
 		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0"}>
 			{/* ------------------------------- Back button ------------------------------ */}

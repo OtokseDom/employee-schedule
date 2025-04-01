@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -40,7 +41,13 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // TODO: validate delete user
+        // Check if the user has existing tasks assigned
+        $hasTasks = DB::table('tasks')->where('assignee_id', $user->id)->exists();
+
+        if ($hasTasks) {
+            return response()->json(['message' => 'User cannot be deleted because they have assigned tasks.'], 400);
+        }
+
         $user->delete();
         // Fetch the updated user again
         $users = User::orderBy("id", "DESC")->get();

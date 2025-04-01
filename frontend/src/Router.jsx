@@ -24,7 +24,6 @@ const router = createBrowserRouter([
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/profile", element: <Users /> },
 			{ path: "/profile/:slug", element: <UserProfile /> },
-			// TODO: Add user master page
 		],
 	},
 	{

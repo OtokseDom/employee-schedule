@@ -33,11 +33,11 @@ export default function Users() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user-auth/${id}`);
+			const userResponse = await axiosClient.delete(`/user-auth/${id}`);
 			fetchData();
 			showToast("Success!", "User deleted.", 3000);
 		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000);
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
