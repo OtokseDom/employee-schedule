@@ -29,7 +29,13 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        return new UserResource($user);
+        $userDetails = DB::table('users')->where('id', $user->id)->first();
+        $assignedTasks = DB::table('tasks')->where('assignee_id', $user->id)->get();
+
+        return response()->json([
+            'user' => $userDetails,
+            'assigned_tasks' => $assignedTasks
+        ]);
     }
 
     public function update(UpdateUserRequest $request, User $user)
