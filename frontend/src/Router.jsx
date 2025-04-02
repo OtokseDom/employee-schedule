@@ -22,8 +22,8 @@ const router = createBrowserRouter([
 			{ path: "/schedule", element: <Schedules /> },
 			{ path: "/event", element: <Events /> },
 			{ path: "/task", element: <Tasks /> },
-			{ path: "/profile", element: <Users /> },
-			{ path: "/profile/:slug", element: <UserProfile /> },
+			{ path: "/users", element: <Users /> },
+			{ path: "/profile/:id", element: <UserProfile /> },
 		],
 	},
 	{

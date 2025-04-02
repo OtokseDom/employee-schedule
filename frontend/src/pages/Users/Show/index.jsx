@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { ArrowLeft, Edit } from "lucide-react";
@@ -6,53 +6,63 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import axiosClient from "@/axios.client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function UserProfile() {
+	const { id } = useParams(); // Get user ID from URL
 	const { loading, setLoading } = useLoadContext();
+	const [user, setUser] = useState(null); // State for user details
 	const [tasks, setTasks] = useState([]);
 
 	useEffect(() => {
 		fetchData();
 	}, []);
+
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get("/task");
-			setTasks(taskResponse.data.data);
+			// Fetch user details and tasks
+			const response = await axiosClient.get(`/user-auth/${id}`);
+			setUser(response.data.user);
+			setTasks(response.data.assigned_tasks);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
-	// TODO: create show user API
+
 	return (
-		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0"}>
+		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
 			{/* ------------------------------- Back button ------------------------------ */}
-			<Link to="/schedule">
+			<Link to="/users">
 				<Button variant="ghost" className="flex items-center">
 					<ArrowLeft />
 				</Button>
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
-			<div className="flex flex-row justify-between items-center gap-4 w-fit p-4 bg-background rounded-lg border border-border shadow-md my-4">
+			<div className="flex flex-row justify-between items-center gap-4 w-full md:w-fit p-4 bg-background rounded-lg border border-border shadow-md my-4">
+				<div>{loading ? <Skeleton className="w-24 h-24 rounded-full" /> : <div className="w-24 h-24 bg-foreground rounded-full"></div>}</div>
 				<div>
-					<div className="w-24 h-24 bg-foreground rounded-full"></div>
-				</div>
-				<div>
-					<div className="flex flex-row justify-between gap-4 items-center">
-						<h2 className="text-lg font-semibold">John Dominic Escoto</h2>
-						<Button variant="ghost" className="flex items-center">
-							<Edit size={20} />
-						</Button>
-					</div>
-					<div className="text-gray-500">
-						<p>imjohndominic08@gmail.com</p>
-						<p>+971 52 000 0000</p>
-						<p>Discovery Gardens, Dubai, UAE</p>
-					</div>
+					{loading ? (
+						<Skeleton className="h-10 w-60" />
+					) : (
+						<div className="flex flex-row justify-between gap-4 items-center">
+							<h2 className="text-sm md:text-lg font-semibold"> {user?.name || "N/A"}</h2>
+							<Button variant="ghost" className="flex items-center">
+								<Edit size={20} />
+							</Button>
+						</div>
+					)}
+					{loading ? (
+						Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-4 w-full mt-1" />)
+					) : (
+						<div className="text-gray-500">
+							<p>{user?.email || "N/A"}</p>
+							<p className="font-bold">{user?.position || "N/A"}</p>
+							<p>{user?.role || "N/A"}</p>
+						</div>
+					)}
 				</div>
 			</div>
 			{/* ---------------------------- Task and Insight ---------------------------- */}
