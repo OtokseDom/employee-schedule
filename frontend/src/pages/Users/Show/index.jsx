@@ -7,13 +7,28 @@ import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import axiosClient from "@/axios.client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/contexts/ToastContextProvider";
 
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	const { loading, setLoading } = useLoadContext();
+	// const { loading, setLoading } = useLoadContext();
 	const [user, setUser] = useState(null); // State for user details
-	const [tasks, setTasks] = useState([]);
+	// const [tasks, setTasks] = useState([]);
 
+	// useEffect(() => {
+	// 	fetchData();
+	// }, []);
+
+	const { loading, setLoading } = useLoadContext();
+	const [tasks, setTasks] = useState([]);
+	const showToast = useToast();
+	const [isOpen, setIsOpen] = useState(false);
+	const [deleted, setDeleted] = useState(false);
+	const [updateData, setUpdateData] = useState({});
+
+	useEffect(() => {
+		if (!isOpen) setUpdateData({});
+	}, [isOpen]);
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -28,6 +43,34 @@ export default function UserProfile() {
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
+			setLoading(false);
+		}
+	};
+	// const fetchData = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		// Make both API calls concurrently using Promise.all
+	// 		const taskResponse = await axiosClient.get("/task");
+	// 		setTasks(taskResponse.data.data);
+	// 	} catch (e) {
+	// 		console.error("Error fetching data:", e);
+	// 	} finally {
+	// 		// Always stop loading when done
+	// 		setLoading(false);
+	// 	}
+	// };
+
+	const handleDelete = async (id) => {
+		setLoading(true);
+		try {
+			await axiosClient.delete(`/task/${id}`);
+			fetchData();
+			showToast("Success!", "Task deleted.", 3000);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
 			setLoading(false);
 		}
 	};
@@ -72,7 +115,16 @@ export default function UserProfile() {
 						<h1 className=" font-extrabold text-3xl">Tasks</h1>
 						<p>View list of all tasks</p>
 					</div>
-					<DataTable columns={columns} data={tasks} />
+					<DataTable
+						columns={columns({ handleDelete, setIsOpen, setUpdateData })}
+						data={tasks}
+						setTasks={setTasks}
+						updateData={updateData}
+						setUpdateData={setUpdateData}
+						isOpen={isOpen}
+						setIsOpen={setIsOpen}
+						fetchData={fetchData}
+					/>
 				</div>
 				<div className="w-full h-3/4 overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 					<div>
