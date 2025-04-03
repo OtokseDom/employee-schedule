@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import { columns } from "./columns";
-import { DataTable } from "./data-table";
+// import { columns } from "./columns";
+// import { DataTable } from "./data-table";
 import { ArrowLeft, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import axiosClient from "@/axios.client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { columnsTask } from "@/pages/Tasks/List/columns";
+import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
@@ -115,8 +117,8 @@ export default function UserProfile() {
 						<h1 className=" font-extrabold text-3xl">Tasks</h1>
 						<p>View list of all tasks</p>
 					</div>
-					<DataTable
-						columns={columns({ handleDelete, setIsOpen, setUpdateData })}
+					<DataTableTasks
+						columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 						data={tasks}
 						setTasks={setTasks}
 						updateData={updateData}
@@ -124,6 +126,7 @@ export default function UserProfile() {
 						isOpen={isOpen}
 						setIsOpen={setIsOpen}
 						fetchData={fetchData}
+						showLess={true}
 					/>
 				</div>
 				<div className="w-full h-3/4 overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">

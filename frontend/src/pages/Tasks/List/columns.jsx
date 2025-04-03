@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
+export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showAssignee = true) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
@@ -49,28 +49,32 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 				);
 			},
 		},
-		{
-			id: "assignee",
-			accessorKey: "assignee.name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-			cell: ({ row }) => {
-				const assignee = row.original.assignee;
+		...(showAssignee
+			? [
+					{
+						id: "assignee",
+						accessorKey: "assignee.name",
+						header: ({ column }) => {
+							return (
+								<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+									Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
+								</button>
+							);
+						},
+						cell: ({ row }) => {
+							const assignee = row.original.assignee;
 
-				return (
-					<div>
-						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
-						<br />
-						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
-					</div>
-				);
-			},
-		},
+							return (
+								<div>
+									<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
+									<br />
+									<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
+								</div>
+							);
+						},
+					},
+			  ]
+			: []),
 		{
 			id: "category",
 			accessorKey: "category",

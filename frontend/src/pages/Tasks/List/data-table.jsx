@@ -15,7 +15,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 
 // Convert the DataTable component to JavaScript
-export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = false }) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -33,12 +33,27 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 			table.getColumn(selectedColumn)?.setFilterValue(value);
 		}
 	};
-	const [columnVisibility, setColumnVisibility] = useState({
-		"expected output": false,
-		"time estimate": false,
-		delay: false,
-		remarks: false,
-	});
+	// Initially hides some column, showing only the main details
+	const [columnVisibility, setColumnVisibility] = useState(
+		showLess
+			? {
+					"start date": false,
+					"end date": false,
+					"expected output": false,
+					"time estimate": false,
+					"time taken": false,
+					"delay reason": false,
+					"performance rating": false,
+					delay: false,
+					remarks: false,
+			  }
+			: {
+					"expected output": false,
+					"time estimate": false,
+					delay: false,
+					remarks: false,
+			  }
+	);
 	const table = useReactTable({
 		data,
 		columns,
