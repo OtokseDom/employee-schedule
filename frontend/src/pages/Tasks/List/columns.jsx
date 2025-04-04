@@ -12,12 +12,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showAssignee = true) => {
+export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess = true) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
 	};
 
+	// Define color classes based on status value
+	const statusColors = {
+		Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
+		"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
+		Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
+		Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
+		Delayed: "bg-red-100 border border-red-800 border-2 text-red-800",
+		"On Hold": "bg-red-100 border border-red-800 border-2 text-red-800",
+	};
 	return [
 		{
 			id: "status",
@@ -32,24 +41,16 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showAssi
 			cell: ({ row }) => {
 				const status = row.original.status;
 
-				// Define color classes based on status value
-				const statusColors = {
-					Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
-					"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
-					Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
-					Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
-					Delayed: "bg-red-100 border border-red-800 border-2 text-red-800",
-					"On Hold": "bg-red-100 border border-red-800 border-2 text-red-800",
-				};
-
 				return (
-					<div className={`px-2 py-1 min-w-28 text-center rounded-2xl text-sm font-medium ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
-						{status.replace("_", " ")}
+					<div className=" min-w-24">
+						<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
+							{status.replace("_", " ")}
+						</span>
 					</div>
 				);
 			},
 		},
-		...(showAssignee
+		...(showLess
 			? [
 					{
 						id: "assignee",
@@ -85,6 +86,24 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showAssi
 					</button>
 				);
 			},
+			...(!showLess
+				? {
+						cell: ({ row }) => {
+							const category = row.original.category;
+							const status = row.original.status;
+							return (
+								<div className="min-w-52">
+									{category}
+									<br />
+									<br />
+									<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
+										{status.replace("_", " ")}
+									</span>
+								</div>
+							);
+						},
+				  }
+				: {}),
 		},
 		{
 			id: "title",

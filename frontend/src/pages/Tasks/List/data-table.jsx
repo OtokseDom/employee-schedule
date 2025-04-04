@@ -37,6 +37,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [columnVisibility, setColumnVisibility] = useState(
 		showLess
 			? {
+					status: false,
 					"start date": false,
 					"end date": false,
 					"expected output": false,

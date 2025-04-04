@@ -60,3 +60,28 @@ class UserController extends Controller
         return response(UserResource::collection($users), 200);
     }
 }
+
+// TODO: Reports
+
+// 📊 Dashboard Widgets (Real-time Overview)
+// For Managers:
+// 🔹 Task Completion % (per employee & team) – Progress bars
+// 🔹 Top 5 Employees This Week – Based on speed & accuracy
+// 🔹 Overdue Tasks Heatmap – By project/team
+// 🔹 Active vs Completed Tasks Pie Chart
+// 🔹 Daily Task Activity Timeline – See peaks and idle periods
+// 🔹 Tasks per Department – Stacked bar chart
+
+// For Employees:
+// ✅ My Completed Tasks (Weekly)
+// 🧠 Upcoming Deadlines (Next 7 Days)
+// ⏰ Avg Time I Spend on Tasks
+// 🚥 My Pending / Overdue Tasks
+
+// 📁 Exportable Reports (Weekly/Monthly)
+// 📌 Employee Performance Summary
+// 📌 Department Task Distribution & Efficiency
+// 📌 Late Tasks Log (with reasons if tagged)
+// 📌 Time Tracking Report (Per Task, Employee, Project)
+// 📌 Workload Forecast Report – Helps plan upcoming weeks
+// 📌 Productivity Trends Over Time
