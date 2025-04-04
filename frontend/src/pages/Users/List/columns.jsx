@@ -14,7 +14,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 		setIsOpen(true);
 		setUpdateData(user);
 	};
-
+	// TODO: Add user profile picture
 	// Define the base columns
 	const columns = [
 		{
@@ -25,6 +25,16 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 					Name <ArrowUpDown className="ml-2 h-4 w-4" />
 				</button>
 			),
+			cell: ({ row }) => {
+				const name = row.original.name;
+				const status = row.original.status;
+				return (
+					<div className="flex items-center gap-2">
+						<div className="w-14 h-14 bg-foreground rounded-full"></div>
+						{name}
+					</div>
+				);
+			},
 		},
 		{
 			id: "role",
