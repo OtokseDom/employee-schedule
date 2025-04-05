@@ -16,7 +16,7 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosClient from "@/axios.client";
 
@@ -49,6 +49,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 		const savedMode = sessionStorage.getItem("theme");
 		return savedMode ? JSON.parse(savedMode) : "dark"; // Default to false if nothing is saved
 	});
+	const navigate = useNavigate();
 	useEffect(() => {
 		sessionStorage.setItem("theme", JSON.stringify(theme));
 		if (theme == "dark") {
@@ -135,11 +136,8 @@ export function AppSidebar({ user, setUser, setToken }) {
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-								<DropdownMenuItem>
+								<DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
 									<span>Account</span>
-								</DropdownMenuItem>
-								<DropdownMenuItem>
-									<span>Billing</span>
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={onLogout}>
 									{/* <a href="#" onClick={onLogout}> */}
