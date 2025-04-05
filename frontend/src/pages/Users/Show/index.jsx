@@ -12,7 +12,9 @@ import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import UserForm from "../form";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
@@ -21,12 +23,16 @@ export default function UserProfile() {
 	const [tasks, setTasks] = useState([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenUser, setIsOpenUser] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+	const [updateDataUser, setUpdateDataUser] = useState({});
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
-	}, [isOpen]);
+		if (!isOpenUser) setUpdateDataUser({});
+	}, [isOpen, isOpenUser]);
+
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -46,8 +52,8 @@ export default function UserProfile() {
 	};
 
 	const handleUpdateUser = (user) => {
-		setIsOpen(true);
-		setUpdateData(user);
+		setIsOpenUser(true);
+		setUpdateDataUser(user);
 	};
 	const handleDelete = async (id) => {
 		setLoading(true);
@@ -127,6 +133,15 @@ export default function UserProfile() {
 					)}
 				</div>
 			</div>
+			{/* Update user Form Sheet */}
+			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
+				<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+					<SheetHeader>
+						<SheetTitle>Update User</SheetTitle>
+					</SheetHeader>
+					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchData} />
+				</SheetContent>
+			</Sheet>
 			{/* ---------------------------- Task and Insight ---------------------------- */}
 			<div className="flex flex-col lg:flex-row justify-between gap-4 w-full">
 				<div className="w-full min-h-[500px] max-h-[500px] overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
@@ -134,6 +149,7 @@ export default function UserProfile() {
 						<h1 className=" font-extrabold text-3xl">Tasks</h1>
 						<p>View list of all tasks</p>
 					</div>
+
 					<DataTableTasks
 						columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 						data={tasks}
