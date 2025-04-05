@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 // import { columns } from "./columns";
 // import { DataTable } from "./data-table";
 import { ArrowLeft, Edit } from "lucide-react";
@@ -10,23 +10,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
-
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	// const { loading, setLoading } = useLoadContext();
+	const { user: user_auth } = useAuthContext(); // Get authenticated user details
 	const [user, setUser] = useState(null); // State for user details
-	// const [tasks, setTasks] = useState([]);
-
-	// useEffect(() => {
-	// 	fetchData();
-	// }, []);
-
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
-	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -48,26 +44,17 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
-	// const fetchData = async () => {
-	// 	setLoading(true);
-	// 	try {
-	// 		// Make both API calls concurrently using Promise.all
-	// 		const taskResponse = await axiosClient.get("/task");
-	// 		setTasks(taskResponse.data.data);
-	// 	} catch (e) {
-	// 		console.error("Error fetching data:", e);
-	// 	} finally {
-	// 		// Always stop loading when done
-	// 		setLoading(false);
-	// 	}
-	// };
 
+	const handleUpdateUser = (user) => {
+		setIsOpen(true);
+		setUpdateData(user);
+	};
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/task/${id}`);
-			fetchData();
-			showToast("Success!", "Task deleted.", 3000);
+			await axiosClient.delete(`/user-auth/${id}`);
+			showToast("Success!", "User deleted.", 3000);
+			navigate("/users");
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
@@ -94,9 +81,39 @@ export default function UserProfile() {
 					) : (
 						<div className="flex flex-row justify-between gap-4 items-center">
 							<h2 className="text-sm md:text-lg font-semibold"> {user?.name || "N/A"}</h2>
-							<Button variant="ghost" className="flex items-center">
-								<Edit size={20} />
-							</Button>
+							{user_auth?.role === "Superadmin" && (
+								<Dialog>
+									<DropdownMenu modal={false}>
+										<DropdownMenuTrigger asChild>
+											<Button variant="ghost" className="flex items-center">
+												<Edit size={20} />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
+												Update Account
+											</DropdownMenuItem>
+											<DropdownMenuItem>
+												<DialogTrigger>Deactivate Account</DialogTrigger>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+									<DialogContent>
+										<DialogHeader>
+											<DialogTitle>Are you absolutely sure?</DialogTitle>
+											<DialogDescription>This action cannot be undone.</DialogDescription>
+										</DialogHeader>
+										<DialogFooter>
+											<DialogClose asChild>
+												<Button type="button" variant="secondary">
+													Close
+												</Button>
+											</DialogClose>
+											<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
+										</DialogFooter>
+									</DialogContent>
+								</Dialog>
+							)}
 						</div>
 					)}
 					{loading ? (
