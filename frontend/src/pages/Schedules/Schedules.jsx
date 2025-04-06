@@ -1,6 +1,6 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
-import CalendarSchedule from "@/components/schedule/calendar";
+import CalendarSchedule from "@/pages/Schedules/calendar";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";

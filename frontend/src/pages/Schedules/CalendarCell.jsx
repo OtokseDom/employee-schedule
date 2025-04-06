@@ -1,5 +1,5 @@
 import React from "react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../components/ui/skeleton";
 import { format, parse } from "date-fns";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
@@ -11,7 +11,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 		<div
 			className={`bg-yellow-100 text-yellow-900
 							border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative `}
-			onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+			// onClick={() => openModal(format(date, "yyyy-MM-dd"))}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -26,10 +26,11 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.event?.name}</span>:{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>:<br />
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
@@ -49,7 +50,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 		<div
 			className={`bg-red-100 text-red-900
 							border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative `}
-			onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+			// onClick={() => openModal(format(date, "yyyy-MM-dd"))}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -64,11 +65,11 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
-							{format(shiftEnd, "h:mm a")}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
@@ -88,7 +89,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 		<div
 			className={`bg-green-100 text-green-900
 							border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative `}
-			onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+			// onClick={() => openModal(format(date, "yyyy-MM-dd"))}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -103,11 +104,11 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
-							{format(shiftEnd, "h:mm a")}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
@@ -127,7 +128,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 		<div
 			className={`bg-blue-100 text-blue-900
 							border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative `}
-			onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+			// onClick={() => openModal(format(date, "yyyy-MM-dd"))}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -142,11 +143,11 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
-							{format(shiftEnd, "h:mm a")}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
@@ -165,7 +166,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 	) : (
 		<div
 			className={`border border-gray-200 p-2 h-20 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative `}
-			onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+			// onClick={() => openModal(format(date, "yyyy-MM-dd"))}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -180,11 +181,11 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
-							<span className=" font-black">{formattedSchedules?.event?.name}</span>: {format(shiftStart, "h:mm a")} -{" "}
-							{format(shiftEnd, "h:mm a")}
+							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
+							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
