@@ -89,7 +89,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 					y: Math.random() * canvas.height,
 					radius: Math.random() * 1.5,
 					color: `rgba(220, 220, 255, ${brightness})`,
-					speed: Math.random() * 0.5,
+					speed: Math.random() * 3,
 				});
 			}
 		};
