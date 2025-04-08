@@ -18,6 +18,7 @@ import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
 import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
+import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
@@ -114,7 +115,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut />
+						<RadarChartGridFilled />
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
