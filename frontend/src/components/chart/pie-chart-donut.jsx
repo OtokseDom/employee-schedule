@@ -46,11 +46,11 @@ export function PieChartDonut() {
 	}, []);
 
 	return (
-		<Card className="flex flex-col">
-			{/* <CardHeader className="items-center pb-0">
+		<Card className="flex flex-col h-full">
+			<CardHeader className="items-center pb-0">
 				<CardTitle>Pie Chart - Donut with Text</CardTitle>
 				<CardDescription>January - June 2024</CardDescription>
-			</CardHeader> */}
+			</CardHeader>
 			<CardContent className="flex-1 pb-0">
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
 					<PieChart>

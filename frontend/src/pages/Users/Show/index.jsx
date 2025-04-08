@@ -17,6 +17,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
+import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
@@ -93,26 +94,26 @@ export default function UserProfile() {
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex min-h-[500px] md:max-h-[550px] flex-col lg:flex-row justify-between gap-4 w-full">
+				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full h-fit">
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<div className="mb-5">
-							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
-						</div>
+						</div> */}
 						<PieChartDonut />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<div className="mb-5">
-							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div>
-						<PieChartDonut />
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
+							<p>Daily Task Activity Timeline</p>
+						</div> */}
+						<AreaChartGradient />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<div className="mb-5">
-							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
-						</div>
+						</div> */}
 						<PieChartDonut />
 					</div>
 				</div>
