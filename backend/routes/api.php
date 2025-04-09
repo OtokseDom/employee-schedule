@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskHistoryController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
     // Route::apiResource('/user-auth', UserController::class); //somehow implicit route is not working
+    // User CRUD
     Route::get('/user-auth', [UserController::class, 'index']);
     Route::post('/user-auth', [UserController::class, 'store']);
     Route::get('/user-auth/{user}', [UserController::class, 'show']);
@@ -33,6 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* ---------------------------- Master Relations ---------------------------- */
     Route::get('/schedule-by-user/{userId}', [ScheduleController::class, 'getScheduleByUser']);
+
+    /* --------------------------------- Reports -------------------------------- */
+    Route::get('/tasks-by-status/{id}', [UserReportController::class, 'tasksByStatus']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);

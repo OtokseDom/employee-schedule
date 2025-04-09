@@ -13,7 +13,6 @@ import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
@@ -21,7 +20,6 @@ import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	const { user: user_auth } = useAuthContext(); // Get authenticated user details
 	const [user, setUser] = useState(null); // State for user details
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
@@ -101,7 +99,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut />
+						<PieChartDonut user_id={user?.id} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
