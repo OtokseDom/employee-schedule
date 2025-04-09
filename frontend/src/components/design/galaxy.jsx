@@ -191,39 +191,40 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 									<span className="text-xs md:text-lg text-purple-200">{position}</span>
 								</div>
 							</div>
-							{user_auth?.role === "Superadmin" && (
-								<Dialog>
-									<DropdownMenu modal={false}>
-										<DropdownMenuTrigger asChild>
-											<Button variant="outline" className="flex items-center">
-												<Edit size={20} />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
-												Update Account
-											</DropdownMenuItem>
-											<DropdownMenuItem>
-												<DialogTrigger>Deactivate Account</DialogTrigger>
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-									<DialogContent>
-										<DialogHeader>
-											<DialogTitle>Are you absolutely sure?</DialogTitle>
-											<DialogDescription>This action cannot be undone.</DialogDescription>
-										</DialogHeader>
-										<DialogFooter>
-											<DialogClose asChild>
-												<Button type="button" variant="secondary">
-													Close
+							{user_auth?.role === "Superadmin" ||
+								(user_auth?.id === user?.id && (
+									<Dialog>
+										<DropdownMenu modal={false}>
+											<DropdownMenuTrigger asChild>
+												<Button variant="outline" className="flex items-center">
+													<Edit size={20} />
 												</Button>
-											</DialogClose>
-											<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
-										</DialogFooter>
-									</DialogContent>
-								</Dialog>
-							)}
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
+													Update Account
+												</DropdownMenuItem>
+												<DropdownMenuItem>
+													<DialogTrigger>Deactivate Account</DialogTrigger>
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+										<DialogContent>
+											<DialogHeader>
+												<DialogTitle>Are you absolutely sure?</DialogTitle>
+												<DialogDescription>This action cannot be undone.</DialogDescription>
+											</DialogHeader>
+											<DialogFooter>
+												<DialogClose asChild>
+													<Button type="button" variant="secondary">
+														Close
+													</Button>
+												</DialogClose>
+												<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
+											</DialogFooter>
+										</DialogContent>
+									</Dialog>
+								))}
 						</div>
 					)}
 					{/* User stats */}

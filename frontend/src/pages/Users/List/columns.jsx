@@ -27,11 +27,11 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			),
 			cell: ({ row }) => {
 				const name = row.original.name;
-				const status = row.original.status;
+				const id = row.original.id;
 				return (
 					<div className="flex items-center gap-2">
 						<div className="w-14 h-14 bg-foreground rounded-full"></div>
-						{name}
+						{name} {user?.id === id && <span className="text-xs text-yellow-800"> (Me)</span>}
 					</div>
 				);
 			},
