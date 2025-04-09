@@ -26,9 +26,12 @@ class ScheduleFactory extends Factory
         return [
             'event_id' => Event::inRandomOrder()->value('id'), // Get a random existing Event ID
             'user_id' => User::inRandomOrder()->value('id'), // Get a random existing User ID
-            'shift_start' => "08:00:00",
-            'shift_end' => "15:00:00",
-            'date' => fake()->dateTimeBetween('2025-03-01', '2025-03-31'),
+            'shift_start' => fake()->dateTimeBetween('06:00:00', '09:00:00'), // Random time between 6 AM and 9 AM
+            'shift_end' => fake()->dateTimeBetween('16:00:00', '18:00:00'), // Random time between 4 PM and 6 PM
+            'date' => fake()->dateTimeBetween(
+                now()->startOfMonth()->subMonth()->startOfDay(),
+                now()->addMonth()->endOfMonth()->endOfDay()
+            ),
             'status' => fake()->randomElement(["Pending", "Completed", "In Progress", "Cancelled"])
         ];
     }

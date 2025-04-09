@@ -7,13 +7,7 @@ import { Button } from "@/components/ui/button";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-// Calendar
-// import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
-// import { cn } from "@/lib/utils";
-// import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
-// import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-// import { Label } from "../../components/ui/label";
 import CalendarCell from "./CalendarCell";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
@@ -251,15 +245,7 @@ export default function CalendarSchedule({ events, schedules, setSchedules, sele
 											handleTimeChange={handleTimeChange}
 											handleSubmit={handleSubmit}
 											handleDelete={handleDelete}
-											// closeModal={closeModal}
 										/>
-										{/* <DialogFooter>
-											<DialogClose asChild>
-												<Button type="button" variant="secondary">
-													Close
-												</Button>
-											</DialogClose>
-										</DialogFooter> */}
 									</DialogContent>
 								</Dialog>
 							);
@@ -275,6 +261,13 @@ export default function CalendarSchedule({ events, schedules, setSchedules, sele
 								openModal={openModal}
 								hoveredEvent={hoveredEvent}
 								setHoveredEvent={setHoveredEvent}
+								form={form}
+								modalData={modalData}
+								events={events}
+								selectedScheduleId={selectedScheduleId}
+								handleTimeChange={handleTimeChange}
+								handleSubmit={handleSubmit}
+								handleDelete={handleDelete}
 							/>
 						) : (
 							<div className="flex flex-col space-1 md:space-y-3 w-full">

@@ -1,8 +1,24 @@
 import React from "react";
 import { format, addDays, startOfWeek, addHours, startOfDay, parse, min, max, subHours } from "date-fns";
 import CalendarCell from "./CalendarCell";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import ScheduleForm from "./ScheduleForm";
 
-export default function WeekView({ currentWeek, schedules, loading, openModal, hoveredEvent, setHoveredEvent }) {
+export default function WeekView({
+	currentWeek,
+	schedules,
+	loading,
+	openModal,
+	hoveredEvent,
+	setHoveredEvent,
+	form,
+	modalData,
+	events,
+	handleTimeChange,
+	handleSubmit,
+	handleDelete,
+	selectedScheduleId,
+}) {
 	const startDate = startOfWeek(currentWeek);
 	const days = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
 
@@ -99,35 +115,55 @@ export default function WeekView({ currentWeek, schedules, loading, openModal, h
 								break;
 						}
 						return (
-							<div
-								key={index}
-								className={`col-span-1 border-b border-foreground relative  ${
-									format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "bg-secondary" : ""
-								}`}
-							>
-								<div className={` text-center font-semibold my-4`}>
-									{format(date, "MMM d")}
-									<br />
-									{format(date, "EEEE")}
-								</div>
-								{formattedSchedules && shiftStart && shiftEnd && (
+							<Dialog key={index}>
+								<DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}>
 									<div
-										className={`flex flex-col absolute left-0 right-0 bg-${color}-100 text-${color}-900 border border-foreground p-2 rounded-lg line-clamp-3 overflow-hidden`}
-										style={getEventStyle(shiftStart, shiftEnd)}
-										onClick={() => openModal(format(date, "yyyy-MM-dd"))}
-										onMouseEnter={() => setHoveredEvent(formattedSchedules)}
-										onMouseLeave={() => setHoveredEvent(null)}
+										key={index}
+										className={`col-span-1 border-b border-foreground relative  ${
+											format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "bg-secondary" : ""
+										}`}
 									>
-										<span className=" font-bold">{formattedSchedules?.event?.name}</span>
-										<br />
-										<span className="text-xs">
-											{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
-										</span>
-										<br />
-										<span>{formattedSchedules?.event?.description}</span>
+										<div className={` text-center font-semibold my-4`}>
+											{format(date, "MMM d")}
+											<br />
+											{format(date, "EEEE")}
+										</div>
+										{formattedSchedules && shiftStart && shiftEnd && (
+											<div
+												className={`flex flex-col absolute left-0 right-0 bg-${color}-100 text-${color}-900 border border-foreground p-2 rounded-lg line-clamp-3 overflow-hidden`}
+												style={getEventStyle(shiftStart, shiftEnd)}
+												onClick={() => openModal(format(date, "yyyy-MM-dd"))}
+												onMouseEnter={() => setHoveredEvent(formattedSchedules)}
+												onMouseLeave={() => setHoveredEvent(null)}
+											>
+												<span className=" font-bold">{formattedSchedules?.event?.name}</span>
+												<br />
+												<span className="text-xs">
+													{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
+												</span>
+												<br />
+												<span>{formattedSchedules?.event?.description}</span>
+											</div>
+										)}
 									</div>
-								)}
-							</div>
+								</DialogTrigger>
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Are you absolutely sure?</DialogTitle>
+										<DialogDescription>This action cannot be undone.</DialogDescription>
+									</DialogHeader>
+									<ScheduleForm
+										form={form}
+										modalData={modalData}
+										events={events}
+										loading={loading}
+										selectedScheduleId={selectedScheduleId}
+										handleTimeChange={handleTimeChange}
+										handleSubmit={handleSubmit}
+										handleDelete={handleDelete}
+									/>
+								</DialogContent>
+							</Dialog>
 						);
 					})}
 				</div>
