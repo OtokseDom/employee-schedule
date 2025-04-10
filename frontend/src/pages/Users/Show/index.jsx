@@ -106,7 +106,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
 							<p>Daily Task Activity Timeline</p>
 						</div> */}
-						<AreaChartGradient />
+						<AreaChartGradient user_id={user?.id} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
@@ -141,7 +141,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div>
-						<PieChartDonut />
+						<PieChartDonut user_id={user?.id} />
 					</div>
 				</div>
 			</div>

@@ -74,35 +74,78 @@ class UserReportController extends Controller
         ];
         return response($data);
     }
-    // visitors: {
-    // 	label: "Visitors",
-    // },
-    // chrome: {
-    // 	label: "Chrome",
-    // 	color: "hsl(var(--chart-1))",
-    // },
-    // safari: {
-    // 	label: "Safari",
-    // 	color: "hsl(var(--chart-2))",
-    // },
-    // firefox: {
-    // 	label: "Firefox",
-    // 	color: "hsl(var(--chart-3))",
-    // },
-    // edge: {
-    // 	label: "Edge",
-    // 	color: "hsl(var(--chart-4))",
-    // },
-    // other: {
-    // 	label: "Other",
-    // 	color: "hsl(var(--chart-5))",
-    // },
     /**
      * Display report for tasks timeline to see users activity load. Area chart
      */
-    public function taskActivityTimeline()
+    public function taskActivityTimeline($id)
     {
-        //
+        $month1 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->month)
+            ->count();
+        $month2 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->subMonth(1)->month)
+            ->count();
+        $month3 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->subMonth(2)->month)
+            ->count();
+        $month4 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->subMonth(3)->month)
+            ->count();
+        $month5 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->subMonth(4)->month)
+            ->count();
+        $month6 = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->whereMonth('start_date', now()->subMonth(5)->month)
+            ->count();
+
+        $percentageDifference = [
+            'value' => $month1 > 0
+                ? round(abs((($month1 - $month2) / $month2) * 100), 2)
+                : ($month2 > 0 ? 100 : 0),
+            'event' => $month1 > $month2 ? 'Increased' : ($month1 < $month2 ? 'Decreased' : 'Same'),
+        ];
+
+        return response()->json([
+            'percentage_difference' => $percentageDifference,
+            'chart_data' => [
+                [
+                    'year' =>  now()->subMonth(5)->format('Y'),
+                    'month' =>  now()->subMonth(5)->format('F'),
+                    'tasks' => $month6,
+                ],
+                [
+                    'year' =>  now()->subMonth(4)->format('Y'),
+                    'month' =>  now()->subMonth(4)->format('F'),
+                    'tasks' => $month5,
+                ],
+                [
+                    'year' =>  now()->subMonth(3)->format('Y'),
+                    'month' =>  now()->subMonth(3)->format('F'),
+                    'tasks' => $month4,
+                ],
+                [
+                    'year' =>  now()->subMonth(2)->format('Y'),
+                    'month' =>  now()->subMonth(2)->format('F'),
+                    'tasks' => $month3,
+                ],
+                [
+                    'year' =>  now()->subMonth(1)->format('Y'),
+                    'month' =>  now()->subMonth(1)->format('F'),
+                    'tasks' => $month2,
+                ],
+                [
+                    'year' =>  now()->format('Y'),
+                    'month' =>  now()->format('F'),
+                    'tasks' => $month1,
+                ],
+            ]
+        ]);
     }
 
     /**
