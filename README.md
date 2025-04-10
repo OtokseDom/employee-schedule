@@ -1,14 +1,25 @@
-# employee-schedule
+# 📅 Employee Schedule with Task Management and Reports (WIP) 📊
 
-**A simple Laravel-React Project for listing employee schedules in a Calendar layout.**
+### **A simple Laravel-React Project for listing employee schedules in a Calendar layout.**
 
+**✨ Current Features:**
 -   Mobile Responsive
 -   Modern Design
 -   Registration and Login
 -   CRUD for all data
 -   Dark Mode
+-   Master Data Management
+-   User specific reports
 
-# How to install
+
+**🤩 Upcoming Features:**
+- Employees reports and leaderboards (dashboard)
+- Data export
+- Rules and Permissions
+- More
+
+
+# ⭐ How to install
 
 ## Requirements
 
