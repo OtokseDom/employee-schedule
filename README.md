@@ -20,7 +20,7 @@
 
 
 # ⭐ How to install
-
+    
 ## Requirements
 
 -   Code editor (I use VS Code)
@@ -76,3 +76,17 @@ _If problems arise, resolve them yourself_ 😝
 -   Use this credential to login
     > email: admin@demo.com <br>
     > password: admin123
+
+Schedule Calendar
+![image](https://github.com/user-attachments/assets/91c306aa-073a-4203-8cd5-bc2b46d6a10c)
+Schedule Week View
+![image](https://github.com/user-attachments/assets/44817ff9-d192-4abc-a615-5374fbaf2804)
+Tasks Datatable
+![image](https://github.com/user-attachments/assets/553f50ea-c142-4dd3-b8a7-459b426b683c)
+Users Datatable
+![image](https://github.com/user-attachments/assets/988a2e51-2362-41ab-9e11-365d9d37b646)
+User Profile
+![image](https://github.com/user-attachments/assets/388ac989-ef62-4a9e-941f-615c9a56d49a)
+
+
+
