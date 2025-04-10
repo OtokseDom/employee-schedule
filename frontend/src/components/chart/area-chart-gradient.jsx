@@ -83,46 +83,42 @@ export function AreaChartGradient({ user_id }) {
 			</CardContent>
 			<CardFooter>
 				<div className="flex w-full items-start gap-2 text-sm">
-					<div className="grid gap-2">
-						<div className="flex items-center gap-2 font-medium leading-none">
-							{loading ? (
-								<div className="flex flex-col gap-2 items-center justify-center h-full w-full">
-									<Skeleton className=" w-full h-4 rounded-full" />
-									<Skeleton className=" w-full h-4 rounded-full" />
+					{loading ? (
+						<div className="flex flex-col gap-2 items-center justify-center h-full w-full">
+							<Skeleton className=" w-full h-4 rounded-full" />
+							<Skeleton className=" w-full h-4 rounded-full" />
+						</div>
+					) : (
+						<div className="grid gap-2">
+							<div className="flex items-center gap-2 font-medium leading-none">
+								{chartData?.percentage_difference?.event == "Increased" ? (
+									<div className="flex items-center gap-2">
+										<span>Trending up by {chartData?.percentage_difference?.value}% this month </span>
+										<TrendingUp className="h-4 w-4" />
+									</div>
+								) : chartData?.percentage_difference?.event == "Decreased" ? (
+									<div className="flex items-center gap-2">
+										<span>Trending dropped by {chartData?.percentage_difference?.value}% this month </span>
+										<TrendingDown className="h-4 w-4" />
+									</div>
+								) : chartData?.percentage_difference?.event == "Same" ? (
+									<div className="flex items-center gap-2">
+										<span>Same as last month </span>
+										<RefreshCcw className="h-4 w-4" />
+									</div>
+								) : (
+									""
+								)}
+							</div>
+							{chartData?.chart_data?.length > 0 && (
+								<div className="flex items-center gap-2 leading-none text-muted-foreground">
+									{chartData?.chart_data?.length > 0 && chartData.chart_data[0].month} -{" "}
+									{chartData?.chart_data?.length > 0 && chartData.chart_data[5].month}{" "}
+									{chartData?.chart_data?.length > 0 && chartData.chart_data[5].year}
 								</div>
-							) : chartData?.percentage_difference?.event == "Increased" ? (
-								<div className="flex items-center gap-2">
-									<span>Trending up by {chartData?.percentage_difference?.value}% this month </span>
-									<TrendingUp className="h-4 w-4" />
-								</div>
-							) : chartData?.percentage_difference?.event == "Decreased" ? (
-								<div className="flex items-center gap-2">
-									<span>Trending dropped by {chartData?.percentage_difference?.value}% this month </span>
-									<TrendingDown className="h-4 w-4" />
-								</div>
-							) : chartData?.percentage_difference?.event == "Same" ? (
-								<div className="flex items-center gap-2">
-									<span>Same as last month </span>
-									<RefreshCcw className="h-4 w-4" />
-								</div>
-							) : (
-								<span>No Data</span>
 							)}
 						</div>
-						{loading ? (
-							<div className="flex flex-col gap-2 items-center justify-center h-full w-full">
-								<Skeleton className="w-full h-4 rounded-full" />
-							</div>
-						) : (
-							<div className="flex items-center gap-2 leading-none text-muted-foreground">
-								{chartData?.chart_data?.length > 0 && chartData.chart_data[0].month} -{" "}
-								{chartData?.chart_data?.length > 0 && chartData.chart_data[5].month}{" "}
-								{chartData?.chart_data?.length > 0 && chartData.chart_data[5].year}
-							</div>
-						)}
-						{/* {chartData?.chart_data[0]?.month} - {chartData?.chart_data[chartData?.chart_data?.length - 1]?.month}{" "}
-							{chartData?.chart_data[chartData?.chart_data?.length - 1]?.year} */}
-					</div>
+					)}
 				</div>
 			</CardFooter>
 		</Card>
