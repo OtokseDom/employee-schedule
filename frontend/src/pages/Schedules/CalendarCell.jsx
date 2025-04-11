@@ -26,11 +26,13 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className=" font-black">{formattedSchedules?.event?.name}</span>:<br />
-							{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
+							<span className="hidden md:block">
+								{format(shiftStart, "h:mm a")} - {format(shiftEnd, "h:mm a")}
+							</span>
 						</div>
 					)}
 					{hoveredEvent === formattedSchedules && formattedSchedules && (
@@ -65,7 +67,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
@@ -104,7 +106,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
@@ -143,7 +145,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />
@@ -181,7 +183,7 @@ export default function CalendarCell({ color, formattedSchedules, date, hoveredE
 				</div>
 			) : (
 				<>
-					<div className="text-left text-sm font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className=" font-black">{formattedSchedules?.event?.name}</span>: <br />

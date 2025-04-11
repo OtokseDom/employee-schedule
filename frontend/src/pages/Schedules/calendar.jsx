@@ -151,36 +151,40 @@ export default function CalendarSchedule({ events, schedules, setSchedules, sele
 
 	return (
 		<div className="p-1 md:p-4 mx-auto mt-5">
-			<div className="flex justify-between gap-2 mb-4">
-				<Button variant={`${viewMode === "month" ? "" : "outline"}`} onClick={() => setViewMode("month")} disabled={loading}>
-					Month View
-				</Button>
-				<Button variant={`${viewMode === "week" ? "" : "outline"}`} onClick={() => setViewMode("week")} disabled={loading}>
-					Week View
-				</Button>
+			<div className="flex flex-col justify-center gap-2">
+				<h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
+				<div className="flex flex-row justify-between">
+					<div className="flex justify-start gap-2 mb-4">
+						<Button variant={`${viewMode === "month" ? "" : "outline"}`} onClick={() => setViewMode("month")} disabled={loading}>
+							Month View
+						</Button>
+						<Button variant={`${viewMode === "week" ? "" : "outline"}`} onClick={() => setViewMode("week")} disabled={loading}>
+							Week View
+						</Button>
+					</div>
+					<h2 className="hidden md:block text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
+					{viewMode == "month" ? (
+						<div className="flex justify-end mb-4 gap-2">
+							<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+								Prev
+							</Button>
+							<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+								Next
+							</Button>
+						</div>
+					) : (
+						<div className="flex justify-end mb-4 gap-2">
+							<Button variant="outline" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
+								Prev
+							</Button>
+							<Button variant="outline" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
+								Next
+							</Button>
+						</div>
+					)}
+				</div>
 			</div>
-			{viewMode == "month" ? (
-				<div className="flex justify-between mb-4">
-					<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-						Prev
-					</Button>
-					<h2 className="text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
-					<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-						Next
-					</Button>
-				</div>
-			) : (
-				<div className="flex justify-between mb-4">
-					<Button variant="outline" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
-						Prev
-					</Button>
-					<h2 className="text-xl font-bold text-center">{format(currentWeek, "MMMM yyyy")}</h2>
-					<Button variant="outline" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
-						Next
-					</Button>
-				</div>
-			)}
-			<div className=" max-w-full min-h-[700px] max-h-[700px] overflow-auto border border-foreground rounded-xl">
+			<div className="  overflow-auto border border-foreground rounded-xl">
 				{viewMode === "month" ? (
 					<div className="bg-background text-foreground grid grid-cols-7 gap-0 md:gap-1 rounded-lg p-2 md:p-8 mt-10 text-xs sm:text-base">
 						{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
@@ -285,26 +289,6 @@ export default function CalendarSchedule({ events, schedules, setSchedules, sele
 					</>
 				)}
 			</div>
-			{/* {selectedDate && (
-				<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-4 z-50">
-					<div className="bg-background p-6 rounded shadow-lg w-full max-w-md">
-						<h3 className="text-lg font-bold mb-2">
-							Event on {format(selectedDate, "MMMM d, yyyy")} for {selectedUser?.name}
-						</h3>
-						<ScheduleForm
-							form={form}
-							modalData={modalData}
-							events={events}
-							loading={loading}
-							selectedScheduleId={selectedScheduleId}
-							handleTimeChange={handleTimeChange}
-							handleSubmit={handleSubmit}
-							handleDelete={handleDelete}
-							closeModal={closeModal}
-						/>
-					</div>
-				</div>
-			)} */}
 		</div>
 	);
 }

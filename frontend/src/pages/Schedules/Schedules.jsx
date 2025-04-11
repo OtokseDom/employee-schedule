@@ -62,7 +62,6 @@ export default function Schedules() {
 			<div className="xl:order-2 order-1 w-screen md:w-full bg-card overflow-auto scrollbar-custom h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 				<h1 className=" font-extrabold text-3xl">Schedules</h1>
 				<div className="flex flex-row justify-start items-center gap-2 mt-2 w-full">
-					<span>Schedule of </span>
 					<span className="min-w-80">
 						<Select
 							onValueChange={(value) => {
