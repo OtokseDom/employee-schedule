@@ -117,7 +117,7 @@ export default function UserProfile() {
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex min-h-[500px] md:max-h-[550px] flex-col lg:flex-row justify-between gap-4 w-full">
+				<div className="flex min-h-[500px] max-h-[700px] flex-col lg:flex-row justify-between gap-4 w-full">
 					<div className="w-full overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						<div>
 							<h1 className=" font-extrabold text-3xl">Tasks</h1>
@@ -136,13 +136,13 @@ export default function UserProfile() {
 							showLess={true}
 						/>
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					{/* <div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						<div className="mb-5">
 							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div>
 						<PieChartDonut user_id={user?.id} />
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</div>
