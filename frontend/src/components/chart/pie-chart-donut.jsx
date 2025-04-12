@@ -23,27 +23,33 @@ export function PieChartDonut({ user_id }) {
 		},
 		pending: {
 			label: "Pending",
-			color: "hsl(30 80% 55%)", // Yellow
+			color: "hsl(270 70% 50%)", // Purple
+			// color: "hsl(30 80% 55%)", // Yellow
 		},
 		in_progress: {
 			label: "In Progress",
-			color: "hsl(220 70% 50%)", // Blue
+			color: "hsl(var(--chart-1))",
+			// color: "hsl(220 70% 50%)", // Blue
 		},
 		completed: {
 			label: "Completed",
-			color: "hsl(160 60% 45%)", // Green
+			color: "hsl(var(--chart-3))",
+			// color: "hsl(160 60% 45%)", // Green
 		},
 		delayed: {
 			label: "Delayed",
-			color: "hsl(340 75% 65%)", // Pink
+			color: "hsl(var(--chart-5))",
+			// color: "hsl(340 75% 65%)", // Pink
 		},
 		cancelled: {
 			label: "Cancelled",
-			color: "hsl(340 75% 55%)", // Dark Pink
+			color: "hsl(var(--chart-7))",
+			// color: "hsl(340 75% 55%)", // Dark Pink
 		},
 		on_hold: {
 			label: "On Hold",
-			color: "hsl(340 75% 45%)", // Darkest Pink
+			color: "hsl(var(--chart-9))",
+			// color: "hsl(340 75% 45%)", // Darkest Pink
 		},
 	};
 	useEffect(() => {
@@ -71,7 +77,7 @@ export function PieChartDonut({ user_id }) {
 		<Card className="flex flex-col h-full">
 			<CardHeader className="items-center pb-0">
 				<CardTitle>Tasks by Status</CardTitle>
-				<CardDescription>All Times</CardDescription>
+				<CardDescription>All Time</CardDescription>
 			</CardHeader>
 			<CardContent className="flex-1 pb-0">
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
@@ -104,11 +110,18 @@ export function PieChartDonut({ user_id }) {
 					)}
 				</ChartContainer>
 			</CardContent>
-			<CardFooter className="flex-col gap-2 text-sm">
-				{/* <div className="flex items-center gap-2 font-medium leading-none">
-					Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-				</div> */}
-				<div className="leading-none text-muted-foreground">Showing all total tasks</div>
+			<CardFooter className="flex flex-wrap gap-2 text-sm">
+				{chartData?.length > 0 ? (
+					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
+						{chartData.map((data, index) => (
+							<div key={index} className="flex items-center gap-1">
+								<span className="font-bold">{data.tasks}</span> {chartConfig[data.status]?.label || data.status}
+							</div>
+						))}
+					</div>
+				) : (
+					<div className="leading-none text-muted-foreground">Showing all total tasks</div>
+				)}
 			</CardFooter>
 		</Card>
 	);
