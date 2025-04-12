@@ -9,7 +9,7 @@ function CellContent({ colorClass, textColorClass, formattedSchedules, date, hov
 
 	return (
 		<div
-			className={`${colorClass} ${textColorClass} border border-gray-200 p-2 h-24 sm:h-24 cursor-pointer hover:bg-secondary rounded-lg relative`}
+			className={`${colorClass} ${textColorClass} border border-gray-200 p-2 h-20 cursor-pointer hover:bg-secondary rounded-lg relative`}
 			onMouseEnter={() => setHoveredEvent(formattedSchedules)}
 			onMouseLeave={() => setHoveredEvent(null)}
 		>
@@ -24,7 +24,7 @@ function CellContent({ colorClass, textColorClass, formattedSchedules, date, hov
 				</div>
 			) : (
 				<>
-					<div className="text-left font-bold">{format(date, "d")}</div>
+					<div className="text-left font-bold text-xs">{format(date, "d")}</div>
 					{formattedSchedules && (
 						<div className="text-xs mt-1 line-clamp-3 overflow-hidden w-full">
 							<span className="font-black">{formattedSchedules?.event?.name}</span>: <br />
