@@ -322,9 +322,9 @@ export default function ScheduleCalendar() {
 							key={index}
 							onClick={() => handleCellClick(day)}
 							className={`
-                min-h-24 p-1 border transition-colors duration-200 cursor-pointer
+                min-h-24 p-1 border transition-colors duration-200 cursor-pointer rounded-sm
                 ${isCurrentMonth ? "bg-white" : "bg-sidebar text-gray-400"} 
-                ${isToday ? "bg-blue-50 border-blue-200" : "border-gray-200"}
+                ${isToday ? "bg-blue-50 border-blue-200" : "border-gray-500"}
               `}
 						>
 							<div className="flex justify-between items-center">
@@ -461,7 +461,7 @@ export default function ScheduleCalendar() {
 				<div className="p-4 border-b flex flex-col justify-between items-center gap-4">
 					<div className="flex flex-col justify-start items-start gap-2 mt-2 w-full">
 						<h1 className=" font-extrabold text-3xl">Schedules</h1>
-						<span className="w-full md:w-fit">
+						<span className="w-full md:w-[300px]">
 							<Select
 								onValueChange={(value) => {
 									const selected = users.find((user) => user.id === value);
@@ -505,7 +505,16 @@ export default function ScheduleCalendar() {
 
 						{/* Navigation */}
 						<div className="flex flex-col justify-center gap-2 w-full">
-							<h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
+							{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
+							<div className="flex items-center justify-center">
+								<span className="block md:hidden text-lg font-bold">
+									{selectedView === "month"
+										? `${format(currentMonth, "MMMM yyyy")}`
+										: `${weekStartDate.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+												weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000
+										  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
+								</span>
+							</div>
 							<div className="flex flex-row justify-between w-full">
 								{/* View toggle */}
 								<div className="flex justify-start gap-2">
@@ -520,17 +529,19 @@ export default function ScheduleCalendar() {
 										Week View
 									</Button>
 								</div>
-								<div className="flex items-center gap-2">
-									<Button variant="outline" onClick={navigatePrev}>
-										Prev
-									</Button>
-									<span className="hidden md:block text-sm font-medium">
+								<div className="flex items-center justify-center">
+									<span className="hidden md:block text-lg font-bold">
 										{selectedView === "month"
 											? `${format(currentMonth, "MMMM yyyy")}`
 											: `${weekStartDate.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
 													weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000
 											  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
 									</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<Button variant="outline" onClick={navigatePrev}>
+										Prev
+									</Button>
 									<Button variant="outline" onClick={navigateNext}>
 										Next
 									</Button>
