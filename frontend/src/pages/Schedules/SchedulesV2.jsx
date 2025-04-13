@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import ScheduleCalendar from "./calendarV2";
 
-export default function Schedules() {
+export default function SchedulesV2() {
 	const { loading, setLoading } = useLoadContext();
 
 	const showToast = useToast();
@@ -61,34 +61,7 @@ export default function Schedules() {
 	return (
 		<div className="flex flex-col xl:flex-row justify-center gap-2 -mb-32 md:mb-0 w-screen md:w-[1000px] h-screen md:h-fit container">
 			<div className="xl:order-2 order-1 bg-card overflow-auto scrollbar-custom h-full text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-				<h1 className=" font-extrabold text-3xl">Schedules</h1>
-				<div className="flex flex-row justify-start items-center gap-2 mt-2 w-full">
-					<span className="min-w-80 w-screen md:w-fit">
-						<Select
-							onValueChange={(value) => {
-								const selected = users.find((user) => user.id === value);
-								setSelectedUser(selected);
-							}}
-							value={selectedUser?.id || ""}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Select a user"></SelectValue>
-							</SelectTrigger>
-							<SelectContent>
-								{Array.isArray(users) && users.length > 0 ? (
-									users?.map((user) => (
-										<SelectItem key={user?.id} value={user?.id}>
-											{user?.name}
-										</SelectItem>
-									))
-								) : (
-									<SelectItem disabled>No users available</SelectItem>
-								)}
-							</SelectContent>
-						</Select>
-					</span>
-				</div>
-				<CalendarSchedule events={events} schedules={schedules} setSchedules={setSchedules} selectedUser={selectedUser} />
+				<ScheduleCalendar />
 			</div>
 		</div>
 	);

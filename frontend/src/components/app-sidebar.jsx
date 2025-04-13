@@ -28,6 +28,11 @@ const items = [
 		icon: CalendarClock,
 	},
 	{
+		title: "Schedules V2",
+		url: "/v2/schedule",
+		icon: CalendarClock,
+	},
+	{
 		title: "Events",
 		url: "/event",
 		icon: Calendar,
