@@ -11,6 +11,7 @@ import UserProfile from "./pages/Users/Show/index";
 import Tasks from "./pages/Tasks/List/index";
 import Users from "./pages/Users/List/index";
 import Events from "./pages/Events/List/index";
+import SchedulesV2 from "./pages/Schedules/SchedulesV2";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/", element: <Navigate to="/schedule" /> },
 			{ path: "/schedule", element: <Schedules /> },
+			{ path: "/v2/schedule", element: <SchedulesV2 /> },
 			{ path: "/event", element: <Events /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/users", element: <Users /> },
