@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
+import MonthViewV2 from "./MonthViewV2";
 
 // Mock data for demonstration
 const mockUsers = [
@@ -204,17 +205,6 @@ export default function ScheduleCalendar() {
 		}
 		return slots;
 	};
-	// const getTimeSlots = () => {
-	// 	const slots = [];
-	// 	for (let hour = 7; hour <= 19; hour++) {
-	// 		const timeStr = `${hour.toString().padStart(2, "0")}:00`;
-	// 		const [h, m] = timeStr.split(":");
-	// 		const date = new Date();
-	// 		date.setHours(Number(h), Number(m), 0, 0); // set to that time
-	// 		slots.push(format(date, "hh:mm a"));
-	// 	}
-	// 	return slots;
-	// };
 
 	// Check if a schedule is within a time slot
 	const isScheduleInTimeSlot = (schedule, time, date) => {
@@ -312,66 +302,6 @@ export default function ScheduleCalendar() {
 		}
 	};
 
-	// Render month view
-	const renderMonthView = () => {
-		// const days = getDaysInMonth(currentMonth);
-
-		return (
-			<div className="grid grid-cols-7 gap-1">
-				{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-					<div key={day} className="p-2 font-semibold text-center text-foreground">
-						{day}
-					</div>
-				))}
-
-				{days.map((day, index) => {
-					const isCurrentMonth = day.getMonth() === currentMonth;
-					// const isToday = formatDate(day) === formatDate(new Date());
-					const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
-					const daySchedules = getSchedulesForDate(day);
-
-					return (
-						<div
-							key={index}
-							onClick={() => handleCellClick(day)}
-							className={`
-                min-h-24 p-1 border transition-colors duration-200 cursor-pointer rounded-sm
-                ${isCurrentMonth ? "bg-white" : "bg-sidebar text-gray-400"} 
-                ${isToday ? "bg-blue-50 border-blue-200" : "border-gray-500"}
-              `}
-						>
-							<div className="flex justify-between items-center">
-								<span className={`text-sm font-medium ${isToday ? "text-blue-600" : ""}`}>{day.getDate()}</span>
-								{daySchedules.length > 0 && (
-									<span className="text-xs bg-muted-foreground text-background rounded-full px-1">{daySchedules.length}</span>
-								)}
-							</div>
-
-							<div className="mt-1 space-y-1 overflow-y-auto max-h-20">
-								{daySchedules.slice(0, 3).map((schedule) => (
-									<div
-										key={schedule.id}
-										onClick={(e) => handleScheduleClick(schedule, e)}
-										className={`
-                      text-xs p-1 rounded border truncate
-                      ${statusColors[schedule.status] || "bg-gray-100 border-gray-300"}
-                    `}
-									>
-										<div className="flex items-center gap-1">
-											<span>{schedule.startTime.substring(0, 5)}</span>
-											<span className="truncate">{schedule.title}</span>
-										</div>
-									</div>
-								))}
-								{daySchedules.length > 3 && <div className="text-xs text-blue-600">+{daySchedules.length - 3} more</div>}
-							</div>
-						</div>
-					);
-				})}
-			</div>
-		);
-	};
-
 	return (
 		<div>
 			<div>
@@ -406,21 +336,6 @@ export default function ScheduleCalendar() {
 					</div>
 
 					<div className="flex flex-row w-full items-center gap-4">
-						{/* User dropdown */}
-						{/* <div className="relative w-full sm:w-auto">
-							<select
-								value={selectedUser}
-								onChange={(e) => setSelectedUser(parseInt(e.target.value))}
-								className="w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-							>
-								{mockUsers.map((user) => (
-									<option key={user.id} value={user.id}>
-										{user.name}
-									</option>
-								))}
-							</select>
-						</div> */}
-
 						{/* Navigation */}
 						<div className="flex flex-col justify-center gap-2 w-full">
 							{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
@@ -472,7 +387,14 @@ export default function ScheduleCalendar() {
 				{/* Calendar/Week View */}
 				<div className="bg-background p-1 overflow-x-auto">
 					{selectedView === "month" ? (
-						renderMonthView()
+						<MonthViewV2
+							days={days}
+							currentMonth={currentMonth}
+							getSchedulesForDate={getSchedulesForDate}
+							handleCellClick={handleCellClick}
+							handleScheduleClick={handleScheduleClick}
+							statusColors={statusColors}
+						/>
 					) : (
 						<WeekViewV2
 							getWeekDays={getWeekDays}
