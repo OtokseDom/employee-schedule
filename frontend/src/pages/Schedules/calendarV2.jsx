@@ -11,6 +11,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
 
+// TODO: Fix modal to use shadcn UI modal component
 // Mock data for demonstration
 const mockUsers = [
 	{ id: 11, name: "John Doe" },

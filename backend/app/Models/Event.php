@@ -13,3 +13,4 @@ class Event extends Model
         "description",
     ];
 }
+// TODO: REMOVE event etnirely from the project
