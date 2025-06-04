@@ -22,18 +22,21 @@ class StoreScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'event_id' => 'required|exists:events,id',
-            'user_id' => 'required|exists:users,id',
-            'date' => 'required|date_format:Y-m-d',
-            'shift_start' => 'required|date_format:H:i:s',
-            'shift_end' => 'required|date_format:H:i:s|after:shift_start', // Ensure shift_end is a valid time and after shift_start
+            'title' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_time' => 'required|date_format:H:i:s',
+            'end_time' => 'required|date_format:H:i:s|after:start_time',
+            'description' => 'nullable|string',
+            'assignee' => 'required|exists:users,id',
             'status' => 'required|in:Pending,Completed,In Progress,Cancelled',
         ];
     }
     public function messages()
     {
         return [
-            'shift_end.after' => 'The shift end time must be after the shift start time.',
+            'end_time.after' => 'The end time must be after the start time.',
         ];
     }
 }

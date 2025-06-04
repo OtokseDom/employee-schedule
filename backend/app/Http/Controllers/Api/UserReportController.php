@@ -105,9 +105,9 @@ class UserReportController extends Controller
             ->count();
 
         $percentageDifference = [
-            'value' => $month1 > 0
+            'value' => ($month2 != 0)
                 ? round(abs((($month1 - $month2) / $month2) * 100), 2)
-                : ($month2 > 0 ? 100 : 0),
+                : ($month1 > 0 ? 100 : 0),
             'event' => $month1 > $month2 ? 'Increased' : ($month1 < $month2 ? 'Decreased' : 'Same'),
         ];
 

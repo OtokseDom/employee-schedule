@@ -8,21 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     use HasFactory;
-    // use HasFactory;
+
     protected $fillable = [
-        "event_id",
-        "user_id",
-        "date",
-        "shift_start",
-        "shift_end",
-        "status"
+        'title',
+        'category',
+        'start_date',
+        'end_date',
+        'start_time',
+        'end_time',
+        'description',
+        'assignee',
+        'status',
     ];
-    public function event()
+
+    public function assignee()
     {
-        return $this->belongsTo(Event::class);
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'assignee');
     }
 }

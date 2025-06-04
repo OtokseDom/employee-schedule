@@ -24,15 +24,15 @@ class ScheduleFactory extends Factory
     public function definition()
     {
         return [
-            'event_id' => Event::inRandomOrder()->value('id'), // Get a random existing Event ID
-            'user_id' => User::inRandomOrder()->value('id'), // Get a random existing User ID
-            'shift_start' => fake()->dateTimeBetween('06:00:00', '09:00:00'), // Random time between 6 AM and 9 AM
-            'shift_end' => fake()->dateTimeBetween('16:00:00', '18:00:00'), // Random time between 4 PM and 6 PM
-            'date' => fake()->dateTimeBetween(
-                now()->startOfMonth()->subMonth()->startOfDay(),
-                now()->addMonth()->endOfMonth()->endOfDay()
-            ),
-            'status' => fake()->randomElement(["Pending", "Completed", "In Progress", "Cancelled"])
+            'title' => fake()->sentence(3),
+            'category' => fake()->randomElement(['Meeting', 'Work', 'Event', 'Task', 'Training', 'Other']),
+            'start_date' => fake()->dateTimeBetween('now', '+1 month'),
+            'end_date' => fake()->dateTimeBetween('+1 month', '+2 months'),
+            'start_time' => fake()->time('H:i:s', '09:00:00'),
+            'end_time' => fake()->time('H:i:s', '19:00:00'),
+            'description' => fake()->optional()->sentence(8),
+            'assignee' => \App\Models\User::inRandomOrder()->value('id'),
+            'status' => fake()->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold'])
         ];
     }
 }

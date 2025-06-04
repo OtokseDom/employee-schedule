@@ -16,29 +16,24 @@ class ScheduleResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'event_id' => $this->event_id,
-            'date' => $this->date,
-            'shift_start' => $this->shift_start,
-            'shift_end' => $this->shift_end,
+            'title' => $this->title,
+            'category' => $this->category,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'description' => $this->description,
+            'assignee_id' => $this->assignee, // always the user id
             'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
-            // 'user' => new EmployeeResource($this->whenLoaded('user')),
-            // For SHOW function
-            'user' => $this->whenLoaded('user', function () {
+            'assignee' => $this->whenLoaded('assignee', function () {
                 return [
-                    'name' => $this->user->name,
-                    'position' => $this->user->position,
-                    'dob' => $this->user->dob,
-                    'role' => $this->user->role,
-                    'email' => $this->user->email,
-                ];
-            }),
-            'event' => $this->whenLoaded('event', function () {
-                return [
-                    'name' => $this->event->name,
-                    'description' => $this->event->description,
+                    'name' => $this->assignee->name,
+                    'position' => $this->assignee->position,
+                    'dob' => $this->assignee->dob,
+                    'role' => $this->assignee->role,
+                    'email' => $this->assignee->email,
                 ];
             }),
         ];
