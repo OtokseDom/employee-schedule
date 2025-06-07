@@ -26,8 +26,8 @@ class ScheduleFactory extends Factory
         return [
             'title' => fake()->sentence(3),
             'category' => fake()->randomElement(['Meeting', 'Work', 'Event', 'Task', 'Training', 'Other']),
-            'start_date' => fake()->dateTimeBetween('now', '+1 month'),
-            'end_date' => fake()->dateTimeBetween('+1 month', '+2 months'),
+            'start_date' => $startDate = fake()->dateTimeBetween('now', '+1 month'),
+            'end_date' => (clone $startDate)->modify('+1 day'),
             'start_time' => fake()->time('H:i:s', '09:00:00'),
             'end_time' => fake()->time('H:i:s', '19:00:00'),
             'description' => fake()->optional()->sentence(8),

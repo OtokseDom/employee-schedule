@@ -44,7 +44,7 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
                     `}
 								>
 									<div className="flex items-center gap-1">
-										<span>{schedule.startTime.substring(0, 5)}</span>
+										<span>{schedule.start_time.substring(0, 5)}</span>
 										<span className="truncate">{schedule.title}</span>
 									</div>
 								</div>

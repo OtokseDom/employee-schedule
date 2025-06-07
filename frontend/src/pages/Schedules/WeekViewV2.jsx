@@ -61,11 +61,11 @@ export default function WeekViewV2({
 									>
 										{schedulesInSlot.map((schedule) => {
 											// Calculate position and height based on time
-											const [startHour, startMin] = schedule.startTime.split(":").map(Number);
+											const [startHour, startMin] = schedule.start_time.split(":").map(Number);
 											const formattedStartTime = new Date();
 											formattedStartTime.setHours(startHour, startMin, 0, 0);
 
-											const [endHour, endMin] = schedule.endTime.split(":").map(Number);
+											const [endHour, endMin] = schedule.end_time.split(":").map(Number);
 											const formattedEndTime = new Date();
 											formattedEndTime.setHours(endHour, endMin, 0, 0);
 											const [slotHour] = time.split(":").map(Number);

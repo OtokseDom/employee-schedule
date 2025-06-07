@@ -19,80 +19,80 @@ const mockUsers = [
 	{ id: 3, name: "Bob Johnson" },
 ];
 
-const mockSchedules = [
-	{
-		id: 1,
-		title: "Project Planning",
-		category: "Meeting",
-		startDate: "2025-04-13",
-		endDate: "2025-04-13",
-		startTime: "09:00",
-		endTime: "10:30",
-		description: "Discuss project roadmap and milestones",
-		assignee: 11,
-		status: "Scheduled",
-	},
-	{
-		id: 2,
-		title: "Code Review",
-		category: "Work",
-		startDate: "2025-04-14",
-		endDate: "2025-04-14",
-		startTime: "13:00",
-		endTime: "15:00",
-		description: "Review pull requests for the new feature",
-		assignee: 11,
-		status: "Pending",
-	},
-	{
-		id: 3,
-		title: "Client Meeting",
-		category: "Meeting",
-		startDate: "2025-04-15",
-		endDate: "2025-04-15",
-		startTime: "11:00",
-		endTime: "12:00",
-		description: "Discuss project requirements with client",
-		assignee: 2,
-		status: "Scheduled",
-	},
-	{
-		id: 4,
-		title: "Team Building",
-		category: "Event",
-		startDate: "2025-04-16",
-		endDate: "2025-04-16",
-		startTime: "15:00",
-		endTime: "17:00",
-		description: "Team building activity",
-		assignee: 11,
-		status: "Confirmed",
-	},
-	{
-		id: 5,
-		title: "Weekly Report",
-		category: "Task",
-		startDate: "2025-04-12",
-		endDate: "2025-04-12",
-		startTime: "14:00",
-		endTime: "16:00",
-		description: "Prepare weekly progress report",
-		assignee: 3,
-		status: "Completed",
-	},
-	{
-		id: 6,
-		title: "I love you bby",
-		category: "Meeting",
-		startDate: "2025-04-13",
-		endDate: "2025-04-13",
-		startTime: "10:00",
-		endTime: "11:30",
-		description: "Discuss project roadmap and milestones",
-		assignee: 11,
-		status: "Cancelled",
-	},
-];
+// const mockSchedules = [
+// 	{
+// 		id: 1,
+// 		title: "Project Planning",
+// 		category: "Meeting",
+// 		startDate: "2025-04-13",
+// 		endDate: "2025-04-13",
+// 		startTime: "09:00",
+// 		endTime: "10:30",
+// 		description: "Discuss project roadmap and milestones",
+// 		assignee: 11,
+// 		status: "Scheduled",
+// 	},
+// 	{
+// 		id: 2,
+// 		title: "Code Review",
+// 		category: "Work",
+// 		startDate: "2025-04-14",
+// 		endDate: "2025-04-14",
+// 		startTime: "13:00",
+// 		endTime: "15:00",
+// 		description: "Review pull requests for the new feature",
+// 		assignee: 11,
+// 		status: "Pending",
+// 	},
+// 	{
+// 		id: 3,
+// 		title: "Client Meeting",
+// 		category: "Meeting",
+// 		startDate: "2025-04-15",
+// 		endDate: "2025-04-15",
+// 		startTime: "11:00",
+// 		endTime: "12:00",
+// 		description: "Discuss project requirements with client",
+// 		assignee: 2,
+// 		status: "Scheduled",
+// 	},
+// 	{
+// 		id: 4,
+// 		title: "Team Building",
+// 		category: "Event",
+// 		startDate: "2025-04-16",
+// 		endDate: "2025-04-16",
+// 		startTime: "15:00",
+// 		endTime: "17:00",
+// 		description: "Team building activity",
+// 		assignee: 11,
+// 		status: "Confirmed",
+// 	},
+// 	{
+// 		id: 5,
+// 		title: "Weekly Report",
+// 		category: "Task",
+// 		startDate: "2025-04-12",
+// 		endDate: "2025-04-12",
+// 		startTime: "14:00",
+// 		endTime: "16:00",
+// 		description: "Prepare weekly progress report",
+// 		assignee: 3,
+// 		status: "Completed",
+// 	},
+// 	{
+// 		id: 6,
+// 		title: "I love you bby",
+// 		category: "Meeting",
+// 		startDate: "2025-04-13",
+// 		endDate: "2025-04-13",
+// 		startTime: "10:00",
+// 		endTime: "11:30",
+// 		description: "Discuss project roadmap and milestones",
+// 		assignee: 11,
+// 		status: "Cancelled",
+// 	},
+// ];
 
 // Status colors
 const statusColors = {
@@ -130,27 +130,28 @@ export default function ScheduleCalendar() {
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
-	const fetchSchedules = async () => {
+	useEffect(() => {
+		fetchUsers();
+		fetchSchedules();
+	}, []);
+
+	const fetchUsers = async () => {
 		setLoading(true);
 		try {
-			const scheduleResponse = await axiosClient.get(`/schedule`);
-			setSchedules(scheduleResponse.data.schedules);
+			const userResponse = await axiosClient.get("/user");
+			setUsers(userResponse.data.users);
+			setSelectedUser(userResponse.data.users[0]);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
 			setLoading(false);
 		}
 	};
-	useEffect(() => {
-		fetchUsers();
-	}, []);
-
-	const fetchUsers = async () => {
+	const fetchSchedules = async () => {
 		setLoading(true);
 		try {
-			const userResponse = await axiosClient.get("/user-auth");
-			setUsers(userResponse.data.users);
-			setSelectedUser(userResponse.data.users[0]);
+			const scheduleResponse = await axiosClient.get(`/schedule`);
+			setSchedules(scheduleResponse.data.schedules);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -205,7 +206,7 @@ export default function ScheduleCalendar() {
 	const getSchedulesForDate = (date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
 		return schedules.filter(
-			(schedule) => schedule.assignee === selectedUser?.id && schedule.startDate <= formattedDate && schedule.endDate >= formattedDate
+			(schedule) => schedule.assignee?.id === selectedUser?.id && schedule.start_date <= formattedDate && schedule.end_date >= formattedDate
 		);
 	};
 
@@ -226,9 +227,9 @@ export default function ScheduleCalendar() {
 		const [endHour, endMinutes] = schedule.endTime.split(":").map(Number);
 
 		return (
-			schedule.assignee === selectedUser?.id &&
-			schedule.startDate <= formattedDate &&
-			schedule.endDate >= formattedDate &&
+			schedule.assignee?.id === selectedUser?.id &&
+			schedule.start_date <= formattedDate &&
+			schedule.end_date >= formattedDate &&
 			startHour <= slotHour &&
 			(endHour > slotHour || (endHour === slotHour && endMinutes > 0))
 		);
@@ -269,8 +270,8 @@ export default function ScheduleCalendar() {
 			id: Date.now(),
 			title: "",
 			category: "Meeting",
-			startDate: formattedDate,
-			endDate: formattedDate,
+			start_date: formattedDate,
+			end_date: formattedDate,
 			assignee: selectedUser?.id,
 			status: "Scheduled",
 			description: "",
@@ -511,11 +512,11 @@ export default function ScheduleCalendar() {
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
 								<select
-									value={selectedSchedule.assignee}
+									value={selectedSchedule.assignee?.id}
 									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, assignee: parseInt(e.target.value) })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								>
-									{mockUsers.map((user) => (
+									{users.map((user) => (
 										<option key={user.id} value={user.id}>
 											{user.name}
 										</option>
