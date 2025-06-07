@@ -14,18 +14,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/user', function (Request $request) {
+    Route::get('/user-auth', function (Request $request) {
         return $request->user();
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
     // Route::apiResource('/user-auth', UserController::class); //somehow implicit route is not working
     // User CRUD
-    Route::get('/user-auth', [UserController::class, 'index']);
-    Route::post('/user-auth', [UserController::class, 'store']);
-    Route::get('/user-auth/{user}', [UserController::class, 'show']);
-    Route::put('/user-auth/{user}', [UserController::class, 'update']);
-    Route::delete('/user-auth/{user}', [UserController::class, 'destroy']);
+    Route::get('/user', [UserController::class, 'index']);
+    Route::post('/user', [UserController::class, 'store']);
+    Route::get('/user/{user}', [UserController::class, 'show']);
+    Route::put('/user/{user}', [UserController::class, 'update']);
+    Route::delete('/user/{user}', [UserController::class, 'destroy']);
     Route::apiResource('/schedule', ScheduleController::class);
     Route::apiResource('/employee', EmployeeController::class);
     Route::apiResource('/event', EventController::class);

@@ -43,7 +43,7 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// Fetch user details and tasks
-			const response = await axiosClient.get(`/user-auth/${id}`);
+			const response = await axiosClient.get(`/user/${id}`);
 			setUser(response.data.user);
 			setTasks(response.data.assigned_tasks);
 		} catch (e) {
@@ -60,7 +60,7 @@ export default function UserProfile() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user-auth/${id}`);
+			await axiosClient.delete(`/user/${id}`);
 			showToast("Success!", "User deleted.", 3000);
 			navigate("/users");
 		} catch (e) {

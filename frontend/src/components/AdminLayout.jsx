@@ -15,7 +15,7 @@ export default function AdminLayout() {
 	}
 
 	useEffect(() => {
-		axiosClient.get("/user").then(({ data }) => {
+		axiosClient.get("/user-auth").then(({ data }) => {
 			setUser(data);
 		});
 	}, []);

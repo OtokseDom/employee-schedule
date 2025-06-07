@@ -20,7 +20,7 @@ export default function Users() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const userResponse = await axiosClient.get("/user-auth");
+			const userResponse = await axiosClient.get("/user");
 			setUsers(userResponse.data.users);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -33,7 +33,7 @@ export default function Users() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const userResponse = await axiosClient.delete(`/user-auth/${id}`);
+			const userResponse = await axiosClient.delete(`/user/${id}`);
 			fetchData();
 			showToast("Success!", "User deleted.", 3000);
 		} catch (e) {

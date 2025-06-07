@@ -116,7 +116,6 @@ export default function ScheduleCalendar() {
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
 	const [currentDate, setCurrentDate] = useState(new Date());
 	// const [selectedUser, setSelectedUser] = useState(1);
-	const [schedules, setSchedules] = useState(mockSchedules);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedSchedule, setSelectedSchedule] = useState(null);
 	const [selectedDay, setSelectedDay] = useState(null);
@@ -127,9 +126,21 @@ export default function ScheduleCalendar() {
 	const endDate = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
+	const [schedules, setSchedules] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
+	const fetchSchedules = async () => {
+		setLoading(true);
+		try {
+			const scheduleResponse = await axiosClient.get(`/schedule`);
+			setSchedules(scheduleResponse.data.schedules);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
 	useEffect(() => {
 		fetchUsers();
 	}, []);

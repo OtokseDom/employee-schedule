@@ -27,7 +27,7 @@ export default function Schedules() {
 	const fetchUsers = async () => {
 		setLoading(true);
 		try {
-			const userResponse = await axiosClient.get("/user-auth");
+			const userResponse = await axiosClient.get("/user");
 			setUsers(userResponse.data.users);
 			setSelectedUser(userResponse.data.users[0]);
 		} catch (e) {
