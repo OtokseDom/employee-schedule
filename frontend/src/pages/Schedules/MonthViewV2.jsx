@@ -15,7 +15,7 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
 				// const isToday = formatDate(day) === formatDate(new Date());
 				const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
 				const daySchedules = getSchedulesForDate(day);
-
+				// const daySchedules = schedules.filter((s) => formatDate(s.start_time) === formatDate(day));
 				return (
 					<div
 						key={index}

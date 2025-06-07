@@ -24,8 +24,8 @@ const mockUsers = [
 // 		id: 1,
 // 		title: "Project Planning",
 // 		category: "Meeting",
-// 		startDate: "2025-04-13",
-// 		endDate: "2025-04-13",
+// 		start_date: "2025-04-13",
+// 		end_date: "2025-04-13",
 // 		startTime: "09:00",
 // 		endTime: "10:30",
 // 		description: "Discuss project roadmap and milestones",
@@ -36,8 +36,8 @@ const mockUsers = [
 // 		id: 2,
 // 		title: "Code Review",
 // 		category: "Work",
-// 		startDate: "2025-04-14",
-// 		endDate: "2025-04-14",
+// 		start_date: "2025-04-14",
+// 		end_date: "2025-04-14",
 // 		startTime: "13:00",
 // 		endTime: "15:00",
 // 		description: "Review pull requests for the new feature",
@@ -48,8 +48,8 @@ const mockUsers = [
 // 		id: 3,
 // 		title: "Client Meeting",
 // 		category: "Meeting",
-// 		startDate: "2025-04-15",
-// 		endDate: "2025-04-15",
+// 		start_date: "2025-04-15",
+// 		end_date: "2025-04-15",
 // 		startTime: "11:00",
 // 		endTime: "12:00",
 // 		description: "Discuss project requirements with client",
@@ -60,8 +60,8 @@ const mockUsers = [
 // 		id: 4,
 // 		title: "Team Building",
 // 		category: "Event",
-// 		startDate: "2025-04-16",
-// 		endDate: "2025-04-16",
+// 		start_date: "2025-04-16",
+// 		end_date: "2025-04-16",
 // 		startTime: "15:00",
 // 		endTime: "17:00",
 // 		description: "Team building activity",
@@ -72,8 +72,8 @@ const mockUsers = [
 // 		id: 5,
 // 		title: "Weekly Report",
 // 		category: "Task",
-// 		startDate: "2025-04-12",
-// 		endDate: "2025-04-12",
+// 		start_date: "2025-04-12",
+// 		end_date: "2025-04-12",
 // 		startTime: "14:00",
 // 		endTime: "16:00",
 // 		description: "Prepare weekly progress report",
@@ -84,8 +84,8 @@ const mockUsers = [
 // 		id: 6,
 // 		title: "I love you bby",
 // 		category: "Meeting",
-// 		startDate: "2025-04-13",
-// 		endDate: "2025-04-13",
+// 		start_date: "2025-04-13",
+// 		end_date: "2025-04-13",
 // 		startTime: "10:00",
 // 		endTime: "11:30",
 // 		description: "Discuss project roadmap and milestones",
@@ -122,8 +122,8 @@ export default function ScheduleCalendar() {
 	const [selectedTime, setSelectedTime] = useState(null);
 
 	const [currentMonth, setCurrentMonth] = useState(new Date());
-	const startDate = startOfWeek(startOfMonth(currentMonth));
-	const endDate = endOfWeek(endOfMonth(currentMonth));
+	const start_date = startOfWeek(startOfMonth(currentMonth));
+	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
 	const [schedules, setSchedules] = useState([]);
@@ -160,26 +160,26 @@ export default function ScheduleCalendar() {
 	};
 
 	// For week view - get the start of the week (Sunday)
-	const getWeekStartDate = (date) => {
+	const getWeekstart_date = (date) => {
 		const d = new Date(date);
 		const day = d.getDay();
 		return new Date(d.setDate(d.getDate() - day));
 	};
 
-	const weekStartDate = getWeekStartDate(currentDate);
+	const weekstart_date = getWeekstart_date(currentDate);
 
 	// Get days in month for calendar view
 	const days = [];
-	let day = startDate;
-	while (day <= endDate) {
+	let day = start_date;
+	while (day <= end_date) {
 		days.push(day);
 		day = addDays(day, 1);
 	}
 
 	// Get all days for the week view
-	const getWeekDays = (startDate) => {
+	const getWeekDays = (start_date) => {
 		const days = [];
-		const currentDate = new Date(startDate);
+		const currentDate = new Date(start_date);
 
 		for (let i = 0; i < 7; i++) {
 			days.push(new Date(currentDate));
@@ -205,9 +205,11 @@ export default function ScheduleCalendar() {
 	// Get schedules for a specific date
 	const getSchedulesForDate = (date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
-		return schedules.filter(
-			(schedule) => schedule.assignee?.id === selectedUser?.id && schedule.start_date <= formattedDate && schedule.end_date >= formattedDate
-		);
+		return schedules.filter((schedule) => {
+			const start = format(new Date(schedule.start_date), "yyyy-MM-dd");
+			const end = format(new Date(schedule.end_date), "yyyy-MM-dd");
+			return schedule.assignee?.id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
+		});
 	};
 
 	// Generate time slots for week view
@@ -240,7 +242,7 @@ export default function ScheduleCalendar() {
 		if (selectedView === "month") {
 			setCurrentMonth(subMonths(currentMonth, 1));
 		} else {
-			const newDate = new Date(weekStartDate);
+			const newDate = new Date(weekstart_date);
 			newDate.setDate(newDate.getDate() - 7);
 			setCurrentDate(newDate);
 		}
@@ -250,7 +252,7 @@ export default function ScheduleCalendar() {
 		if (selectedView === "month") {
 			setCurrentMonth(addMonths(currentMonth, 1));
 		} else {
-			const newDate = new Date(weekStartDate);
+			const newDate = new Date(weekstart_date);
 			newDate.setDate(newDate.getDate() + 7);
 			setCurrentDate(newDate);
 		}
@@ -356,8 +358,8 @@ export default function ScheduleCalendar() {
 								<span className="block md:hidden text-lg font-bold">
 									{selectedView === "month"
 										? `${format(currentMonth, "MMMM yyyy")}`
-										: `${weekStartDate.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
-												weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000
+										: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+												weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
 										  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
 								</span>
 							</div>
@@ -379,8 +381,8 @@ export default function ScheduleCalendar() {
 									<span className="hidden md:block text-lg font-bold">
 										{selectedView === "month"
 											? `${format(currentMonth, "MMMM yyyy")}`
-											: `${weekStartDate.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
-													weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000
+											: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+													weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
 											  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
 									</span>
 								</div>
@@ -412,7 +414,7 @@ export default function ScheduleCalendar() {
 						<WeekViewV2
 							getWeekDays={getWeekDays}
 							getTimeSlots={getTimeSlots}
-							weekStartDate={weekStartDate}
+							weekstart_date={weekstart_date}
 							isScheduleInTimeSlot={isScheduleInTimeSlot}
 							schedules={schedules}
 							statusColors={statusColors}
@@ -470,8 +472,8 @@ export default function ScheduleCalendar() {
 									<label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
 									<input
 										type="date"
-										value={selectedSchedule.startDate}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, startDate: e.target.value })}
+										value={selectedSchedule.start_date}
+										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, start_date: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
@@ -479,8 +481,8 @@ export default function ScheduleCalendar() {
 									<label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
 									<input
 										type="date"
-										value={selectedSchedule.endDate}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, endDate: e.target.value })}
+										value={selectedSchedule.end_date}
+										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, end_date: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
