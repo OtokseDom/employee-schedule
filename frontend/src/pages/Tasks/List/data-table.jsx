@@ -51,6 +51,8 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 			: {
 					"expected output": false,
 					"time estimate": false,
+					"time taken": false,
+					"delay reason": false,
 					delay: false,
 					remarks: false,
 			  }
