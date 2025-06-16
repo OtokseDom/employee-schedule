@@ -5,7 +5,7 @@ import React from "react";
 export default function WeekViewV2({
 	getWeekDays,
 	getTimeSlots,
-	weekStartDate,
+	weekstart_date: weekStartDate,
 	isScheduleInTimeSlot,
 	schedules,
 	statusColors,

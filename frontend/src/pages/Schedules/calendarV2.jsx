@@ -225,8 +225,9 @@ export default function ScheduleCalendar() {
 	const isScheduleInTimeSlot = (schedule, time, date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
 		const [slotHour] = time.split(":").map(Number);
-		const [startHour] = schedule.startTime.split(":").map(Number);
-		const [endHour, endMinutes] = schedule.endTime.split(":").map(Number);
+
+		const [startHour] = schedule?.start_time.split(":").map(Number);
+		const [endHour, endMinutes] = schedule?.end_time.split(":").map(Number);
 
 		return (
 			schedule.assignee?.id === selectedUser?.id &&
