@@ -30,6 +30,8 @@ class StoreTaskRequest extends FormRequest
             'status' => 'required|in:Pending,In Progress,Completed,Delayed,Cancelled,On Hold',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_time' => 'required|date_format:H:i:s',
+            'end_time' => 'required|date_format:H:i:s|after:start_time',
             'time_estimate' => 'nullable|numeric',
             'time_taken' => 'nullable|numeric',
             'delay' => 'nullable|numeric',
@@ -52,6 +54,7 @@ class StoreTaskRequest extends FormRequest
             'status.required' => 'Status is required.',
             'start_date.required' => 'Start date is required.',
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
+            'end_time.after' => 'The end time must be after the start time.',
             'performance_rating.min' => 'Performance rating must be at least 0.',
             'performance_rating.max' => 'Performance rating may not be greater than 100.',
             // ...other custom messages...

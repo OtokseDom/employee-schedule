@@ -21,6 +21,8 @@ return new class extends Migration
             $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold'])->default('pending');
             $table->date('start_date');
             $table->date('end_date');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->double('time_estimate')->nullable(); // in hours
             $table->double('time_taken')->nullable(); // in hours
             $table->double('delay')->nullable(); // in hours
