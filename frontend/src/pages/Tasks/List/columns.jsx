@@ -164,6 +164,30 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess
 			accessorFn: (row) => (row.end_date ? format(new Date(row.end_date), "MMM-dd yyyy") : ""),
 		},
 		{
+			id: "start time",
+			accessorKey: "start_time",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Start Time <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			accessorFn: (row) => (row.start_time ? format(new Date(`1970-01-01T${row.start_time}`), "h:mm a") : ""),
+		},
+		{
+			id: "end time",
+			accessorKey: "end_time",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						End Time <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			accessorFn: (row) => (row.end_time ? format(new Date(`1970-01-01T${row.end_time}`), "h:mm a") : ""),
+		},
+		{
 			id: "time estimate",
 			accessorKey: "time_estimate",
 			header: ({ column }) => {

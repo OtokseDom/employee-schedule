@@ -18,6 +18,8 @@ class Task extends Model
         'status',
         'start_date',
         'end_date',
+        'start_time',
+        'end_time',
         'time_estimate',
         'time_taken',
         'delay',
