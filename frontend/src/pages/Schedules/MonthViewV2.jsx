@@ -2,10 +2,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
 import React from "react";
+import TaskForm from "../Tasks/form";
 
 export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, handleCellClick, handleScheduleClick, statusColors }) {
 	const { loading, setLoading } = useLoadContext();
+	const [tasks, setTasks] = useState([]);
+	const [isOpen, setIsOpen] = useState(false);
+	const [updateData, setUpdateData] = useState({});
 
+	useEffect(() => {
+		if (!isOpen) setUpdateData({});
+	}, [isOpen]);
+	useEffect(() => {
+		fetchData();
+	}, []);
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			// Make both API calls concurrently using Promise.all
+			const taskResponse = await axiosClient.get("/task");
+			setTasks(taskResponse.data.data);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+	};
 	return (
 		<div className="grid grid-cols-7 gap-1">
 			{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
@@ -33,10 +56,10 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
 									key={index}
 									// onClick={() => handleCellClick(day)}
 									className={`
-							min-h-24 p-1 border transition-colors duration-200 cursor-pointer rounded-sm
-							${isCurrentMonth ? "bg-white" : "bg-sidebar text-gray-400"} 
-							${isToday ? "bg-blue-50 border-blue-200" : "border-gray-500"}
-						`}
+										min-h-24 p-1 border transition-colors duration-200 cursor-pointer rounded-sm
+										${isCurrentMonth ? "bg-white" : "bg-sidebar text-gray-400"} 
+										${isToday ? "bg-blue-50 border-blue-200" : "border-gray-500"}
+									`}
 								>
 									<div className="flex justify-between items-center">
 										<span className={`text-sm font-medium ${isToday ? "text-blue-600" : ""}`}>{day.getDate()}</span>
@@ -84,15 +107,14 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
 								<DialogTitle>Update Schedule</DialogTitle>
 								<DialogDescription>Update schedule for {selectedUser?.name}</DialogDescription>
 							</DialogHeader>
-							<ScheduleForm
-								form={form}
-								modalData={modalData}
-								events={events}
-								loading={loading}
-								selectedScheduleId={selectedScheduleId}
-								handleTimeChange={handleTimeChange}
-								handleSubmit={handleSubmit}
-								handleDelete={handleDelete}
+							<TaskForm
+								data={tasks}
+								setTasks={setTasks}
+								// isOpen={isOpen}
+								// setIsOpen={setIsOpen}
+								updateData={updateData}
+								setUpdateData={setUpdateData}
+								fetchData={fetchData}
 							/>
 						</DialogContent>
 					</Dialog>
