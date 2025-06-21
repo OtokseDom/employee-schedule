@@ -6,11 +6,11 @@ export default function WeekViewV2({
 	getWeekDays,
 	getTimeSlots,
 	weekstart_date: weekStartDate,
-	isScheduleInTimeSlot,
-	schedules,
+	isInTimeSlot,
+	tasks,
 	statusColors,
 	handleCellClick,
-	handleScheduleClick,
+	handletaskClick,
 }) {
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
@@ -46,8 +46,7 @@ export default function WeekViewV2({
 							</div>
 
 							{timeSlots.map((time, timeIndex) => {
-								const schedulesInSlot = schedules.filter((s) => isScheduleInTimeSlot(s, time, day));
-
+								const tasksInSlot = tasks.filter((s) => isInTimeSlot(s, time, day));
 								return (
 									<div
 										key={`${dayIndex}-${timeIndex}`}
@@ -59,18 +58,18 @@ export default function WeekViewV2({
                                                 ${dayIndex === 6 ? "border-r" : ""}
                                             `}
 									>
-										{schedulesInSlot.map((schedule) => {
+										{tasksInSlot.map((task) => {
 											// Calculate position and height based on time
-											const [startHour, startMin] = schedule.start_time.split(":").map(Number);
+											const [startHour, startMin] = task.start_time?.split(":").map(Number);
 											const formattedStartTime = new Date();
 											formattedStartTime.setHours(startHour, startMin, 0, 0);
 
-											const [endHour, endMin] = schedule.end_time.split(":").map(Number);
+											const [endHour, endMin] = task.end_time?.split(":").map(Number);
 											const formattedEndTime = new Date();
 											formattedEndTime.setHours(endHour, endMin, 0, 0);
 											const [slotHour] = time.split(":").map(Number);
 
-											// Only show if this is the starting slot for this schedule
+											// Only show if this is the starting slot for this task
 											if (startHour !== slotHour) return null;
 
 											// Calculate duration in hours
@@ -78,15 +77,15 @@ export default function WeekViewV2({
 
 											return (
 												<div
-													key={schedule.id}
-													onClick={(e) => handleScheduleClick(schedule, e)}
+													key={task.id}
+													// onClick={(e) => handletaskClick(task, e)}
 													className={`
                                                         absolute left-0 right-0 mx-1 p-1 rounded border overflow-hidden
-                                                        ${statusColors[schedule.status] || "bg-gray-100 border-gray-300"}
+                                                        ${statusColors[task.status] || "bg-gray-100 border-gray-300 text-black"}
                                                         `}
 													style={{ height: `${duration * 4}rem` }}
 												>
-													<div className="text-xs font-medium truncate">{schedule.title}</div>
+													<div className="text-xs font-medium truncate">{task.title}</div>
 													<div className="text-xs flex items-center gap-1 truncate">
 														<Clock className="w-3 h-3" />
 														{format(formattedStartTime, "hh:mm a")} - {format(formattedEndTime, "hh:mm a")}
