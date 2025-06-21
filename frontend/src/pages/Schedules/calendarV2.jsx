@@ -10,7 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
-// TODO: Read from DB instead of mock data
+// TODO: close modal after submit
 // TODO: Fix modal to use shadcn UI modal component
 // Mock data for demonstration
 const mockUsers = [
