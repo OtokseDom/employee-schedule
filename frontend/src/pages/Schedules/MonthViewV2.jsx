@@ -1,8 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TaskForm from "../Tasks/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import axiosClient from "@/axios.client";
 
 export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, handleCellClick, handleScheduleClick, statusColors }) {
 	const { loading, setLoading } = useLoadContext();
@@ -45,12 +47,9 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
 
 				return (
 					<Dialog key={index}>
-						<DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}>
-							<div
-								className={`${
-									format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") ? "outline outline-5 outline-foreground rounded-lg" : ""
-								}`}
-							>
+						<DialogTrigger>
+							{/* <DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}> */}
+							<div>
 								{/* Calendar cell Clickable */}
 								<div
 									key={index}
@@ -105,17 +104,19 @@ export default function MonthViewV2({ days, currentMonth, getSchedulesForDate, h
 						<DialogContent>
 							<DialogHeader className="text-left">
 								<DialogTitle>Update Schedule</DialogTitle>
-								<DialogDescription>Update schedule for {selectedUser?.name}</DialogDescription>
+								<DialogDescription>Update schedule for </DialogDescription>
 							</DialogHeader>
-							<TaskForm
-								data={tasks}
-								setTasks={setTasks}
-								// isOpen={isOpen}
-								// setIsOpen={setIsOpen}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-							/>
+							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
+								<TaskForm
+									data={tasks}
+									setTasks={setTasks}
+									// isOpen={isOpen}
+									// setIsOpen={setIsOpen}
+									updateData={updateData}
+									setUpdateData={setUpdateData}
+									fetchData={fetchData}
+								/>
+							</div>
 						</DialogContent>
 					</Dialog>
 				);

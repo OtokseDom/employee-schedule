@@ -427,7 +427,7 @@ export default function ScheduleCalendar() {
 			</div>
 
 			{/* Modal for adding/editing schedules */}
-			{modalOpen && selectedSchedule && (
+			{/* {modalOpen && selectedSchedule && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
 					<div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-screen overflow-y-auto">
 						<div className="p-4 border-b flex justify-between items-center">
@@ -440,7 +440,6 @@ export default function ScheduleCalendar() {
 						</div>
 
 						<div className="p-4 space-y-4">
-							{/* Title */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
 								<input
@@ -452,7 +451,6 @@ export default function ScheduleCalendar() {
 								/>
 							</div>
 
-							{/* Category */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
 								<select
@@ -467,7 +465,6 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Date Range */}
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -489,7 +486,6 @@ export default function ScheduleCalendar() {
 								</div>
 							</div>
 
-							{/* Time Range */}
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
@@ -511,7 +507,6 @@ export default function ScheduleCalendar() {
 								</div>
 							</div>
 
-							{/* Assignee */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
 								<select
@@ -527,7 +522,6 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Status */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
 								<select
@@ -543,7 +537,6 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Description */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
 								<textarea
@@ -575,7 +568,7 @@ export default function ScheduleCalendar() {
 						</div>
 					</div>
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }

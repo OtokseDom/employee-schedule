@@ -30,22 +30,10 @@ const formSchema = z.object({
 		message: "Description is required.",
 	}),
 	expected_output: z.string().optional(),
-	start_date: z.date({
-		required_error: "Start date is required.",
-	}),
+	start_date: z.date().optional(),
 	end_date: z.date().optional(),
-	start_time: z
-		.string()
-		.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: "Start time must be in HH:mm format.",
-		})
-		.optional(),
-	end_time: z
-		.string()
-		.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: "End time must be in HH:mm format.",
-		})
-		.optional(),
+	start_time: z.string().optional(),
+	end_time: z.string().optional(),
 	time_estimate: z.coerce.number().optional(),
 	delay: z.coerce.number().optional(),
 	delay_reason: z.string().optional(),
