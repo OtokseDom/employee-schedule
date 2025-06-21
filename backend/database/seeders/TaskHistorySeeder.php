@@ -12,6 +12,6 @@ class TaskHistorySeeder extends Seeder
      */
     public function run(): void
     {
-        TaskHistory::factory()->count(100)->create();
+        TaskHistory::factory()->count(50)->create();
     }
 }

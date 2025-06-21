@@ -22,20 +22,16 @@ class TaskFactory extends Factory
     {
 
         return [
-            'category' => $this->faker->word,
+            'category' => fake()->randomElement(['Bug', 'Feature', 'Documentation', 'Maintenance', 'Other']),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,
             'assignee_id' => User::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
-            'start_date' => fake()->dateTimeBetween(
-                now()->startOfMonth()->subMonths(8)->startOfDay(),
-                now()->endOfMonth()->endOfDay()
-            ),
-            'end_date' => fake()->dateTimeBetween(
-                now()->endOfMonth()->endOfDay(),
-                now()->startOfMonth()->addMonth()->startOfDay()
-            ),
+            'start_date' => $startDate = fake()->dateTimeBetween('now', '+1 month'),
+            'end_date' => (clone $startDate)->modify('+1 day'),
+            'start_time' => '07:00:00',
+            'end_time' => '16:00:00',
             'time_estimate' => $this->faker->randomFloat(2, 1, 100),
             'time_taken' => $this->faker->randomFloat(2, 1, 100),
             'delay' => $this->faker->randomFloat(2, 0, 10),

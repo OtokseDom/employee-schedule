@@ -10,7 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
-// TODO: Read from DB instead of mock data
+// TODO: close modal after submit
 // TODO: Fix modal to use shadcn UI modal component
 // Mock data for demonstration
 const mockUsers = [
@@ -96,13 +96,13 @@ const mockUsers = [
 
 // Status colors
 const statusColors = {
-	Scheduled: "bg-blue-100 border-blue-300 text-blue-800",
+	"In Progress": "bg-blue-100 border-blue-300 text-blue-800",
 	Pending: "bg-yellow-100 border-yellow-300 text-yellow-800",
-	Confirmed: "bg-green-100 border-green-300 text-green-800",
+	Completed: "bg-green-100 border-green-300 text-green-800",
 	Completed: "bg-gray-100 border-gray-300 text-gray-800",
 	Cancelled: "bg-red-100 border-red-300 text-red-800",
+	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
 };
-
 // Category icons
 const categoryIcons = {
 	Meeting: <Users className="w-4 h-4" />,
@@ -117,7 +117,7 @@ export default function ScheduleCalendar() {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	// const [selectedUser, setSelectedUser] = useState(1);
 	const [modalOpen, setModalOpen] = useState(false);
-	const [selectedSchedule, setSelectedSchedule] = useState(null);
+	const [selectedTask, setSelectedTask] = useState(null);
 	const [selectedDay, setSelectedDay] = useState(null);
 	const [selectedTime, setSelectedTime] = useState(null);
 
@@ -126,13 +126,13 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const [schedules, setSchedules] = useState([]);
+	const [tasks, setTasks] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
 	useEffect(() => {
 		fetchUsers();
-		fetchSchedules();
+		fetchTasks();
 	}, []);
 
 	const fetchUsers = async () => {
@@ -147,11 +147,11 @@ export default function ScheduleCalendar() {
 			setLoading(false);
 		}
 	};
-	const fetchSchedules = async () => {
+	const fetchTasks = async () => {
 		setLoading(true);
 		try {
-			const scheduleResponse = await axiosClient.get(`/schedule`);
-			setSchedules(scheduleResponse.data.schedules);
+			const taskResponse = await axiosClient.get(`/task`);
+			setTasks(taskResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -202,13 +202,13 @@ export default function ScheduleCalendar() {
 	// 	return [year, month, day].join("-");
 	// };
 
-	// Get schedules for a specific date
-	const getSchedulesForDate = (date) => {
+	// Get tasks for a specific date
+	const getTaskForDate = (date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
-		return schedules.filter((schedule) => {
-			const start = format(new Date(schedule.start_date), "yyyy-MM-dd");
-			const end = format(new Date(schedule.end_date), "yyyy-MM-dd");
-			return schedule.assignee?.id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
+		return tasks.filter((task) => {
+			const start = format(new Date(task.start_date), "yyyy-MM-dd");
+			const end = format(new Date(task.end_date), "yyyy-MM-dd");
+			return task.assignee_id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
 		});
 	};
 
@@ -221,18 +221,17 @@ export default function ScheduleCalendar() {
 		return slots;
 	};
 
-	// Check if a schedule is within a time slot
-	const isScheduleInTimeSlot = (schedule, time, date) => {
+	// Check if a task is within a time slot
+	const isInTimeSlot = (task, time, date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
-		const [slotHour] = time.split(":").map(Number);
-
-		const [startHour] = schedule?.start_time.split(":").map(Number);
-		const [endHour, endMinutes] = schedule?.end_time.split(":").map(Number);
+		const [slotHour] = time?.split(":").map(Number);
+		const [startHour] = task.start_time ? task.start_time.split(":").map(Number) : [];
+		const [endHour, endMinutes] = task.end_time ? task.end_time.split(":").map(Number) : [];
 
 		return (
-			schedule.assignee?.id === selectedUser?.id &&
-			schedule.start_date <= formattedDate &&
-			schedule.end_date >= formattedDate &&
+			task?.assignee_id === selectedUser?.id &&
+			task?.start_date <= formattedDate &&
+			task?.end_date >= formattedDate &&
 			startHour <= slotHour &&
 			(endHour > slotHour || (endHour === slotHour && endMinutes > 0))
 		);
@@ -259,10 +258,10 @@ export default function ScheduleCalendar() {
 		}
 	};
 
-	// Handle schedule click
-	const handleScheduleClick = (schedule, e) => {
+	// Handle task click
+	const handleScheduleClick = (task, e) => {
 		e.stopPropagation();
-		setSelectedSchedule({ ...schedule });
+		setSelectedTask({ ...task });
 		setModalOpen(true);
 	};
 
@@ -290,31 +289,31 @@ export default function ScheduleCalendar() {
 			newSchedule.endTime = "10:00";
 		}
 
-		setSelectedSchedule(newSchedule);
+		setSelectedTask(newSchedule);
 		setSelectedDay(date);
 		setSelectedTime(time);
 		setModalOpen(true);
 	};
 
-	// Save schedule
+	// Save task
 	const saveSchedule = () => {
-		if (selectedSchedule.id && schedules.some((s) => s.id === selectedSchedule.id)) {
-			// Update existing schedule
-			setSchedules(schedules.map((s) => (s.id === selectedSchedule.id ? selectedSchedule : s)));
+		if (selectedTask.id && tasks.some((s) => s.id === selectedTask.id)) {
+			// Update existing task
+			setTasks(tasks.map((s) => (s.id === selectedTask.id ? selectedTask : s)));
 		} else {
-			// Add new schedule
-			setSchedules([...schedules, selectedSchedule]);
+			// Add new task
+			setTasks([...tasks, selectedTask]);
 		}
 		setModalOpen(false);
-		setSelectedSchedule(null);
+		setSelectedTask(null);
 	};
 
-	// Delete schedule
+	// Delete task
 	const deleteSchedule = () => {
-		if (selectedSchedule && selectedSchedule.id) {
-			setSchedules(schedules.filter((s) => s.id !== selectedSchedule.id));
+		if (selectedTask && selectedTask.id) {
+			setTasks(tasks.filter((s) => s.id !== selectedTask.id));
 			setModalOpen(false);
-			setSelectedSchedule(null);
+			setSelectedTask(null);
 		}
 	};
 
@@ -337,7 +336,7 @@ export default function ScheduleCalendar() {
 									<SelectValue placeholder="Select a user"></SelectValue>
 								</SelectTrigger>
 								<SelectContent>
-									{Array.isArray(users) && users.length > 0 ? (
+									{Array.isArray(users) && users?.length > 0 ? (
 										users?.map((user) => (
 											<SelectItem key={user?.id} value={user?.id}>
 												{user?.name}
@@ -406,7 +405,7 @@ export default function ScheduleCalendar() {
 						<MonthViewV2
 							days={days}
 							currentMonth={currentMonth}
-							getSchedulesForDate={getSchedulesForDate}
+							getTaskForDate={getTaskForDate}
 							handleCellClick={handleCellClick}
 							handleScheduleClick={handleScheduleClick}
 							statusColors={statusColors}
@@ -416,8 +415,8 @@ export default function ScheduleCalendar() {
 							getWeekDays={getWeekDays}
 							getTimeSlots={getTimeSlots}
 							weekstart_date={weekstart_date}
-							isScheduleInTimeSlot={isScheduleInTimeSlot}
-							schedules={schedules}
+							isInTimeSlot={isInTimeSlot}
+							tasks={tasks}
 							statusColors={statusColors}
 							handleCellClick={handleCellClick}
 							handleScheduleClick={handleScheduleClick}
@@ -426,13 +425,13 @@ export default function ScheduleCalendar() {
 				</div>
 			</div>
 
-			{/* Modal for adding/editing schedules */}
-			{modalOpen && selectedSchedule && (
+			{/* Modal for adding/editing tasks */}
+			{/* {modalOpen && selectedTask && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
 					<div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-screen overflow-y-auto">
 						<div className="p-4 border-b flex justify-between items-center">
 							<h2 className="text-lg font-semibold text-gray-900">
-								{selectedSchedule.id && schedules.some((s) => s.id === selectedSchedule.id) ? "Edit Schedule" : "Add Schedule"}
+								{selectedTask.id && tasks.some((s) => s.id === selectedTask.id) ? "Edit Schedule" : "Add Schedule"}
 							</h2>
 							<button onClick={() => setModalOpen(false)} className="text-gray-500 hover:text-gray-700">
 								<X className="w-5 h-5" />
@@ -440,24 +439,22 @@ export default function ScheduleCalendar() {
 						</div>
 
 						<div className="p-4 space-y-4">
-							{/* Title */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
 								<input
 									type="text"
-									value={selectedSchedule.title}
-									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, title: e.target.value })}
+									value={selectedTask.title}
+									onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									placeholder="Schedule title"
 								/>
 							</div>
 
-							{/* Category */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
 								<select
-									value={selectedSchedule.category}
-									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, category: e.target.value })}
+									value={selectedTask.category}
+									onChange={(e) => setSelectedTask({ ...selectedTask, category: e.target.value })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								>
 									<option value="Meeting">Meeting</option>
@@ -467,14 +464,13 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Date Range */}
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
 									<input
 										type="date"
-										value={selectedSchedule.start_date}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, start_date: e.target.value })}
+										value={selectedTask.start_date}
+										onChange={(e) => setSelectedTask({ ...selectedTask, start_date: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
@@ -482,21 +478,20 @@ export default function ScheduleCalendar() {
 									<label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
 									<input
 										type="date"
-										value={selectedSchedule.end_date}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, end_date: e.target.value })}
+										value={selectedTask.end_date}
+										onChange={(e) => setSelectedTask({ ...selectedTask, end_date: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
 							</div>
 
-							{/* Time Range */}
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
 									<input
 										type="time"
-										value={selectedSchedule.startTime}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, startTime: e.target.value })}
+										value={selectedTask.startTime}
+										onChange={(e) => setSelectedTask({ ...selectedTask, startTime: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
@@ -504,19 +499,18 @@ export default function ScheduleCalendar() {
 									<label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
 									<input
 										type="time"
-										value={selectedSchedule.endTime}
-										onChange={(e) => setSelectedSchedule({ ...selectedSchedule, endTime: e.target.value })}
+										value={selectedTask.endTime}
+										onChange={(e) => setSelectedTask({ ...selectedTask, endTime: e.target.value })}
 										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									/>
 								</div>
 							</div>
 
-							{/* Assignee */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
 								<select
-									value={selectedSchedule.assignee?.id}
-									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, assignee: parseInt(e.target.value) })}
+									value={selectedTask.assignee?.id}
+									onChange={(e) => setSelectedTask({ ...selectedTask, assignee: parseInt(e.target.value) })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								>
 									{users.map((user) => (
@@ -527,12 +521,11 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Status */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
 								<select
-									value={selectedSchedule.status}
-									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, status: e.target.value })}
+									value={selectedTask.status}
+									onChange={(e) => setSelectedTask({ ...selectedTask, status: e.target.value })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 								>
 									<option value="Scheduled">Scheduled</option>
@@ -543,12 +536,11 @@ export default function ScheduleCalendar() {
 								</select>
 							</div>
 
-							{/* Description */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
 								<textarea
-									value={selectedSchedule.description}
-									onChange={(e) => setSelectedSchedule({ ...selectedSchedule, description: e.target.value })}
+									value={selectedTask.description}
+									onChange={(e) => setSelectedTask({ ...selectedTask, description: e.target.value })}
 									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 									rows="3"
 									placeholder="Add description"
@@ -557,7 +549,7 @@ export default function ScheduleCalendar() {
 						</div>
 
 						<div className="p-4 border-t flex justify-between">
-							{selectedSchedule.id && schedules.some((s) => s.id === selectedSchedule.id) ? (
+							{selectedTask.id && tasks.some((s) => s.id === selectedTask.id) ? (
 								<button onClick={deleteSchedule} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center gap-1">
 									<Trash className="w-4 h-4" />
 									Delete
@@ -575,7 +567,7 @@ export default function ScheduleCalendar() {
 						</div>
 					</div>
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }

@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format, parseISO } from "date-fns";
 import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
 	assignee_id: z.number({
@@ -29,10 +30,10 @@ const formSchema = z.object({
 		message: "Description is required.",
 	}),
 	expected_output: z.string().optional(),
-	start_date: z.date({
-		required_error: "Start date is required.",
-	}),
+	start_date: z.date().optional(),
 	end_date: z.date().optional(),
+	start_time: z.string().optional(),
+	end_time: z.string().optional(),
 	time_estimate: z.coerce.number().optional(),
 	delay: z.coerce.number().optional(),
 	delay_reason: z.string().optional(),
@@ -58,6 +59,8 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 			expected_output: "",
 			start_date: undefined,
 			end_date: undefined,
+			start_time: "",
+			end_time: "",
 			time_estimate: "",
 			delay: "",
 			delay_reason: "",
@@ -97,6 +100,8 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				expected_output,
 				start_date,
 				end_date,
+				start_time,
+				end_time,
 				time_estimate,
 				delay,
 				delay_reason,
@@ -112,6 +117,8 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
 				end_date: end_date ? parseISO(end_date) : undefined,
+				start_time: start_time || "",
+				end_time: end_time || "",
 				time_estimate: time_estimate || "",
 				delay: delay || "",
 				delay_reason: delay_reason || "",
@@ -126,15 +133,26 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 		setLoading(true);
 		try {
 			// Parse numeric fields
+			const formatTime = (time) => {
+				if (!time) return "";
+				// If already in HH:mm:ss, return as is
+				if (/^\d{2}:\d{2}:\d{2}$/.test(time)) return time;
+				// If in HH:mm, append :00
+				if (/^\d{2}:\d{2}$/.test(time)) return `${time}:00`;
+				return time;
+			};
+
 			const parsedForm = {
 				...formData,
 				start_date: formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : null,
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
+				start_time: formatTime(formData.start_time),
+				end_time: formatTime(formData.end_time),
 				time_estimate: formData.time_estimate ? parseFloat(formData.time_estimate) : undefined,
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : undefined,
 			};
-
+			console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
 				console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
@@ -175,7 +193,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={updateData?.assignee_id || field.value}>
+								<Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={updateData?.assignee_id || field.value}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select an assignee">
@@ -186,7 +204,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 									<SelectContent>
 										{Array.isArray(users) && users.length > 0 ? (
 											users.map((user) => (
-												<SelectItem key={user.id} value={user.id}>
+												<SelectItem key={user.id} value={user.id.toString()}>
 													{user.name}
 												</SelectItem>
 											))
@@ -272,6 +290,48 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 					name="end_date"
 					render={({ field }) => {
 						return <DateInput field={field} label={"End date"} placeholder={"Select end date"} />;
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="start_time"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Start Time</FormLabel>
+								<FormControl>
+									<Input
+										type="time"
+										step="any"
+										// placeholder="Rating &#40;1-10&#41;"
+										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="end_time"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>End Time</FormLabel>
+								<FormControl>
+									<Input
+										type="time"
+										step="any"
+										// placeholder="Rating &#40;1-10&#41;"
+										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
 					}}
 				/>
 				<FormField

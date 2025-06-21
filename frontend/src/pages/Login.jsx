@@ -50,6 +50,10 @@ export default function Login() {
 			<div className="form bg-secondary text-foreground">
 				<form onSubmit={onsubmit}>
 					<h1 className="title">Login into your account</h1>
+					<div className="text-muted-foreground flex flex-col justify-between items-center mb-5">
+						<p>admin@demo.com</p>
+						<p>admin123</p>
+					</div>
 					{errors && (
 						<div className="alert">
 							{Object.keys(errors).map((key) => (

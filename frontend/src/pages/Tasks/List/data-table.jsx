@@ -15,7 +15,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 
 // Convert the DataTable component to JavaScript
-export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = false }) {
+export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -40,6 +40,8 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 					status: false,
 					"start date": false,
 					"end date": false,
+					"start time": false,
+					"end time": false,
 					"expected output": false,
 					"time estimate": false,
 					"time taken": false,
