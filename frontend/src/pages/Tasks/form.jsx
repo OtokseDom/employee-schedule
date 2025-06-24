@@ -91,6 +91,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	}, [isOpen]);
 
 	useEffect(() => {
+		// console.log(updateData);
 		if (updateData) {
 			const {
 				title,
@@ -152,9 +153,9 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : undefined,
 			};
-			console.log(parsedForm);
+			// console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
-				console.log("add");
+				// console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);

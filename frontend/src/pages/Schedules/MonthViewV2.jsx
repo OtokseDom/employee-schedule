@@ -6,15 +6,15 @@ import TaskForm from "../Tasks/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosClient from "@/axios.client";
 
-export default function MonthViewV2({ days, currentMonth, getTaskForDate, handleCellClick, handleScheduleClick, statusColors }) {
+export default function MonthViewV2({ days, currentMonth, getTaskForDate, handleCellClick, handleScheduleClick, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
-	useEffect(() => {
-		if (!isOpen) setUpdateData({});
-	}, [isOpen]);
+	// useEffect(() => {
+	// 	if (!isOpen) setUpdateData({});
+	// }, [isOpen]);
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -47,7 +47,16 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, handle
 
 				return (
 					<Dialog key={index}>
-						<DialogTrigger>
+						<DialogTrigger
+							onClick={() => {
+								setUpdateData({
+									assignee: selectedUser.id !== "undefined" ? selectedUser : null,
+									assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
+									start_date: format(day, "yyyy-MM-dd"),
+								});
+								setIsOpen(true);
+							}}
+						>
 							{/* <DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}> */}
 							<div>
 								{/* Calendar cell Clickable */}
@@ -104,14 +113,14 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, handle
 						<DialogContent>
 							<DialogHeader className="text-left">
 								<DialogTitle>Update Schedule</DialogTitle>
-								<DialogDescription>Update task for </DialogDescription>
+								<DialogDescription>Update task for {selectedUser?.name}</DialogDescription>
 							</DialogHeader>
 							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
 								<TaskForm
 									data={tasks}
 									setTasks={setTasks}
-									// isOpen={isOpen}
-									// setIsOpen={setIsOpen}
+									isOpen={isOpen}
+									setIsOpen={setIsOpen}
 									updateData={updateData}
 									setUpdateData={setUpdateData}
 									fetchData={fetchData}

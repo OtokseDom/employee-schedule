@@ -334,6 +334,7 @@ export default function ScheduleCalendar() {
 							handleCellClick={handleCellClick}
 							handleScheduleClick={handleScheduleClick}
 							statusColors={statusColors}
+							selectedUser={selectedUser}
 						/>
 					) : (
 						<WeekViewV2
