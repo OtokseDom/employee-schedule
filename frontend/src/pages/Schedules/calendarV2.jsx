@@ -10,14 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
-// TODO: close modal after submit
-// TODO: Fix modal to use shadcn UI modal component
-// Mock data for demonstration
-const mockUsers = [
-	{ id: 11, name: "John Doe" },
-	{ id: 2, name: "Jane Smith" },
-	{ id: 3, name: "Bob Johnson" },
-];
+// TODO: weekview: put fetchData there
 
 // Status colors
 const statusColors = {
@@ -28,23 +21,11 @@ const statusColors = {
 	Cancelled: "bg-red-100 border-red-300 text-red-800",
 	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
 };
-// Category icons
-const categoryIcons = {
-	Meeting: <Users className="w-4 h-4" />,
-	Work: <Edit3 className="w-4 h-4" />,
-	Event: <Calendar className="w-4 h-4" />,
-	Task: <Check className="w-4 h-4" />,
-};
 
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
 	const [currentDate, setCurrentDate] = useState(new Date());
-	// const [selectedUser, setSelectedUser] = useState(1);
-	const [modalOpen, setModalOpen] = useState(false);
-	const [selectedTask, setSelectedTask] = useState(null);
-	const [selectedDay, setSelectedDay] = useState(null);
-	const [selectedTime, setSelectedTime] = useState(null);
 
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const start_date = startOfWeek(startOfMonth(currentMonth));
@@ -259,8 +240,6 @@ export default function ScheduleCalendar() {
 							days={days}
 							currentMonth={currentMonth}
 							getTaskForDate={getTaskForDate}
-							// handleCellClick={handleCellClick}
-							// handleScheduleClick={handleScheduleClick}
 							statusColors={statusColors}
 							selectedUser={selectedUser}
 						/>
@@ -272,8 +251,6 @@ export default function ScheduleCalendar() {
 							isInTimeSlot={isInTimeSlot}
 							// tasks={tasks} //move task fetch inside WeekViewV2
 							statusColors={statusColors}
-							// handleCellClick={handleCellClick}
-							// handleScheduleClick={handleScheduleClick}
 						/>
 					)}
 				</div>
