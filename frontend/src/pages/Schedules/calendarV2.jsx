@@ -10,89 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
-// TODO: close modal after submit
-// TODO: Fix modal to use shadcn UI modal component
-// Mock data for demonstration
-const mockUsers = [
-	{ id: 11, name: "John Doe" },
-	{ id: 2, name: "Jane Smith" },
-	{ id: 3, name: "Bob Johnson" },
-];
-
-// const mockSchedules = [
-// 	{
-// 		id: 1,
-// 		title: "Project Planning",
-// 		category: "Meeting",
-// 		start_date: "2025-04-13",
-// 		end_date: "2025-04-13",
-// 		startTime: "09:00",
-// 		endTime: "10:30",
-// 		description: "Discuss project roadmap and milestones",
-// 		assignee: 11,
-// 		status: "Scheduled",
-// 	},
-// 	{
-// 		id: 2,
-// 		title: "Code Review",
-// 		category: "Work",
-// 		start_date: "2025-04-14",
-// 		end_date: "2025-04-14",
-// 		startTime: "13:00",
-// 		endTime: "15:00",
-// 		description: "Review pull requests for the new feature",
-// 		assignee: 11,
-// 		status: "Pending",
-// 	},
-// 	{
-// 		id: 3,
-// 		title: "Client Meeting",
-// 		category: "Meeting",
-// 		start_date: "2025-04-15",
-// 		end_date: "2025-04-15",
-// 		startTime: "11:00",
-// 		endTime: "12:00",
-// 		description: "Discuss project requirements with client",
-// 		assignee: 2,
-// 		status: "Scheduled",
-// 	},
-// 	{
-// 		id: 4,
-// 		title: "Team Building",
-// 		category: "Event",
-// 		start_date: "2025-04-16",
-// 		end_date: "2025-04-16",
-// 		startTime: "15:00",
-// 		endTime: "17:00",
-// 		description: "Team building activity",
-// 		assignee: 11,
-// 		status: "Confirmed",
-// 	},
-// 	{
-// 		id: 5,
-// 		title: "Weekly Report",
-// 		category: "Task",
-// 		start_date: "2025-04-12",
-// 		end_date: "2025-04-12",
-// 		startTime: "14:00",
-// 		endTime: "16:00",
-// 		description: "Prepare weekly progress report",
-// 		assignee: 3,
-// 		status: "Completed",
-// 	},
-// 	{
-// 		id: 6,
-// 		title: "I love you bby",
-// 		category: "Meeting",
-// 		start_date: "2025-04-13",
-// 		end_date: "2025-04-13",
-// 		startTime: "10:00",
-// 		endTime: "11:30",
-// 		description: "Discuss project roadmap and milestones",
-// 		assignee: 11,
-// 		status: "Cancelled",
-// 	},
-// ];
+// TODO: weekview: put fetchData there
 
 // Status colors
 const statusColors = {
@@ -103,36 +21,24 @@ const statusColors = {
 	Cancelled: "bg-red-100 border-red-300 text-red-800",
 	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
 };
-// Category icons
-const categoryIcons = {
-	Meeting: <Users className="w-4 h-4" />,
-	Work: <Edit3 className="w-4 h-4" />,
-	Event: <Calendar className="w-4 h-4" />,
-	Task: <Check className="w-4 h-4" />,
-};
 
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
 	const [currentDate, setCurrentDate] = useState(new Date());
-	// const [selectedUser, setSelectedUser] = useState(1);
-	const [modalOpen, setModalOpen] = useState(false);
-	const [selectedTask, setSelectedTask] = useState(null);
-	const [selectedDay, setSelectedDay] = useState(null);
-	const [selectedTime, setSelectedTime] = useState(null);
 
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const start_date = startOfWeek(startOfMonth(currentMonth));
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const [tasks, setTasks] = useState([]);
+	// const [tasks, setTasks] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
 	useEffect(() => {
 		fetchUsers();
-		fetchTasks();
+		// fetchTasks();
 	}, []);
 
 	const fetchUsers = async () => {
@@ -147,17 +53,17 @@ export default function ScheduleCalendar() {
 			setLoading(false);
 		}
 	};
-	const fetchTasks = async () => {
-		setLoading(true);
-		try {
-			const taskResponse = await axiosClient.get(`/task`);
-			setTasks(taskResponse.data.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			setLoading(false);
-		}
-	};
+	// const fetchTasks = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		const taskResponse = await axiosClient.get(`/task`);
+	// 		setTasks(taskResponse.data.data);
+	// 	} catch (e) {
+	// 		console.error("Error fetching data:", e);
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
 
 	// For week view - get the start of the week (Sunday)
 	const getWeekstart_date = (date) => {
@@ -189,21 +95,8 @@ export default function ScheduleCalendar() {
 		return days;
 	};
 
-	// Format date to yyyy-MM-dd
-	// const formatDate = (date) => {
-	// 	const d = new Date(date);
-	// 	let month = "" + (d.getMonth() + 1);
-	// 	let day = "" + d.getDate();
-	// 	const year = d.getFullYear();
-
-	// 	if (month.length < 2) month = "0" + month;
-	// 	if (day.length < 2) day = "0" + day;
-
-	// 	return [year, month, day].join("-");
-	// };
-
 	// Get tasks for a specific date
-	const getTaskForDate = (date) => {
+	const getTaskForDate = (date, tasks) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
 		return tasks.filter((task) => {
 			const start = format(new Date(task.start_date), "yyyy-MM-dd");
@@ -255,65 +148,6 @@ export default function ScheduleCalendar() {
 			const newDate = new Date(weekstart_date);
 			newDate.setDate(newDate.getDate() + 7);
 			setCurrentDate(newDate);
-		}
-	};
-
-	// Handle task click
-	const handleScheduleClick = (task, e) => {
-		e.stopPropagation();
-		setSelectedTask({ ...task });
-		setModalOpen(true);
-	};
-
-	// Handle cell click (empty area)
-	const handleCellClick = (date, time) => {
-		const formattedDate = format(date, "yyyy-MM-dd");
-		let newSchedule = {
-			id: Date.now(),
-			title: "",
-			category: "Meeting",
-			start_date: formattedDate,
-			end_date: formattedDate,
-			assignee: selectedUser?.id,
-			status: "Scheduled",
-			description: "",
-		};
-
-		if (time) {
-			const [hour] = time.split(":");
-			const endHour = parseInt(hour) + 1;
-			newSchedule.startTime = `${hour}:00`;
-			newSchedule.endTime = `${endHour.toString().padStart(2, "0")}:00`;
-		} else {
-			newSchedule.startTime = "09:00";
-			newSchedule.endTime = "10:00";
-		}
-
-		setSelectedTask(newSchedule);
-		setSelectedDay(date);
-		setSelectedTime(time);
-		setModalOpen(true);
-	};
-
-	// Save task
-	const saveSchedule = () => {
-		if (selectedTask.id && tasks.some((s) => s.id === selectedTask.id)) {
-			// Update existing task
-			setTasks(tasks.map((s) => (s.id === selectedTask.id ? selectedTask : s)));
-		} else {
-			// Add new task
-			setTasks([...tasks, selectedTask]);
-		}
-		setModalOpen(false);
-		setSelectedTask(null);
-	};
-
-	// Delete task
-	const deleteSchedule = () => {
-		if (selectedTask && selectedTask.id) {
-			setTasks(tasks.filter((s) => s.id !== selectedTask.id));
-			setModalOpen(false);
-			setSelectedTask(null);
 		}
 	};
 
@@ -406,9 +240,8 @@ export default function ScheduleCalendar() {
 							days={days}
 							currentMonth={currentMonth}
 							getTaskForDate={getTaskForDate}
-							handleCellClick={handleCellClick}
-							handleScheduleClick={handleScheduleClick}
 							statusColors={statusColors}
+							selectedUser={selectedUser}
 						/>
 					) : (
 						<WeekViewV2
@@ -416,158 +249,12 @@ export default function ScheduleCalendar() {
 							getTimeSlots={getTimeSlots}
 							weekstart_date={weekstart_date}
 							isInTimeSlot={isInTimeSlot}
-							tasks={tasks}
+							// tasks={tasks} //move task fetch inside WeekViewV2
 							statusColors={statusColors}
-							handleCellClick={handleCellClick}
-							handleScheduleClick={handleScheduleClick}
 						/>
 					)}
 				</div>
 			</div>
-
-			{/* Modal for adding/editing tasks */}
-			{/* {modalOpen && selectedTask && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-					<div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-screen overflow-y-auto">
-						<div className="p-4 border-b flex justify-between items-center">
-							<h2 className="text-lg font-semibold text-gray-900">
-								{selectedTask.id && tasks.some((s) => s.id === selectedTask.id) ? "Edit Schedule" : "Add Schedule"}
-							</h2>
-							<button onClick={() => setModalOpen(false)} className="text-gray-500 hover:text-gray-700">
-								<X className="w-5 h-5" />
-							</button>
-						</div>
-
-						<div className="p-4 space-y-4">
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-								<input
-									type="text"
-									value={selectedTask.title}
-									onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
-									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									placeholder="Schedule title"
-								/>
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-								<select
-									value={selectedTask.category}
-									onChange={(e) => setSelectedTask({ ...selectedTask, category: e.target.value })}
-									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								>
-									<option value="Meeting">Meeting</option>
-									<option value="Work">Work</option>
-									<option value="Event">Event</option>
-									<option value="Task">Task</option>
-								</select>
-							</div>
-
-							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-									<input
-										type="date"
-										value={selectedTask.start_date}
-										onChange={(e) => setSelectedTask({ ...selectedTask, start_date: e.target.value })}
-										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-									<input
-										type="date"
-										value={selectedTask.end_date}
-										onChange={(e) => setSelectedTask({ ...selectedTask, end_date: e.target.value })}
-										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									/>
-								</div>
-							</div>
-
-							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-									<input
-										type="time"
-										value={selectedTask.startTime}
-										onChange={(e) => setSelectedTask({ ...selectedTask, startTime: e.target.value })}
-										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-									<input
-										type="time"
-										value={selectedTask.endTime}
-										onChange={(e) => setSelectedTask({ ...selectedTask, endTime: e.target.value })}
-										className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									/>
-								</div>
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
-								<select
-									value={selectedTask.assignee?.id}
-									onChange={(e) => setSelectedTask({ ...selectedTask, assignee: parseInt(e.target.value) })}
-									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								>
-									{users.map((user) => (
-										<option key={user.id} value={user.id}>
-											{user.name}
-										</option>
-									))}
-								</select>
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-								<select
-									value={selectedTask.status}
-									onChange={(e) => setSelectedTask({ ...selectedTask, status: e.target.value })}
-									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-								>
-									<option value="Scheduled">Scheduled</option>
-									<option value="Pending">Pending</option>
-									<option value="Confirmed">Confirmed</option>
-									<option value="Completed">Completed</option>
-									<option value="Cancelled">Cancelled</option>
-								</select>
-							</div>
-
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-								<textarea
-									value={selectedTask.description}
-									onChange={(e) => setSelectedTask({ ...selectedTask, description: e.target.value })}
-									className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-									rows="3"
-									placeholder="Add description"
-								></textarea>
-							</div>
-						</div>
-
-						<div className="p-4 border-t flex justify-between">
-							{selectedTask.id && tasks.some((s) => s.id === selectedTask.id) ? (
-								<button onClick={deleteSchedule} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center gap-1">
-									<Trash className="w-4 h-4" />
-									Delete
-								</button>
-							) : (
-								<button onClick={() => setModalOpen(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-									Cancel
-								</button>
-							)}
-
-							<button onClick={saveSchedule} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-1">
-								<Check className="w-4 h-4" />
-								Save
-							</button>
-						</div>
-					</div>
-				</div>
-			)} */}
 		</div>
 	);
 }

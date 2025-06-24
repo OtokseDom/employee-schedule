@@ -42,6 +42,7 @@ const formSchema = z.object({
 	status: z.string({
 		required_error: "Status is required.",
 	}),
+	calendar_add: z.boolean().optional(),
 });
 
 export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
@@ -52,6 +53,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			calendar_add: false,
 			title: "",
 			description: "",
 			assignee_id: undefined,
@@ -91,8 +93,10 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	}, [isOpen]);
 
 	useEffect(() => {
+		// console.log(updateData);
 		if (updateData) {
 			const {
+				calendar_add, //when update data is set on calendar cell click
 				title,
 				description,
 				assignee_id,
@@ -110,6 +114,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				status,
 			} = updateData;
 			form.reset({
+				calendar_add: calendar_add || false,
 				title: title || "",
 				description: description || "",
 				assignee_id: assignee_id || undefined,
@@ -152,12 +157,17 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : undefined,
 			};
-			console.log(parsedForm);
+			// console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
-				console.log("add");
+				// console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
+				setIsOpen(false);
+			} else if (updateData?.calendar_add) {
+				await axiosClient.post(`/task`, parsedForm);
+				fetchData();
+				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
 			} else {
 				await axiosClient.put(`/task/${updateData?.id}`, parsedForm);
@@ -302,9 +312,10 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 								<FormControl>
 									<Input
 										type="time"
-										step="any"
-										// placeholder="Rating &#40;1-10&#41;"
-										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										step="60"
+										inputMode="numeric"
+										pattern="[0-9]{2}:[0-9]{2}"
+										className="bg-background appearance-none"
 										{...field}
 									/>
 								</FormControl>
