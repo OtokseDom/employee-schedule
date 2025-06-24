@@ -6,15 +6,15 @@ import TaskForm from "../Tasks/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosClient from "@/axios.client";
 
-export default function MonthViewV2({ days, currentMonth, getTaskForDate, handleCellClick, handleScheduleClick, statusColors, selectedUser }) {
+export default function MonthViewV2({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
-	const [isOpen, setIsOpen] = useState(false);
+	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 
-	// useEffect(() => {
-	// 	if (!isOpen) setUpdateData({});
-	// }, [isOpen]);
+	useEffect(() => {
+		if (!openDialogIndex) fetchData({});
+	}, [openDialogIndex]);
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -42,19 +42,22 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, handle
 				const isCurrentMonth = day.getMonth() === currentMonth;
 				// const isToday = formatDate(day) === formatDate(new Date());
 				const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
-				const dayTasks = getTaskForDate(day);
+				const dayTasks = getTaskForDate(day, tasks);
 				// const dayTasks = schedules.filter((s) => formatDate(s.start_time) === formatDate(day));
 
+				const isDialogOpen = openDialogIndex === index; //added to prevent aria-hidden warning
 				return (
-					<Dialog key={index}>
+					<Dialog key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)}>
 						<DialogTrigger
 							onClick={() => {
 								setUpdateData({
+									calendar_add: true,
 									assignee: selectedUser.id !== "undefined" ? selectedUser : null,
 									assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
 									start_date: format(day, "yyyy-MM-dd"),
+									end_date: format(day, "yyyy-MM-dd"),
 								});
-								setIsOpen(true);
+								setOpenDialogIndex(index);
 							}}
 						>
 							{/* <DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}> */}
@@ -112,15 +115,17 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, handle
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader className="text-left">
-								<DialogTitle>Update Schedule</DialogTitle>
-								<DialogDescription>Update task for {selectedUser?.name}</DialogDescription>
+								<DialogTitle>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</DialogTitle>
+								<DialogDescription>
+									{updateData?.calendar_add ? "Add task for" : "Update task for"} {selectedUser?.name}
+								</DialogDescription>
 							</DialogHeader>
 							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
 								<TaskForm
 									data={tasks}
 									setTasks={setTasks}
-									isOpen={isOpen}
-									setIsOpen={setIsOpen}
+									isOpen={isDialogOpen}
+									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
 									setUpdateData={setUpdateData}
 									fetchData={fetchData}
