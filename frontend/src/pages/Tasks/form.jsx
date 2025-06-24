@@ -302,9 +302,10 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 								<FormControl>
 									<Input
 										type="time"
-										step="any"
-										// placeholder="Rating &#40;1-10&#41;"
-										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										step="60"
+										inputMode="numeric"
+										pattern="[0-9]{2}:[0-9]{2}"
+										className="bg-background appearance-none"
 										{...field}
 									/>
 								</FormControl>
