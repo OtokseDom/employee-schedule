@@ -45,7 +45,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 
-export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState();
@@ -94,7 +94,8 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 
 	useEffect(() => {
 		// console.log(updateData);
-		if (updateData) {
+		// console.log(users);
+		if (updateData && users) {
 			const {
 				calendar_add, //when update data is set on calendar cell click
 				title,
@@ -169,6 +170,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				fetchData();
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
+				setTaskAdded(true);
 			} else {
 				await axiosClient.put(`/task/${updateData?.id}`, parsedForm);
 				fetchData();
@@ -203,7 +205,11 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
-								<Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={updateData?.assignee_id || field.value}>
+								<Select
+									onValueChange={(value) => field.onChange(Number(value))}
+									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
+									value={field.value ? field.value.toString() : undefined}
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select an assignee">
@@ -435,7 +441,11 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Status</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={updateData?.status || field.value}>
+								<Select
+									onValueChange={field.onChange}
+									value={field.value || undefined}
+									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a status"></SelectValue>

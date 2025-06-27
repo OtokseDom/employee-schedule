@@ -12,9 +12,17 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 
+	const [taskAdded, setTaskAdded] = useState(false);
+
 	useEffect(() => {
-		if (!openDialogIndex) fetchData({});
-	}, [openDialogIndex]);
+		if (taskAdded) {
+			fetchData();
+			setTaskAdded(false);
+		}
+	}, [taskAdded]);
+	// useEffect(() => {
+	// 	console.log(updateData);
+	// }, [updateData]);
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -60,7 +68,6 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 								setOpenDialogIndex(index);
 							}}
 						>
-							{/* <DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}> */}
 							<div>
 								{/* Calendar cell Clickable */}
 								<div
@@ -95,7 +102,13 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 											{(dayTasks || []).slice(0, 3).map((task) => (
 												<div
 													key={task.id}
-													// onClick={(e) => handleScheduleClick(task, e)}
+													onClick={(e) => {
+														//set update data when a task is clicked
+														e.stopPropagation();
+														setUpdateData({});
+														setTimeout(() => setUpdateData(task), 0);
+														setOpenDialogIndex(index);
+													}}
 													className={`
 											text-xs p-1 rounded border truncate
 											${statusColors[task.status] || "bg-gray-100 border-gray-300"}
@@ -123,12 +136,12 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
 								<TaskForm
 									data={tasks}
-									setTasks={setTasks}
 									isOpen={isDialogOpen}
 									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
 									setUpdateData={setUpdateData}
 									fetchData={fetchData}
+									setTaskAdded={setTaskAdded}
 								/>
 							</div>
 						</DialogContent>
