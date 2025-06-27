@@ -120,11 +120,13 @@ export default function ScheduleCalendar() {
 		const [slotHour] = time?.split(":").map(Number);
 		const [startHour] = task.start_time ? task.start_time.split(":").map(Number) : [];
 		const [endHour, endMinutes] = task.end_time ? task.end_time.split(":").map(Number) : [];
+		const taskStartDate = format(new Date(task?.start_date), "yyyy-MM-dd");
+		const taskEndDate = format(new Date(task?.end_date), "yyyy-MM-dd");
 
 		return (
 			task?.assignee_id === selectedUser?.id &&
-			task?.start_date <= formattedDate &&
-			task?.end_date >= formattedDate &&
+			formattedDate >= taskStartDate &&
+			formattedDate <= taskEndDate &&
 			startHour <= slotHour &&
 			(endHour > slotHour || (endHour === slotHour && endMinutes > 0))
 		);

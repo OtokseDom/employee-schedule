@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, handleCellClick, handletaskClick }) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
-
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
 
@@ -62,7 +61,7 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 								return (
 									<div
 										key={`${dayIndex}-${timeIndex}`}
-										onClick={() => handleCellClick(day, time)}
+										// onClick={() => handleCellClick(day, time)}
 										className={`
                                                 h-16 p-1 border-t   relative
                                                 ${isToday ? "bg-blue-50" : "bg-sidebar"} 
@@ -83,7 +82,6 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 
 											// Only show if this is the starting slot for this task
 											if (startHour !== slotHour) return null;
-											console.log(slotHour);
 
 											// Calculate duration in hours
 											const duration = endHour - startHour + (endMin - startMin) / 60;
