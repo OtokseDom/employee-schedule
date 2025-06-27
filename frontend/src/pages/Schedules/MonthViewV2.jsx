@@ -11,7 +11,6 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 	const [tasks, setTasks] = useState([]);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
-
 	const [taskAdded, setTaskAdded] = useState(false);
 
 	useEffect(() => {
@@ -20,9 +19,7 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 			setTaskAdded(false);
 		}
 	}, [taskAdded]);
-	// useEffect(() => {
-	// 	console.log(updateData);
-	// }, [updateData]);
+
 	useEffect(() => {
 		fetchData();
 	}, []);

@@ -10,7 +10,8 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import WeekViewV2 from "./WeekViewV2";
 import MonthViewV2 from "./MonthViewV2";
-// TODO: weekview: put fetchData there
+// TODO: weekview: onClick cell to add
+// TODO: weekview: onClick cell to update
 
 // Status colors
 const statusColors = {
@@ -251,7 +252,7 @@ export default function ScheduleCalendar() {
 							getTimeSlots={getTimeSlots}
 							weekstart_date={weekstart_date}
 							isInTimeSlot={isInTimeSlot}
-							// tasks={tasks} //move task fetch inside WeekViewV2
+							selectedUser={selectedUser}
 							statusColors={statusColors}
 						/>
 					)}
