@@ -59,7 +59,6 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 
 							{timeSlots.map((time, timeIndex) => {
 								const tasksInSlot = (Array.isArray(tasks) ? tasks : []).filter((s) => isInTimeSlot(s, time, day));
-								console.log(tasks);
 								return (
 									<div
 										key={`${dayIndex}-${timeIndex}`}
@@ -84,24 +83,29 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 
 											// Only show if this is the starting slot for this task
 											if (startHour !== slotHour) return null;
+											console.log(slotHour);
 
 											// Calculate duration in hours
 											const duration = endHour - startHour + (endMin - startMin) / 60;
-
+											// console.log(duration ?? duration);
 											return (
 												<div
 													key={task.id}
 													// onClick={(e) => handletaskClick(task, e)}
 													className={`
-														absolute left-0 right-0 mx-1 p-1 rounded border z-10
+														absolute left-0 right-0 mx-1 p-1 rounded border z-10 overflow-clip
 														${statusColors[task.status] || "bg-gray-100 border-gray-300 text-black"}
 														`}
-													style={{ height: `${duration * 4}rem` }}
+													style={{ height: `${duration * 4}rem`, top: `${(startMin / 60) * 4}rem` }}
 												>
-													<div className="text-xs font-medium truncate">{task.title}</div>
 													<div className="text-xs flex items-center gap-1 truncate">
-														<Clock className="w-3 h-3" />
 														{format(formattedStartTime, "hh:mm a")} - {format(formattedEndTime, "hh:mm a")}
+													</div>
+													<div className={`text-xs mt-2`}>
+														<b>Title:</b> {task.title}
+													</div>
+													<div className="text-xs mt-2 font-medium">
+														<b>Description:</b> {task.description}
 													</div>
 												</div>
 											);
