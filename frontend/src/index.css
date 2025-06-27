@@ -3,6 +3,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================
+   Galaxy Color Palette
+   Used by galaxy.jsx
+   ===================== */
+:root {
+	--galaxy-star: #dcdcff;
+	--galaxy-nebula-1: #0a0a2a;
+	--galaxy-nebula-2: #14143c;
+	--galaxy-nebula-3: #1e1e46;
+	--galaxy-nebula-4: #28284e;
+	--galaxy-nebula-5: #323256;
+	--galaxy-nebula-6: #3c3c5e;
+	--galaxy-bg: #050518;
+	--galaxy-gradient-0: rgba(30, 30, 60, 0.5);
+	--galaxy-gradient-05: rgba(40, 40, 70, 0.3);
+	--galaxy-gradient-1: rgba(10, 10, 30, 0);
+}
+.dark {
+	--galaxy-star: #dcdcff;
+	--galaxy-nebula-1: #0a0a2a;
+	--galaxy-nebula-2: #14143c;
+	--galaxy-nebula-3: #1e1e46;
+	--galaxy-nebula-4: #28284e;
+	--galaxy-nebula-5: #323256;
+	--galaxy-nebula-6: #3c3c5e;
+	--galaxy-bg: #050518;
+	--galaxy-gradient-0: rgba(30, 30, 60, 0.5);
+	--galaxy-gradient-05: rgba(40, 40, 70, 0.3);
+	--galaxy-gradient-1: rgba(10, 10, 30, 0);
+}
+.light {
+	--galaxy-star: #fffbe6;
+	--galaxy-nebula-1: #fff7b2;
+	--galaxy-nebula-2: #ffe066;
+	--galaxy-nebula-3: #ffd23f;
+	--galaxy-nebula-4: #ffb200;
+	--galaxy-nebula-5: #ff8800;
+	--galaxy-nebula-6: #ff6f00;
+	--galaxy-bg: #fff9e3;
+	/* Reversed for orange outside, light center */
+	--galaxy-gradient-0: rgba(255, 250, 220, 0.7); /* center: light yellow/white */
+	--galaxy-gradient-05: rgba(255, 200, 80, 0.3); /* mid: yellow/orange */
+	--galaxy-gradient-1: rgba(255, 111, 0, 0.7); /* edge: deep orange */
+}
+
 /* Navbar Css */
 .navbar {
 	padding: 18px 0;

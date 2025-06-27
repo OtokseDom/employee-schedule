@@ -80,7 +80,7 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 										<span className={`text-sm font-medium ${isToday ? "text-blue-600" : ""}`}>{day.getDate()}</span>
 										{loading ? (
 											<div className="flex flex-col w-full">
-												<Skeleton className="h-4 w-full" />
+												<Skeleton className="h-4 w-full bg-sidebar-border" />
 											</div>
 										) : (
 											dayTasks?.length > 0 && (
@@ -90,9 +90,9 @@ export default function MonthViewV2({ days, currentMonth, getTaskForDate, status
 									</div>
 									{loading ? (
 										<div className="flex flex-col w-full">
-											<Skeleton className="h-4 mt-1 w-full" />
-											<Skeleton className="h-4 mt-1 w-full" />
-											<Skeleton className="h-4 mt-1 w-full" />
+											<Skeleton className="h-4 mt-1 w-full bg-sidebar-border" />
+											<Skeleton className="h-4 mt-1 w-full bg-sidebar-border" />
+											<Skeleton className="h-4 mt-1 w-full bg-sidebar-border" />
 										</div>
 									) : (
 										<div className="mt-1 space-y-1 overflow-y-auto max-h-20">

@@ -5,6 +5,7 @@ import { Clock } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import TaskForm from "../Tasks/form";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
@@ -76,7 +77,7 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 									setOpenDialogIndex(dayIndex);
 								}}
 							>
-								<div key={dayIndex} className="col-span-1 min-w-32">
+								<div key={dayIndex} className="col-span-1 min-w-32 text-left">
 									<div className={`h-12 p-2 text-center font-medium ${isToday ? "text-blue-600" : ""}`}>
 										<div>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day.getDay()]}</div>
 										<div className="text-sm">{day.getDate()}</div>
@@ -95,6 +96,18 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
                                                 ${dayIndex === 6 ? "border-r" : ""}
                                             `}
 											>
+												{loading ? (
+													<div className="flex flex-col w-full">
+														<div className="flex flex-row items-center gap-2">
+															<Skeleton className="h-3 mt-1 w-1/3 bg-sidebar-border" />
+															<Skeleton className="h-3 mt-1 w-2/3 bg-sidebar-border" />
+														</div>
+														<Skeleton className="h-3 mt-1 w-full bg-sidebar-border" />
+														<Skeleton className="h-3 mt-1 w-full bg-sidebar-border" />
+													</div>
+												) : (
+													""
+												)}
 												{tasksInSlot.map((task) => {
 													// Calculate position and height based on time
 													const [startHour, startMin] = task.start_time?.split(":").map(Number);
@@ -105,7 +118,6 @@ export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: 
 													const formattedEndTime = new Date();
 													formattedEndTime.setHours(endHour, endMin, 0, 0);
 													const [slotHour] = time.split(":").map(Number);
-
 													// Only show if this is the starting slot for this task
 													if (startHour !== slotHour) return null;
 
