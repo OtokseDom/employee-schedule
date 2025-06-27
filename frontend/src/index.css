@@ -289,6 +289,19 @@ table > tbody > tr > td {
 		--sidebar-accent-foreground: 240 5.9% 10%;
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		/* GALAXY USER PROFILE */
+		--galaxy-star: #fffbe6;
+		--galaxy-nebula-1: #fff7b2;
+		--galaxy-nebula-2: #ffe066;
+		--galaxy-nebula-3: #ffd23f;
+		--galaxy-nebula-4: #ffb200;
+		--galaxy-nebula-5: #ff8800;
+		--galaxy-nebula-6: #ff6f00;
+		--galaxy-bg: #fff9e3;
+		/* Reversed for orange outside, light center */
+		--galaxy-gradient-0: rgba(255, 250, 220, 0.7); /* center: light yellow/white */
+		--galaxy-gradient-05: rgba(255, 200, 80, 0.3); /* mid: yellow/orange */
+		--galaxy-gradient-1: rgba(255, 111, 0, 0.7); /* edge: deep orange */
 	}
 	.dark {
 		--background: 0 0% 3.9%;
@@ -324,6 +337,18 @@ table > tbody > tr > td {
 		--sidebar-accent-foreground: 240 4.8% 95.9%;
 		--sidebar-border: 240 3.7% 15.9%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+		/* GALAXY USER PROFILE */
+		--galaxy-star: #dcdcff;
+		--galaxy-nebula-1: #0a0a2a;
+		--galaxy-nebula-2: #14143c;
+		--galaxy-nebula-3: #1e1e46;
+		--galaxy-nebula-4: #28284e;
+		--galaxy-nebula-5: #323256;
+		--galaxy-nebula-6: #3c3c5e;
+		--galaxy-bg: #050518;
+		--galaxy-gradient-0: rgba(30, 30, 60, 0.5);
+		--galaxy-gradient-05: rgba(40, 40, 70, 0.3);
+		--galaxy-gradient-1: rgba(10, 10, 30, 0);
 	}
 }
 
