@@ -1,20 +1,32 @@
+import axiosClient from "@/axios.client";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
 import { Clock } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export default function WeekViewV2({
-	getWeekDays,
-	getTimeSlots,
-	weekstart_date: weekStartDate,
-	isInTimeSlot,
-	tasks,
-	statusColors,
-	handleCellClick,
-	handletaskClick,
-}) {
+export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, handleCellClick, handletaskClick }) {
+	const { loading, setLoading } = useLoadContext();
+	const [tasks, setTasks] = useState([]);
+
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
 
+	useEffect(() => {
+		fetchData();
+	}, []);
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			// Make both API calls concurrently using Promise.all
+			const taskResponse = await axiosClient.get("/task");
+			setTasks(taskResponse.data.data);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+	};
 	return (
 		<div className="overflow-x-auto">
 			<div className="min-w-max grid grid-cols-8 gap-1">
@@ -46,7 +58,8 @@ export default function WeekViewV2({
 							</div>
 
 							{timeSlots.map((time, timeIndex) => {
-								const tasksInSlot = tasks.filter((s) => isInTimeSlot(s, time, day));
+								const tasksInSlot = (Array.isArray(tasks) ? tasks : []).filter((s) => isInTimeSlot(s, time, day));
+								console.log(tasks);
 								return (
 									<div
 										key={`${dayIndex}-${timeIndex}`}
@@ -80,9 +93,9 @@ export default function WeekViewV2({
 													key={task.id}
 													// onClick={(e) => handletaskClick(task, e)}
 													className={`
-                                                        absolute left-0 right-0 mx-1 p-1 rounded border overflow-hidden
-                                                        ${statusColors[task.status] || "bg-gray-100 border-gray-300 text-black"}
-                                                        `}
+														absolute left-0 right-0 mx-1 p-1 rounded border z-10
+														${statusColors[task.status] || "bg-gray-100 border-gray-300 text-black"}
+														`}
 													style={{ height: `${duration * 4}rem` }}
 												>
 													<div className="text-xs font-medium truncate">{task.title}</div>
