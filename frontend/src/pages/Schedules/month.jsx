@@ -6,7 +6,7 @@ import TaskForm from "../Tasks/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosClient from "@/axios.client";
 
-export default function MonthViewV2({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
+export default function Month({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);

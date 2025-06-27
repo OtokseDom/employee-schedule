@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function WeekViewV2({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
+export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
 	const weekDays = getWeekDays(weekStartDate);

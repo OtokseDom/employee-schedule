@@ -1,293 +1,260 @@
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subMonths, addMonths, parse, subWeeks, addWeeks } from "date-fns";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-// import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
-import { useEffect, useState } from "react";
-import CalendarCell from "./CalendarCell";
+import { useState, useEffect } from "react";
 import axiosClient from "@/axios.client";
+import { Calendar, ChevronLeft, ChevronRight, Clock, Edit3, Users, Plus, X, Check, Trash } from "lucide-react";
+import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths } from "date-fns";
+// Shadcn UI
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// Contexts
 import { useToast } from "@/contexts/ToastContextProvider";
-import WeekView from "./WeekView";
-import { Skeleton } from "../../components/ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-import ScheduleForm from "./ScheduleForm";
+import Week from "./week";
+import Month from "./month";
 
-const formSchema = z.object({
-	// coerce ensures that even if it's a string, it will convert it to a number.
-	event_id: z.coerce.number(),
-	shift_start: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "Invalid time format (HH:MM:SS)"),
-	shift_end: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, "Invalid time format (HH:MM:SS)"),
-	status: z.string(),
-});
+// Status colors
+const statusColors = {
+	"In Progress": "bg-blue-100 border-blue-300 text-blue-800",
+	Pending: "bg-yellow-100 border-yellow-300 text-yellow-800",
+	Completed: "bg-green-100 border-green-300 text-green-800",
+	Completed: "bg-gray-100 border-gray-300 text-gray-800",
+	Cancelled: "bg-red-100 border-red-300 text-red-800",
+	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
+};
 
-export default function CalendarSchedule({ events, schedules, setSchedules, selectedUser }) {
+export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
-	const [currentMonth, setCurrentMonth] = useState(new Date());
-	const [currentWeek, setCurrentWeek] = useState(new Date());
-	const [selectedDate, setSelectedDate] = useState(null);
-	const [selectedScheduleId, setSelectedScheduleId] = useState(null);
-	const [modalData, setModalData] = useState({ event: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
-	const [hoveredEvent, setHoveredEvent] = useState(null);
-	const [viewMode, setViewMode] = useState("month"); // "month" or "week"
-	const showToast = useToast();
+	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
+	const [currentDate, setCurrentDate] = useState(new Date());
 
-	const startDate = startOfWeek(startOfMonth(currentMonth));
-	const endDate = endOfWeek(endOfMonth(currentMonth));
+	const [currentMonth, setCurrentMonth] = useState(new Date());
+	const start_date = startOfWeek(startOfMonth(currentMonth));
+	const end_date = endOfWeek(endOfMonth(currentMonth));
+
+	// API Data
+	// const [tasks, setTasks] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [selectedUser, setSelectedUser] = useState(users || null);
+
+	useEffect(() => {
+		fetchUsers();
+		// fetchTasks();
+	}, []);
+
+	const fetchUsers = async () => {
+		setLoading(true);
+		try {
+			const userResponse = await axiosClient.get("/user");
+			setUsers(userResponse.data.users);
+			setSelectedUser(userResponse.data.users[0]);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
+	// const fetchTasks = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		const taskResponse = await axiosClient.get(`/task`);
+	// 		setTasks(taskResponse.data.data);
+	// 	} catch (e) {
+	// 		console.error("Error fetching data:", e);
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
+
+	// For week view - get the start of the week (Sunday)
+	const getWeekstart_date = (date) => {
+		const d = new Date(date);
+		const day = d.getDay();
+		return new Date(d.setDate(d.getDate() - day));
+	};
+
+	const weekstart_date = getWeekstart_date(currentDate);
+
+	// Get days in month for calendar view
 	const days = [];
-	let day = startDate;
-	while (day <= endDate) {
+	let day = start_date;
+	while (day <= end_date) {
 		days.push(day);
 		day = addDays(day, 1);
 	}
 
-	const matchingSchedule = (date) => {
-		if (Array.isArray(schedules)) {
-			return schedules.find((schedule) => format(schedule.date, "yyyy-MM-dd") === date);
+	// Get all days for the week view
+	const getWeekDays = (start_date) => {
+		const days = [];
+		const currentDate = new Date(start_date);
+
+		for (let i = 0; i < 7; i++) {
+			days.push(new Date(currentDate));
+			currentDate.setDate(currentDate.getDate() + 1);
 		}
-		return null;
+
+		return days;
 	};
 
-	const openModal = (date) => {
-		const schedule = schedules.find((schedule) => format(schedule.date, "yyyy-MM-dd") === date);
-		setSelectedDate(date);
-		setSelectedScheduleId(schedule?.id);
-		setModalData(
-			schedule
-				? { event_id: schedule?.event_id, shift_start: schedule?.shift_start, shift_end: schedule?.shift_end, status: schedule?.status }
-				: { event_id: 0, shift_start: undefined, shift_end: undefined }
+	// Get tasks for a specific date
+	const getTaskForDate = (date, tasks) => {
+		const formattedDate = format(date, "yyyy-MM-dd");
+		return tasks.filter((task) => {
+			const start = format(new Date(task.start_date), "yyyy-MM-dd");
+			const end = format(new Date(task.end_date), "yyyy-MM-dd");
+			return task.assignee_id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
+		});
+	};
+
+	// Generate time slots for week view
+	const getTimeSlots = () => {
+		const slots = [];
+		for (let hour = 7; hour <= 19; hour++) {
+			slots.push(`${hour.toString().padStart(2, "0")}:00`);
+		}
+		return slots;
+	};
+
+	// Check if a task is within a time slot
+	const isInTimeSlot = (task, time, date) => {
+		const formattedDate = format(date, "yyyy-MM-dd");
+		const [slotHour] = time?.split(":").map(Number);
+		const [startHour] = task.start_time ? task.start_time.split(":").map(Number) : [];
+		const [endHour, endMinutes] = task.end_time ? task.end_time.split(":").map(Number) : [];
+		const taskStartDate = format(new Date(task?.start_date), "yyyy-MM-dd");
+		const taskEndDate = format(new Date(task?.end_date), "yyyy-MM-dd");
+
+		return (
+			task?.assignee_id === selectedUser?.id &&
+			formattedDate >= taskStartDate &&
+			formattedDate <= taskEndDate &&
+			startHour <= slotHour &&
+			(endHour > slotHour || (endHour === slotHour && endMinutes > 0))
 		);
 	};
 
-	// const closeModal = () => {
-	// 	setSelectedScheduleId(null);
-	// 	setSelectedDate(null);
-	// 	setModalData({ event_id: 0, shift_start: undefined, shift_end: undefined, status: "Select a status" });
-	// };
-
-	// Calendar Input
-	const form = useForm({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			event_id: modalData?.event_id || 0,
-			shift_start: modalData?.shift_start || undefined,
-			shift_end: modalData?.shift_end || undefined,
-		},
-	});
-
-	useEffect(() => {
-		form.reset({
-			event_id: modalData?.event_id || 0,
-			shift_start: modalData?.shift_start || undefined,
-			shift_end: modalData?.shift_end || undefined,
-			status: modalData?.status || "Select a status",
-		});
-	}, [modalData, form]);
-
-	const handleTimeChange = (type, value, field) => {
-		// Turn time to a date format to get hours and minutes
-		const currentTime = form.getValues(field) ? parse(form.getValues(field), "HH:mm:ss", new Date()) : new Date();
-		let newDate = new Date(currentTime);
-		if (type === "hour") {
-			const hour = parseInt(value, 10);
-			newDate.setHours(hour);
-		} else if (type === "minute") {
-			newDate.setMinutes(parseInt(value, 10));
-		}
-		// Turn back time format to string for expected field value
-		form.setValue(field, format(newDate, "HH:mm:ss"));
-	};
-
-	const handleSubmit = async (form) => {
-		setLoading(true);
-		const newForm = { ...form, user_id: selectedUser?.id, date: selectedDate };
-		try {
-			let scheduleResponse;
-			if (selectedScheduleId) {
-				scheduleResponse = await axiosClient.put(`/schedule/${selectedScheduleId}`, newForm);
-				const updatedSchedule = scheduleResponse.data;
-				// Update one object from schedules array based on the updated schedule
-				const updatedSchedules = schedules.map((schedule) => (schedule.id === updatedSchedule.id ? updatedSchedule : schedule));
-				setSchedules(updatedSchedules);
-				showToast("Success!", "Schedule updated.", 3000);
-			} else {
-				scheduleResponse = await axiosClient.post(`/schedule`, newForm);
-				const updatedSchedule = scheduleResponse.data;
-				// Add one object from schedules array based on the added schedule
-				const updatedSchedules = [...schedules, updatedSchedule];
-				setSchedules(updatedSchedules);
-				setSelectedScheduleId(updatedSchedule?.id);
-				// set modal data to be able to update it after adding
-				setModalData(newForm);
-				showToast("Success!", "Schedule added.", 3000);
-			}
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 7000, "fail");
-			console.error("Error fetching data:", e);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
+	// Navigate to previous/next month or week
+	const navigatePrev = () => {
+		if (selectedView === "month") {
+			setCurrentMonth(subMonths(currentMonth, 1));
+		} else {
+			const newDate = new Date(weekstart_date);
+			newDate.setDate(newDate.getDate() - 7);
+			setCurrentDate(newDate);
 		}
 	};
-	const handleDelete = async () => {
-		setLoading(true);
-		try {
-			let scheduleResponse;
-			scheduleResponse = await axiosClient.delete(`/schedule/${selectedScheduleId}`, selectedUser?.id);
-			setSchedules(scheduleResponse.data);
-			showToast("Success!", "Schedule deleted.", 3000);
-			setSelectedScheduleId(null);
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 7000, "fail");
-			console.error("Error fetching data:", e);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
+
+	const navigateNext = () => {
+		if (selectedView === "month") {
+			setCurrentMonth(addMonths(currentMonth, 1));
+		} else {
+			const newDate = new Date(weekstart_date);
+			newDate.setDate(newDate.getDate() + 7);
+			setCurrentDate(newDate);
 		}
 	};
 
 	return (
-		<div className="p-1 md:p-4 mx-auto mt-5 w-full">
-			<div className="flex flex-col justify-center gap-2">
-				<h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
-				<div className="flex flex-row justify-between">
-					<div className="flex justify-start gap-2 mb-4">
-						<Button variant={`${viewMode === "month" ? "" : "outline"}`} onClick={() => setViewMode("month")} disabled={loading}>
-							Month View
-						</Button>
-						<Button variant={`${viewMode === "week" ? "" : "outline"}`} onClick={() => setViewMode("week")} disabled={loading}>
-							Week View
-						</Button>
+		<div>
+			<div>
+				{/* Header */}
+				<div className="p-4 border-b flex flex-col justify-between items-center gap-4">
+					<div className="flex flex-col justify-start items-start gap-2 mt-2 w-full">
+						<h1 className=" font-extrabold text-3xl">Schedules</h1>
+						<span className="w-full md:w-[300px]">
+							<Select
+								onValueChange={(value) => {
+									const selected = users.find((user) => user.id === value);
+									setSelectedUser(selected);
+								}}
+								value={selectedUser?.id || ""}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select a user"></SelectValue>
+								</SelectTrigger>
+								<SelectContent>
+									{Array.isArray(users) && users?.length > 0 ? (
+										users?.map((user) => (
+											<SelectItem key={user?.id} value={user?.id}>
+												{user?.name}
+											</SelectItem>
+										))
+									) : (
+										<SelectItem disabled>No users available</SelectItem>
+									)}
+								</SelectContent>
+							</Select>
+						</span>
 					</div>
-					<h2 className="hidden md:block text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2>
-					{viewMode == "month" ? (
-						<div className="flex justify-end mb-4 gap-2">
-							<Button variant="outline" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-								Prev
-							</Button>
-							<Button variant="outline" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-								Next
-							</Button>
+
+					<div className="flex flex-row w-full items-center gap-4">
+						{/* Navigation */}
+						<div className="flex flex-col justify-center gap-2 w-full">
+							{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
+							<div className="flex items-center justify-center">
+								<span className="block md:hidden text-lg font-bold">
+									{selectedView === "month"
+										? `${format(currentMonth, "MMMM yyyy")}`
+										: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+												weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
+										  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
+								</span>
+							</div>
+							<div className="flex flex-row justify-between w-full">
+								{/* View toggle */}
+								<div className="flex justify-start gap-2">
+									<Button
+										variant={`${selectedView === "month" ? "" : "outline"}`}
+										onClick={() => setSelectedView("month")}
+										disabled={loading}
+									>
+										Month View
+									</Button>
+									<Button variant={`${selectedView === "week" ? "" : "outline"}`} onClick={() => setSelectedView("week")} disabled={loading}>
+										Week View
+									</Button>
+								</div>
+								<div className="flex items-center justify-center">
+									<span className="hidden md:block text-lg font-bold">
+										{selectedView === "month"
+											? `${format(currentMonth, "MMMM yyyy")}`
+											: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+													weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
+											  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
+									</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<Button variant="outline" onClick={navigatePrev}>
+										Prev
+									</Button>
+									<Button variant="outline" onClick={navigateNext}>
+										Next
+									</Button>
+								</div>
+							</div>
 						</div>
+					</div>
+				</div>
+
+				{/* Calendar/Week View */}
+				<div className="bg-background p-1 overflow-x-auto">
+					{selectedView === "month" ? (
+						<Month
+							days={days}
+							currentMonth={currentMonth}
+							getTaskForDate={getTaskForDate}
+							statusColors={statusColors}
+							selectedUser={selectedUser}
+						/>
 					) : (
-						<div className="flex justify-end mb-4 gap-2">
-							<Button variant="outline" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
-								Prev
-							</Button>
-							<Button variant="outline" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
-								Next
-							</Button>
-						</div>
+						<Week
+							getWeekDays={getWeekDays}
+							getTimeSlots={getTimeSlots}
+							weekstart_date={weekstart_date}
+							isInTimeSlot={isInTimeSlot}
+							selectedUser={selectedUser}
+							statusColors={statusColors}
+						/>
 					)}
 				</div>
-			</div>
-			<div className="w-full overflow-auto border border-foreground rounded-xl">
-				{viewMode === "month" ? (
-					<div className="bg-background text-foreground grid grid-cols-7 gap-0 md:gap-1 rounded-lg p-2 text-xs sm:text-base">
-						{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-							<div key={d} className="text-center font-semibold my-4">
-								{d}
-							</div>
-						))}
-						{days.map((date, index) => {
-							const formattedSchedules = matchingSchedule(format(date, "yyyy-MM-dd"));
-							const status = formattedSchedules?.status;
-							let color = "";
-
-							switch (status) {
-								case "Pending":
-									color = "yellow";
-									break;
-								case "In Progress":
-									color = "blue";
-									break;
-								case "Completed":
-									color = "green";
-									break;
-								case "Cancelled":
-									color = "red";
-									break;
-								default:
-									color = "gray";
-									break;
-							}
-							return (
-								<Dialog key={index}>
-									<DialogTrigger onClick={() => openModal(format(date, "yyyy-MM-dd"))}>
-										<div
-											className={`${
-												format(date, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd")
-													? "outline outline-5 outline-foreground rounded-lg"
-													: ""
-											}`}
-										>
-											<CalendarCell
-												color={color}
-												loading={loading}
-												formattedSchedules={formattedSchedules}
-												hoveredEvent={hoveredEvent}
-												setHoveredEvent={setHoveredEvent}
-												openModal={openModal}
-												date={date}
-											/>
-										</div>
-									</DialogTrigger>
-									<DialogContent>
-										<DialogHeader className="text-left">
-											<DialogTitle>Update Schedule</DialogTitle>
-											<DialogDescription>Update schedule for {selectedUser?.name}</DialogDescription>
-										</DialogHeader>
-										<ScheduleForm
-											form={form}
-											modalData={modalData}
-											events={events}
-											loading={loading}
-											selectedScheduleId={selectedScheduleId}
-											handleTimeChange={handleTimeChange}
-											handleSubmit={handleSubmit}
-											handleDelete={handleDelete}
-										/>
-									</DialogContent>
-								</Dialog>
-							);
-						})}
-					</div>
-				) : (
-					<>
-						{!loading ? (
-							<WeekView
-								currentWeek={currentWeek}
-								schedules={schedules}
-								loading={loading}
-								openModal={openModal}
-								hoveredEvent={hoveredEvent}
-								setHoveredEvent={setHoveredEvent}
-								form={form}
-								modalData={modalData}
-								events={events}
-								selectedScheduleId={selectedScheduleId}
-								handleTimeChange={handleTimeChange}
-								handleSubmit={handleSubmit}
-								handleDelete={handleDelete}
-							/>
-						) : (
-							<div className="flex flex-col space-1 md:space-y-3 w-full">
-								{Array.from({ length: 26 }).map((_, i) => (
-									<div key={i} className="flex flex-row gap-2">
-										<Skeleton className="h-4 w-1/5" />
-										<Skeleton className="h-4 w-1/5" />
-										<Skeleton className="h-4 w-1/5" />
-										<Skeleton className="h-4 w-1/5" />
-										<Skeleton className="h-4 w-1/5" />
-									</div>
-								))}
-							</div>
-						)}
-					</>
-				)}
 			</div>
 		</div>
 	);
