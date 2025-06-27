@@ -6,12 +6,11 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import GuestLayout from "./components/GuestLayout";
 import AdminLayout from "./components/AdminLayout";
-import Schedules from "./pages/Schedules/Schedules";
 import UserProfile from "./pages/Users/Show/index";
 import Tasks from "./pages/Tasks/List/index";
 import Users from "./pages/Users/List/index";
 import Events from "./pages/Events/List/index";
-import SchedulesV2 from "./pages/Schedules/SchedulesV2";
+import Schedules from "./pages/Schedules";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -19,9 +18,8 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <AdminLayout />,
 		children: [
-			{ path: "/", element: <Navigate to="/schedule" /> },
-			{ path: "/schedule", element: <Schedules /> },
-			{ path: "/v2/schedule", element: <SchedulesV2 /> },
+			{ path: "/", element: <Navigate to="/calendar" /> },
+			{ path: "/calendar", element: <Schedules /> },
 			{ path: "/event", element: <Events /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/users", element: <Users /> },

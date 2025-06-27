@@ -23,20 +23,15 @@ import axiosClient from "@/axios.client";
 // Menu items.
 const items = [
 	{
-		title: "Schedules",
-		url: "/schedule",
+		title: "Calendar",
+		url: "/calendar",
 		icon: CalendarClock,
 	},
-	{
-		title: "Schedules V2",
-		url: "/v2/schedule",
-		icon: CalendarClock,
-	},
-	{
-		title: "Events",
-		url: "/event",
-		icon: Calendar,
-	},
+	// {
+	// 	title: "Events",
+	// 	url: "/event",
+	// 	icon: Calendar,
+	// },
 	{
 		title: "Tasks",
 		url: "/task",
