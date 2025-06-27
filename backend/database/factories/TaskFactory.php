@@ -29,7 +29,7 @@ class TaskFactory extends Factory
             'assignee_id' => User::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'start_date' => $startDate = fake()->dateTimeBetween('now', '+1 month'),
-            'end_date' => (clone $startDate)->modify('+1 day'),
+            'end_date' => $startDate,
             'start_time' => '07:00:00',
             'end_time' => '16:00:00',
             'time_estimate' => $this->faker->randomFloat(2, 1, 100),
