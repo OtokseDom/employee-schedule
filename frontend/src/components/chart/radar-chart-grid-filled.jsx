@@ -40,10 +40,19 @@ export function RadarChartGridFilled({ report }) {
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex-col gap-2 text-sm">
-				<div className="flex items-center gap-2 font-medium leading-none">
-					<Star className="h-4 w-4" /> {report?.highest_rating?.category} has the highest rating of {report?.highest_rating?.value}
-				</div>
-				<div className="flex items-center gap-2 leading-none text-muted-foreground">All Time</div>
+				{loading ? (
+					<div className="flex flex-col gap-2 items-center justify-center h-full w-full p-8">
+						<Skeleton className=" w-full h-4" />
+						<Skeleton className=" w-full h-4" />
+					</div>
+				) : (
+					<>
+						<div className="flex items-center gap-2 font-medium leading-none">
+							<Star className="h-4 w-4" /> {report?.highest_rating?.category} has the highest rating of {report?.highest_rating?.value}
+						</div>
+						<div className="flex items-center gap-2 leading-none text-muted-foreground">All Time</div>
+					</>
+				)}
 			</CardFooter>
 		</Card>
 	);

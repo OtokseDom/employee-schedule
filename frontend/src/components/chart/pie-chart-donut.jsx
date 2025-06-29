@@ -89,16 +89,19 @@ export function PieChartDonut({ report }) {
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex flex-wrap gap-2 text-sm">
-				{report?.length > 0 ? (
+				{loading ? (
+					<div className="flex flex-col gap-2 items-center justify-center h-full w-full p-8">
+						<Skeleton className=" w-full h-4" />
+						<Skeleton className=" w-full h-4" />
+					</div>
+				) : (
 					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
-						{report.map((data, index) => (
+						{report?.map((data, index) => (
 							<div key={index} className="flex items-center gap-1">
 								<span className="font-bold">{data.tasks}</span> {chartConfig[data.status]?.label || data.status}
 							</div>
 						))}
 					</div>
-				) : (
-					<div className="leading-none text-muted-foreground">Showing all total tasks</div>
 				)}
 			</CardFooter>
 		</Card>
