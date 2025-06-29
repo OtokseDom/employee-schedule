@@ -1,4 +1,4 @@
-import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock } from "lucide-react";
+import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -14,11 +14,16 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 	SidebarTrigger,
+	SidebarMenuSubButton,
+	SidebarMenuSub,
+	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosClient from "@/axios.client";
+import { sub } from "date-fns";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 
 // Menu items.
 const items = [
@@ -26,21 +31,37 @@ const items = [
 		title: "Calendar",
 		url: "/calendar",
 		icon: CalendarClock,
+		collapsible: false,
+		subItems: [],
 	},
-	// {
-	// 	title: "Events",
-	// 	url: "/event",
-	// 	icon: Calendar,
-	// },
 	{
 		title: "Tasks",
 		url: "/task",
 		icon: ClipboardList,
+		collapsible: false,
+		subItems: [],
 	},
 	{
 		title: "Users",
 		url: "/users",
 		icon: Users2,
+		collapsible: false,
+		subItems: [],
+	},
+	{
+		title: "Settings",
+		url: "/settings",
+		icon: Settings,
+		collapsible: true,
+		subItems: [
+			{
+				title: "Categories",
+				url: "/categories",
+				icon: Tag,
+				collapsible: false,
+				subItems: [],
+			},
+		],
 	},
 ];
 export function AppSidebar({ user, setUser, setToken }) {
@@ -96,18 +117,66 @@ export function AppSidebar({ user, setUser, setToken }) {
 					<SidebarGroupLabel asChild>Application</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{items.map((item) => (
-								<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
-									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
-											<span>
-												<item.icon />
-												{item.title}
-											</span>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								</Link>
-							))}
+							{items.map((item) =>
+								!item.collapsible ? (
+									<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
+										<SidebarMenuItem key={item.title}>
+											<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
+												<span>
+													<item.icon />
+													{item.title}
+												</span>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									</Link>
+								) : (
+									<Collapsible key={item.title} defaultOpen className="group/collapsible cursor-pointer">
+										<SidebarMenuItem>
+											<CollapsibleTrigger asChild>
+												<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
+													<span className="flex flex-row justify-between">
+														<span className="flex items-center gap-2">
+															<item.icon size={16} />
+															{item.title}
+														</span>
+														<span>
+															<ChevronDown
+																size={18}
+																className="transition-transform duration-200 group-data-[state=closed]/collapsible:rotate-[-90deg]"
+															/>
+														</span>
+													</span>
+												</SidebarMenuButton>
+											</CollapsibleTrigger>
+											<CollapsibleContent>
+												<SidebarMenuSub>
+													{item.subItems.map((subItem) => (
+														<Link
+															key={subItem.title}
+															to={item.url + subItem.url}
+															onClick={() => setCurrentPath(item.url + subItem.url)}
+														>
+															<SidebarMenuSubItem>
+																<SidebarMenuButton
+																	isChild={true}
+																	key={subItem.title}
+																	isActive={currentPath.startsWith(item.url + subItem.url)}
+																	asChild
+																>
+																	<span>
+																		<subItem.icon />
+																		{subItem.title}
+																	</span>
+																</SidebarMenuButton>
+															</SidebarMenuSubItem>
+														</Link>
+													))}
+												</SidebarMenuSub>
+											</CollapsibleContent>
+										</SidebarMenuItem>
+									</Collapsible>
+								)
+							)}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
@@ -139,11 +208,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 								<DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
 									<span>Account</span>
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={onLogout}>
-									{/* <a href="#" onClick={onLogout}> */}
-									Sign out
-									{/* </a> */}
-								</DropdownMenuItem>
+								<DropdownMenuItem onClick={onLogout}>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</SidebarMenuItem>

@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
@@ -21,6 +21,11 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
+
+	const handleUpdate = (task) => {
+		setIsOpen(true);
+		setUpdateData(task);
+	};
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
 		setSelectedColumn(columnId);
@@ -113,7 +118,12 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 							</SheetTrigger>
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
-									<SheetTitle>Add Task</SheetTitle>
+									<SheetTitle>
+										<div className="flex flex-row gap-5">
+											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
+											<span>{loading && <Loader2 className="animate-spin" />}</span>
+										</div>
+									</SheetTitle>
 								</SheetHeader>
 								<TaskForm
 									data={data}
@@ -194,7 +204,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id}>
+								<TableRow key={row.id} onClick={() => handleUpdate(row.original)}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}

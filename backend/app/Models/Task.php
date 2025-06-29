@@ -10,7 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category',
+        'category_id',
         'title',
         'description',
         'expected_output',
@@ -40,8 +40,14 @@ class Task extends Model
     }
 
     // Relationship with TaskHistory
-    public function histories()
+    public function taskHistories()
     {
-        return $this->hasMany(TaskHistory::class);
+        return $this->hasMany(\App\Models\TaskHistory::class, 'task_id');
+    }
+
+    // Relationship with Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

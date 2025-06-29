@@ -14,14 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format, parseISO } from "date-fns";
 import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
-import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
 	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
-	category: z.string().refine((data) => data.trim() !== "", {
-		message: "Category is required.",
+	category_id: z.number({
+		required_error: "Category is required.",
 	}),
 	title: z.string().refine((data) => data.trim() !== "", {
 		message: "Title is required.",
@@ -49,6 +48,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState();
+	const [categories, setCategories] = useState([]);
 
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -73,18 +73,22 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 	});
 
 	useEffect(() => {
-		fetchUsers();
+		fetchSelection();
 	}, [isOpen]);
 
-	const fetchUsers = async () => {
+	const fetchSelection = async () => {
 		// setLoading(true);
 		try {
+			setLoading(true);
 			const userResponse = await axiosClient.get("/user");
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.users);
+			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			// setLoading(false);
+			setLoading(false);
 		}
 	};
 
@@ -95,13 +99,13 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 	useEffect(() => {
 		// console.log(updateData);
 		// console.log(users);
-		if (updateData && users) {
+		if (updateData && users && categories) {
 			const {
 				calendar_add, //when update data is set on calendar cell click
 				title,
 				description,
 				assignee_id,
-				category,
+				category_id,
 				expected_output,
 				start_date,
 				end_date,
@@ -119,7 +123,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				title: title || "",
 				description: description || "",
 				assignee_id: assignee_id || undefined,
-				category: category || "",
+				category_id: category_id || undefined,
 				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
 				end_date: end_date ? parseISO(end_date) : undefined,
@@ -236,14 +240,31 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				/>
 				<FormField
 					control={form.control}
-					name="category"
+					name="category_id"
 					render={({ field }) => {
 						return (
 							<FormItem>
 								<FormLabel>Category</FormLabel>
-								<FormControl>
-									<Input placeholder="Category" {...field} />
-								</FormControl>
+								<Select onValueChange={(value) => field.onChange(Number(value))} value={field.value ? field.value.toString() : undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a category">
+												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a category"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(categories) && categories.length > 0 ? (
+											categories.map((category) => (
+												<SelectItem key={category.id} value={category.id.toString()}>
+													{category.name}
+												</SelectItem>
+											))
+										) : (
+											<></>
+										)}
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						);
@@ -469,7 +490,8 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>

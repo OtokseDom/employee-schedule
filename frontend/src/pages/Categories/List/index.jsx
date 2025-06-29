@@ -1,16 +1,15 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
-import { columnsTask } from "./columns";
+import { columnsCategory } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-// TODO: Task History Logs Screen for Admin
-export default function Tasks() {
+import { DataTableCategories } from "./data-table";
+
+export default function Categories() {
 	const { loading, setLoading } = useLoadContext();
-	const [tasks, setTasks] = useState([]);
+	const [categories, setCategories] = useState([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
-	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
@@ -23,8 +22,8 @@ export default function Tasks() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get("/task");
-			setTasks(taskResponse.data.data);
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -36,9 +35,9 @@ export default function Tasks() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/task/${id}`);
+			await axiosClient.delete(`/category/${id}`);
 			fetchData();
-			showToast("Success!", "Task deleted.", 3000);
+			showToast("Success!", "Category deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
@@ -50,13 +49,13 @@ export default function Tasks() {
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 			<div>
-				<h1 className=" font-extrabold text-3xl">Tasks</h1>
-				<p>View list of all tasks</p>
+				<h1 className=" font-extrabold text-3xl">Categories</h1>
+				<p>View list of all categories</p>
 			</div>
-			<DataTableTasks
-				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
-				data={tasks}
-				setTasks={setTasks}
+			<DataTableCategories
+				columns={columnsCategory({ handleDelete, setIsOpen, setUpdateData })}
+				data={categories}
+				setCategories={setCategories}
 				updateData={updateData}
 				setUpdateData={setUpdateData}
 				isOpen={isOpen}

@@ -50,35 +50,31 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess
 				);
 			},
 		},
-		...(showLess
-			? [
-					{
-						id: "assignee",
-						accessorKey: "assignee.name",
-						header: ({ column }) => {
-							return (
-								<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-									Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
-								</button>
-							);
-						},
-						cell: ({ row }) => {
-							const assignee = row.original.assignee;
+		{
+			id: "assignee",
+			accessorKey: "assignee.name",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			cell: ({ row }) => {
+				const assignee = row.original.assignee;
 
-							return (
-								<div>
-									<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
-									<br />
-									<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
-								</div>
-							);
-						},
-					},
-			  ]
-			: []),
+				return (
+					<div>
+						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
+						<br />
+						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
+					</div>
+				);
+			},
+		},
 		{
 			id: "category",
-			accessorKey: "category",
+			accessorKey: "category.name",
 			header: ({ column }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -86,24 +82,6 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess
 					</button>
 				);
 			},
-			...(!showLess
-				? {
-						cell: ({ row }) => {
-							const category = row.original.category;
-							const status = row.original.status;
-							return (
-								<div className="min-w-52">
-									{category}
-									<br />
-									<br />
-									<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
-										{status.replace("_", " ")}
-									</span>
-								</div>
-							);
-						},
-				  }
-				: {}),
 		},
 		{
 			id: "title",
@@ -266,7 +244,8 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess
 					<Dialog>
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" className="h-8 w-8 p-0">
+								{/* //stop propagation when parent row is clicked */}
+								<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
 									<span className="sr-only">Open menu</span>
 									<MoreHorizontal className="h-4 w-4" />
 								</Button>
