@@ -11,6 +11,7 @@ import Tasks from "./pages/Tasks/List/index";
 import Users from "./pages/Users/List/index";
 import Events from "./pages/Events/List/index";
 import Schedules from "./pages/Schedules";
+import Categories from "./pages/Categories/List";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -20,10 +21,14 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/", element: <Navigate to="/calendar" /> },
 			{ path: "/calendar", element: <Schedules /> },
-			{ path: "/event", element: <Events /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/users", element: <Users /> },
 			{ path: "/profile/:id", element: <UserProfile /> },
+			{
+				path: "/settings",
+				children: [{ path: "categories", element: <Categories /> }],
+			},
+			{ path: "", element: <Users /> },
 		],
 	},
 	{
