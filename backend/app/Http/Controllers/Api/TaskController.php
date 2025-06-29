@@ -20,6 +20,16 @@ class TaskController extends Controller
     {
         $task = Task::create($request->validated());
         $task->load(['assignee:id,name,email']);
+
+        // Record Addition in Task History
+        $task->taskHistories()->create([
+            'task_id' => $task->id,
+            'status' => $task->status,
+            'changed_by' => \Illuminate\Support\Facades\Auth::id(),
+            'changed_at' => now(),
+            'remarks' => "Task Added",
+        ]);
+
         return new TaskResource($task);
     }
 
