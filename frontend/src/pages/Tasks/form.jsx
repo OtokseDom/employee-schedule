@@ -469,7 +469,8 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>
