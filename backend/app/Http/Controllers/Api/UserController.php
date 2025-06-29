@@ -6,59 +6,60 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        // $users = User::orderBy("id", "DESC")->paginate(10);
-        $users = User::orderBy("id", "DESC")->get();
+   public function index()
+   {
+      // $users = User::orderBy("id", "DESC")->paginate(10);
+      $users = User::orderBy("id", "DESC")->get();
 
-        return response(compact('users'));
-    }
+      return response(compact('users'));
+   }
 
-    public function store(StoreUserRequest $request)
-    {
-        $data = $request->validated();
-        $users = User::create($data);
+   public function store(StoreUserRequest $request)
+   {
+      $data = $request->validated();
+      $users = User::create($data);
 
-        return response(new UserResource($users), 201);
-    }
+      return response(new UserResource($users), 201);
+   }
 
-    public function show(User $user)
-    {
-        $userDetails = DB::table('users')->where('id', $user->id)->first();
-        $assignedTasks = DB::table('tasks')->where('assignee_id', $user->id)->get();
+   public function show(User $user)
+   {
+      $userDetails = DB::table('users')->where('id', $user->id)->first();
+      $assignedTasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $user->id)->get();
 
-        return response()->json([
-            'user' => $userDetails,
-            'assigned_tasks' => $assignedTasks
-        ]);
-    }
+      return response()->json([
+         'user' => $userDetails,
+         'assigned_tasks' => $assignedTasks
+      ]);
+   }
 
-    public function update(UpdateUserRequest $request, User $user)
-    {
-        $data = $request->validated();
-        $user->update($data);
-        return new UserResource($user);
-    }
+   public function update(UpdateUserRequest $request, User $user)
+   {
+      $data = $request->validated();
+      $user->update($data);
+      return new UserResource($user);
+   }
 
-    public function destroy(User $user)
-    {
-        // Check if the user has existing tasks assigned
-        $hasTasks = DB::table('tasks')->where('assignee_id', $user->id)->exists();
+   public function destroy(User $user)
+   {
+      // Check if the user has existing tasks assigned
+      $hasTasks = DB::table('tasks')->where('assignee_id', $user->id)->exists();
 
-        if ($hasTasks) {
-            return response()->json(['message' => 'User cannot be deleted because they have assigned tasks.'], 400);
-        }
+      if ($hasTasks) {
+         return response()->json(['message' => 'User cannot be deleted because they have assigned tasks.'], 400);
+      }
 
-        $user->delete();
-        // Fetch the updated user again
-        $users = User::orderBy("id", "DESC")->get();
-        return response(UserResource::collection($users), 200);
-    }
+      $user->delete();
+      // Fetch the updated user again
+      $users = User::orderBy("id", "DESC")->get();
+      return response(UserResource::collection($users), 200);
+   }
 }
 
 // TODO: Reports
@@ -86,7 +87,7 @@ class UserController extends Controller
    - Task count per month
    - Visualization: Bar chart or area chart
 
-6. Average Rating Per Category
+6. 🔵 Average Rating Per Category
    - Performance by task type (e.g. Bug, Feature)
    - Visualization: Radar chart or grouped bar chart
 

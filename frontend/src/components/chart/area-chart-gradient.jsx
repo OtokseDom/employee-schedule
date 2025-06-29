@@ -5,9 +5,7 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-import axiosClient from "@/axios.client";
 import { Skeleton } from "../ui/skeleton";
 
 const chartConfig = {
@@ -17,30 +15,12 @@ const chartConfig = {
 	},
 };
 
-export function AreaChartGradient({ user_id }) {
+export function AreaChartGradient({ report }) {
 	const { loading, setLoading } = useLoadContext();
 
-	const [chartData, setChartData] = useState([]);
-	useEffect(() => {
-		if (!user_id) return;
-		fetchData();
-	}, [user_id]);
-
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Fetch user tasks by status
-			const response = await axiosClient.get(`/task-activity-timeline/${user_id}`);
-			setChartData(response.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			setLoading(false);
-		}
-	};
 	return (
 		<Card className="flex flex-col relative h-full">
-			<CardHeader>
+			<CardHeader className="items-center text-center">
 				<CardTitle>Task Activity Timeline</CardTitle>
 				<CardDescription>Total tasks assigned for the last 6 months</CardDescription>
 			</CardHeader>
@@ -56,7 +36,7 @@ export function AreaChartGradient({ user_id }) {
 					) : (
 						<AreaChart
 							accessibilityLayer
-							data={chartData?.chart_data}
+							data={report?.chart_data}
 							margin={{
 								left: 12,
 								right: 12,
@@ -91,17 +71,17 @@ export function AreaChartGradient({ user_id }) {
 					) : (
 						<div className="grid gap-2">
 							<div className="flex items-center gap-2 font-medium leading-none">
-								{chartData?.percentage_difference?.event == "Increased" ? (
+								{report?.percentage_difference?.event == "Increased" ? (
 									<div className="flex items-center gap-2">
-										<span>Trending up by {chartData?.percentage_difference?.value}% this month </span>
+										<span>Trending up by {report?.percentage_difference?.value}% this month </span>
 										<TrendingUp className="h-4 w-4" />
 									</div>
-								) : chartData?.percentage_difference?.event == "Decreased" ? (
+								) : report?.percentage_difference?.event == "Decreased" ? (
 									<div className="flex items-center gap-2">
-										<span>Trending dropped by {chartData?.percentage_difference?.value}% this month </span>
+										<span>Trending dropped by {report?.percentage_difference?.value}% this month </span>
 										<TrendingDown className="h-4 w-4" />
 									</div>
-								) : chartData?.percentage_difference?.event == "Same" ? (
+								) : report?.percentage_difference?.event == "Same" ? (
 									<div className="flex items-center gap-2">
 										<span>Same as last month </span>
 										<RefreshCcw className="h-4 w-4" />
@@ -110,11 +90,11 @@ export function AreaChartGradient({ user_id }) {
 									""
 								)}
 							</div>
-							{chartData?.chart_data?.length > 0 && (
+							{report?.chart_data?.length > 0 && (
 								<div className="flex items-center gap-2 leading-none text-muted-foreground">
-									{chartData?.chart_data?.length > 0 && chartData.chart_data[0].month} -{" "}
-									{chartData?.chart_data?.length > 0 && chartData.chart_data[5].month}{" "}
-									{chartData?.chart_data?.length > 0 && chartData.chart_data[5].year}
+									{report?.chart_data?.length > 0 && report?.chart_data[0].month} -{" "}
+									{report?.chart_data?.length > 0 && report?.chart_data[5].month}{" "}
+									{report?.chart_data?.length > 0 && report?.chart_data[5].year}
 								</div>
 							)}
 						</div>
