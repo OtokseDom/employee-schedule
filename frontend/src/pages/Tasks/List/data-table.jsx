@@ -42,7 +42,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [columnVisibility, setColumnVisibility] = useState(
 		showLess
 			? {
-					status: false,
+					// status: false,
 					"start date": false,
 					"end date": false,
 					"start time": false,
@@ -195,7 +195,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<div className="flex items-center justify-center">
 										<div className="flex flex-col space-y-3 w-full">
 											{Array.from({ length: 6 }).map((_, i) => (
-												<Skeleton key={i} className="h-24 w-2/5 md:w-full" />
+												<Skeleton key={i} index={i * 0.9} className="h-24 w-2/5 md:w-full" />
 											))}
 										</div>
 									</div>

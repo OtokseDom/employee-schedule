@@ -99,11 +99,11 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 												{loading ? (
 													<div className="flex flex-col w-full">
 														<div className="flex flex-row items-center gap-2">
-															<Skeleton className="h-3 mt-1 w-1/3 bg-sidebar-border" />
-															<Skeleton className="h-3 mt-1 w-2/3 bg-sidebar-border" />
+															<Skeleton index={timeIndex * 0.5} className="h-3 mt-1 w-1/3 bg-sidebar-border" />
+															<Skeleton index={timeIndex * 0.5} className="h-3 mt-1 w-2/3 bg-sidebar-border" />
 														</div>
-														<Skeleton className="h-3 mt-1 w-full bg-sidebar-border" />
-														<Skeleton className="h-3 mt-1 w-full bg-sidebar-border" />
+														<Skeleton index={timeIndex * 0.5} className="h-3 mt-1 w-full bg-sidebar-border" />
+														<Skeleton index={timeIndex * 0.5} className="h-3 mt-1 w-full bg-sidebar-border" />
 													</div>
 												) : (
 													""

@@ -1,21 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-import axiosClient from "@/axios.client";
 import { useMemo } from "react";
 import { Skeleton } from "../ui/skeleton";
 
-export function PieChartDonut({ user_id }) {
+export function PieChartDonut({ report }) {
 	const { loading, setLoading } = useLoadContext();
-
-	const [chartData, setChartData] = useState([]);
 
 	const chartConfig = {
 		tasks: {
@@ -52,30 +47,13 @@ export function PieChartDonut({ user_id }) {
 			// color: "hsl(340 75% 45%)", // Darkest Pink
 		},
 	};
-	useEffect(() => {
-		if (!user_id) return;
-		fetchData();
-	}, [user_id]);
-
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Fetch user tasks by status
-			const response = await axiosClient.get(`/tasks-by-status/${user_id}`);
-			setChartData(response.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const totalVisitors = useMemo(() => {
-		return chartData.reduce((acc, curr) => acc + curr.tasks, 0);
-	}, [chartData]);
+	const totalTasks = useMemo(() => {
+		return report?.reduce((acc, curr) => acc + curr.tasks, 0);
+	}, [report]);
 
 	return (
 		<Card className="flex flex-col h-full">
-			<CardHeader className="items-center pb-0">
+			<CardHeader className="items-center text-center pb-0">
 				<CardTitle>Tasks by Status</CardTitle>
 				<CardDescription>All Time</CardDescription>
 			</CardHeader>
@@ -88,14 +66,14 @@ export function PieChartDonut({ user_id }) {
 					) : (
 						<PieChart>
 							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-							<Pie data={chartData} dataKey="tasks" nameKey="status" innerRadius={60} strokeWidth={5}>
+							<Pie data={report} dataKey="tasks" nameKey="status" innerRadius={60} strokeWidth={5}>
 								<Label
 									content={({ viewBox }) => {
 										if (viewBox && "cx" in viewBox && "cy" in viewBox) {
 											return (
 												<text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
 													<tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
-														{totalVisitors.toLocaleString()}
+														{totalTasks?.toLocaleString()}
 													</tspan>
 													<tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
 														Tasks
@@ -111,9 +89,9 @@ export function PieChartDonut({ user_id }) {
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex flex-wrap gap-2 text-sm">
-				{chartData?.length > 0 ? (
+				{report?.length > 0 ? (
 					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
-						{chartData.map((data, index) => (
+						{report.map((data, index) => (
 							<div key={index} className="flex items-center gap-1">
 								<span className="font-bold">{data.tasks}</span> {chartConfig[data.status]?.label || data.status}
 							</div>

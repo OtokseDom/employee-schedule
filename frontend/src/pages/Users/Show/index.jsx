@@ -23,6 +23,7 @@ export default function UserProfile() {
 	const [user, setUser] = useState(null); // State for user details
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
+	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenUser, setIsOpenUser] = useState(false);
@@ -46,6 +47,10 @@ export default function UserProfile() {
 			const response = await axiosClient.get(`/user/${id}`);
 			setUser(response.data.user);
 			setTasks(response.data.assigned_tasks);
+			// Fetch all user reports in one call
+			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
+			setUserReports(reportsRes.data.data);
+			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -99,21 +104,21 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut user_id={user?.id} />
+						<PieChartDonut report={userReports?.tasks_by_status?.data} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
 							<p>Daily Task Activity Timeline</p>
 						</div> */}
-						<AreaChartGradient user_id={user?.id} />
+						<AreaChartGradient report={userReports?.task_activity_timeline?.data} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<RadarChartGridFilled />
+						<RadarChartGridFilled report={userReports?.rating_per_category?.data} />
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
