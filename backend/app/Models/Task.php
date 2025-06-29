@@ -44,4 +44,9 @@ class Task extends Model
     {
         return $this->hasMany(TaskHistory::class);
     }
+
+    public function taskHistories()
+    {
+        return $this->hasMany(\App\Models\TaskHistory::class, 'task_id');
+    }
 }

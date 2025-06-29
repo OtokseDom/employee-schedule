@@ -23,7 +23,6 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [filterValue, setFilterValue] = useState("");
 
 	const handleUpdate = (task) => {
-		console.log("Update task:", task);
 		setIsOpen(true);
 		setUpdateData(task);
 	};

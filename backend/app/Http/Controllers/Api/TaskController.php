@@ -31,8 +31,45 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task->update($request->validated());
+        $original = $task->getOriginal();
+        $validated = $request->validated();
+        $task->update($validated);
         $task->load(['assignee:id,name,email,role,position']);
+
+        // Build changes as a JSON object
+        $changes = [];
+        foreach ($validated as $key => $value) {
+            // Normalize date values for comparison
+            if (in_array($key, ['start_date', 'end_date'])) {
+                $orig = isset($original[$key]) ? date('Y-m-d', strtotime($original[$key])) : null;
+                $val = $value ? date('Y-m-d', strtotime($value)) : null;
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $original[$key],
+                        'to' => $value,
+                    ];
+                }
+            } else {
+                if (array_key_exists($key, $original) && $original[$key] != $value) {
+                    $changes[$key] = [
+                        'from' => $original[$key],
+                        'to' => $value,
+                    ];
+                }
+            }
+        }
+        // Record changes in Task History if there are any
+        if (!empty($changes)) {
+            // Record Update in Task History
+            $task->taskHistories()->create([
+                'task_id' => $task->id,
+                'status' => $task->status,
+                'changed_by' => \Illuminate\Support\Facades\Auth::id(),
+                'changed_at' => now(),
+                'remarks' => $changes ? json_encode($changes) : null,
+            ]);
+        }
+
         return new TaskResource($task);
     }
 
