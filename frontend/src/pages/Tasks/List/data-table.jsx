@@ -21,6 +21,12 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
+
+	const handleUpdate = (task) => {
+		console.log("Update task:", task);
+		setIsOpen(true);
+		setUpdateData(task);
+	};
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
 		setSelectedColumn(columnId);
@@ -192,7 +198,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id}>
+								<TableRow key={row.id} onClick={() => handleUpdate(row.original)}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
