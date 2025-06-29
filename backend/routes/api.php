@@ -34,8 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* --------------------------------- Reports -------------------------------- */
     Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
-    Route::get('/tasks-by-status/{id}', [UserReportController::class, 'tasksByStatus']);
-    Route::get('/task-activity-timeline/{id}', [UserReportController::class, 'taskActivityTimeline']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);
