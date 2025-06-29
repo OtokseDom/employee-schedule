@@ -16,7 +16,7 @@ class TaskResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'category' => $this->category,
+            'category_id' => $this->category_id,
             'title' => $this->title,
             'description' => $this->description,
             'expected_output' => $this->expected_output,
@@ -42,6 +42,7 @@ class TaskResource extends JsonResource
                     'position' => $this->assignee->position,
                 ];
             }),
+            'category' => new CategoryResource($this->whenLoaded('category')),
         ];
     }
 }

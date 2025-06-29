@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
 use App\Models\Task;
@@ -20,9 +21,8 @@ class TaskFactory extends Factory
      */
     public function definition()
     {
-
         return [
-            'category' => fake()->randomElement(['Bug', 'Feature', 'Documentation', 'Maintenance', 'Other']),
+            'category_id' => Category::inRandomOrder()->value('id'),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,

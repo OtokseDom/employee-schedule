@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\PerformanceReportController;
@@ -26,15 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/{user}', [UserController::class, 'show']);
     Route::put('/user/{user}', [UserController::class, 'update']);
     Route::delete('/user/{user}', [UserController::class, 'destroy']);
-    Route::apiResource('/schedule', ScheduleController::class);
-    Route::apiResource('/employee', EmployeeController::class);
-    Route::apiResource('/event', EventController::class);
+    Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/task', TaskController::class);
     Route::apiResource('/task-history', TaskHistoryController::class);
     Route::apiResource('/performance-report', PerformanceReportController::class);
-
-    /* ---------------------------- Master Relations ---------------------------- */
-    Route::get('/schedule-by-user/{userId}', [ScheduleController::class, 'getScheduleByUser']);
 
     /* --------------------------------- Reports -------------------------------- */
     Route::get('/tasks-by-status/{id}', [UserReportController::class, 'tasksByStatus']);

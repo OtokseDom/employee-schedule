@@ -22,7 +22,7 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
@@ -49,7 +49,7 @@ class UpdateTaskRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'category.required' => 'Category is required.',
+            'category_id.required' => 'Category is required.',
             'title.required' => 'Title is required.',
             'status.required' => 'Status is required.',
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',

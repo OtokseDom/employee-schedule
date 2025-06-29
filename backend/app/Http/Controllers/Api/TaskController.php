@@ -12,14 +12,14 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::with(['assignee:id,name,email,role,position'])->orderBy('id', 'DESC')->get();
+        $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->get();
         return TaskResource::collection($tasks);
     }
 
     public function store(StoreTaskRequest $request)
     {
         $task = Task::create($request->validated());
-        $task->load(['assignee:id,name,email']);
+        $task->load(['assignee:id,name,email', 'category']);
 
         // Record Addition in Task History
         $task->taskHistories()->create([
@@ -35,7 +35,7 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        $task->load(['assignee:id,name,email,role,position']);
+        $task->load(['assignee:id,name,email,role,position', 'category']);
         return new TaskResource($task);
     }
 
