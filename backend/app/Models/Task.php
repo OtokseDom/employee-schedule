@@ -40,11 +40,6 @@ class Task extends Model
     }
 
     // Relationship with TaskHistory
-    public function histories()
-    {
-        return $this->hasMany(TaskHistory::class);
-    }
-
     public function taskHistories()
     {
         return $this->hasMany(\App\Models\TaskHistory::class, 'task_id');
