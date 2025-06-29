@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import TaskForm from "../Tasks/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axiosClient from "@/axios.client";
+import { Loader2 } from "lucide-react";
 
 export default function Month({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
@@ -125,7 +126,12 @@ export default function Month({ days, currentMonth, getTaskForDate, statusColors
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader className="text-left">
-								<DialogTitle>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</DialogTitle>
+								<DialogTitle>
+									<div className="flex flex-row gap-5">
+										<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</span>
+										<span>{loading && <Loader2 className="animate-spin" />}</span>
+									</div>
+								</DialogTitle>
 								<DialogDescription>
 									{updateData?.calendar_add ? "Add task for" : "Update task for"} {selectedUser?.name}
 								</DialogDescription>

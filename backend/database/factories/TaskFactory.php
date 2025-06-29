@@ -36,7 +36,7 @@ class TaskFactory extends Factory
             'time_taken' => $this->faker->randomFloat(2, 1, 100),
             'delay' => $this->faker->randomFloat(2, 0, 10),
             'delay_reason' => $this->faker->sentence,
-            'performance_rating' => $this->faker->numberBetween(0, 100),
+            'performance_rating' => $this->faker->numberBetween(0, 10),
             'remarks' => $this->faker->paragraph,
         ];
     }

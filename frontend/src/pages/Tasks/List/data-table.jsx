@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
@@ -116,7 +116,12 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 							</SheetTrigger>
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
-									<SheetTitle>Add Task</SheetTitle>
+									<SheetTitle>
+										<div className="flex flex-row gap-5">
+											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
+											<span>{loading && <Loader2 className="animate-spin" />}</span>
+										</div>
+									</SheetTitle>
 								</SheetHeader>
 								<TaskForm
 									data={data}
