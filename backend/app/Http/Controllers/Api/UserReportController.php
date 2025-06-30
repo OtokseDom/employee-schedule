@@ -23,10 +23,12 @@ class UserReportController extends Controller
         $tasksByStatus = $this->tasksByStatus($id);
         $taskActivityTimeline = $this->taskActivityTimeline($id);
         $ratingPerCategory = $this->ratingPerCategory($id);
+        $performanceRatingTrend = $this->performanceRatingTrend($id);
         $data = [
             'tasks_by_status' => $tasksByStatus->getData(),
             'task_activity_timeline' => $taskActivityTimeline->getData(),
             'rating_per_category' => $ratingPerCategory->getData(),
+            'performance_rating_trend' => $performanceRatingTrend->getData(),
         ];
         return apiResponse($data, 'Reports fetched successfully');
     }
@@ -107,31 +109,34 @@ class UserReportController extends Controller
      */
     public function taskActivityTimeline($id)
     {
-        $month1 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->month)
-            ->count();
-        $month2 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->subMonth(1)->month)
-            ->count();
-        $month3 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->subMonth(2)->month)
-            ->count();
-        $month4 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->subMonth(3)->month)
-            ->count();
-        $month5 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->subMonth(4)->month)
-            ->count();
-        $month6 = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->whereMonth('start_date', now()->subMonth(5)->month)
-            ->count();
+        // Calculate the last 6 months (including current)
+        $months = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->startOfMonth()->subMonths($i);
+            $months[] = [
+                'year' => $date->year,
+                'month' => $date->format('F'),
+                'month_num' => $date->month,
+            ];
+        }
 
+        $chart_data = [];
+        foreach ($months as $m) {
+            $count = DB::table('tasks')
+                ->where('assignee_id', $id)
+                ->whereYear('start_date', $m['year'])
+                ->whereMonth('start_date', $m['month_num'])
+                ->count();
+            $chart_data[] = [
+                'year' => $m['year'],
+                'month' => $m['month'],
+                'tasks' => $count,
+            ];
+        }
+
+        // Calculate percentage difference (current vs previous month)
+        $month1 = $chart_data[5]['tasks'];
+        $month2 = $chart_data[4]['tasks'];
         $percentageDifference = [
             'value' => ($month2 != 0)
                 ? round(abs((($month1 - $month2) / $month2) * 100), 2)
@@ -141,38 +146,7 @@ class UserReportController extends Controller
 
         $data = [
             'percentage_difference' => $percentageDifference,
-            'chart_data' => [
-                [
-                    'year' =>  now()->subMonth(5)->format('Y'),
-                    'month' =>  now()->subMonth(5)->format('F'),
-                    'tasks' => $month6,
-                ],
-                [
-                    'year' =>  now()->subMonth(4)->format('Y'),
-                    'month' =>  now()->subMonth(4)->format('F'),
-                    'tasks' => $month5,
-                ],
-                [
-                    'year' =>  now()->subMonth(3)->format('Y'),
-                    'month' =>  now()->subMonth(3)->format('F'),
-                    'tasks' => $month4,
-                ],
-                [
-                    'year' =>  now()->subMonth(2)->format('Y'),
-                    'month' =>  now()->subMonth(2)->format('F'),
-                    'tasks' => $month3,
-                ],
-                [
-                    'year' =>  now()->subMonth(1)->format('Y'),
-                    'month' =>  now()->subMonth(1)->format('F'),
-                    'tasks' => $month2,
-                ],
-                [
-                    'year' =>  now()->format('Y'),
-                    'month' =>  now()->format('F'),
-                    'tasks' => $month1,
-                ],
-            ]
+            'chart_data' => $chart_data
         ];
 
         if (empty($data['chart_data'])) {
@@ -181,7 +155,6 @@ class UserReportController extends Controller
 
         return apiResponse($data, "Task activity timeline report fetched successfully");
     }
-
     /**
      * Display report for tasks by Average Rating Per Category. Radar chart
      */
@@ -198,7 +171,7 @@ class UserReportController extends Controller
             ->map(function ($item) {
                 return [
                     'category' => $item->category,
-                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2),
+                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2)
                 ];
             });
         $highestRatingValue = $ratings->max('value');
@@ -216,5 +189,56 @@ class UserReportController extends Controller
         }
 
         return apiResponse($data, "Rating per category report fetched successfully");
+    }
+    /**
+     * Display report for tasks timeline to see users activity load. Area chart
+     */
+    public function performanceRatingTrend($id)
+    {
+        // Calculate the last 6 months (including current)
+        $months = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->startOfMonth()->subMonths($i);
+            $months[] = [
+                'year' => $date->year,
+                'month' => $date->format('F'),
+                'month_num' => $date->month,
+            ];
+        }
+
+        $chart_data = [];
+        foreach ($months as $m) {
+            $rating = DB::table('tasks')
+                ->where('assignee_id', $id)
+                ->whereYear('start_date', $m['year'])
+                ->whereMonth('start_date', $m['month_num'])
+                ->avg('performance_rating');
+            $chart_data[] = [
+                'year' => $m['year'],
+                'month' => $m['month'],
+                'rating' => round($rating, 2),
+            ];
+        }
+
+        // Calculate percentage difference (current vs previous month)
+        $month1 = $chart_data[5]['rating'];
+        $month2 = $chart_data[4]['rating'];
+        $percentageDifference = [
+            'value' => ($month2 != 0)
+                ? round(abs((($month1 - $month2) / $month2) * 100), 2)
+                : ($month1 > 0 ? 100 : 0),
+            'event' => $month1 > $month2 ? 'Increased' : ($month1 < $month2 ? 'Decreased' : 'Same'),
+        ];
+
+        $data = [
+            'percentage_difference' => $percentageDifference,
+            'chart_data' => $chart_data
+        ];
+
+        if (empty($data['chart_data'])) {
+            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+        }
+
+        return apiResponse($data, "Performance rating trend report fetched successfully");
     }
 }

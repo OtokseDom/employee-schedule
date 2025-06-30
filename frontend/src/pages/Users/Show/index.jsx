@@ -1,23 +1,21 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 // import { columns } from "./columns";
 // import { DataTable } from "./data-table";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import axiosClient from "@/axios.client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
 import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
+import { ChartLineLabel } from "@/components/chart/line-chart-label";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
@@ -119,6 +117,16 @@ export default function UserProfile() {
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
 						<RadarChartGridFilled report={userReports?.rating_per_category?.data} />
+					</div>
+				</div>
+
+				<div className="flex flex-row w-full h-fit">
+					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
+							<p>Pie Chart of Tasks by Status</p>
+						</div> */}
+						<ChartLineLabel report={userReports?.performance_rating_trend?.data} />
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}

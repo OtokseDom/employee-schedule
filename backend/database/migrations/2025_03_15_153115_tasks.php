@@ -27,7 +27,7 @@ return new class extends Migration
             $table->double('time_taken')->nullable(); // in hours
             $table->double('delay')->nullable(); // in hours
             $table->text('delay_reason')->nullable();
-            $table->integer('performance_rating')->default(0);
+            $table->integer('performance_rating')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

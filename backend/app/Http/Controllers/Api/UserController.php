@@ -71,7 +71,7 @@ class UserController extends Controller
    - Completed / Cancelled / In Progress, etc.
    - Visualization: Pie chart or donut chart
 
-2. Performance Over Time
+2. ✅ Performance Over Time
    - Track performance_rating weekly/monthly
    - Visualization: Line graph (x: date, y: rating)
 
@@ -87,7 +87,7 @@ class UserController extends Controller
    - Task count per month
    - Visualization: Bar chart or area chart
 
-6. 🔵 Average Rating Per Category
+6. ✅ Average Rating Per Category
    - Performance by task type (e.g. Bug, Feature)
    - Visualization: Radar chart or grouped bar chart
 

@@ -36,7 +36,7 @@ class UpdateTaskRequest extends FormRequest
             'time_taken' => 'nullable|numeric',
             'delay' => 'nullable|numeric',
             'delay_reason' => 'nullable|string',
-            'performance_rating' => 'nullable|integer|min:0|max:100',
+            'performance_rating' => 'nullable|integer|min:0|max:10',
             'remarks' => 'nullable|string',
         ];
     }
@@ -55,7 +55,7 @@ class UpdateTaskRequest extends FormRequest
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
             'end_time.after' => 'The end time must be after the start time.',
             'performance_rating.min' => 'Performance rating must be at least 0.',
-            'performance_rating.max' => 'Performance rating may not be greater than 100.',
+            'performance_rating.max' => 'Performance rating may not be greater than 10.',
             // ...other custom messages...
         ];
     }

@@ -28,7 +28,7 @@ class TaskFactory extends Factory
             'expected_output' => $this->faker->sentence,
             'assignee_id' => User::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
-            'start_date' => $startDate = fake()->dateTimeBetween('now', '+1 month'),
+            'start_date' => $startDate = fake()->dateTimeBetween('-6 months', 'now'),
             'end_date' => $startDate,
             'start_time' => '07:00:00',
             'end_time' => '16:00:00',

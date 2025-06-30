@@ -160,7 +160,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				end_time: formatTime(formData.end_time),
 				time_estimate: formData.time_estimate ? parseFloat(formData.time_estimate) : undefined,
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
-				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : undefined,
+				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
 			// console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
