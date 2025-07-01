@@ -1,25 +1,12 @@
 "use client";
 
-import { CheckCircle, ClockAlert, Hourglass, PartyPopper, TrendingDown, TrendingUp, TriangleAlert, Zap } from "lucide-react";
+import { CheckCircle, ClockAlert, Zap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export const description = "A multiple bar chart";
-
-const chartData = [
-	{ task: "January", estimate: 186, actual: 80 },
-	{ task: "February", estimate: 305, actual: 200 },
-	{ task: "March", estimate: 237, actual: 120 },
-	{ task: "April", estimate: 73, actual: 190 },
-	{ task: "May", estimate: 209, actual: 130 },
-	{ task: "June", estimate: 214, actual: 140 },
-	{ task: "June", estimate: 214, actual: 140 },
-	{ task: "June", estimate: 214, actual: 140 },
-	{ task: "June", estimate: 214, actual: 140 },
-	{ task: "June", estimate: 214, actual: 140 },
-];
 
 const chartConfig = {
 	estimate: {

@@ -1,6 +1,5 @@
 "use client";
 
-import { Star, TrendingUp } from "lucide-react";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,7 +47,7 @@ export function RadarChartGridFilled({ report }) {
 				) : (
 					<>
 						<div className="flex items-center gap-2 font-medium leading-none">
-							<Star className="h-4 w-4" /> {report?.highest_rating?.category} has the highest rating of {report?.highest_rating?.value}
+							{report?.highest_rating?.category} has the highest rating: {report?.highest_rating?.value}
 						</div>
 						<div className="flex items-center gap-2 leading-none text-muted-foreground">All Time</div>
 					</>
