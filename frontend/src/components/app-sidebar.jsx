@@ -19,7 +19,7 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosClient from "@/axios.client";
 import { sub } from "date-fns";
@@ -71,6 +71,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 		return savedMode ? JSON.parse(savedMode) : "dark"; // Default to false if nothing is saved
 	});
 	const navigate = useNavigate();
+	const location = useLocation();
 	useEffect(() => {
 		sessionStorage.setItem("theme", JSON.stringify(theme));
 		if (theme == "dark") {
@@ -100,7 +101,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 	const [currentPath, setCurrentPath] = useState(location.pathname);
 	useEffect(() => {
 		setCurrentPath(location.pathname);
-	}, []);
+	}, [location.pathname]);
 	return (
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
@@ -121,7 +122,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 								!item.collapsible ? (
 									<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
 										<SidebarMenuItem key={item.title}>
-											<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
+											<SidebarMenuButton isActive={currentPath === item.url || currentPath.startsWith(item.url + "/")} asChild>
 												<span>
 													<item.icon />
 													{item.title}
@@ -133,7 +134,7 @@ export function AppSidebar({ user, setUser, setToken }) {
 									<Collapsible key={item.title} defaultOpen className="group/collapsible cursor-pointer">
 										<SidebarMenuItem>
 											<CollapsibleTrigger asChild>
-												<SidebarMenuButton isActive={currentPath.startsWith(item.url)} asChild>
+												<SidebarMenuButton isActive={currentPath === item.url || currentPath.startsWith(item.url + "/")} asChild>
 													<span className="flex flex-row justify-between">
 														<span className="flex items-center gap-2">
 															<item.icon size={16} />
@@ -160,7 +161,10 @@ export function AppSidebar({ user, setUser, setToken }) {
 																<SidebarMenuButton
 																	isChild={true}
 																	key={subItem.title}
-																	isActive={currentPath.startsWith(item.url + subItem.url)}
+																	isActive={
+																		currentPath === item.url + subItem.url ||
+																		currentPath.startsWith(item.url + subItem.url + "/")
+																	}
 																	asChild
 																>
 																	<span>
@@ -205,7 +209,12 @@ export function AppSidebar({ user, setUser, setToken }) {
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-								<DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
+								<DropdownMenuItem
+									onClick={() => {
+										setCurrentPath(`/users/${user.id}`);
+										navigate(`/users/${user.id}`);
+									}}
+								>
 									<span>Account</span>
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={onLogout}>Sign out</DropdownMenuItem>

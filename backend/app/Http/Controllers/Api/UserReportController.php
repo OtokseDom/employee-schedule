@@ -24,15 +24,16 @@ class UserReportController extends Controller
         $taskActivityTimeline = $this->taskActivityTimeline($id);
         $ratingPerCategory = $this->ratingPerCategory($id);
         $performanceRatingTrend = $this->performanceRatingTrend($id);
+        $estimateVsActual = $this->estimateVsActual($id);
         $data = [
             'tasks_by_status' => $tasksByStatus->getData(),
             'task_activity_timeline' => $taskActivityTimeline->getData(),
             'rating_per_category' => $ratingPerCategory->getData(),
             'performance_rating_trend' => $performanceRatingTrend->getData(),
+            'estimate_vs_actual' => $estimateVsActual->getData(),
         ];
         return apiResponse($data, 'Reports fetched successfully');
     }
-
     /**
      * Display report for tasks by status. Donut Chart
      */
@@ -240,5 +241,63 @@ class UserReportController extends Controller
         }
 
         return apiResponse($data, "Performance rating trend report fetched successfully");
+    }
+    /**
+     * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
+     */
+    public function estimateVsActual($id)
+    {
+        // Fetch the 10 most recent tasks for the user
+        $tasks = DB::table('tasks')
+            ->where('assignee_id', $id)
+            ->orderBy('start_date', 'desc')
+            ->take(10)
+            ->get(['title', 'time_estimate', 'time_taken', 'start_date']);
+
+        // Prepare the data for the bar chart
+        $chart_data = [];
+        $runs = [
+            'over' => null,
+            'under' => null,
+            'exact' => 0
+        ];
+        foreach ($tasks as $index => $task) {
+            $chart_data[] = [
+                'task' => $task->title,
+                'estimate' => round($task->time_estimate, 2),
+                'actual' => round($task->time_taken, 2),
+                'percentage_difference' => 0
+            ];
+
+            // Calculate percentage difference for each task
+            $chart_data[$index]['percentage_difference'] = round($chart_data[$index]['estimate'] - $chart_data[$index]['actual'], 2);
+            if (mb_strlen($chart_data[$index]['task']) > 15) {
+                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . abs($chart_data[$index]['percentage_difference']) . ")";
+            } else {
+                $chart_data[$index]['task'] = $chart_data[$index]['task'] . " (" . $chart_data[$index]['percentage_difference'] . ")";
+            }
+
+            // Get total underruns and overruns
+            if ($chart_data[$index]['percentage_difference'] > 0)
+                $runs['over'] += $chart_data[$index]['percentage_difference'];
+            elseif ($chart_data[$index]['percentage_difference'] < 0)
+                $runs['under'] += $chart_data[$index]['percentage_difference'];
+            else
+                $runs['exact']++;
+        }
+
+        $taskCount = count($chart_data);
+
+        $data = [
+            'chart_data' => $chart_data,
+            'runs' => $runs,
+            'task_count' => $taskCount
+        ];
+
+        if (empty($data)) {
+            return response()->json(['message' => 'Failed to fetch estimate vs actual report', 404]);
+        }
+
+        return apiResponse($data, "Estimate vs actual report fetched successfully");
     }
 }

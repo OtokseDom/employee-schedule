@@ -23,7 +23,7 @@ const router = createBrowserRouter([
 			{ path: "/calendar", element: <Schedules /> },
 			{ path: "/task", element: <Tasks /> },
 			{ path: "/users", element: <Users /> },
-			{ path: "/profile/:id", element: <UserProfile /> },
+			{ path: "/users/:id", element: <UserProfile /> },
 			{
 				path: "/settings",
 				children: [{ path: "categories", element: <Categories /> }],
