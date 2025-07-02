@@ -32,9 +32,9 @@ class StoreTaskRequest extends FormRequest
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i:s',
             'end_time' => 'nullable|date_format:H:i:s|after:start_time',
-            'time_estimate' => 'nullable|numeric',
-            'time_taken' => 'nullable|numeric',
-            'delay' => 'nullable|numeric',
+            'time_estimate' => 'nullable|numeric|min:0.1',
+            'time_taken' => 'nullable|numeric|min:0',
+            'delay' => 'nullable|numeric|min:0',
             'delay_reason' => 'nullable|string',
             'performance_rating' => 'nullable|integer|min:0|max:10',
             'remarks' => 'nullable|string',
@@ -56,6 +56,9 @@ class StoreTaskRequest extends FormRequest
             'end_time.after' => 'The end time must be after the start time.',
             'performance_rating.min' => 'Performance rating must be at least 0.',
             'performance_rating.max' => 'Performance rating may not be greater than 10.',
+            'time_estimate' => 'Time estimate must be greater than 0',
+            'time_taken' => 'Actual time must be greater than 0',
+            'delay' => 'Delay time must be greater than 0 or set to null',
             // ...other custom messages...
         ];
     }
