@@ -129,7 +129,7 @@ export default function Month({ days, currentMonth, getTaskForDate, statusColors
 							<DialogHeader className="text-left">
 								<DialogTitle>
 									<div className="flex flex-row gap-5">
-										<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</span>
+										<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Task"}</span>
 										<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 									</div>
 								</DialogTitle>

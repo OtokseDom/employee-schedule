@@ -1,7 +1,7 @@
 import axiosClient from "@/axios.client";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
-import { Clock } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import TaskForm from "../Tasks/form";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
+	const [localLoading, setLocalLoading] = useState(false);
 	const [tasks, setTasks] = useState([]);
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
@@ -159,14 +160,21 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader className="text-left">
-									<DialogTitle>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</DialogTitle>
+									<DialogTitle>
+										<div className="flex flex-row gap-5">
+											<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Task"}</span>
+											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
+										</div>
+									</DialogTitle>
 									<DialogDescription>
 										{updateData?.calendar_add ? "Add task for" : "Update task for"} {selectedUser?.name}
 									</DialogDescription>
 								</DialogHeader>
 								<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
 									<TaskForm
-										data={tasks}
+										// data={tasks}
+										localLoading={localLoading}
+										setLocalLoading={setLocalLoading}
 										isOpen={isDialogOpen}
 										setIsOpen={(open) => setOpenDialogIndex(open ? dayIndex : null)}
 										updateData={updateData}
