@@ -45,8 +45,9 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 
-export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { loading, setLoading } = useLoadContext();
+export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	// const { loading, setLoading } = useLoadContext();
+
 	const showToast = useToast();
 	const [users, setUsers] = useState();
 	const [categories, setCategories] = useState([]);
@@ -75,22 +76,21 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 	});
 
 	useEffect(() => {
-		fetchSelection();
+		if (isOpen) fetchSelection();
 	}, [isOpen]);
 
 	const fetchSelection = async () => {
-		// setLoading(true);
+		// setLocalLoading(true);
 		try {
-			setLoading(true);
+			setLocalLoading(true);
 			const userResponse = await axiosClient.get("/user");
 			const categoryResponse = await axiosClient.get("/category");
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.users);
-			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			setLoading(false);
+			setLocalLoading(false);
 		}
 	};
 
@@ -144,7 +144,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 	}, [updateData, form, users]);
 
 	const handleSubmit = async (formData) => {
-		setLoading(true);
+		setLocalLoading(true);
 		try {
 			// Parse numeric fields
 			const formatTime = (time) => {
@@ -200,7 +200,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				});
 			}
 		} finally {
-			setLoading(false);
+			setLocalLoading(false);
 		}
 	};
 
@@ -509,8 +509,8 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 						);
 					}}
 				/>
-				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+				<Button type="submit" disabled={localLoading}>
+					{localLoading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
 					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 				</Button>
 			</form>

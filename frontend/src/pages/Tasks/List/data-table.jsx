@@ -17,14 +17,17 @@ import TaskForm from "../form";
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
 	const { loading, setLoading } = useLoadContext();
+	const [localLoading, setLocalLoading] = useState(false);
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
 
 	const handleUpdate = (task) => {
+		setLocalLoading(true);
 		setIsOpen(true);
 		setUpdateData(task);
+		setLocalLoading(false);
 	};
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
@@ -121,12 +124,14 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<SheetTitle>
 										<div className="flex flex-row gap-5">
 											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
-											<span>{loading && <Loader2 className="animate-spin" />}</span>
+											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 										</div>
 									</SheetTitle>
 								</SheetHeader>
 								<TaskForm
-									data={data}
+									// data={data}
+									localLoading={localLoading}
+									setLocalLoading={setLocalLoading}
 									setTasks={setTasks}
 									isOpen={isOpen}
 									setIsOpen={setIsOpen}
