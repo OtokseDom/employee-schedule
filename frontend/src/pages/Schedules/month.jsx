@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 
 export default function Month({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
+	const [localLoading, setLocalLoading] = useState(false);
 	const [tasks, setTasks] = useState([]);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
@@ -129,7 +130,7 @@ export default function Month({ days, currentMonth, getTaskForDate, statusColors
 								<DialogTitle>
 									<div className="flex flex-row gap-5">
 										<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Schedule"}</span>
-										<span>{loading && <Loader2 className="animate-spin" />}</span>
+										<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 									</div>
 								</DialogTitle>
 								<DialogDescription>
@@ -138,7 +139,9 @@ export default function Month({ days, currentMonth, getTaskForDate, statusColors
 							</DialogHeader>
 							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
 								<TaskForm
-									data={tasks}
+									// data={tasks}
+									localLoading={localLoading}
+									setLocalLoading={setLocalLoading}
 									isOpen={isDialogOpen}
 									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
