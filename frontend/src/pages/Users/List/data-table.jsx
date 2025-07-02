@@ -136,7 +136,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 								<TableRow
 									className="cursor-pointer"
 									key={row.id}
-									onClick={() => navigate(`/profile/${row.original.id}`)} // Redirect on row click
+									onClick={() => navigate(`/users/${row.original.id}`)} // Redirect on row click
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
