@@ -34,6 +34,7 @@ const formSchema = z.object({
 	start_time: z.string().optional(),
 	end_time: z.string().optional(),
 	time_estimate: z.coerce.number().optional(),
+	time_taken: z.coerce.number().optional(),
 	delay: z.coerce.number().optional(),
 	delay_reason: z.string().optional(),
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
@@ -64,6 +65,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 			start_time: "",
 			end_time: "",
 			time_estimate: "",
+			time_taken: "",
 			delay: "",
 			delay_reason: "",
 			performance_rating: "",
@@ -112,6 +114,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				start_time,
 				end_time,
 				time_estimate,
+				time_taken,
 				delay,
 				delay_reason,
 				performance_rating,
@@ -130,6 +133,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				start_time: start_time || "",
 				end_time: end_time || "",
 				time_estimate: time_estimate || "",
+				time_taken: time_taken || "",
 				delay: delay || "",
 				delay_reason: delay_reason || "",
 				performance_rating: performance_rating || "",
@@ -159,6 +163,7 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
 				time_estimate: formData.time_estimate ? parseFloat(formData.time_estimate) : undefined,
+				time_taken: formData.time_taken ? parseFloat(formData.time_taken) : undefined,
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
@@ -381,6 +386,21 @@ export default function TaskForm({ data, setTaskAdded, isOpen, setIsOpen, update
 								<FormLabel>Time Estimate &#40;hrs&#41;</FormLabel>
 								<FormControl>
 									<Input type="number" step="any" placeholder="Time estimate &#40;hrs&#41;" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="time_taken"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Time Taken &#40;hrs&#41;</FormLabel>
+								<FormControl>
+									<Input type="number" step="any" placeholder="Time taken &#40;hrs&#41;" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
