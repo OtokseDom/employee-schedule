@@ -72,12 +72,12 @@ export function AreaChartGradient({ report }) {
 						<div className="grid gap-2">
 							<div className="flex items-center gap-2 font-medium leading-none">
 								{report?.percentage_difference?.event == "Increased" ? (
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-2 text-green-500">
 										<span>Trending up by {report?.percentage_difference?.value}% this month </span>
 										<TrendingUp className="h-4 w-4" />
 									</div>
 								) : report?.percentage_difference?.event == "Decreased" ? (
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-2 text-red-500">
 										<span>Trending dropped by {report?.percentage_difference?.value}% this month </span>
 										<TrendingDown className="h-4 w-4" />
 									</div>
