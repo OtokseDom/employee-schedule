@@ -278,11 +278,13 @@ class UserReportController extends Controller
             }
 
             // Get total underruns and overruns
-            if ($chart_data[$index]['percentage_difference'] > 0)
+            if ($chart_data[$index]['percentage_difference'] > 0) {
                 $runs['over'] += $chart_data[$index]['percentage_difference'];
-            elseif ($chart_data[$index]['percentage_difference'] < 0)
+                $runs['over'] = round($runs['over'], 2);
+            } elseif ($chart_data[$index]['percentage_difference'] < 0) {
                 $runs['under'] += $chart_data[$index]['percentage_difference'];
-            else
+                $runs['under'] = round($runs['under'], 2);
+            } else
                 $runs['exact']++;
         }
 
