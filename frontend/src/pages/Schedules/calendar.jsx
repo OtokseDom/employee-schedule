@@ -16,7 +16,7 @@ const statusColors = {
 	"In Progress": "bg-blue-100 border-blue-300 text-blue-800",
 	Pending: "bg-yellow-100 border-yellow-300 text-yellow-800",
 	Completed: "bg-green-100 border-green-300 text-green-800",
-	Completed: "bg-gray-100 border-gray-300 text-gray-800",
+	"On Hold": "bg-gray-100 border-gray-300 text-gray-800",
 	Cancelled: "bg-red-100 border-red-300 text-red-800",
 	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
 };
