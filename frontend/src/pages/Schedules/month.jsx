@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 
-export default function Month({ days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
+export default function Month({ data, fetchData, days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [localLoading, setLocalLoading] = useState(false);
-	const [tasks, setTasks] = useState([]);
+	const [tasks, setTasks] = useState(data);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
@@ -23,21 +23,21 @@ export default function Month({ days, currentMonth, getTaskForDate, statusColors
 	}, [taskAdded]);
 
 	useEffect(() => {
-		fetchData();
-	}, []);
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get("/task");
-			setTasks(taskResponse.data.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
+		setTasks(data);
+	}, [data]);
+	// const fetchData = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		// Make both API calls concurrently using Promise.all
+	// 		const taskResponse = await axiosClient.get("/task");
+	// 		setTasks(taskResponse.data.data);
+	// 	} catch (e) {
+	// 		console.error("Error fetching data:", e);
+	// 	} finally {
+	// 		// Always stop loading when done
+	// 		setLoading(false);
+	// 	}
+	// };
 	return (
 		<div className="grid grid-cols-7 gap-1">
 			{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (

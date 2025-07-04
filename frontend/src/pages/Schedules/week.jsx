@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
+export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
 	const [localLoading, setLocalLoading] = useState(false);
-	const [tasks, setTasks] = useState([]);
+	const [tasks, setTasks] = useState(data);
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
@@ -25,21 +25,21 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 	}, [taskAdded]);
 
 	useEffect(() => {
-		fetchData();
-	}, []);
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get("/task");
-			setTasks(taskResponse.data.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
+		setTasks(data);
+	}, [data]);
+	// const fetchData = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		// Make both API calls concurrently using Promise.all
+	// 		const taskResponse = await axiosClient.get("/task");
+	// 		setTasks(taskResponse.data.data);
+	// 	} catch (e) {
+	// 		console.error("Error fetching data:", e);
+	// 	} finally {
+	// 		// Always stop loading when done
+	// 		setLoading(false);
+	// 	}
+	// };
 	return (
 		<div className="overflow-x-auto">
 			<div className="min-w-max grid grid-cols-8 gap-1">

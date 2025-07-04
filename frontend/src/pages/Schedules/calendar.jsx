@@ -31,13 +31,13 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	// const [tasks, setTasks] = useState([]);
+	const [tasks, setTasks] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
 	useEffect(() => {
 		fetchUsers();
-		// fetchTasks();
+		fetchTasks();
 	}, []);
 
 	const fetchUsers = async () => {
@@ -52,17 +52,18 @@ export default function ScheduleCalendar() {
 			setLoading(false);
 		}
 	};
-	// const fetchTasks = async () => {
-	// 	setLoading(true);
-	// 	try {
-	// 		const taskResponse = await axiosClient.get(`/task`);
-	// 		setTasks(taskResponse.data.data);
-	// 	} catch (e) {
-	// 		console.error("Error fetching data:", e);
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
+	const fetchTasks = async () => {
+		setLoading(true);
+		try {
+			const taskResponse = await axiosClient.get(`/task`);
+			setTasks(taskResponse.data.data);
+			console.log("called fetch on calendar");
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	// For week view - get the start of the week (Sunday)
 	const getWeekstart_date = (date) => {
@@ -239,6 +240,8 @@ export default function ScheduleCalendar() {
 					{selectedView === "month" ? (
 						<Month
 							days={days}
+							data={tasks}
+							fetchData={fetchTasks}
 							currentMonth={currentMonth}
 							getTaskForDate={getTaskForDate}
 							statusColors={statusColors}
@@ -246,6 +249,8 @@ export default function ScheduleCalendar() {
 						/>
 					) : (
 						<Week
+							data={tasks}
+							fetchData={fetchTasks}
 							getWeekDays={getWeekDays}
 							getTimeSlots={getTimeSlots}
 							weekstart_date={weekstart_date}
