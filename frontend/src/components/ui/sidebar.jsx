@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebarContext } from "@/contexts/SidebarContextProvider";
@@ -136,6 +136,10 @@ const Sidebar = React.forwardRef(({ side = "left", variant = "sidebar", collapsi
 					}}
 					side={side}
 				>
+					<SheetHeader>
+						<SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
+						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
+					</SheetHeader>
 					<div className="flex h-full w-full flex-col">{children}</div>
 				</SheetContent>
 			</Sheet>

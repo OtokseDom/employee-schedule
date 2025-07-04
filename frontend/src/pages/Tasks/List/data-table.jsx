@@ -4,7 +4,7 @@ import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -127,6 +127,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 										</div>
 									</SheetTitle>
+									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
 								<TaskForm
 									// data={data}
@@ -200,7 +201,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<div className="flex items-center justify-center">
 										<div className="flex flex-col space-y-3 w-full">
 											{Array.from({ length: 6 }).map((_, i) => (
-												<Skeleton key={i} index={i * 0.9} className="h-24 w-2/5 md:w-full" />
+												<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
 											))}
 										</div>
 									</div>

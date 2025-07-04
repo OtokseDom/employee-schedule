@@ -57,7 +57,6 @@ export default function ScheduleCalendar() {
 		try {
 			const taskResponse = await axiosClient.get(`/task`);
 			setTasks(taskResponse.data.data);
-			console.log("called fetch on calendar");
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
