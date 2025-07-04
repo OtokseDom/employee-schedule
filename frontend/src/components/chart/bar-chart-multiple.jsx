@@ -23,7 +23,7 @@ const chartConfig = {
 export function ChartBarMultiple({ report }) {
 	const { loading } = useLoadContext();
 	return (
-		<Card>
+		<Card className="flex flex-col relative h-full justify-between">
 			<CardHeader>
 				<CardTitle>Estimate vs Actual Time</CardTitle>
 				<CardDescription>Showing 10 most recent tasks</CardDescription>

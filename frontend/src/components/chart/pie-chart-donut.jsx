@@ -52,7 +52,7 @@ export function PieChartDonut({ report }) {
 	}, [report]);
 
 	return (
-		<Card className="flex flex-col h-full">
+		<Card className="flex flex-col relative h-full justify-between">
 			<CardHeader className="items-center text-center pb-0">
 				<CardTitle>Tasks by Status</CardTitle>
 				<CardDescription>All Time</CardDescription>

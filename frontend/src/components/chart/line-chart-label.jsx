@@ -19,7 +19,7 @@ const chartConfig = {
 export function ChartLineLabel({ report }) {
 	const { loading, setLoading } = useLoadContext();
 	return (
-		<Card>
+		<Card className="flex flex-col relative h-full justify-between">
 			<CardHeader>
 				<CardTitle>Performance Trends</CardTitle>
 				<CardDescription>Performance Rating for the last 6 months</CardDescription>
