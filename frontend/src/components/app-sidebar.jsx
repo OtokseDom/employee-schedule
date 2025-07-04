@@ -1,4 +1,4 @@
-import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown } from "lucide-react";
+import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown, Gauge } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -27,6 +27,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collap
 
 // Menu items.
 const items = [
+	{
+		title: "Dashboard",
+		url: "/dashboard",
+		icon: Gauge,
+		collapsible: false,
+		subItems: [],
+	},
 	{
 		title: "Calendar",
 		url: "/calendar",
