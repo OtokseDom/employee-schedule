@@ -228,6 +228,19 @@ export function AppSidebar({ user, setUser, setToken }) {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</SidebarMenuItem>
+					<SidebarMenuItem className="block md:hidden">
+						{theme == "light" ? (
+							<SidebarMenuButton onClick={toggleDark}>
+								<MoonStar size={16} />
+								<span className="ml-2">Dark Mode</span>
+							</SidebarMenuButton>
+						) : (
+							<SidebarMenuButton onClick={toggleDark}>
+								<Sun size={16} />
+								<span className="ml-2">Light Mode</span>
+							</SidebarMenuButton>
+						)}
+					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>
 		</Sidebar>

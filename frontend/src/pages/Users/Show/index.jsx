@@ -15,7 +15,6 @@ import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
-import { SectionCards } from "@/components/chart/section-card";
 // TODO: Datatable sort not working properly. Sorting by text instead of date value
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
@@ -120,12 +119,6 @@ export default function UserProfile() {
 						<RadarChartGridFilled report={userReports?.rating_per_category?.data} />
 					</div>
 				</div>
-				{/* ---------------------------- Section Cards ---------------------------- */}
-				{/* <div className="flex flex-row gap-4 w-full h-fit">
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<SectionCards report={userReports?.performance_rating_trend?.data} />
-					</div>
-				</div> */}
 				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
 				<div className="flex flex-col lg:flex-row gap-4 w-full h-fit">
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
@@ -163,13 +156,6 @@ export default function UserProfile() {
 							showLess={true}
 						/>
 					</div>
-					{/* <div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<div className="mb-5">
-							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div>
-						<PieChartDonut user_id={user?.id} />
-					</div> */}
 				</div>
 			</div>
 		</div>
