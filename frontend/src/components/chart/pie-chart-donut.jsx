@@ -9,7 +9,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useMemo } from "react";
 import { Skeleton } from "../ui/skeleton";
 
-export function PieChartDonut({ report }) {
+export function PieChartDonut({ report, variant }) {
 	const { loading, setLoading } = useLoadContext();
 
 	const chartConfig = {
@@ -52,7 +52,7 @@ export function PieChartDonut({ report }) {
 	}, [report]);
 
 	return (
-		<Card className="flex flex-col relative h-full justify-between">
+		<Card className={`flex flex-col relative h-full justify-between ${variant == "solid" ? "bg-primary-foreground rounded-2xl" : ""}`}>
 			<CardHeader className="items-center text-center pb-0">
 				<CardTitle>Tasks by Status</CardTitle>
 				<CardDescription>All Time</CardDescription>

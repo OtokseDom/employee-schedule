@@ -19,7 +19,7 @@ import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
-	const { loading, setLoading } = useLoadContext();
+	const { setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
 	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
@@ -102,7 +102,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut report={userReports?.tasks_by_status?.data} />
+						<PieChartDonut report={userReports?.tasks_by_status?.data} variant="outline" />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
