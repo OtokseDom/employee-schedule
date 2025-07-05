@@ -75,11 +75,11 @@ class UserController extends Controller
    - Track performance_rating weekly/monthly
    - Visualization: Line graph (x: date, y: rating)
 
-3. Time Estimate vs Time Taken
+3. ✅ Time Estimate vs Time Taken
    - Compare estimated vs actual time
    - Visualization: Bar graph (2 bars per task)
 
-4. Tasks with Delays
+4. ❌ Tasks with Delays
    - % of delayed tasks, total delay hours
    - Visualization: KPI cards + delay reason table
 

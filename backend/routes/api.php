@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardReportController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\PerformanceReportController;
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* --------------------------------- Reports -------------------------------- */
     Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
+    Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);
