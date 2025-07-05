@@ -42,62 +42,41 @@ class UserReportController extends Controller
         if (!is_numeric($id)) {
             return response()->json(['error' => 'Invalid user ID'], 400);
         }
-        $pending = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'Pending')
-            ->count();
-        $in_progress = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'In Progress')
-            ->count();
-        $completed = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'Completed')
-            ->count();
-        $delayed = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'delayed')
-            ->count();
-        $cancelled = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'Cancelled')
-            ->count();
-        $on_hold = DB::table('tasks')
-            ->where('assignee_id', $id)
-            ->where('status', 'On Hold')
-            ->count();
-        $data = [
+        $statuses = [
             [
-                'status' => 'pending',
-                'tasks' => $pending,
-                'fill' => 'var(--color-pending)',
+                'name' => 'Pending',
+                'field' => 'pending',
             ],
             [
-                'status' => 'in_progress',
-                'tasks' => $in_progress,
-                'fill' => 'var(--color-in_progress)',
+                'name' => 'In Progress',
+                'field' => 'in_progress',
             ],
             [
-                'status' => 'completed',
-                'tasks' => $completed,
-                'fill' => 'var(--color-completed)',
+                'name' => 'Completed',
+                'field' => 'completed',
             ],
             [
-                'status' => 'delayed',
-                'tasks' => $delayed,
-                'fill' => 'var(--color-delayed)',
+                'name' => 'Delayed',
+                'field' => 'delayed',
             ],
             [
-                'status' => 'cancelled',
-                'tasks' => $cancelled,
-                'fill' => 'var(--color-cancelled)',
+                'name' => 'Cancelled',
+                'field' => 'cancelled',
             ],
             [
-                'status' => 'on_hold',
-                'tasks' => $on_hold,
-                'fill' => 'var(--color-on_hold)',
-            ]
+                'name' => 'On Hold',
+                'field' => 'on_hold',
+            ],
         ];
+        $data = [];
+        foreach ($statuses as $index => $status) {
+            $data[$index]['status'] = $status['field'];
+            $data[$index]['tasks'] = DB::table('tasks')
+                ->where('assignee_id', $id)
+                ->where('status', $status['name'])
+                ->count();
+            $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+        }
         // return response($data);
 
         if (empty($data)) {
