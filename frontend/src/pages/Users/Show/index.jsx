@@ -102,7 +102,7 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut report={userReports?.tasks_by_status?.data} variant="outline" />
+						<PieChartDonut report={userReports?.tasks_by_status?.data} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">

@@ -95,25 +95,25 @@ class UserController extends Controller
 🔸 Overall Dashboard Insights
 
 1. Team-Wide Task Status Distribution
-   - All tasks by status
+   - ✅ All tasks by status
    - Visualization: Pie chart or stacked bar by user
 
 2. Top Performers
    - Average performance_rating (ranked)
    - Visualization: Leaderboard table
 
-3. Avg. Delay Per Category
+3. ❌ Avg. Delay Per Category
    - Visualization: Horizontal bar chart
 
 4. Task Load Distribution
    - Tasks assigned per user
    - Visualization: Horizontal bar chart
 
-5. Time Estimate vs Time Taken (Overall)
+5. ✅ Time Estimate vs Time Taken (Overall)
    - Spot over/underestimations
    - Visualization: Line or bar graph (averages)
 
-6. Daily/Weekly Task Activity
+6. ❌ Daily/Weekly Task Activity
    - Number of tasks worked on per day
    - Visualization: Heatmap or bar chart
 

@@ -20,13 +20,15 @@ const chartConfig = {
 	},
 };
 
-export function ChartBarMultiple({ report }) {
+export function ChartBarMultiple({ report, variant }) {
 	const { loading } = useLoadContext();
 	return (
-		<Card className="flex flex-col relative h-full justify-between">
+		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-2xl" : ""}`}>
 			<CardHeader>
-				<CardTitle>Estimate vs Actual Time</CardTitle>
-				<CardDescription>Showing 10 most recent tasks</CardDescription>
+				<CardTitle>{variant == "dashboard" && "Overall "}Estimate vs Actual Time</CardTitle>
+				<CardDescription>
+					Showing {report?.task_count} {variant == "dashboard" ? "statuses" : "most recent tasks"}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig}>
@@ -59,7 +61,7 @@ export function ChartBarMultiple({ report }) {
 						{/* Overruns */}
 						{report?.runs["over"] > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
-								Total Overruns:
+								Total Overruns (hrs):
 								<span className="flex flex-row gap-4 text-red-500">
 									{report.runs["over"]} <ClockAlert className="h-4 w-4" />
 								</span>
@@ -73,7 +75,7 @@ export function ChartBarMultiple({ report }) {
 						{/* Underruns */}
 						{Math.abs(report?.runs["under"]) > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
-								Total Underruns:
+								Total Underruns (hrs):
 								<span className="flex flex-row gap-4 text-green-500">
 									{Math.abs(report.runs["under"])} <Zap className="h-4 w-4" />
 								</span>
@@ -85,7 +87,9 @@ export function ChartBarMultiple({ report }) {
 						)}
 
 						{/* On-Time Tasks */}
-						{report?.runs["exact"] > 0 ? (
+						{variant == "dashboard" ? (
+							""
+						) : report?.runs["exact"] > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
 								Tasks finished on exact time:
 								<span className="flex flex-row gap-4 text-blue-500">

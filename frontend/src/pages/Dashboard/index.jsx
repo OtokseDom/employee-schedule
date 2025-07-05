@@ -3,6 +3,7 @@ import axiosClient from "@/axios.client";
 import { SectionCard } from "@/components/chart/section-card";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
+import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 // TODO: Datatable sort not working properly. Sorting by text instead of date value
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
@@ -39,8 +40,11 @@ export default function UserProfile() {
 				<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
 				<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
 			</div>
-			<div className="flex flex-col md:flex-row gap-4">
-				<PieChartDonut report={reports?.tasks_by_status?.data} variant="solid" />
+			<div className="flex flex-col md:flex-row gap-4 w-full h-full">
+				{/* <div className="md:w-1/2"> */}
+				<PieChartDonut report={reports?.tasks_by_status?.data} variant="dashboard" />
+				{/* </div> */}
+				<ChartBarMultiple report={reports?.estimate_vs_actual?.data} variant="dashboard" />
 			</div>
 		</div>
 	);
