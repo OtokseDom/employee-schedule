@@ -251,16 +251,16 @@ class UserReportController extends Controller
             // Calculate percentage difference for each task
             $chart_data[$index]['percentage_difference'] = round($chart_data[$index]['estimate'] - $chart_data[$index]['actual'], 2);
             if (mb_strlen($chart_data[$index]['task']) > 15) {
-                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . abs($chart_data[$index]['percentage_difference']) . ")";
+                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . $chart_data[$index]['percentage_difference'] . ")";
             } else {
                 $chart_data[$index]['task'] = $chart_data[$index]['task'] . " (" . $chart_data[$index]['percentage_difference'] . ")";
             }
 
             // Get total underruns and overruns
-            if ($chart_data[$index]['percentage_difference'] > 0) {
+            if ($chart_data[$index]['percentage_difference'] < 0) {
                 $runs['over'] += $chart_data[$index]['percentage_difference'];
                 $runs['over'] = round($runs['over'], 2);
-            } elseif ($chart_data[$index]['percentage_difference'] < 0) {
+            } elseif ($chart_data[$index]['percentage_difference'] > 0) {
                 $runs['under'] += $chart_data[$index]['percentage_difference'];
                 $runs['under'] = round($runs['under'], 2);
             } else

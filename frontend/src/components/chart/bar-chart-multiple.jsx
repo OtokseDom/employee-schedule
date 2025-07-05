@@ -59,7 +59,7 @@ export function ChartBarMultiple({ report, variant }) {
 				) : (
 					<>
 						{/* Overruns */}
-						{report?.runs["over"] > 0 ? (
+						{report?.runs["over"] < 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
 								Total Overruns (hrs):
 								<span className="flex flex-row gap-4 text-red-500">
