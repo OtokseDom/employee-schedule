@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../axios.client";
 import { useAuthContext } from "../contexts/AuthContextProvider";
@@ -11,6 +11,10 @@ export default function Login() {
 	const { setUser, setToken } = useAuthContext();
 	const emailRef = useRef();
 	const passwordRef = useRef();
+
+	useEffect(() => {
+		document.title = "Task Management | Log In";
+	}, []);
 
 	const onsubmit = (e) => {
 		setLoading(true);

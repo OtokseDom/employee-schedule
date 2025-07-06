@@ -10,6 +10,7 @@ export default function UserProfile() {
 	const [reports, setReports] = useState();
 
 	useEffect(() => {
+		document.title = "Task Management";
 		fetchData();
 	}, []);
 

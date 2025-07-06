@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
@@ -16,6 +16,10 @@ export default function Signup() {
 	const dobRef = useRef();
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
+
+	useEffect(() => {
+		document.title = "Task Management | Sign Up";
+	}, []);
 
 	const onSubmit = (e) => {
 		setLoading(true);

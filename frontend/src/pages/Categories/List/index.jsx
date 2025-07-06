@@ -16,6 +16,7 @@ export default function Categories() {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);
 	useEffect(() => {
+		document.title = "Task Management | Categories";
 		fetchData();
 	}, []);
 	const fetchData = async () => {

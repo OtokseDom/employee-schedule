@@ -35,6 +35,7 @@ export default function UserProfile() {
 	}, [isOpen, isOpenUser]);
 
 	useEffect(() => {
+		document.title = "Task Management | User Profile";
 		fetchData();
 	}, []);
 

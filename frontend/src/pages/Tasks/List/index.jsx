@@ -17,6 +17,7 @@ export default function Tasks() {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);
 	useEffect(() => {
+		document.title = "Task Management | Tasks";
 		fetchData();
 	}, []);
 	const fetchData = async () => {

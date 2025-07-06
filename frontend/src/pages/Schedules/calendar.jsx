@@ -36,6 +36,7 @@ export default function ScheduleCalendar() {
 	const [selectedUser, setSelectedUser] = useState(users || null);
 
 	useEffect(() => {
+		document.title = "Task Management | Calendar";
 		fetchUsers();
 		fetchTasks();
 	}, []);

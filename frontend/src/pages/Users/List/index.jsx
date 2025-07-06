@@ -13,6 +13,7 @@ export default function Users() {
 	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
+		document.title = "Task Management | Users";
 		fetchData();
 	}, []);
 
