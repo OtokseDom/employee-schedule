@@ -77,55 +77,31 @@ class DashboardReportController extends Controller
     public function estimateVsActual()
     {
         // Fetch overall estimate and actual time
-        $tasks = DB::table('tasks')
+        $chart_data = DB::table('tasks')
             ->leftJoin('categories', 'categories.id', '=', 'tasks.category_id')
             ->select(
                 'categories.name as category',
-                DB::raw('SUM(time_estimate) as total_estimate'),
-                DB::raw('SUM(time_taken) as total_taken')
+                DB::raw('ROUND(SUM(time_taken - time_estimate),2) as net_difference'),
+                DB::raw('ROUND(SUM(CASE WHEN time_taken > time_estimate THEN time_taken - time_estimate ELSE 0 END),2) as overrun'),
+                DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
             ->groupBy('categories.name')
             ->get();
 
         // Prepare the data for the bar chart
-        $chart_data = [];
+        // $chart_data = [];
         $runs = [
-            'over' => null,
-            'under' => null,
-            'exact' => 0
+            'over' => round($chart_data->sum('overrun'), 2),
+            'under' => round($chart_data->sum('underrun'), 2),
+            'net' => round($chart_data->sum('percentage_difference'), 2),
         ];
-        foreach ($tasks as $index => $task) {
-            $chart_data[] = [
-                'task' => $task->category, //category for dashboard - task for user report
-                'estimate' => round($task->total_estimate, 2),
-                'actual' => round($task->total_taken, 2),
-                'percentage_difference' => 0
-            ];
 
-            // Calculate percentage difference for each task/category
-            $chart_data[$index]['percentage_difference'] = round($chart_data[$index]['estimate'] - $chart_data[$index]['actual'], 2);
-            if (mb_strlen($chart_data[$index]['task']) > 15) {
-                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . $chart_data[$index]['percentage_difference'] . ")";
-            } else {
-                $chart_data[$index]['task'] = $chart_data[$index]['task'] . " (" . $chart_data[$index]['percentage_difference'] . ")";
-            }
-
-            // Get total underruns and overruns
-            if ($chart_data[$index]['percentage_difference'] < 0) {
-                $runs['over'] += $chart_data[$index]['percentage_difference'];
-                $runs['over'] = round($runs['over'], 2);
-            } elseif ($chart_data[$index]['percentage_difference'] > 0) {
-                $runs['under'] += $chart_data[$index]['percentage_difference'];
-                $runs['under'] = round($runs['under'], 2);
-            }
-        }
-
-        $taskCount = count($chart_data);
+        $categoryCount = count($chart_data);
 
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'task_count' => $taskCount
+            'task_count' => $categoryCount
         ];
 
         if (empty($data)) {

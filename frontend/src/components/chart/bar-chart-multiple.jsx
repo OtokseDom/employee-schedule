@@ -8,26 +8,38 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Skeleton } from "../ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
-export const description = "A multiple bar chart";
-const chartConfig = {
-	estimate: {
-		label: "Estimate (hr) ",
-		color: "hsl(var(--chart-1))",
-	},
-	actual: {
-		label: "Actual (hr) ",
-		color: "hsl(270 70% 50%)", // Purple
-	},
-};
-
 export function ChartBarMultiple({ report, variant }) {
+	var chartConfig = null;
+	if (variant == "dashboard") {
+		chartConfig = {
+			underrun: {
+				label: "Underrun (hr) ",
+				color: "hsl(var(--chart-1))",
+			},
+			overrun: {
+				label: "Overrun (hr) ",
+				color: "hsl(270 70% 50%)", // Purple
+			},
+		};
+	} else {
+		chartConfig = {
+			estimate: {
+				label: "Estimate (hr) ",
+				color: "hsl(var(--chart-1))",
+			},
+			actual: {
+				label: "Actual (hr) ",
+				color: "hsl(270 70% 50%)", // Purple
+			},
+		};
+	}
 	const { loading } = useLoadContext();
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-2xl" : ""}`}>
 			<CardHeader>
-				<CardTitle>{variant == "dashboard" && "Overall "}Estimate vs Actual Time</CardTitle>
+				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
-					Showing {report?.task_count} {variant == "dashboard" ? "statuses" : "most recent tasks"}
+					Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -42,10 +54,25 @@ export function ChartBarMultiple({ report, variant }) {
 					) : (
 						<BarChart accessibilityLayer data={report?.chart_data}>
 							<CartesianGrid vertical={false} />
-							<XAxis dataKey="task" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)} />
+							<XAxis
+								dataKey={variant == "dashboard" ? "category" : "task"}
+								tickLine={false}
+								tickMargin={10}
+								axisLine={false}
+								tickFormatter={(value) => value.slice(0, 3)}
+							/>
 							<ChartTooltip cursor={true} content={<ChartTooltipContent indicator="line" />} />
-							<Bar dataKey="estimate" fill="var(--color-estimate)" radius={4} />
-							<Bar dataKey="actual" fill="var(--color-actual)" radius={4} />
+							{variant == "dashboard" ? (
+								<>
+									<Bar dataKey="underrun" fill="var(--color-underrun)" radius={4} />
+									<Bar dataKey="overrun" fill="var(--color-overrun)" radius={4} />
+								</>
+							) : (
+								<>
+									<Bar dataKey="estimate" fill="var(--color-estimate)" radius={4} />
+									<Bar dataKey="actual" fill="var(--color-actual)" radius={4} />
+								</>
+							)}
 						</BarChart>
 					)}
 				</ChartContainer>
@@ -58,20 +85,9 @@ export function ChartBarMultiple({ report, variant }) {
 					</div>
 				) : (
 					<>
-						{/* Overruns */}
-						{report?.runs["over"] < 0 ? (
-							<div className="flex gap-2 leading-none font-medium">
-								Total Overruns (hrs):
-								<span className="flex flex-row gap-4 text-red-500">
-									{report.runs["over"]} <ClockAlert className="h-4 w-4" />
-								</span>
-							</div>
-						) : (
-							<div className="text-green-500 leading-none italic flex flex-row gap-2">
-								🎉 No overruns <span className="text-muted-foreground">— great time control!</span>
-							</div>
-						)}
-
+						<div className="flex flex-row gap-2 text-muted-foreground leading-none">
+							Showing {report?.task_count} {variant == "dashboard" ? "statuses" : "most recent tasks"}
+						</div>
 						{/* Underruns */}
 						{Math.abs(report?.runs["under"]) > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
@@ -86,6 +102,20 @@ export function ChartBarMultiple({ report, variant }) {
 							</div>
 						)}
 
+						{/* Overruns */}
+						{(variant == "dashboard" && report?.runs["over"] > 0) || (variant != "dashboard" && report?.runs["over"] < 0) ? (
+							<div className="flex gap-2 leading-none font-medium">
+								Total Overruns (hrs):
+								<span className="flex flex-row gap-4 text-red-500">
+									{report.runs["over"]} <ClockAlert className="h-4 w-4" />
+								</span>
+							</div>
+						) : (
+							<div className="text-green-500 leading-none italic flex flex-row gap-2">
+								🎉 No overruns <span className="text-muted-foreground">— great time control!</span>
+							</div>
+						)}
+
 						{/* On-Time Tasks */}
 						{variant == "dashboard" ? (
 							""
@@ -97,7 +127,7 @@ export function ChartBarMultiple({ report, variant }) {
 								</span>
 							</div>
 						) : (
-							<div className="flex flex-row gap-2 text-muted-foreground leading-none italic">⌛ No exact matches — review your estimates?</div>
+							<div className="flex flex-row gap-2 text-muted-foreground leading-none italic">No exact matches — review your estimates?</div>
 						)}
 					</>
 				)}

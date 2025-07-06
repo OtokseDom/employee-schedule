@@ -245,23 +245,23 @@ class UserReportController extends Controller
                 'task' => $task->title,
                 'estimate' => round($task->time_estimate, 2),
                 'actual' => round($task->time_taken, 2),
-                'percentage_difference' => 0
+                'net_difference' => 0
             ];
 
             // Calculate percentage difference for each task
-            $chart_data[$index]['percentage_difference'] = round($chart_data[$index]['estimate'] - $chart_data[$index]['actual'], 2);
+            $chart_data[$index]['net_difference'] = round($chart_data[$index]['estimate'] - $chart_data[$index]['actual'], 2);
             if (mb_strlen($chart_data[$index]['task']) > 15) {
-                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . $chart_data[$index]['percentage_difference'] . ")";
+                $chart_data[$index]['task'] = mb_substr($chart_data[$index]['task'], 0, 15) . '...' . " (" . $chart_data[$index]['net_difference'] . ")";
             } else {
-                $chart_data[$index]['task'] = $chart_data[$index]['task'] . " (" . $chart_data[$index]['percentage_difference'] . ")";
+                $chart_data[$index]['task'] = $chart_data[$index]['task'] . " (" . $chart_data[$index]['net_difference'] . ")";
             }
 
             // Get total underruns and overruns
-            if ($chart_data[$index]['percentage_difference'] < 0) {
-                $runs['over'] += $chart_data[$index]['percentage_difference'];
+            if ($chart_data[$index]['net_difference'] < 0) {
+                $runs['over'] += $chart_data[$index]['net_difference'];
                 $runs['over'] = round($runs['over'], 2);
-            } elseif ($chart_data[$index]['percentage_difference'] > 0) {
-                $runs['under'] += $chart_data[$index]['percentage_difference'];
+            } elseif ($chart_data[$index]['net_difference'] > 0) {
+                $runs['under'] += $chart_data[$index]['net_difference'];
                 $runs['under'] = round($runs['under'], 2);
             } else
                 $runs['exact']++;
