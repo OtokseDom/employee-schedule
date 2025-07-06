@@ -14,16 +14,16 @@ class DashboardReportController extends Controller
     public function dashboardReports()
     {
         $tasksByStatus = $this->tasksByStatus();
-        // $taskActivityTimeline = $this->taskActivityTimeline($id);
-        // $ratingPerCategory = $this->ratingPerCategory($id);
-        // $performanceRatingTrend = $this->performanceRatingTrend($id);
+        $usersTaskLoad = $this->usersTaskLoad();
+        // $ratingPerCategory = $this->ratingPerCategory();
+        // $performanceRatingTrend = $this->performanceRatingTrend();
         $estimateVsActual = $this->estimateVsActual();
         $data = [
-            'tasks_by_status' => $tasksByStatus->getData(),
-            //     'task_activity_timeline' => $taskActivityTimeline->getData(),
-            //     'rating_per_category' => $ratingPerCategory->getData(),
-            //     'performance_rating_trend' => $performanceRatingTrend->getData(),
-            'estimate_vs_actual' => $estimateVsActual->getData(),
+            'tasks_by_status' => $tasksByStatus->getData()->data,
+            'users_task_load' => $usersTaskLoad->getData()->data,
+            //     'rating_per_category' => $ratingPerCategory->getData()->data,
+            //     'performance_rating_trend' => $performanceRatingTrend->getData()->data,
+            'estimate_vs_actual' => $estimateVsActual->getData()->data,
         ];
         return apiResponse($data, 'Reports fetched successfully');
     }
@@ -133,5 +133,42 @@ class DashboardReportController extends Controller
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");
+    }
+    /**
+     * Display report for users activity load. Horizontal Bar chart
+     */
+    public function usersTaskLoad()
+    {
+        $chart_data = DB::table('tasks')
+            ->leftJoin('users', 'users.id', '=', 'tasks.assignee_id')
+            ->select(
+                'users.name as user',
+                DB::raw('COUNT(tasks.id) as task'),
+            )
+            ->groupBy('user')
+            ->get();
+
+        // Get users with highest and lowest task load
+        $highest = null;
+        $lowest = null;
+        foreach ($chart_data as $item) {
+            if (!$highest || $item->task > $highest->task)
+                $highest = $item;
+            if (!$lowest || $item->task < $lowest->task)
+                $lowest = $item;
+        }
+
+        $data = [
+            'chart_data' => $chart_data,
+            'highest' => $highest,
+            'lowest' => $lowest,
+            'count' => $chart_data->count()
+        ];
+
+        if (empty($data)) {
+            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+        }
+
+        return apiResponse($data, "Users task load report fetched successfully");
     }
 }

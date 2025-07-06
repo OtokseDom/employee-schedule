@@ -26,11 +26,11 @@ class UserReportController extends Controller
         $performanceRatingTrend = $this->performanceRatingTrend($id);
         $estimateVsActual = $this->estimateVsActual($id);
         $data = [
-            'tasks_by_status' => $tasksByStatus->getData(),
-            'task_activity_timeline' => $taskActivityTimeline->getData(),
-            'rating_per_category' => $ratingPerCategory->getData(),
-            'performance_rating_trend' => $performanceRatingTrend->getData(),
-            'estimate_vs_actual' => $estimateVsActual->getData(),
+            'tasks_by_status' => $tasksByStatus->getData()->data,
+            'task_activity_timeline' => $taskActivityTimeline->getData()->data,
+            'rating_per_category' => $ratingPerCategory->getData()->data,
+            'performance_rating_trend' => $performanceRatingTrend->getData()->data,
+            'estimate_vs_actual' => $estimateVsActual->getData()->data,
         ];
         return apiResponse($data, 'Reports fetched successfully');
     }
@@ -171,7 +171,7 @@ class UserReportController extends Controller
         return apiResponse($data, "Rating per category report fetched successfully");
     }
     /**
-     * Display report for tasks timeline to see users activity load. Area chart
+     * Display report for user performance rating per month. Line chart
      */
     public function performanceRatingTrend($id)
     {

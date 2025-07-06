@@ -103,21 +103,21 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut report={userReports?.tasks_by_status?.data} />
+						<PieChartDonut report={userReports?.tasks_by_status} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
 							<p>Daily Task Activity Timeline</p>
 						</div> */}
-						<AreaChartGradient report={userReports?.task_activity_timeline?.data} />
+						<AreaChartGradient report={userReports?.task_activity_timeline} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<RadarChartGridFilled report={userReports?.rating_per_category?.data} />
+						<RadarChartGridFilled report={userReports?.rating_per_category} />
 					</div>
 				</div>
 				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
@@ -127,14 +127,14 @@ export default function UserProfile() {
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<ChartLineLabel report={userReports?.performance_rating_trend?.data} />
+						<ChartLineLabel report={userReports?.performance_rating_trend} />
 					</div>
 					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<ChartBarMultiple report={userReports?.estimate_vs_actual?.data} />
+						<ChartBarMultiple report={userReports?.estimate_vs_actual} />
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
