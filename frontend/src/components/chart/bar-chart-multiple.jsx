@@ -86,7 +86,7 @@ export function ChartBarMultiple({ report, variant }) {
 				) : (
 					<>
 						<div className="flex flex-row gap-2 text-muted-foreground leading-none">
-							Showing {report?.task_count} {variant == "dashboard" ? "statuses" : "most recent tasks"}
+							Showing {report?.task_count} {variant == "dashboard" ? "categories" : "most recent tasks"}
 						</div>
 						{/* Underruns */}
 						{Math.abs(report?.runs["under"]) > 0 ? (
