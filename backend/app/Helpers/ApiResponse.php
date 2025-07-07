@@ -10,12 +10,18 @@ if (!function_exists('apiResponse')) {
      * @param int    $code
      * @return \Illuminate\Http\JsonResponse
      */
-    function apiResponse($data = null, $message = '', $success = true, $code = 200)
+    function apiResponse($data = null, $message = '', $success = true, $code = 200, $errors = null)
     {
-        return response()->json([
+        $response = [
             'success' => $success,
             'message' => $message,
-            'data'    => $data,
-        ], $code);
+            'data' => $data,
+        ];
+
+        if (!$success && $errors) {
+            $response['errors'] = $errors;
+        }
+
+        return response()->json($response, $code);
     }
 }
