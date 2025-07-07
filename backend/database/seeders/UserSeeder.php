@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
             'email' => "admin@demo.com", //dom@gmail.com
             'email_verified_at' => now(),
             'password' => 'admin123', // 1
+            'status' => 'active', // active, inactive, pending, banned
             'remember_token' => Str::random(10),
         ]);
     }

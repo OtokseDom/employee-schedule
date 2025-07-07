@@ -28,6 +28,7 @@ class StoreUserRequest extends FormRequest
             'dob' => 'required|date_format:Y-m-d',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'status' => 'required|string|in:active,inactive,pending,banned',
         ];
     }
 }
