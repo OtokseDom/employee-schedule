@@ -3,10 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardReportController;
-use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\PerformanceReportController;
-use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskHistoryController;
 use App\Http\Controllers\Api\UserController;
@@ -36,6 +33,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
     Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
 });
-
+Route::apiResource('/organization', OrganizationController::class);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);

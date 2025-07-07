@@ -22,6 +22,7 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'organization_id' => 'nullable|exists:organizations,id',
             'name' => 'required|string|max:255',
             'role' => 'required|in:Superadmin,Admin,Manager,Employee',
             'position' => 'required|string|max:255',
