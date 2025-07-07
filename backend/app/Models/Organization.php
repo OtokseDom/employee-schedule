@@ -13,4 +13,24 @@ class Organization extends Model
         'name',
         'description',
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function taskHistories()
+    {
+        return $this->hasMany(TaskHistory::class);
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }
