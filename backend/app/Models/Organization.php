@@ -12,6 +12,7 @@ class Organization extends Model
     protected $fillable = [
         'name',
         'description',
+        'code',
     ];
 
     public function users()
