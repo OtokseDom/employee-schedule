@@ -34,12 +34,6 @@ class Task extends Model
         'end_date' => 'date',
     ];
 
-    // Relationship with Organization
-    public function organization()
-    {
-        return $this->belongsTo(Organization::class);
-    }
-
     // Relationship with User (Assignee)
     public function assignee()
     {

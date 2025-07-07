@@ -10,7 +10,6 @@ class TaskHistory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'organization_id',
         'task_id',
         'status',
         'changed_by',
@@ -21,12 +20,6 @@ class TaskHistory extends Model
     protected $casts = [
         'changed_at' => 'datetime',
     ];
-
-    // Relationship with Organization
-    public function organization()
-    {
-        return $this->belongsTo(Organization::class);
-    }
 
     // Relationship with Task
     public function task()

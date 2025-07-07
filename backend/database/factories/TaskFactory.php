@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
 use App\Models\Task;
@@ -22,6 +23,7 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
+            'organization_id' => 1,
             'category_id' => Category::inRandomOrder()->value('id'),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,

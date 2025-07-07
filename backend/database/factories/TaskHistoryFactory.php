@@ -22,6 +22,7 @@ class TaskHistoryFactory extends Factory
     public function definition()
     {
         return [
+            'organization_id' => 1,
             'task_id' => Task::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'changed_by' => User::inRandomOrder()->value('id'),

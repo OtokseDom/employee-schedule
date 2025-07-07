@@ -31,6 +31,7 @@ class UserFactory extends Factory
             'Employee',
         ];
         return [
+            'organization_id' => 1,
             'name' => fake()->name(),
             'dob' => fake()->date(),
             'position' => fake()->jobTitle(),
