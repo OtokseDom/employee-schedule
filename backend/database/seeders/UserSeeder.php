@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
         \App\Models\User::factory(10)->create();
 
         \App\Models\User::factory()->create([
+            'organization_id' => 1,
             'name' => "Admin User",
             'dob' => Carbon::parse('2000-11-08'),
             'position' => "Software Engineer",
