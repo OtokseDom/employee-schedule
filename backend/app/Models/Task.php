@@ -10,6 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organization_id',
         'category_id',
         'title',
         'description',
@@ -32,6 +33,12 @@ class Task extends Model
         'start_date' => 'date',
         'end_date' => 'date',
     ];
+
+    // Relationship with Organization
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     // Relationship with User (Assignee)
     public function assignee()

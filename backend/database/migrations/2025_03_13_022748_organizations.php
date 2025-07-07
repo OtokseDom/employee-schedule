@@ -6,14 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('organizations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
@@ -22,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('organizations');
     }
 };

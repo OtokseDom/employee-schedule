@@ -31,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/task', TaskController::class);
     Route::apiResource('/task-history', TaskHistoryController::class);
-    Route::apiResource('/performance-report', PerformanceReportController::class);
 
     /* --------------------------------- Reports -------------------------------- */
     Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);

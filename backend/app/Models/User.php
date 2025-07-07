@@ -21,6 +21,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'organization_id',
         'name',
         'dob',
         'position',
@@ -50,5 +51,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationship with Organization
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
     }
 }
