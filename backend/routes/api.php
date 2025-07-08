@@ -18,13 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
-    // Route::apiResource('/user-auth', UserController::class); //somehow implicit route is not working
     // User CRUD
-    Route::get('/user', [UserController::class, 'index']);
-    Route::post('/user', [UserController::class, 'store']);
-    Route::get('/user/{user}', [UserController::class, 'show']);
-    Route::put('/user/{user}', [UserController::class, 'update']);
-    Route::delete('/user/{user}', [UserController::class, 'destroy']);
+    Route::apiResource('/user', UserController::class);
     Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/task', TaskController::class);
     Route::apiResource('/task-history', TaskHistoryController::class);

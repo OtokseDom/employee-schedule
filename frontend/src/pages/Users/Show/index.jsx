@@ -44,8 +44,8 @@ export default function UserProfile() {
 		try {
 			// Fetch user details and tasks
 			const response = await axiosClient.get(`/user/${id}`);
-			setUser(response.data.user);
-			setTasks(response.data.assigned_tasks);
+			setUser(response.data.data.user);
+			setTasks(response.data.data.assigned_tasks);
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
 			setUserReports(reportsRes.data.data);

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
@@ -15,35 +16,50 @@ class UserController extends Controller
    public function index()
    {
       // $users = User::orderBy("id", "DESC")->paginate(10);
-      $users = User::orderBy("id", "DESC")->get();
+      $users = User::orderBy("id", "DESC")
+         ->where('organization_id', Auth::user()->organization_id)
+         ->get();
 
-      return response(compact('users'));
+      return apiResponse($users, 'Users fetched successfully');
+      // return response(compact('users'));
    }
 
    public function store(StoreUserRequest $request)
    {
       $data = $request->validated();
+
       $users = User::create($data);
 
-      return response(new UserResource($users), 201);
+      return apiResponse(new UserResource($users), 'User created successfully', true, 201);
+      // return response(new UserResource($users), 201);
    }
 
-   public function show(User $user)
+   public function show($id) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
    {
-      $userDetails = DB::table('users')->where('id', $user->id)->first();
-      $assignedTasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $user->id)->get();
+      $userDetails = DB::table('users')->where('id', $id)->first();
+      // Return API response when no user found
+      if (!$userDetails || $userDetails->organization_id !== Auth::user()->organization_id)
+         return apiResponse(null, 'User not found within your organization', false, 404);
 
-      return response()->json([
+      $assignedTasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $id)->get();
+
+      $data = [
          'user' => $userDetails,
          'assigned_tasks' => $assignedTasks
-      ]);
+      ];
+      return apiResponse($data, 'User details fetched successfully');
+      // return response()->json([
+      //    'user' => $userDetails,
+      //    'assigned_tasks' => $assignedTasks
+      // ]);
    }
 
    public function update(UpdateUserRequest $request, User $user)
    {
       $data = $request->validated();
       $user->update($data);
-      return new UserResource($user);
+      return apiResponse(new UserResource($user), 'User updated successfully');
+      // return new UserResource($user);
    }
 
    public function destroy(User $user)
@@ -52,13 +68,14 @@ class UserController extends Controller
       $hasTasks = DB::table('tasks')->where('assignee_id', $user->id)->exists();
 
       if ($hasTasks) {
-         return response()->json(['message' => 'User cannot be deleted because they have assigned tasks.'], 400);
+         return apiResponse('', 'User cannot be deleted because they have assigned tasks.', false, 400);
       }
 
       $user->delete();
       // Fetch the updated user again
       $users = User::orderBy("id", "DESC")->get();
-      return response(UserResource::collection($users), 200);
+      return apiResponse(UserResource::collection($users), 'User deleted successfully');
+      // return response(UserResource::collection($users), 200);
    }
 }
 
