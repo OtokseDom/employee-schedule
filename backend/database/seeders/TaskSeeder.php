@@ -17,6 +17,6 @@ class TaskSeeder extends Seeder
         DB::table('tasks')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        Task::factory()->count(1000)->create();
+        Task::factory()->count(5)->create();
     }
 }

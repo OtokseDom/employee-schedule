@@ -118,14 +118,17 @@ class DashboardReportController extends Controller
      */
     public function usersTaskLoad()
     {
-        $chart_data = DB::table('tasks')
-            ->leftJoin('users', 'users.id', '=', 'tasks.assignee_id')
+        $chart_data = DB::table('users')
+            ->leftJoin('tasks', function ($join) {
+                $join->on('users.id', '=', 'tasks.assignee_id')
+                    ->where('tasks.organization_id', Auth::user()->organization_id);
+            })
             ->where('users.organization_id', Auth::user()->organization_id)
             ->select(
                 'users.name as user',
-                DB::raw('COUNT(tasks.id) as task'),
+                DB::raw('COUNT(tasks.id) as task')
             )
-            ->groupBy('user')
+            ->groupBy('users.name')
             ->get();
 
         // Get users with highest and lowest task load
