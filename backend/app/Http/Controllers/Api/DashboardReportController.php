@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardReportController extends Controller
@@ -63,6 +64,7 @@ class DashboardReportController extends Controller
             $data[$index]['status'] = $status['field'];
             $data[$index]['tasks'] = DB::table('tasks')
                 ->where('status', $status['name'])
+                ->where('organization_id', Auth::user()->organization_id)
                 ->count();
             $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
         }
@@ -85,6 +87,7 @@ class DashboardReportController extends Controller
                 DB::raw('ROUND(SUM(CASE WHEN time_taken > time_estimate THEN time_taken - time_estimate ELSE 0 END),2) as overrun'),
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
+            ->where('tasks.organization_id', Auth::user()->organization_id)
             ->groupBy('categories.name')
             ->get();
 
@@ -117,6 +120,7 @@ class DashboardReportController extends Controller
     {
         $chart_data = DB::table('tasks')
             ->leftJoin('users', 'users.id', '=', 'tasks.assignee_id')
+            ->where('users.organization_id', Auth::user()->organization_id)
             ->select(
                 'users.name as user',
                 DB::raw('COUNT(tasks.id) as task'),
