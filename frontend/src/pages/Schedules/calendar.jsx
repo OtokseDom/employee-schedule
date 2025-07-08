@@ -45,8 +45,8 @@ export default function ScheduleCalendar() {
 		setLoading(true);
 		try {
 			const userResponse = await axiosClient.get("/user");
-			setUsers(userResponse.data.users);
-			setSelectedUser(userResponse.data.users[0]);
+			setUsers(userResponse.data.data);
+			setSelectedUser(userResponse.data.data[0]);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {

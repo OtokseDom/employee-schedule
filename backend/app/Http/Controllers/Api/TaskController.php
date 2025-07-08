@@ -37,10 +37,19 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
-    public function show(Task $task)
+    public function show($id)
     {
-        $task->load(['assignee:id,name,email,role,position', 'category']);
-        return new TaskResource($task);
+        // $task->load(['assignee:id,name,email,role,position', 'category']);
+
+        $task = Task::with(['assignee:id,name,email,role,position', 'category'])
+            ->where('id', $id)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->first();
+        // Return API response when no task found
+        if (!$task || $task->organization_id !== Auth::user()->organization_id)
+            return apiResponse(null, 'Task not found within your organization', false, 404);
+        return apiResponse(new TaskResource($task), 'Task details fetched successfully');
+        // return new TaskResource($task);
     }
 
     public function update(UpdateTaskRequest $request, Task $task)
@@ -76,6 +85,7 @@ class TaskController extends Controller
         if (!empty($changes)) {
             // Record Update in Task History
             $task->taskHistories()->create([
+                'organization_id' => Auth::user()->organization_id,
                 'task_id' => $task->id,
                 'status' => $task->status,
                 'changed_by' => \Illuminate\Support\Facades\Auth::id(),

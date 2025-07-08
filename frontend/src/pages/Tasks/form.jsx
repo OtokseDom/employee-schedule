@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format, parseISO } from "date-fns";
 import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 const formSchema = z.object({
 	assignee_id: z.number({
@@ -47,7 +48,7 @@ const formSchema = z.object({
 
 export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	// const { loading, setLoading } = useLoadContext();
-
+	const { user } = useAuthContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState();
 	const [categories, setCategories] = useState([]);
@@ -86,7 +87,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 			const userResponse = await axiosClient.get("/user");
 			const categoryResponse = await axiosClient.get("/category");
 			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.users);
+			setUsers(userResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -158,6 +159,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 
 			const parsedForm = {
 				...formData,
+				organization_id: user.organization_id,
 				start_date: formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : null,
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),

@@ -22,6 +22,7 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'organization_id' => 'required|exists:organizations,id',
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -49,6 +50,7 @@ class StoreTaskRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'organization_id.required' => 'Organization is required.',
             'category_id.required' => 'Category is required.',
             'title.required' => 'Title is required.',
             'status.required' => 'Status is required.',
