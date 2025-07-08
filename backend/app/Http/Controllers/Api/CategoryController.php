@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
@@ -14,7 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         // $categories = Category::orderBy("id", "DESC")->paginate(10);
-        $categories = Category::orderBy("id", "DESC")->get();
+        $categories = Category::orderBy("id", "DESC")->where('organization_id', Auth::user()->organization_id)->get();
 
         return apiResponse($categories, 'Categories fetched successfully');
         // return response(compact('categories'));
@@ -34,7 +35,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $categoryDetails = DB::table('categories')->where('id', $category->id)->first();
+        $categoryDetails = DB::table('categories')->where('id', $category->id)->where('organization_id', Auth::user()->organization_id)->first();
 
 
         if (!$categoryDetails) {
@@ -67,7 +68,7 @@ class CategoryController extends Controller
             return apiResponse(null, 'Failed to delete category.', false, 500);
         }
         // Fetch the updated categories again
-        $categories = Category::orderBy("id", "DESC")->get();
+        $categories = Category::where('organization_id', Auth::user()->organization_id)->orderBy("id", "DESC")->get();
 
         return apiResponse(CategoryResource::collection($categories), 'Category deleted successfully');
         // return response(CategoryResource::collection($categories), 200);

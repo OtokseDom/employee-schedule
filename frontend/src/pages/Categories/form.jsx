@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useEffect } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -22,6 +23,7 @@ const formSchema = z.object({
 });
 
 export default function CategoryForm({ data, setCategories, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -43,6 +45,7 @@ export default function CategoryForm({ data, setCategories, setIsOpen, updateDat
 	}, [updateData, form]);
 
 	const handleSubmit = async (form) => {
+		form.organization_id = user.organization_id;
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
