@@ -97,22 +97,22 @@ export default function UserProfile() {
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full h-fit">
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
 						<PieChartDonut report={userReports?.tasks_by_status} />
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
 							<p>Daily Task Activity Timeline</p>
 						</div> */}
 						<AreaChartGradient report={userReports?.task_activity_timeline} />
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
@@ -121,15 +121,15 @@ export default function UserProfile() {
 					</div>
 				</div>
 				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
-				<div className="flex flex-col lg:flex-row gap-4 w-full h-fit">
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+				<div className="flex flex-col lg:flex-row gap-4 w-full items-stretch">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
 						<ChartLineLabel report={userReports?.performance_rating_trend} />
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
