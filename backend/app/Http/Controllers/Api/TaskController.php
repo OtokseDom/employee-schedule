@@ -16,7 +16,8 @@ class TaskController extends Controller
         $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])
             ->where('organization_id', Auth::user()->organization_id)
             ->orderBy('id', 'DESC')->get();
-        return TaskResource::collection($tasks);
+        return apiResponse(TaskResource::collection($tasks), 'Tasks fetched successfully');
+        // return TaskResource::collection($tasks);
     }
 
     public function store(StoreTaskRequest $request)
@@ -34,7 +35,8 @@ class TaskController extends Controller
             'remarks' => "Task Added",
         ]);
 
-        return new TaskResource($task);
+        return apiResponse(new TaskResource($task), 'Task created successfully', true, 201);
+        // return new TaskResource($task);
     }
 
     public function show($id)
@@ -94,12 +96,14 @@ class TaskController extends Controller
             ]);
         }
 
-        return new TaskResource($task);
+        return apiResponse(new TaskResource($task), 'Task updated successfully');
+        // return new TaskResource($task);
     }
 
     public function destroy(Task $task)
     {
         $task->delete();
-        return response()->json(['message' => 'Task successfully deleted'], 200);
+        return apiResponse('', 'Task deleted successfully');
+        // return response()->json(['message' => 'Task successfully deleted'], 200);
     }
 }
