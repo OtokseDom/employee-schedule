@@ -7,12 +7,15 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->get();
+        $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])
+            ->where('organization_id', Auth::user()->organization_id)
+            ->orderBy('id', 'DESC')->get();
         return TaskResource::collection($tasks);
     }
 
@@ -23,6 +26,7 @@ class TaskController extends Controller
 
         // Record Addition in Task History
         $task->taskHistories()->create([
+            'organization_id' => Auth::user()->organization_id,
             'task_id' => $task->id,
             'status' => $task->status,
             'changed_by' => \Illuminate\Support\Facades\Auth::id(),
