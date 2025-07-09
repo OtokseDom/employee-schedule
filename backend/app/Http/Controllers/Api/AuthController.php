@@ -21,7 +21,7 @@ class AuthController extends Controller
     public function signup(SignupRequest $request)
     {
         $data = $request->validated();
-
+        $status = "pending";
         $organization = null;
         if (!empty($data['organization_name']) && empty($data['organization_code'])) {
             // If creating new organization
@@ -30,6 +30,7 @@ class AuthController extends Controller
                 'description' => '',
                 'code' => strtoupper(bin2hex(random_bytes(4))),
             ]);
+            $status = "active";
             if ($organization) {
                 MasterDataGeneratorService::generate($organization->id);
             }
@@ -50,7 +51,7 @@ class AuthController extends Controller
             'position' => $data['position'],
             'dob' => $data['dob'],
             'password' => bcrypt($data['password']),
-            'status' => 'pending',
+            'status' => $status,
         ]);
 
         $token = $user->createToken('main')->plainTextToken;
