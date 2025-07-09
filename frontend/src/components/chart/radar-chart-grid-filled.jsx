@@ -28,6 +28,8 @@ export function RadarChartGridFilled({ report }) {
 						<div className="flex items-center justify-center h-full w-full p-8">
 							<Skeleton className=" w-full h-full rounded-full" />
 						</div>
+					) : report?.task_count == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<RadarChart data={report?.ratings?.length > 0 ? report?.ratings : []} outerRadius={90} width={300} height={300}>
 							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -44,6 +46,8 @@ export function RadarChartGridFilled({ report }) {
 						<Skeleton className=" w-full h-4" />
 						<Skeleton className=" w-full h-4" />
 					</div>
+				) : report?.task_count == 0 ? (
+					""
 				) : (
 					<>
 						<div className="flex items-center gap-2 font-medium leading-none">

@@ -33,6 +33,8 @@ export function AreaChartGradient({ report }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
+					) : report?.task_count == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<AreaChart
 							accessibilityLayer
@@ -68,6 +70,8 @@ export function AreaChartGradient({ report }) {
 							<Skeleton className=" w-full h-4 rounded-full" />
 							<Skeleton className=" w-full h-4 rounded-full" />
 						</div>
+					) : report?.task_count == 0 ? (
+						""
 					) : (
 						<div className="grid gap-2">
 							<div className="flex items-center gap-2 font-medium leading-none">

@@ -15,24 +15,27 @@ class UserReportController extends Controller
     public function userReports($id)
     {
         if (!is_numeric($id)) {
-            return response()->json(['error' => 'Invalid user ID'], 400);
+            return apiResponse('', 'Invalid user ID', false, 400);
         }
         $user = DB::table('users')->where('id', $id)->first();
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return apiResponse('', 'User not found', false, 404);
         }
-        $tasksByStatus = $this->tasksByStatus($id);
-        $taskActivityTimeline = $this->taskActivityTimeline($id);
-        $ratingPerCategory = $this->ratingPerCategory($id);
-        $performanceRatingTrend = $this->performanceRatingTrend($id);
-        $estimateVsActual = $this->estimateVsActual($id);
-        $data = [
-            'tasks_by_status' => $tasksByStatus->getData()->data,
-            'task_activity_timeline' => $taskActivityTimeline->getData()->data,
-            'rating_per_category' => $ratingPerCategory->getData()->data,
-            'performance_rating_trend' => $performanceRatingTrend->getData()->data,
-            'estimate_vs_actual' => $estimateVsActual->getData()->data,
+
+        $reports = [
+            'tasks_by_status' => $this->tasksByStatus($id),
+            'task_activity_timeline' => $this->taskActivityTimeline($id),
+            'rating_per_category' => $this->ratingPerCategory($id),
+            'performance_rating_trend' => $this->performanceRatingTrend($id),
+            'estimate_vs_actual' => $this->estimateVsActual($id),
         ];
+
+        $data = [];
+
+        foreach ($reports as $key => $report) {
+            $payload = $report->getData(true);
+            $data[$key] = $payload['success'] ? $payload['data'] : null;
+        }
         return apiResponse($data, 'Reports fetched successfully');
     }
     /**
@@ -81,7 +84,7 @@ class UserReportController extends Controller
         // return response($data);
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch task by status report', 404]);
+            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
         }
         return apiResponse($data, "Task by status report fetched successfully");
     }
@@ -102,6 +105,7 @@ class UserReportController extends Controller
         }
 
         $chart_data = [];
+        $task_count = 0;
         foreach ($months as $m) {
             $count = DB::table('tasks')
                 ->where('assignee_id', $id)
@@ -113,6 +117,7 @@ class UserReportController extends Controller
                 'month' => $m['month'],
                 'tasks' => $count,
             ];
+            $task_count = $task_count + $count;
         }
 
         // Calculate percentage difference (current vs previous month)
@@ -127,11 +132,12 @@ class UserReportController extends Controller
 
         $data = [
             'percentage_difference' => $percentageDifference,
-            'chart_data' => $chart_data
+            'chart_data' => $chart_data,
+            'task_count' => $task_count
         ];
 
         if (empty($data['chart_data'])) {
-            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+            return apiResponse(null, 'Failed to fetch task activity timeline report', false, 404);
         }
 
         return apiResponse($data, "Task activity timeline report fetched successfully");
@@ -147,15 +153,21 @@ class UserReportController extends Controller
                     ->where('tasks.assignee_id', '=', $id);
             })
             ->where('categories.organization_id', Auth::user()->organization_id)
-            ->select('categories.name as category', DB::raw('AVG(tasks.performance_rating) as average_rating'))
+            ->select(
+                'categories.name as category',
+                DB::raw('AVG(tasks.performance_rating) as average_rating'),
+                DB::raw('COUNT(tasks.id) as task_count')
+            )
             ->groupBy('categories.id', 'categories.name')
             ->get()
             ->map(function ($item) {
                 return [
                     'category' => $item->category,
-                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2)
+                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2),
+                    'task_count' => $item->task_count
                 ];
             });
+        $task_count = $ratings->sum('task_count');
         $highestRatingValue = $ratings->max('value');
         $highestRatingCategory = $ratings->firstWhere('value', $highestRatingValue);
         $highestRating = [
@@ -164,10 +176,11 @@ class UserReportController extends Controller
         ];
         $data = [
             "highest_rating" => $highestRating,
-            "ratings" => $ratings
+            "ratings" => $ratings,
+            "task_count" => $task_count
         ];
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch rating per category report', 404]);
+            return apiResponse(null, 'Failed to fetch rating per category report', false, 404);
         }
 
         return apiResponse($data, "Rating per category report fetched successfully");
@@ -189,17 +202,22 @@ class UserReportController extends Controller
         }
 
         $chart_data = [];
+        $task_count = 0;
         foreach ($months as $m) {
             $rating = DB::table('tasks')
                 ->where('assignee_id', $id)
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
-                ->avg('performance_rating');
+                ->select(
+                    DB::raw('AVG(performance_rating) as average_rating'),
+                    DB::raw('COUNT(id) as task_count')
+                )->first();
             $chart_data[] = [
                 'year' => $m['year'],
                 'month' => $m['month'],
-                'rating' => round($rating, 2),
+                'rating' => round($rating->average_rating, 2),
             ];
+            $task_count = $task_count + $rating->task_count;
         }
 
         // Calculate percentage difference (current vs previous month)
@@ -214,11 +232,12 @@ class UserReportController extends Controller
 
         $data = [
             'percentage_difference' => $percentageDifference,
-            'chart_data' => $chart_data
+            'chart_data' => $chart_data,
+            'task_count' => $task_count
         ];
 
         if (empty($data['chart_data'])) {
-            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+            return apiResponse(null, 'Failed to fetch task activity timeline report', false, 404);
         }
 
         return apiResponse($data, "Performance rating trend report fetched successfully");
@@ -278,7 +297,7 @@ class UserReportController extends Controller
         ];
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch estimate vs actual report', 404]);
+            return apiResponse(null, 'Failed to fetch estimate vs actual report', false, 404);
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");

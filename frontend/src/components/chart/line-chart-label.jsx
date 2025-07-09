@@ -33,6 +33,8 @@ export function ChartLineLabel({ report }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
+					) : report?.task_count == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<LineChart
 							accessibilityLayer
@@ -70,6 +72,8 @@ export function ChartLineLabel({ report }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
+				) : report?.task_count == 0 ? (
+					""
 				) : (
 					<>
 						<div className="flex gap-2 leading-none font-medium">
