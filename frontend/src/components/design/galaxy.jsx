@@ -18,6 +18,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 		position = "Captain of the Starship",
 		email = "captain@stardust.com",
 		role = "Stardust Collector",
+		status = "Active",
 		dob = "Unknown",
 	} = user || {};
 
@@ -270,6 +271,22 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 						</div>
 					) : (
 						<div className="flex mt-4 space-x-4">
+							<div
+								className={`backdrop-blur-sm px-3 py-1 rounded-full 
+							${
+								status == "pending"
+									? "text-yellow-100 bg-yellow-900/50"
+									: status == "active"
+									? "text-green-100 bg-green-900/50"
+									: status == "inactive"
+									? "text-gray-100 bg-gray-900/50"
+									: status == "banned"
+									? "text-red-100 bg-red-900/50"
+									: ""
+							}`}
+							>
+								{status}
+							</div>
 							<div className="bg-purple-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-purple-100">✨{role}</div>
 							<div className="bg-indigo-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-indigo-100">🌌 {email}</div>
 						</div>
