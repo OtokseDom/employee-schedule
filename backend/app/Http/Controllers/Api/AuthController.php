@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // TODO: Add org factory data on signup
     public function signup(SignupRequest $request)
     {
         $data = $request->validated();
