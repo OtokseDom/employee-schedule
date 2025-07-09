@@ -19,7 +19,6 @@ export default function Signup() {
 	const dobRef = useRef();
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
-	// TODO: Add or select Organization
 	useEffect(() => {
 		document.title = "Task Management | Sign Up";
 	}, []);

@@ -7,12 +7,15 @@ use App\Http\Requests\StoreTaskHistoryRequest;
 use App\Http\Requests\UpdateTaskHistoryRequest;
 use App\Http\Resources\TaskHistoryResource;
 use App\Models\TaskHistory;
-// TODO: use apiResponse
+use Illuminate\Support\Facades\Auth;
+
 class TaskHistoryController extends Controller
 {
     public function index()
     {
-        $taskHistories = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])->orderBy('id', 'DESC')->get();
+        $taskHistories = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
+            ->where('organization_id', Auth::user()->organization_id)
+            ->orderBy('id', 'DESC')->get();
         return apiResponse(TaskHistoryResource::collection($taskHistories), 'Task history fetched successfully');
         // return TaskHistoryResource::collection($taskHistories);
     }
@@ -25,9 +28,17 @@ class TaskHistoryController extends Controller
         // return new TaskHistoryResource($taskHistory);
     }
 
-    public function show(TaskHistory $taskHistory)
+    public function show($id)
     {
-        $taskHistory->load(['task:id,title', 'changedBy:id,name,email']);
+        $taskHistory = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
+            ->where('id', $id)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->first();
+
+        // Return API response when no task found
+        if (!$taskHistory || $taskHistory->organization_id !== Auth::user()->organization_id)
+            return apiResponse(null, 'Task history not found within your organization', false, 404);
+
         return apiResponse(new TaskHistoryResource($taskHistory), 'Task history details fetched successfully');
         // return new TaskHistoryResource($taskHistory);
     }
