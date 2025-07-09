@@ -9,6 +9,7 @@ use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\MasterDataGeneratorService;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // TODO: Add org factory data on signup
     public function signup(SignupRequest $request)
     {
         $data = $request->validated();
@@ -28,6 +30,9 @@ class AuthController extends Controller
                 'description' => '',
                 'code' => strtoupper(bin2hex(random_bytes(4))),
             ]);
+            if ($organization) {
+                MasterDataGeneratorService::generate($organization->id);
+            }
         } elseif (!empty($data['organization_code'] && empty($data['organization_name']))) {
             // If has existing organization code
             $organization = Organization::select('id')
