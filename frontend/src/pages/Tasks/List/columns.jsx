@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }, showLess = true) => {
+export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);

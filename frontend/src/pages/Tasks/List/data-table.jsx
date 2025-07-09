@@ -24,10 +24,8 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [filterValue, setFilterValue] = useState("");
 
 	const handleUpdate = (task) => {
-		setLocalLoading(true);
 		setIsOpen(true);
 		setUpdateData(task);
-		setLocalLoading(false);
 	};
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
