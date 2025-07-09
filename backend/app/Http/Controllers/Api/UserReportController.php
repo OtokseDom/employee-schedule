@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserReportController extends Controller
@@ -145,6 +146,7 @@ class UserReportController extends Controller
                 $join->on('tasks.category_id', '=', 'categories.id')
                     ->where('tasks.assignee_id', '=', $id);
             })
+            ->where('categories.organization_id', Auth::user()->organization_id)
             ->select('categories.name as category', DB::raw('AVG(tasks.performance_rating) as average_rating'))
             ->groupBy('categories.id', 'categories.name')
             ->get()
