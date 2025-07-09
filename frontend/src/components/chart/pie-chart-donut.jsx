@@ -63,6 +63,8 @@ export function PieChartDonut({ report, variant }) {
 						<div className="flex items-center justify-center h-full w-full p-8">
 							<Skeleton className=" w-full h-full rounded-full" />
 						</div>
+					) : totalTasks == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<PieChart>
 							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -94,6 +96,8 @@ export function PieChartDonut({ report, variant }) {
 						<Skeleton className=" w-full h-4" />
 						<Skeleton className=" w-full h-4" />
 					</div>
+				) : totalTasks == 0 ? (
+					""
 				) : (
 					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
 						{report?.map((data, index) => (

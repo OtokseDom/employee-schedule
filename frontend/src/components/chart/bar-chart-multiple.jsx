@@ -36,7 +36,7 @@ export function ChartBarMultiple({ report, variant }) {
 	const { loading } = useLoadContext();
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-2xl" : ""}`}>
-			<CardHeader>
+			<CardHeader className="text-center">
 				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
 					Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated
@@ -51,6 +51,8 @@ export function ChartBarMultiple({ report, variant }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
+					) : report?.task_count == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart accessibilityLayer data={report?.chart_data}>
 							<CartesianGrid vertical={false} />
@@ -83,6 +85,8 @@ export function ChartBarMultiple({ report, variant }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
+				) : report?.task_count == 0 ? (
+					""
 				) : (
 					<>
 						<div className="flex flex-row gap-2 text-muted-foreground leading-none">
