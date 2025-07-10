@@ -58,7 +58,10 @@ export default function UserProfile() {
 				{/* DataTable - 1/4 width, scrollable */}
 				<div className="w-full max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-2xl container px-4 shadow-md">
 					<CardHeader>
-						<CardTitle>Performance Leaderboard</CardTitle>
+						<CardTitle>
+							Performance Leaderboard{" "}
+							{reports?.performance_leaderboard?.length > 0 ? "(Top " + reports?.performance_leaderboard?.length + ")" : ""}
+						</CardTitle>
 						<CardDescription>All Time</CardDescription>
 					</CardHeader>
 					<DataTable columns={columns} data={reports?.performance_leaderboard} />
