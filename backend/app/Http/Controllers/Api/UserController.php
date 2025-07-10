@@ -122,11 +122,11 @@ class UserController extends Controller
 3. ❌ Avg. Delay Per Category
    - Visualization: Horizontal bar chart
 
-4. Task Load Distribution
+4. ✅ Task Load Distribution
    - Tasks assigned per user
    - Visualization: Horizontal bar chart
 
-5. ✅ Time Estimate vs Time Taken (Overall)
+5. ✅ Task overruns and underruns (Overall)
    - Spot over/underestimations
    - Visualization: Line or bar graph (averages)
 

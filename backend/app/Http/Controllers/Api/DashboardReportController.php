@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,18 +15,20 @@ class DashboardReportController extends Controller
      */
     public function dashboardReports()
     {
-        $tasksByStatus = $this->tasksByStatus();
-        $usersTaskLoad = $this->usersTaskLoad();
-        // $ratingPerCategory = $this->ratingPerCategory();
-        // $performanceRatingTrend = $this->performanceRatingTrend();
-        $estimateVsActual = $this->estimateVsActual();
-        $data = [
-            'tasks_by_status' => $tasksByStatus->getData()->data,
-            'users_task_load' => $usersTaskLoad->getData()->data,
-            //     'rating_per_category' => $ratingPerCategory->getData()->data,
-            //     'performance_rating_trend' => $performanceRatingTrend->getData()->data,
-            'estimate_vs_actual' => $estimateVsActual->getData()->data,
+        $reports = [
+            'tasks_by_status' => $this->tasksByStatus(),
+            'users_task_load' => $this->usersTaskLoad(),
+            'estimate_vs_actual' => $this->estimateVsActual(),
+            'performance_leaderboard' => $this->performanceLeaderboard(),
         ];
+
+        $data = [];
+
+        foreach ($reports as $key => $report) {
+            $payload = $report->getData(true);
+            $data[$key] = $payload['success'] ? $payload['data'] : null;
+        }
+
         return apiResponse($data, 'Reports fetched successfully');
     }
     /**
@@ -153,5 +156,28 @@ class DashboardReportController extends Controller
         }
 
         return apiResponse($data, "Users task load report fetched successfully");
+    }
+    /**
+     * Display report for leaderboards. Datatable
+     */
+    public function performanceLeaderboard()
+    {
+        $data = User::join('tasks', function ($join) {
+            $join->on('users.id', '=', 'tasks.assignee_id')
+                ->where('tasks.organization_id', Auth::user()->organization_id);
+        })
+            ->where('users.organization_id', Auth::user()->organization_id)
+            ->select(
+                'users.id',
+                'name',
+                'position',
+                DB::raw('ROUND(AVG(tasks.performance_rating),2) as avg_performance_rating')
+            )
+            ->groupBy('users.id', 'name', 'position')
+            ->orderByDesc('avg_performance_rating')
+            ->limit(10)
+            ->get();
+
+        return apiResponse($data, "Performance leaderbord fetched successfully");
     }
 }
