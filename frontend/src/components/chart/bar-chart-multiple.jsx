@@ -36,7 +36,7 @@ export function ChartBarMultiple({ report, variant }) {
 	const { loading } = useLoadContext();
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-2xl" : ""}`}>
-			<CardHeader className="text-center">
+			<CardHeader className="">
 				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
 					Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated
