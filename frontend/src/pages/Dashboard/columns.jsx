@@ -15,9 +15,9 @@ export const columns = [
 			const position = row.original.position;
 			return (
 				<div className="min-w-52">
-					{name}
+					<b>{name}</b>
 					<br />
-					<span className="text-sm text-gray-500">{position}</span>
+					<span className="text-sm text-muted-foreground">{position}</span>
 				</div>
 			);
 		},
