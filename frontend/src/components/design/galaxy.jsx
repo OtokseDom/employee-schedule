@@ -18,18 +18,45 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 		position = "Captain of the Starship",
 		email = "captain@stardust.com",
 		role = "Stardust Collector",
+		status = "Active",
 		dob = "Unknown",
 	} = user || {};
+
+	// Track theme (dark/light) by observing <html> class changes
+	const [theme, setTheme] = useState(() => (document.documentElement.classList.contains("dark") ? "dark" : "light"));
+
+	useEffect(() => {
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains("dark");
+			setTheme(isDark ? "dark" : "light");
+		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const ctx = canvas.getContext("2d");
 		const stars = [];
 		let time = 0;
-		const flickerSpeed = 0.5; // Very slow flickering
+		const flickerSpeed = 0.1; // Very slow flickering
 
-		// Monochrome color palette
-		const monochromeColors = ["#0A0A2A", "#14143C", "#1E1E46", "#28284E", "#323256", "#3C3C5E"];
+		// Get palette from CSS variables
+		const style = getComputedStyle(document.documentElement);
+		const isDarkMode = theme === "dark";
+		const galaxyColors = [
+			style.getPropertyValue("--galaxy-nebula-1").trim(),
+			style.getPropertyValue("--galaxy-nebula-2").trim(),
+			style.getPropertyValue("--galaxy-nebula-3").trim(),
+			style.getPropertyValue("--galaxy-nebula-4").trim(),
+			style.getPropertyValue("--galaxy-nebula-5").trim(),
+			style.getPropertyValue("--galaxy-nebula-6").trim(),
+		];
+		const galaxyStar = style.getPropertyValue("--galaxy-star").trim();
+		const galaxyBg = style.getPropertyValue("--galaxy-bg").trim();
+		const galaxyGradient0 = style.getPropertyValue("--galaxy-gradient-0").trim();
+		const galaxyGradient05 = style.getPropertyValue("--galaxy-gradient-05").trim();
+		const galaxyGradient1 = style.getPropertyValue("--galaxy-gradient-1").trim();
 
 		// Cloud positions and properties (fixed so they don't regenerate each frame)
 		const nebulaClouds = [
@@ -88,7 +115,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 					x: Math.random() * canvas.width,
 					y: Math.random() * canvas.height,
 					radius: Math.random() * 1.5,
-					color: `rgba(220, 220, 255, ${brightness})`,
+					color: isDarkMode ? `rgba(220, 220, 255, ${brightness})` : `rgba(255, 200, 80, ${brightness})`, // yellowish for day
 					speed: Math.random() * 3,
 				});
 			}
@@ -98,9 +125,9 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 		const drawNebula = (currentTime) => {
 			const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
 
-			gradient.addColorStop(0, "rgba(30, 30, 60, 0.5)");
-			gradient.addColorStop(0.5, "rgba(40, 40, 70, 0.3)");
-			gradient.addColorStop(1, "rgba(10, 10, 30, 0)");
+			gradient.addColorStop(0, galaxyGradient0);
+			gradient.addColorStop(0.5, galaxyGradient05);
+			gradient.addColorStop(1, galaxyGradient1);
 
 			ctx.fillStyle = gradient;
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -112,11 +139,19 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 
 				const nebulaGradient = ctx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.radius);
 
-				const color = monochromeColors[cloud.colorIndex];
+				const color = galaxyColors[cloud.colorIndex];
 				const alpha = Math.floor(80 * flickerAmount); // Convert to 0-80 range
 				const alphaHex = alpha.toString(16).padStart(2, "0"); // Convert to hex
 
-				nebulaGradient.addColorStop(0, `${color}${alphaHex}`);
+				if (isDarkMode) {
+					nebulaGradient.addColorStop(0, `${color}${alphaHex}`);
+				} else {
+					// Convert hex to rgb
+					const r = parseInt(color.substring(1, 3), 16);
+					const g = parseInt(color.substring(3, 5), 16);
+					const b = parseInt(color.substring(5, 7), 16);
+					nebulaGradient.addColorStop(0, `rgba(${r},${g},${b},${flickerAmount * 0.7})`);
+				}
 				nebulaGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
 				ctx.fillStyle = nebulaGradient;
@@ -131,7 +166,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Background
-			ctx.fillStyle = "#050518";
+			ctx.fillStyle = galaxyBg;
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 			// Update time for flickering
@@ -144,7 +179,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 			stars.forEach((star) => {
 				ctx.beginPath();
 				ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-				ctx.fillStyle = star.color;
+				ctx.fillStyle = galaxyStar;
 				ctx.fill();
 
 				// Move stars slightly
@@ -163,7 +198,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 		return () => {
 			window.removeEventListener("resize", resizeCanvas);
 		};
-	}, []);
+	}, [theme]);
 
 	return (
 		<div className="relative w-full h-52 md:h-60 overflow-hidden rounded-lg shadow-lg mb-5">
@@ -191,40 +226,41 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 									<span className="text-xs md:text-lg text-purple-200">{position}</span>
 								</div>
 							</div>
-							{user_auth?.role === "Superadmin" ||
-								(user_auth?.id === user?.id && (
-									<Dialog>
-										<DropdownMenu modal={false}>
-											<DropdownMenuTrigger asChild>
-												<Button variant="outline" className="flex items-center">
-													<Edit size={20} />
+							{user_auth?.role === "Superadmin" || user_auth?.id === user?.id ? (
+								<Dialog>
+									<DropdownMenu modal={false}>
+										<DropdownMenuTrigger asChild>
+											<Button variant="default" className="flex items-center bg-foreground text-background">
+												<Edit size={20} />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
+												Update Account
+											</DropdownMenuItem>
+											<DropdownMenuItem>
+												<DialogTrigger>Deactivate Account</DialogTrigger>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+									<DialogContent>
+										<DialogHeader>
+											<DialogTitle>Are you absolutely sure?</DialogTitle>
+											<DialogDescription>This action cannot be undone.</DialogDescription>
+										</DialogHeader>
+										<DialogFooter>
+											<DialogClose asChild>
+												<Button type="button" variant="secondary">
+													Close
 												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
-													Update Account
-												</DropdownMenuItem>
-												<DropdownMenuItem>
-													<DialogTrigger>Deactivate Account</DialogTrigger>
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-										<DialogContent>
-											<DialogHeader>
-												<DialogTitle>Are you absolutely sure?</DialogTitle>
-												<DialogDescription>This action cannot be undone.</DialogDescription>
-											</DialogHeader>
-											<DialogFooter>
-												<DialogClose asChild>
-													<Button type="button" variant="secondary">
-														Close
-													</Button>
-												</DialogClose>
-												<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
-											</DialogFooter>
-										</DialogContent>
-									</Dialog>
-								))}
+											</DialogClose>
+											<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
+										</DialogFooter>
+									</DialogContent>
+								</Dialog>
+							) : (
+								""
+							)}
 						</div>
 					)}
 					{/* User stats */}
@@ -235,6 +271,22 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 						</div>
 					) : (
 						<div className="flex mt-4 space-x-4">
+							<div
+								className={`backdrop-blur-sm px-3 py-1 rounded-full 
+							${
+								status == "pending"
+									? "text-yellow-100 bg-yellow-900/50"
+									: status == "active"
+									? "text-green-100 bg-green-900/50"
+									: status == "inactive"
+									? "text-gray-100 bg-gray-900/50"
+									: status == "banned"
+									? "text-red-100 bg-red-900/50"
+									: ""
+							}`}
+							>
+								{status}
+							</div>
 							<div className="bg-purple-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-purple-100">✨{role}</div>
 							<div className="bg-indigo-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-indigo-100">🌌 {email}</div>
 						</div>

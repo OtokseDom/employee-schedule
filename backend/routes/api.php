@@ -1,10 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\PerformanceReportController;
-use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardReportController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskHistoryController;
 use App\Http\Controllers\Api\UserController;
@@ -19,27 +18,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
-    // Route::apiResource('/user-auth', UserController::class); //somehow implicit route is not working
     // User CRUD
-    Route::get('/user', [UserController::class, 'index']);
-    Route::post('/user', [UserController::class, 'store']);
-    Route::get('/user/{user}', [UserController::class, 'show']);
-    Route::put('/user/{user}', [UserController::class, 'update']);
-    Route::delete('/user/{user}', [UserController::class, 'destroy']);
-    Route::apiResource('/schedule', ScheduleController::class);
-    Route::apiResource('/employee', EmployeeController::class);
-    Route::apiResource('/event', EventController::class);
+    Route::apiResource('/user', UserController::class);
+    Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/task', TaskController::class);
     Route::apiResource('/task-history', TaskHistoryController::class);
-    Route::apiResource('/performance-report', PerformanceReportController::class);
-
-    /* ---------------------------- Master Relations ---------------------------- */
-    Route::get('/schedule-by-user/{userId}', [ScheduleController::class, 'getScheduleByUser']);
 
     /* --------------------------------- Reports -------------------------------- */
-    Route::get('/tasks-by-status/{id}', [UserReportController::class, 'tasksByStatus']);
-    Route::get('/task-activity-timeline/{id}', [UserReportController::class, 'taskActivityTimeline']);
+    Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
+    Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
 });
-
+Route::apiResource('/organization', OrganizationController::class);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);

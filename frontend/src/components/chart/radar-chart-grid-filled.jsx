@@ -1,48 +1,61 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-const chartData = [
-	{ month: "January", desktop: 186 },
-	{ month: "February", desktop: 285 },
-	{ month: "March", desktop: 237 },
-	{ month: "April", desktop: 203 },
-	{ month: "May", desktop: 209 },
-	{ month: "June", desktop: 264 },
-];
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { Skeleton } from "../ui/skeleton";
 
 const chartConfig = {
-	desktop: {
-		label: "Desktop",
+	value: {
+		label: "AVG Rating",
 		color: "hsl(var(--chart-1))",
 	},
 };
 
-export function RadarChartGridFilled() {
+export function RadarChartGridFilled({ report }) {
+	const { loading, setLoading } = useLoadContext();
 	return (
-		<Card className="flex flex-col relative h-full">
-			<CardHeader className="items-center pb-4">
-				<CardTitle>Radar Chart - Grid Filled</CardTitle>
-				<CardDescription>Showing total visitors for the last 6 months</CardDescription>
+		<Card className="flex flex-col relative h-full justify-between">
+			<CardHeader className="items-center text-center pb-4">
+				<CardTitle>AVG Rating Per Category</CardTitle>
+				<CardDescription>Showing all categories</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-0">
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-					<RadarChart data={chartData}>
-						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-						<PolarGrid className="fill-[--color-desktop] opacity-20" />
-						<PolarAngleAxis dataKey="month" />
-						<Radar dataKey="desktop" fill="var(--color-desktop)" fillOpacity={0.5} />
-					</RadarChart>
+					{loading ? (
+						<div className="flex items-center justify-center h-full w-full p-8">
+							<Skeleton className=" w-full h-full rounded-full" />
+						</div>
+					) : report?.task_count == 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
+					) : (
+						<RadarChart data={report?.ratings?.length > 0 ? report?.ratings : []} outerRadius={90} width={300} height={300}>
+							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+							<PolarGrid className="fill-[--color-value] opacity-20" />
+							<PolarAngleAxis dataKey="category" />
+							<Radar dataKey="value" fill="var(--color-value)" fillOpacity={0.5} />
+						</RadarChart>
+					)}
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex-col gap-2 text-sm">
-				<div className="flex items-center gap-2 font-medium leading-none">
-					Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-				</div>
-				<div className="flex items-center gap-2 leading-none text-muted-foreground">January - June 2024</div>
+				{loading ? (
+					<div className="flex flex-col gap-2 items-center justify-center h-full w-full p-8">
+						<Skeleton className=" w-full h-4" />
+						<Skeleton className=" w-full h-4" />
+					</div>
+				) : report?.task_count == 0 ? (
+					""
+				) : (
+					<>
+						<div className="flex items-center gap-2 font-medium leading-none">
+							{report?.highest_rating?.category} has the highest rating: {report?.highest_rating?.value}
+						</div>
+						<div className="flex items-center gap-2 leading-none text-muted-foreground">All Time</div>
+					</>
+				)}
 			</CardFooter>
 		</Card>
 	);

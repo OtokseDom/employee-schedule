@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
@@ -10,12 +10,18 @@ export default function Signup() {
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
 
+	const [hasOrgCode, setHasOrgCode] = useState(true); // toggle between code or new org
+	const orgCodeRef = useRef();
+	const orgNameRef = useRef();
 	const nameRef = useRef();
 	const emailRef = useRef();
 	const positionRef = useRef();
 	const dobRef = useRef();
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
+	useEffect(() => {
+		document.title = "Task Management | Sign Up";
+	}, []);
 
 	const onSubmit = (e) => {
 		setLoading(true);
@@ -29,20 +35,27 @@ export default function Signup() {
 			password: passwordRef.current.value,
 			password_confirmation: passwordConfiramtionRef.current.value,
 		};
+		if (hasOrgCode) {
+			payload.organization_code = orgCodeRef.current.value;
+		} else {
+			payload.organization_name = orgNameRef.current.value;
+		}
 		axiosClient
 			.post("/signup", payload)
 			.then(({ data }) => {
 				// response will contain headers, status codes, data, ec
 				// just extract data
-				setUser(data.user);
-				setToken(data.token);
+				setUser(data.data.user);
+				setToken(data.data.token);
+
 				setLoading(false);
 			})
 			.catch((err) => {
 				const response = err.response;
 				if (response && response.status === 422) {
 					// Validation error
-					console.log(response.data.errors);
+					setErrors(response.data.errors);
+				} else {
 					setErrors(response.data.errors);
 				}
 				setLoading(false);
@@ -54,12 +67,23 @@ export default function Signup() {
 				<form onSubmit={onSubmit}>
 					<h1 className="title">Signup for Free</h1>
 					{errors && (
-						<div className="alert">
-							{Object.keys(errors).map((key) => (
-								<p key={key}>{errors[key][0]}</p>
-							))}
+						<div className="alert text-sm text-red-600 space-y-1">
+							{Object.keys(errors).map((field) => errors[field].map((msg, index) => <p key={`${field}-${index}`}>{msg}</p>))}
 						</div>
 					)}
+
+					<div className="mb-4">
+						<label className="block text-sm mb-1">Organization</label>
+						{hasOrgCode ? (
+							<input ref={orgCodeRef} type="text" placeholder="Enter Organization Code" className="bg-background text-foreground" required />
+						) : (
+							<input ref={orgNameRef} type="text" placeholder="Enter New Organization Name" className="bg-background text-foreground" required />
+						)}
+
+						<button type="button" className="mt-2 text-sm text-muted-foreground underline" onClick={() => setHasOrgCode((prev) => !prev)}>
+							{hasOrgCode ? "Don't have a code? Create a new organization" : "Have a code? Join existing organization"}
+						</button>
+					</div>
 					<input className="bg-background text-foreground" ref={nameRef} type="text" placeholder="Full Name" />
 					<input className="bg-background text-foreground" ref={emailRef} type="email" placeholder="Email" />
 					<input className="bg-background text-foreground" ref={positionRef} type="text" placeholder="Position" />

@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->string('category');
+            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade')->onUpdate('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('expected_output')->nullable();
-            $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');;
+            $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold'])->default('pending');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->double('time_taken')->nullable(); // in hours
             $table->double('delay')->nullable(); // in hours
             $table->text('delay_reason')->nullable();
-            $table->integer('performance_rating')->default(0);
+            $table->integer('performance_rating')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

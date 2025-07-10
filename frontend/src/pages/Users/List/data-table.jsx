@@ -124,7 +124,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 									<div className="flex items-center justify-center">
 										<div className="flex flex-col space-y-3 w-full">
 											{Array.from({ length: 6 }).map((_, i) => (
-												<Skeleton key={i} className="h-24 w-2/5 md:w-full" />
+												<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
 											))}
 										</div>
 									</div>
@@ -136,7 +136,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 								<TableRow
 									className="cursor-pointer"
 									key={row.id}
-									onClick={() => navigate(`/profile/${row.original.id}`)} // Redirect on row click
+									onClick={() => navigate(`/users/${row.original.id}`)} // Redirect on row click
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>

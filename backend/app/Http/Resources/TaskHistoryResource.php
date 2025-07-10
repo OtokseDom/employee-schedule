@@ -16,6 +16,7 @@ class TaskHistoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'organization_id' => $this->organization_id,
             'task_id' => $this->task_id,
             'status' => $this->status,
             'changed_by' => $this->changed_by,

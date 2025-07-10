@@ -14,14 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format, parseISO } from "date-fns";
 import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
-import { Label } from "@/components/ui/label";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 const formSchema = z.object({
 	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
-	category: z.string().refine((data) => data.trim() !== "", {
-		message: "Category is required.",
+	category_id: z.number({
+		required_error: "Category is required.",
 	}),
 	title: z.string().refine((data) => data.trim() !== "", {
 		message: "Title is required.",
@@ -30,23 +30,12 @@ const formSchema = z.object({
 		message: "Description is required.",
 	}),
 	expected_output: z.string().optional(),
-	start_date: z.date({
-		required_error: "Start date is required.",
-	}),
+	start_date: z.date().optional(),
 	end_date: z.date().optional(),
-	start_time: z
-		.string()
-		.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: "Start time must be in HH:mm format.",
-		})
-		.optional(),
-	end_time: z
-		.string()
-		.regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-			message: "End time must be in HH:mm format.",
-		})
-		.optional(),
+	start_time: z.string().optional(),
+	end_time: z.string().optional(),
 	time_estimate: z.coerce.number().optional(),
+	time_taken: z.coerce.number().optional(),
 	delay: z.coerce.number().optional(),
 	delay_reason: z.string().optional(),
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
@@ -54,16 +43,20 @@ const formSchema = z.object({
 	status: z.string({
 		required_error: "Status is required.",
 	}),
+	calendar_add: z.boolean().optional(),
 });
 
-export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { loading, setLoading } = useLoadContext();
+export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	// const { loading, setLoading } = useLoadContext();
+	const { user } = useAuthContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState();
+	const [categories, setCategories] = useState([]);
 
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			calendar_add: false,
 			title: "",
 			description: "",
 			assignee_id: undefined,
@@ -74,6 +67,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 			start_time: "",
 			end_time: "",
 			time_estimate: "",
+			time_taken: "",
 			delay: "",
 			delay_reason: "",
 			performance_rating: "",
@@ -83,18 +77,21 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	});
 
 	useEffect(() => {
-		fetchUsers();
+		if (isOpen) fetchSelection();
 	}, [isOpen]);
 
-	const fetchUsers = async () => {
-		// setLoading(true);
+	const fetchSelection = async () => {
+		// setLocalLoading(true);
 		try {
+			setLocalLoading(true);
 			const userResponse = await axiosClient.get("/user");
-			setUsers(userResponse.data.users);
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
+			setUsers(userResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
-			// setLoading(false);
+			setLocalLoading(false);
 		}
 	};
 
@@ -103,18 +100,22 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	}, [isOpen]);
 
 	useEffect(() => {
-		if (updateData) {
+		// console.log(updateData);
+		// console.log(users);
+		if (updateData && users && categories) {
 			const {
+				calendar_add, //when update data is set on calendar cell click
 				title,
 				description,
 				assignee_id,
-				category,
+				category_id,
 				expected_output,
 				start_date,
 				end_date,
 				start_time,
 				end_time,
 				time_estimate,
+				time_taken,
 				delay,
 				delay_reason,
 				performance_rating,
@@ -122,16 +123,18 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				status,
 			} = updateData;
 			form.reset({
+				calendar_add: calendar_add || false,
 				title: title || "",
 				description: description || "",
 				assignee_id: assignee_id || undefined,
-				category: category || "",
+				category_id: category_id || undefined,
 				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
 				end_date: end_date ? parseISO(end_date) : undefined,
 				start_time: start_time || "",
 				end_time: end_time || "",
 				time_estimate: time_estimate || "",
+				time_taken: time_taken || "",
 				delay: delay || "",
 				delay_reason: delay_reason || "",
 				performance_rating: performance_rating || "",
@@ -142,7 +145,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 	}, [updateData, form, users]);
 
 	const handleSubmit = async (formData) => {
-		setLoading(true);
+		setLocalLoading(true);
 		try {
 			// Parse numeric fields
 			const formatTime = (time) => {
@@ -156,21 +159,29 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 
 			const parsedForm = {
 				...formData,
+				organization_id: user.organization_id,
 				start_date: formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : null,
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
 				time_estimate: formData.time_estimate ? parseFloat(formData.time_estimate) : undefined,
+				time_taken: formData.time_taken ? parseFloat(formData.time_taken) : undefined,
 				delay: formData.delay ? parseFloat(formData.delay) : undefined,
-				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : undefined,
+				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
-			console.log(parsedForm);
+			// console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
-				console.log("add");
+				// console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
 				setIsOpen(false);
+			} else if (updateData?.calendar_add) {
+				await axiosClient.post(`/task`, parsedForm);
+				fetchData();
+				showToast("Success!", "Task added to calendar.", 3000);
+				setIsOpen(false);
+				setTaskAdded(true);
 			} else {
 				await axiosClient.put(`/task/${updateData?.id}`, parsedForm);
 				fetchData();
@@ -191,7 +202,7 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				});
 			}
 		} finally {
-			setLoading(false);
+			setLocalLoading(false);
 		}
 	};
 
@@ -205,7 +216,11 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
-								<Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={updateData?.assignee_id || field.value}>
+								<Select
+									onValueChange={(value) => field.onChange(Number(value))}
+									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
+									value={field.value ? field.value.toString() : undefined}
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select an assignee">
@@ -232,14 +247,31 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 				/>
 				<FormField
 					control={form.control}
-					name="category"
+					name="category_id"
 					render={({ field }) => {
 						return (
 							<FormItem>
 								<FormLabel>Category</FormLabel>
-								<FormControl>
-									<Input placeholder="Category" {...field} />
-								</FormControl>
+								<Select onValueChange={(value) => field.onChange(Number(value))} value={field.value ? field.value.toString() : undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a category">
+												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a category"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(categories) && categories.length > 0 ? (
+											categories.map((category) => (
+												<SelectItem key={category.id} value={category.id.toString()}>
+													{category.name}
+												</SelectItem>
+											))
+										) : (
+											<></>
+										)}
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						);
@@ -314,9 +346,10 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 								<FormControl>
 									<Input
 										type="time"
-										step="any"
-										// placeholder="Rating &#40;1-10&#41;"
-										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										step="60"
+										inputMode="numeric"
+										pattern="[0-9]{2}:[0-9]{2}"
+										className="bg-background appearance-none"
 										{...field}
 									/>
 								</FormControl>
@@ -355,6 +388,21 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 								<FormLabel>Time Estimate &#40;hrs&#41;</FormLabel>
 								<FormControl>
 									<Input type="number" step="any" placeholder="Time estimate &#40;hrs&#41;" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="time_taken"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Time Taken &#40;hrs&#41;</FormLabel>
+								<FormControl>
+									<Input type="number" step="any" placeholder="Time taken &#40;hrs&#41;" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -436,7 +484,11 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						return (
 							<FormItem>
 								<FormLabel>Status</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={updateData?.status || field.value}>
+								<Select
+									onValueChange={field.onChange}
+									value={field.value || undefined}
+									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a status"></SelectValue>
@@ -459,8 +511,9 @@ export default function TaskForm({ data, setTasks, isOpen, setIsOpen, updateData
 						);
 					}}
 				/>
-				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
+				<Button type="submit" disabled={localLoading}>
+					{localLoading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 				</Button>
 			</form>
 		</Form>

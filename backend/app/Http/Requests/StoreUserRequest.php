@@ -22,12 +22,14 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'organization_id' => 'required|exists:organizations,id',
             'name' => 'required|string|max:255',
             'role' => 'required|in:Superadmin,Admin,Manager,Employee',
             'position' => 'required|string|max:255',
             'dob' => 'required|date_format:Y-m-d',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'status' => 'required|string|in:active,inactive,pending,banned',
         ];
     }
 }

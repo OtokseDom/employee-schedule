@@ -101,6 +101,8 @@ export default function DateInput({ field, label, placeholder, disableFuture = f
 					</div>
 					<Calendar
 						mode="single"
+						className={"pointer-events-auto"} //added to fix the issue with calendar not being clickable
+						// modal={true}
 						selected={date}
 						onSelect={(date) => field.onChange(date)}
 						month={new Date(year, month)}

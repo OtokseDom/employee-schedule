@@ -1,28 +1,27 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-// import { columns } from "./columns";
-// import { DataTable } from "./data-table";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import axiosClient from "@/axios.client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
 import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
+import { ChartLineLabel } from "@/components/chart/line-chart-label";
+import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
+// TODO: Datatable sort not working properly. Sorting by text instead of date value
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
-	const { loading, setLoading } = useLoadContext();
+	const { setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
+	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenUser, setIsOpenUser] = useState(false);
@@ -36,6 +35,7 @@ export default function UserProfile() {
 	}, [isOpen, isOpenUser]);
 
 	useEffect(() => {
+		document.title = "Task Management | User Profile";
 		fetchData();
 	}, []);
 
@@ -44,8 +44,12 @@ export default function UserProfile() {
 		try {
 			// Fetch user details and tasks
 			const response = await axiosClient.get(`/user/${id}`);
-			setUser(response.data.user);
-			setTasks(response.data.assigned_tasks);
+			setUser(response.data.data.user);
+			setTasks(response.data.data.assigned_tasks);
+			// Fetch all user reports in one call
+			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
+			setUserReports(reportsRes.data.data);
+			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -93,27 +97,44 @@ export default function UserProfile() {
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full h-fit">
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<PieChartDonut user_id={user?.id} />
+						<PieChartDonut report={userReports?.tasks_by_status} />
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
 							<p>Daily Task Activity Timeline</p>
 						</div> */}
-						<AreaChartGradient user_id={user?.id} />
+						<AreaChartGradient report={userReports?.task_activity_timeline} />
 					</div>
-					<div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
 						{/* <div className="mb-5">
 							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
 							<p>Pie Chart of Tasks by Status</p>
 						</div> */}
-						<RadarChartGridFilled />
+						<RadarChartGridFilled report={userReports?.rating_per_category} />
+					</div>
+				</div>
+				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
+				<div className="flex flex-col lg:flex-row gap-4 w-full items-stretch">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
+							<p>Pie Chart of Tasks by Status</p>
+						</div> */}
+						<ChartLineLabel report={userReports?.performance_rating_trend} />
+					</div>
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
+						{/* <div className="mb-5">
+							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
+							<p>Pie Chart of Tasks by Status</p>
+						</div> */}
+						<ChartBarMultiple report={userReports?.estimate_vs_actual} />
 					</div>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
@@ -136,13 +157,6 @@ export default function UserProfile() {
 							showLess={true}
 						/>
 					</div>
-					{/* <div className="w-full h-full overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-						<div className="mb-5">
-							<h1 className=" font-extrabold text-3xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div>
-						<PieChartDonut user_id={user?.id} />
-					</div> */}
 				</div>
 			</div>
 		</div>

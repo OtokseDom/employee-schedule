@@ -13,6 +13,7 @@ export default function Users() {
 	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
+		document.title = "Task Management | Users";
 		fetchData();
 	}, []);
 
@@ -21,7 +22,7 @@ export default function Users() {
 		try {
 			// Make both API calls concurrently using Promise.all
 			const userResponse = await axiosClient.get("/user");
-			setUsers(userResponse.data.users);
+			setUsers(userResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -33,7 +34,7 @@ export default function Users() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const userResponse = await axiosClient.delete(`/user/${id}`);
+			await axiosClient.delete(`/user/${id}`);
 			fetchData();
 			showToast("Success!", "User deleted.", 3000);
 		} catch (e) {

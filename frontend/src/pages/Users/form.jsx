@@ -32,6 +32,9 @@ const formSchema = z.object({
 	email: z.string().refine((data) => data.trim() !== "", {
 		message: "Email is required.",
 	}),
+	status: z.string().refine((data) => data.trim() !== "", {
+		message: "Status is required.",
+	}),
 });
 
 export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchData }) {
@@ -48,18 +51,19 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 			dob: undefined,
 			role: "",
 			email: "",
+			status: "",
 		},
 	});
-
 	useEffect(() => {
 		if (updateData) {
-			const { name, position, dob, role, email } = updateData;
+			const { name, position, dob, role, email, status } = updateData;
 			form.reset({
 				name,
 				position,
 				dob: dob ? parseISO(dob) : undefined,
 				role,
 				email,
+				status,
 			});
 			setDate(dob ? parseISO(dob) : undefined);
 		}
@@ -68,6 +72,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 	const handleSubmit = async (form) => {
 		const formattedData = {
 			...form,
+			organization_id: user.organization_id,
 			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
 			password: "$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW", //password: admin123
 		};
@@ -183,6 +188,42 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 					name="dob"
 					render={({ field }) => {
 						return <DateInput field={field} label={"Birthday"} placeholder={"Pick a date"} disableFuture={true} />;
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="status"
+					render={({ field }) => {
+						const statuses = [
+							{ id: 1, name: "Pending" },
+							{ id: 2, name: "Active" },
+							{ id: 3, name: "Inactive" },
+							{ id: 4, name: "Banned" },
+						];
+						return (
+							<FormItem>
+								<FormLabel>Status</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={updateData?.status || field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a status"></SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(statuses) && statuses.length > 0 ? (
+											statuses?.map((status) => (
+												<SelectItem key={status?.id} value={status?.name.toLowerCase()}>
+													{status?.name}
+												</SelectItem>
+											))
+										) : (
+											<SelectItem disabled>No statuses available</SelectItem>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
 					}}
 				/>
 				<Button type="submit" disabled={loading}>

@@ -22,11 +22,12 @@ class TaskHistoryFactory extends Factory
     public function definition()
     {
         return [
-            'task_id' => Task::factory(),
+            'organization_id' => 1,
+            'task_id' => Task::inRandomOrder()->value('id'),
             'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'changed_by' => User::inRandomOrder()->value('id'),
             'changed_at' => $this->faker->dateTime,
-            'remarks' => $this->faker->paragraph,
+            'remarks' => "Task Added",
         ];
     }
 }

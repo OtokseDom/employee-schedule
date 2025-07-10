@@ -22,6 +22,7 @@ class UpdateTaskHistoryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'organization_id' => 'required|exists:organizations,id',
             'task_id' => 'required|exists:tasks,id',
             'status' => 'required|in:Pending,In Progress,Completed,Delayed,Cancelled,On Hold',
             'changed_by' => 'required|exists:users,id',

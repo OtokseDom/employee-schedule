@@ -4,11 +4,11 @@ import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
@@ -17,10 +17,16 @@ import TaskForm from "../form";
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
 	const { loading, setLoading } = useLoadContext();
+	const [localLoading, setLocalLoading] = useState(false);
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
+
+	const handleUpdate = (task) => {
+		setIsOpen(true);
+		setUpdateData(task);
+	};
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
 		setSelectedColumn(columnId);
@@ -37,7 +43,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	const [columnVisibility, setColumnVisibility] = useState(
 		showLess
 			? {
-					status: false,
+					// status: false,
 					"start date": false,
 					"end date": false,
 					"start time": false,
@@ -113,10 +119,18 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 							</SheetTrigger>
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
-									<SheetTitle>Add Task</SheetTitle>
+									<SheetTitle>
+										<div className="flex flex-row gap-5">
+											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
+											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
+										</div>
+									</SheetTitle>
+									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
 								<TaskForm
-									data={data}
+									// data={data}
+									localLoading={localLoading}
+									setLocalLoading={setLocalLoading}
 									setTasks={setTasks}
 									isOpen={isOpen}
 									setIsOpen={setIsOpen}
@@ -185,7 +199,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<div className="flex items-center justify-center">
 										<div className="flex flex-col space-y-3 w-full">
 											{Array.from({ length: 6 }).map((_, i) => (
-												<Skeleton key={i} className="h-24 w-2/5 md:w-full" />
+												<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
 											))}
 										</div>
 									</div>
@@ -194,7 +208,7 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id}>
+								<TableRow key={row.id} onClick={() => handleUpdate(row.original)}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
