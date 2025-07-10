@@ -29,15 +29,6 @@ class DashboardReportController extends Controller
             $data[$key] = $payload['success'] ? $payload['data'] : null;
         }
 
-        // $tasksByStatus = $this->tasksByStatus();
-        // $usersTaskLoad = $this->usersTaskLoad();
-        // $estimateVsActual = $this->estimateVsActual();
-        // $data = [
-        //     'tasks_by_status' => $tasksByStatus->getData()->data,
-        //     'users_task_load' => $usersTaskLoad->getData()->data,
-        //     'estimate_vs_actual' => $estimateVsActual->getData()->data,
-        // ];
-
         return apiResponse($data, 'Reports fetched successfully');
     }
     /**
