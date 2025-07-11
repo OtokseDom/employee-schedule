@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ class DashboardReportController extends Controller
             'users_task_load' => $this->usersTaskLoad(),
             'estimate_vs_actual' => $this->estimateVsActual(),
             'performance_leaderboard' => $this->performanceLeaderboard(),
+            'performance_trend' => $this->performanceTrend(),
         ];
 
         $data = [];
@@ -71,8 +73,9 @@ class DashboardReportController extends Controller
                 ->count();
             $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
         }
+
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch task by status report', 404]);
+            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
         }
         return apiResponse($data, "Task by status report fetched successfully");
     }
@@ -111,7 +114,7 @@ class DashboardReportController extends Controller
         ];
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch estimate vs actual report', 404]);
+            return apiResponse(null, 'Failed to fetch estimate vs actual report', false, 404);
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");
@@ -152,7 +155,7 @@ class DashboardReportController extends Controller
         ];
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+            return apiResponse(null, 'Failed to fetch task activity timeline report', false, 404);
         }
 
         return apiResponse($data, "Users task load report fetched successfully");
@@ -178,6 +181,48 @@ class DashboardReportController extends Controller
             ->limit(10)
             ->get();
 
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch performance leaderboard report', false, 404);
+        }
+
         return apiResponse($data, "Performance leaderbord fetched successfully");
+    }
+    /**
+     * Display report for performance trend last 6 months. Datatable
+     */
+    public function performanceTrend()
+    {
+        $chart_data = Task::selectRaw('
+                DATE_FORMAT(start_date, "%M") as month,
+                DATE_FORMAT(start_date, "%Y") as year,
+                DATE_FORMAT(start_date, "%Y-%m") as sort_key,
+                ROUND(AVG(performance_rating),2) as rating,
+                COUNT(id) as task_count
+            ')
+            ->where('start_date', '>=', now()->subMonths(5)->startOfMonth())
+            ->groupBy('month', 'year', 'sort_key')
+            ->orderBy('sort_key')
+            ->get();
+
+        $rating_now = $chart_data[5]->rating;
+        $rating_prev = $chart_data[4]->rating;
+        $percentageDifference = [
+            'value' => round(abs((($rating_now - $rating_prev) / $rating_prev) * 100), 2),
+            'event' => ($rating_now - $rating_prev) > 0 ? 'Increased' : (($rating_now - $rating_prev) < 0 ? 'Decreased' : 'Same')
+        ];
+        $task_count = 0;
+        foreach ($chart_data as $item) {
+            $task_count = $task_count + $item->task_count;
+        }
+        $data = [
+            'percentage_difference' => $percentageDifference,
+            'chart_data' => $chart_data,
+            'task_count' => $task_count
+        ];
+
+        if (empty($chart_data)) {
+            return apiResponse(null, 'Failed to fetch performance trend report', false, 404);
+        }
+        return apiResponse($data, "All user performance trend fetched successfully");
     }
 }
