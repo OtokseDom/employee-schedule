@@ -8,6 +8,7 @@ import { ChartBarHorizontal } from "@/components/chart/chart-bar-horizontal";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartLineLabel } from "@/components/chart/line-chart-label";
 // TODO: Datatable sort not working properly. Sorting by text instead of date value
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
@@ -62,13 +63,18 @@ export default function UserProfile() {
 				<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" />
 			</div>
 
-			{/* Horizontal Bar Chart */}
+			{/* Line Chart */}
 			<div className="md:col-span-4">
+				<ChartLineLabel report={reports?.performance_trend} variant="dashboard" />
+			</div>
+
+			{/* Horizontal Bar Chart */}
+			<div className="md:col-span-6">
 				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
 			</div>
 
 			{/* Datatable */}
-			<div className="md:col-span-12 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
+			<div className="md:col-span-6 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
 				<CardHeader>
 					<CardTitle>
 						Performance Leaderboard {reports?.performance_leaderboard?.length > 0 ? "(Top " + reports?.performance_leaderboard?.length + ")" : ""}
