@@ -52,13 +52,13 @@ export function PieChartDonut({ report, variant }) {
 	}, [report]);
 
 	return (
-		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-2xl" : ""}`}>
+		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader className="items-center text-center pb-0">
 				<CardTitle>{variant == "dashboard" && "Overall "}Tasks by Status</CardTitle>
 				<CardDescription>All Time</CardDescription>
 			</CardHeader>
 			<CardContent className="flex-1 pb-0">
-				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+				<ChartContainer config={chartConfig} className="mx-auto aspect-square">
 					{loading ? (
 						<div className="flex items-center justify-center h-full w-full p-8">
 							<Skeleton className=" w-full h-full rounded-full" />

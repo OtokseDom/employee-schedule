@@ -111,11 +111,11 @@ class UserController extends Controller
 
 🔸 Overall Dashboard Insights
 
-1. Team-Wide Task Status Distribution
-   - ✅ All tasks by status
+1. ✅ Team-Wide Task Status Distribution
+   - All tasks by status
    - Visualization: Pie chart or stacked bar by user
 
-2. Top Performers
+2. ✅ Top Performers
    - Average performance_rating (ranked)
    - Visualization: Leaderboard table
 
@@ -134,7 +134,7 @@ class UserController extends Controller
    - Number of tasks worked on per day
    - Visualization: Heatmap or bar chart
 
-7. Performance Trends (All Users)
+7. Performance Trends (All Users)x
    - Average performance over time
    - Visualization: Line chart
 

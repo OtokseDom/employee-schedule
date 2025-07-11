@@ -16,13 +16,13 @@ const chartConfig = {
 	},
 };
 
-export function ChartLineLabel({ report }) {
+export function ChartLineLabel({ report, variant }) {
 	const { loading, setLoading } = useLoadContext();
 	return (
-		<Card className="flex flex-col relative h-full justify-between">
+		<Card className={`flex flex-col relative h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader>
 				<CardTitle>Performance Trends</CardTitle>
-				<CardDescription>Performance Rating for the last 6 months</CardDescription>
+				<CardDescription> {variant == "dashboard" ? "All Users" : ""} Performance Rating for the last 6 months</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
@@ -99,9 +99,8 @@ export function ChartLineLabel({ report }) {
 						<div className="text-muted-foreground leading-none">
 							{report?.chart_data?.length > 0 && (
 								<div className="flex items-center gap-2 leading-none text-muted-foreground">
-									{report?.chart_data?.length > 0 && report?.chart_data[0].month} -{" "}
-									{report?.chart_data?.length > 0 && report?.chart_data[5].month}{" "}
-									{report?.chart_data?.length > 0 && report?.chart_data[5].year}
+									{report?.chart_data[0].month} {report?.chart_data[0].year == report?.chart_data[5].year ? "" : report?.chart_data[0].year} -{" "}
+									{report?.chart_data[5].month} {report?.chart_data[5].year}
 								</div>
 							)}
 						</div>

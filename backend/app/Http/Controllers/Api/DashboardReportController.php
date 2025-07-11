@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
 use App\Models\User;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +22,7 @@ class DashboardReportController extends Controller
             'users_task_load' => $this->usersTaskLoad(),
             'estimate_vs_actual' => $this->estimateVsActual(),
             'performance_leaderboard' => $this->performanceLeaderboard(),
+            'performance_rating_trend' => ReportService::performanceRatingTrend(0, "dashboard"),
         ];
 
         $data = [];
@@ -71,8 +74,9 @@ class DashboardReportController extends Controller
                 ->count();
             $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
         }
+
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch task by status report', 404]);
+            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
         }
         return apiResponse($data, "Task by status report fetched successfully");
     }
@@ -111,7 +115,7 @@ class DashboardReportController extends Controller
         ];
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch estimate vs actual report', 404]);
+            return apiResponse(null, 'Failed to fetch estimate vs actual report', false, 404);
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");
@@ -152,7 +156,7 @@ class DashboardReportController extends Controller
         ];
 
         if (empty($data)) {
-            return response()->json(['message' => 'Failed to fetch task activity timeline report', 404]);
+            return apiResponse(null, 'Failed to fetch task activity timeline report', false, 404);
         }
 
         return apiResponse($data, "Users task load report fetched successfully");
@@ -177,6 +181,10 @@ class DashboardReportController extends Controller
             ->orderByDesc('avg_performance_rating')
             ->limit(10)
             ->get();
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch performance leaderboard report', false, 404);
+        }
 
         return apiResponse($data, "Performance leaderbord fetched successfully");
     }

@@ -201,7 +201,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 	}, [theme]);
 
 	return (
-		<div className="relative w-full h-52 md:h-60 overflow-hidden rounded-lg shadow-lg mb-5">
+		<div className="relative w-full h-60 md:h-60 overflow-hidden rounded-2xl shadow-lg mb-5">
 			<canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
 
 			{/* Content overlay */}
@@ -270,9 +270,9 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 							<Skeleton className="w-24 h-8 rounded-full" />
 						</div>
 					) : (
-						<div className="flex mt-4 space-x-4">
+						<div className="flex flex-wrap mt-4 gap-2 md:gap-4">
 							<div
-								className={`backdrop-blur-sm px-3 py-1 rounded-full 
+								className={`backdrop-blur-sm px-3 py-1 w-fit rounded-full flex  items-center
 							${
 								status == "pending"
 									? "text-yellow-100 bg-yellow-900/50"
@@ -287,8 +287,8 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 							>
 								{status}
 							</div>
-							<div className="bg-purple-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-purple-100">✨{role}</div>
-							<div className="bg-indigo-900/50 backdrop-blur-sm px-3 py-1 rounded-full text-indigo-100">🌌 {email}</div>
+							<div className="bg-purple-900/50 backdrop-blur-sm px-3 py-1 w-fit rounded-full flex  items-center text-purple-100">✨{role}</div>
+							<div className="bg-indigo-900/50 backdrop-blur-sm px-3 py-1 w-fit rounded-full flex  items-center text-indigo-100">🌌 {email}</div>
 						</div>
 					)}
 				</div>
