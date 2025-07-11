@@ -201,7 +201,7 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 	}, [theme]);
 
 	return (
-		<div className="relative w-full h-52 md:h-60 overflow-hidden rounded-lg shadow-lg mb-5">
+		<div className="relative w-full h-52 md:h-60 overflow-hidden rounded-2xl shadow-lg mb-5">
 			<canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
 
 			{/* Content overlay */}
