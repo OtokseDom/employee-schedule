@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -190,45 +191,30 @@ class UserReportController extends Controller
      */
     public function performanceRatingTrend($id)
     {
-        // Calculate the last 6 months (including current)
-        $months = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $date = now()->startOfMonth()->subMonths($i);
-            $months[] = [
-                'year' => $date->year,
-                'month' => $date->format('F'),
-                'month_num' => $date->month,
-            ];
-        }
+        $chart_data = Task::selectRaw('
+                DATE_FORMAT(start_date, "%M") as month,
+                DATE_FORMAT(start_date, "%Y") as year,
+                DATE_FORMAT(start_date, "%Y-%m") as sort_key,
+                ROUND(AVG(performance_rating),2) as rating,
+                COUNT(id) as task_count
+            ')
+            ->where('start_date', '>=', now()->subMonths(5)->startOfMonth())
+            ->where('assignee_id', $id)
+            ->groupBy('month', 'year', 'sort_key')
+            ->orderBy('sort_key')
+            ->get();
 
-        $chart_data = [];
-        $task_count = 0;
-        foreach ($months as $m) {
-            $rating = DB::table('tasks')
-                ->where('assignee_id', $id)
-                ->whereYear('start_date', $m['year'])
-                ->whereMonth('start_date', $m['month_num'])
-                ->select(
-                    DB::raw('AVG(performance_rating) as average_rating'),
-                    DB::raw('COUNT(id) as task_count')
-                )->first();
-            $chart_data[] = [
-                'year' => $m['year'],
-                'month' => $m['month'],
-                'rating' => round($rating->average_rating, 2),
-            ];
-            $task_count = $task_count + $rating->task_count;
-        }
-
-        // Calculate percentage difference (current vs previous month)
-        $month1 = $chart_data[5]['rating'];
-        $month2 = $chart_data[4]['rating'];
+        $rating_now = $chart_data[5]->rating;
+        $rating_prev = $chart_data[4]->rating;
         $percentageDifference = [
-            'value' => ($month2 != 0)
-                ? round(abs((($month1 - $month2) / $month2) * 100), 2)
-                : ($month1 > 0 ? 100 : 0),
-            'event' => $month1 > $month2 ? 'Increased' : ($month1 < $month2 ? 'Decreased' : 'Same'),
+            'value' => round(abs((($rating_now - $rating_prev) / $rating_prev) * 100), 2),
+            'event' => ($rating_now - $rating_prev) > 0 ? 'Increased' : (($rating_now - $rating_prev) < 0 ? 'Decreased' : 'Same')
         ];
+
+        $task_count = 0;
+        foreach ($chart_data as $item) {
+            $task_count = $task_count + $item->task_count;
+        }
 
         $data = [
             'percentage_difference' => $percentageDifference,
