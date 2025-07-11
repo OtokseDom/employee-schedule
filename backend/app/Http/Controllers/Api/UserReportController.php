@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Task;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class UserReportController extends Controller
             'tasks_by_status' => $this->tasksByStatus($id),
             'task_activity_timeline' => $this->taskActivityTimeline($id),
             'rating_per_category' => $this->ratingPerCategory($id),
-            'performance_rating_trend' => $this->performanceRatingTrend($id),
+            'performance_rating_trend' => ReportService::performanceRatingTrend($id),
             'estimate_vs_actual' => $this->estimateVsActual($id),
         ];
 
@@ -78,6 +78,7 @@ class UserReportController extends Controller
             $data[$index]['status'] = $status['field'];
             $data[$index]['tasks'] = DB::table('tasks')
                 ->where('assignee_id', $id)
+                ->where('organization_id', Auth::user()->organization_id)
                 ->where('status', $status['name'])
                 ->count();
             $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
@@ -110,6 +111,7 @@ class UserReportController extends Controller
         foreach ($months as $m) {
             $count = DB::table('tasks')
                 ->where('assignee_id', $id)
+                ->where('organization_id', Auth::user()->organization_id)
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
                 ->count();
@@ -187,48 +189,6 @@ class UserReportController extends Controller
         return apiResponse($data, "Rating per category report fetched successfully");
     }
     /**
-     * Display report for user performance rating per month. Line chart
-     */
-    public function performanceRatingTrend($id)
-    {
-        $chart_data = Task::selectRaw('
-                DATE_FORMAT(start_date, "%M") as month,
-                DATE_FORMAT(start_date, "%Y") as year,
-                DATE_FORMAT(start_date, "%Y-%m") as sort_key,
-                ROUND(AVG(performance_rating),2) as rating,
-                COUNT(id) as task_count
-            ')
-            ->where('start_date', '>=', now()->subMonths(5)->startOfMonth())
-            ->where('assignee_id', $id)
-            ->groupBy('month', 'year', 'sort_key')
-            ->orderBy('sort_key')
-            ->get();
-
-        $rating_now = $chart_data[5]->rating;
-        $rating_prev = $chart_data[4]->rating;
-        $percentageDifference = [
-            'value' => round(abs((($rating_now - $rating_prev) / $rating_prev) * 100), 2),
-            'event' => ($rating_now - $rating_prev) > 0 ? 'Increased' : (($rating_now - $rating_prev) < 0 ? 'Decreased' : 'Same')
-        ];
-
-        $task_count = 0;
-        foreach ($chart_data as $item) {
-            $task_count = $task_count + $item->task_count;
-        }
-
-        $data = [
-            'percentage_difference' => $percentageDifference,
-            'chart_data' => $chart_data,
-            'task_count' => $task_count
-        ];
-
-        if (empty($data['chart_data'])) {
-            return apiResponse(null, 'Failed to fetch task activity timeline report', false, 404);
-        }
-
-        return apiResponse($data, "Performance rating trend report fetched successfully");
-    }
-    /**
      * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
      */
     public function estimateVsActual($id)
@@ -236,6 +196,7 @@ class UserReportController extends Controller
         // Fetch the 10 most recent tasks for the user
         $tasks = DB::table('tasks')
             ->where('assignee_id', $id)
+            ->where('organization_id', Auth::user()->organization_id)
             ->orderBy('start_date', 'desc')
             ->take(10)
             ->get(['title', 'time_estimate', 'time_taken', 'start_date']);
