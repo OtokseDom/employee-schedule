@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+// TODO: Move all reports here
 class ReportService
 {
     public static function performanceRatingTrend($id, $variant = "")
