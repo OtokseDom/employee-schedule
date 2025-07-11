@@ -40,7 +40,7 @@ export default function UserProfile() {
 				<p>Your workspace at a glance</p>
 			</div>
 			{/* Section Cards */}
-			<div className="md:col-span-3">
+			{/* <div className="md:col-span-3">
 				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
 			</div>
 			<div className="md:col-span-3">
@@ -51,7 +51,7 @@ export default function UserProfile() {
 			</div>
 			<div className="md:col-span-3">
 				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
-			</div>
+			</div> */}
 
 			{/* Pie Chart */}
 			<div className="md:col-span-4">
@@ -65,7 +65,7 @@ export default function UserProfile() {
 
 			{/* Line Chart */}
 			<div className="md:col-span-4">
-				<ChartLineLabel report={reports?.performance_trend} variant="dashboard" />
+				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
 			</div>
 
 			{/* Horizontal Bar Chart */}
