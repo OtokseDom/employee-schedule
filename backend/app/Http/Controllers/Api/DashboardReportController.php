@@ -18,7 +18,7 @@ class DashboardReportController extends Controller
     public function dashboardReports()
     {
         $reports = [
-            'tasks_by_status' => $this->tasksByStatus(),
+            'tasks_by_status' => ReportService::tasksByStatus(0, "dashboard"),
             'users_task_load' => $this->usersTaskLoad(),
             'estimate_vs_actual' => $this->estimateVsActual(),
             'performance_leaderboard' => $this->performanceLeaderboard(),
@@ -37,49 +37,49 @@ class DashboardReportController extends Controller
     /**
      * Display report for tasks by status. Donut Chart
      */
-    public function tasksByStatus()
-    {
-        $statuses = [
-            [
-                'name' => 'Pending',
-                'field' => 'pending',
-            ],
-            [
-                'name' => 'In Progress',
-                'field' => 'in_progress',
-            ],
-            [
-                'name' => 'Completed',
-                'field' => 'completed',
-            ],
-            [
-                'name' => 'Delayed',
-                'field' => 'delayed',
-            ],
-            [
-                'name' => 'Cancelled',
-                'field' => 'cancelled',
-            ],
-            [
-                'name' => 'On Hold',
-                'field' => 'on_hold',
-            ],
-        ];
-        $data = [];
-        foreach ($statuses as $index => $status) {
-            $data[$index]['status'] = $status['field'];
-            $data[$index]['tasks'] = DB::table('tasks')
-                ->where('status', $status['name'])
-                ->where('organization_id', Auth::user()->organization_id)
-                ->count();
-            $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
-        }
+    // public function tasksByStatus()
+    // {
+    //     $statuses = [
+    //         [
+    //             'name' => 'Pending',
+    //             'field' => 'pending',
+    //         ],
+    //         [
+    //             'name' => 'In Progress',
+    //             'field' => 'in_progress',
+    //         ],
+    //         [
+    //             'name' => 'Completed',
+    //             'field' => 'completed',
+    //         ],
+    //         [
+    //             'name' => 'Delayed',
+    //             'field' => 'delayed',
+    //         ],
+    //         [
+    //             'name' => 'Cancelled',
+    //             'field' => 'cancelled',
+    //         ],
+    //         [
+    //             'name' => 'On Hold',
+    //             'field' => 'on_hold',
+    //         ],
+    //     ];
+    //     $data = [];
+    //     foreach ($statuses as $index => $status) {
+    //         $data[$index]['status'] = $status['field'];
+    //         $data[$index]['tasks'] = DB::table('tasks')
+    //             ->where('status', $status['name'])
+    //             ->where('organization_id', Auth::user()->organization_id)
+    //             ->count();
+    //         $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+    //     }
 
-        if (empty($data)) {
-            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
-        }
-        return apiResponse($data, "Task by status report fetched successfully");
-    }
+    //     if (empty($data)) {
+    //         return apiResponse(null, 'Failed to fetch task by status report', false, 404);
+    //     }
+    //     return apiResponse($data, "Task by status report fetched successfully");
+    // }
     /**
      * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
      */
