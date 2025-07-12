@@ -12,6 +12,9 @@ export default withMT({
 	],
 	theme: {
 		extend: {
+			fontSize: {
+				xxs: "10px",
+			},
 			colors: {
 				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground))",

@@ -76,10 +76,15 @@ export default function UserProfile() {
 			{/* Datatable */}
 			<div className="md:col-span-6 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
 				<CardHeader>
-					<CardTitle>
-						Performance Leaderboard {reports?.performance_leaderboard?.length > 0 ? "(Top " + reports?.performance_leaderboard?.length + ")" : ""}
-					</CardTitle>
-					<CardDescription>All Time</CardDescription>
+					<CardTitle>All Time Top Performers</CardTitle>
+					<CardDescription>
+						Showing{" "}
+						{reports?.performance_leaderboard?.length == 1
+							? "(Top 1) user"
+							: reports?.performance_leaderboard?.length > 1
+							? "(Top " + reports?.performance_leaderboard?.length + ") users"
+							: ""}
+					</CardDescription>
 				</CardHeader>
 				<DataTable columns={columns} data={reports?.performance_leaderboard} />
 			</div>
