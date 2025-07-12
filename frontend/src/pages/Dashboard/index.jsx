@@ -84,41 +84,5 @@ export default function UserProfile() {
 				<DataTable columns={columns} data={reports?.performance_leaderboard} />
 			</div>
 		</div>
-
-		// <div className="flex flex-col w-screen md:w-full h-fit gap-4 overflow-auto bg-card text-card-foreground border border-border rounded-md container p-4 md:p-10 shadow-md">
-		// 	<div className="w-full mb-5">
-		// 		<h1 className="font-extrabold text-3xl">Dashboard</h1>
-		// 		<p>Your workspace at a glance</p>
-		// 	</div>
-		// 	{/* -------------------------------- first row ------------------------------- */}
-		// 	<div className="flex flex-col md:flex-row gap-4">
-		// 		<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
-		// 		<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
-		// 		<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
-		// 		<SectionCard description={"test"} value={100} percentage={12.2} insight={"sample"} footer={"sample"} />
-		// 	</div>
-		// 	<div className="flex flex-col md:flex-row gap-4 w-full h-fit">
-		// 		<PieChartDonut report={reports?.tasks_by_status} variant="dashboard" />
-		// 		<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" />
-		// 	</div>
-		// 	<div className="flex flex-col md:flex-row gap-4 w-full h-fit">
-		// 		{/* Chart - 3/4 width, auto height */}
-		// 		<div className="w-full">
-		// 			<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
-		// 		</div>
-
-		// 		{/* DataTable - 1/4 width, scrollable */}
-		// 		<div className="w-full max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-2xl container px-4 shadow-md">
-		// 			<CardHeader>
-		// 				<CardTitle>
-		// 					Performance Leaderboard{" "}
-		// 					{reports?.performance_leaderboard?.length > 0 ? "(Top " + reports?.performance_leaderboard?.length + ")" : ""}
-		// 				</CardTitle>
-		// 				<CardDescription>All Time</CardDescription>
-		// 			</CardHeader>
-		// 			<DataTable columns={columns} data={reports?.performance_leaderboard} />
-		// 		</div>
-		// 	</div>
-		// </div>
 	);
 }
