@@ -7,6 +7,63 @@ use Illuminate\Support\Facades\DB;
 // TODO: Move all reports here
 class ReportService
 {
+    // Task status - Pie donut chart
+    public static function tasksByStatus($id, $variant = "")
+    {
+        if (!is_numeric($id) && $variant == "") {
+            return apiResponse(null, 'Invalid user ID', false, 400);
+            // return response()->json(['error' => 'Invalid user ID'], 400);
+        }
+
+        $statuses = [
+            [
+                'name' => 'Pending',
+                'field' => 'pending',
+            ],
+            [
+                'name' => 'In Progress',
+                'field' => 'in_progress',
+            ],
+            [
+                'name' => 'Completed',
+                'field' => 'completed',
+            ],
+            [
+                'name' => 'Delayed',
+                'field' => 'delayed',
+            ],
+            [
+                'name' => 'Cancelled',
+                'field' => 'cancelled',
+            ],
+            [
+                'name' => 'On Hold',
+                'field' => 'on_hold',
+            ],
+        ];
+        $data = [];
+        foreach ($statuses as $index => $status) {
+            $data[$index]['status'] = $status['field'];
+            $query = DB::table('tasks')
+                ->where('organization_id', Auth::user()->organization_id)
+                ->where('status', $status['name']);
+
+            if ($variant !== 'dashboard') {
+                $query->where('assignee_id', $id);
+            }
+
+            $data[$index]['tasks'] = $query->count();
+            $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+        }
+        // return response($data);
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
+        }
+        return apiResponse($data, "Task by status report fetched successfully");
+    }
+
+    // Performance Trend - Line chart label
     public static function performanceRatingTrend($id, $variant = "")
     {
         // Calculate the last 6 months (including current)
