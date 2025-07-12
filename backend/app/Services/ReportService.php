@@ -5,7 +5,8 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-// TODO: Move all reports here
+// TODO: Add Filter
+// TODO: Add excel export
 class ReportService
 {
     /* ----------------------------- SHARED REPORTS ----------------------------- */
