@@ -12,7 +12,6 @@ export default function Tasks() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
-	// TODO: Show history logs for admins
 	// Add comments from users
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});

@@ -9,7 +9,6 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
-// TODO: Datatable sort not working properly. Sorting by text instead of date value
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
