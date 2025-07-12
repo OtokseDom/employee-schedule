@@ -24,7 +24,7 @@ class UserReportController extends Controller
         }
 
         $reports = [
-            'tasks_by_status' => $this->tasksByStatus($id),
+            'tasks_by_status' => ReportService::tasksByStatus($id, "dashboard"),
             'task_activity_timeline' => $this->taskActivityTimeline($id),
             'rating_per_category' => $this->ratingPerCategory($id),
             'performance_rating_trend' => ReportService::performanceRatingTrend($id),
@@ -42,54 +42,54 @@ class UserReportController extends Controller
     /**
      * Display report for tasks by status. Donut Chart
      */
-    public function tasksByStatus($id)
-    {
-        if (!is_numeric($id)) {
-            return response()->json(['error' => 'Invalid user ID'], 400);
-        }
-        $statuses = [
-            [
-                'name' => 'Pending',
-                'field' => 'pending',
-            ],
-            [
-                'name' => 'In Progress',
-                'field' => 'in_progress',
-            ],
-            [
-                'name' => 'Completed',
-                'field' => 'completed',
-            ],
-            [
-                'name' => 'Delayed',
-                'field' => 'delayed',
-            ],
-            [
-                'name' => 'Cancelled',
-                'field' => 'cancelled',
-            ],
-            [
-                'name' => 'On Hold',
-                'field' => 'on_hold',
-            ],
-        ];
-        $data = [];
-        foreach ($statuses as $index => $status) {
-            $data[$index]['status'] = $status['field'];
-            $data[$index]['tasks'] = DB::table('tasks')
-                ->where('assignee_id', $id)
-                ->where('organization_id', Auth::user()->organization_id)
-                ->where('status', $status['name'])
-                ->count();
-            $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
-        }
-        // return response($data);
+    // public function tasksByStatus($id)
+    // {
+    //     if (!is_numeric($id)) {
+    //         return response()->json(['error' => 'Invalid user ID'], 400);
+    //     }
+    //     $statuses = [
+    //         [
+    //             'name' => 'Pending',
+    //             'field' => 'pending',
+    //         ],
+    //         [
+    //             'name' => 'In Progress',
+    //             'field' => 'in_progress',
+    //         ],
+    //         [
+    //             'name' => 'Completed',
+    //             'field' => 'completed',
+    //         ],
+    //         [
+    //             'name' => 'Delayed',
+    //             'field' => 'delayed',
+    //         ],
+    //         [
+    //             'name' => 'Cancelled',
+    //             'field' => 'cancelled',
+    //         ],
+    //         [
+    //             'name' => 'On Hold',
+    //             'field' => 'on_hold',
+    //         ],
+    //     ];
+    //     $data = [];
+    //     foreach ($statuses as $index => $status) {
+    //         $data[$index]['status'] = $status['field'];
+    //         $data[$index]['tasks'] = DB::table('tasks')
+    //             ->where('assignee_id', $id)
+    //             ->where('organization_id', Auth::user()->organization_id)
+    //             ->where('status', $status['name'])
+    //             ->count();
+    //         $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+    //     }
+    //     // return response($data);
 
-        if (empty($data)) {
-            return apiResponse(null, 'Failed to fetch task by status report', false, 404);
-        }
-        return apiResponse($data, "Task by status report fetched successfully");
-    }
+    //     if (empty($data)) {
+    //         return apiResponse(null, 'Failed to fetch task by status report', false, 404);
+    //     }
+    //     return apiResponse($data, "Task by status report fetched successfully");
+    // }
     /**
      * Display report for tasks timeline to see users activity load. Area chart
      */
