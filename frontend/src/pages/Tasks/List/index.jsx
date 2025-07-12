@@ -12,7 +12,7 @@ export default function Tasks() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
-
+	// Add comments from users
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);

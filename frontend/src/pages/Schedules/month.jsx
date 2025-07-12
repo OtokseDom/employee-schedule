@@ -39,7 +39,7 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	// 	}
 	// };
 	return (
-		<div className="grid grid-cols-7 gap-1">
+		<div className="grid grid-cols-7 gap-0 md:gap-1">
 			{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
 				<div key={day} className="p-2 font-semibold text-center text-foreground">
 					{day}
@@ -109,13 +109,12 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 														setOpenDialogIndex(index);
 													}}
 													className={`
-											text-xs p-1 rounded border truncate
+											text-xxs md:text-xs py-1 md:p-1 rounded border truncate
 											${statusColors[task.status] || "bg-gray-100 border-gray-300"}
 										`}
 												>
-													<div className="flex items-center gap-1">
-														<span>{task.start_time?.substring(0, 5)}</span>
-														<span className="truncate">{task.title}</span>
+													<div className="flex items-center">
+														<span>{task.title}</span>
 													</div>
 												</div>
 											))}

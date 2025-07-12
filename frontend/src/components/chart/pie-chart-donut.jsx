@@ -57,8 +57,8 @@ export function PieChartDonut({ report, variant }) {
 				<CardTitle>{variant == "dashboard" && "Overall "}Tasks by Status</CardTitle>
 				<CardDescription>All Time</CardDescription>
 			</CardHeader>
-			<CardContent className="flex-1 pb-0">
-				<ChartContainer config={chartConfig} className="mx-auto aspect-square">
+			<CardContent className="pb-0">
+				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
 					{loading ? (
 						<div className="flex items-center justify-center h-full w-full p-8">
 							<Skeleton className=" w-full h-full rounded-full" />

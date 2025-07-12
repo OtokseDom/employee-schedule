@@ -118,16 +118,20 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			},
 		},
 		{
-			id: "start date",
+			id: "start_date",
 			accessorKey: "start_date",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Start Date <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Start Date <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
+			// Keep raw value for sorting
+			accessorFn: (row) => row.start_date,
+			// Use cell renderer to format for display
+			cell: ({ row }) => {
+				const date = row.original.start_date;
+				return date ? format(new Date(date), "MMM-dd yyyy") : "";
 			},
-			accessorFn: (row) => (row.start_date ? format(new Date(row.start_date), "MMM-dd yyyy") : ""),
 		},
 		{
 			id: "end date",
@@ -139,7 +143,13 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 					</button>
 				);
 			},
-			accessorFn: (row) => (row.end_date ? format(new Date(row.end_date), "MMM-dd yyyy") : ""),
+			// Keep raw value for sorting
+			accessorFn: (row) => row.end_date,
+			// Use cell renderer to format for display
+			cell: ({ row }) => {
+				const date = row.original.end_date;
+				return date ? format(new Date(date), "MMM-dd yyyy") : "";
+			},
 		},
 		{
 			id: "start time",

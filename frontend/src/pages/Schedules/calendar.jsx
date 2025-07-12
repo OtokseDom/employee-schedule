@@ -155,43 +155,61 @@ export default function ScheduleCalendar() {
 
 	return (
 		<div>
-			<div>
-				{/* Header */}
-				<div className="p-4 border-b flex flex-col justify-between items-center gap-4">
-					<div className="flex flex-col justify-start items-start gap-2 mt-2 w-full">
-						<h1 className=" font-extrabold text-3xl">Schedules</h1>
-						<span className="w-full md:w-[300px]">
-							<Select
-								onValueChange={(value) => {
-									const selected = users.find((user) => user.id === value);
-									setSelectedUser(selected);
-								}}
-								value={selectedUser?.id || ""}
-							>
-								<SelectTrigger>
-									<SelectValue placeholder="Select a user"></SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{Array.isArray(users) && users?.length > 0 ? (
-										users?.map((user) => (
-											<SelectItem key={user?.id} value={user?.id}>
-												{user?.name}
-											</SelectItem>
-										))
-									) : (
-										<SelectItem disabled>No users available</SelectItem>
-									)}
-								</SelectContent>
-							</Select>
-						</span>
-					</div>
+			{/* Header */}
+			<div className="p-4 border-b flex flex-col justify-between items-center gap-4">
+				<div className="flex flex-col justify-start items-start gap-2 mt-2 w-full">
+					<h1 className=" font-extrabold text-3xl">Schedules</h1>
+					<span className="w-full md:w-[300px]">
+						<Select
+							onValueChange={(value) => {
+								const selected = users.find((user) => user.id === value);
+								setSelectedUser(selected);
+							}}
+							value={selectedUser?.id || ""}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a user"></SelectValue>
+							</SelectTrigger>
+							<SelectContent>
+								{Array.isArray(users) && users?.length > 0 ? (
+									users?.map((user) => (
+										<SelectItem key={user?.id} value={user?.id}>
+											{user?.name}
+										</SelectItem>
+									))
+								) : (
+									<SelectItem disabled>No users available</SelectItem>
+								)}
+							</SelectContent>
+						</Select>
+					</span>
+				</div>
 
-					<div className="flex flex-row w-full items-center gap-4">
-						{/* Navigation */}
-						<div className="flex flex-col justify-center gap-2 w-full">
-							{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
+				<div className="flex flex-row w-full items-center gap-4">
+					{/* Navigation */}
+					<div className="flex flex-col justify-center gap-2 w-full">
+						{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
+						<div className="flex items-center justify-center">
+							<span className="block md:hidden text-lg font-bold">
+								{selectedView === "month"
+									? `${format(currentMonth, "MMMM yyyy")}`
+									: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
+											weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
+									  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
+							</span>
+						</div>
+						<div className="flex flex-row justify-between w-full">
+							{/* View toggle */}
+							<div className="flex justify-start gap-2">
+								<Button variant={`${selectedView === "month" ? "" : "outline"}`} onClick={() => setSelectedView("month")} disabled={loading}>
+									Month View
+								</Button>
+								<Button variant={`${selectedView === "week" ? "" : "outline"}`} onClick={() => setSelectedView("week")} disabled={loading}>
+									Week View
+								</Button>
+							</div>
 							<div className="flex items-center justify-center">
-								<span className="block md:hidden text-lg font-bold">
+								<span className="hidden md:block text-lg font-bold">
 									{selectedView === "month"
 										? `${format(currentMonth, "MMMM yyyy")}`
 										: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
@@ -199,67 +217,43 @@ export default function ScheduleCalendar() {
 										  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
 								</span>
 							</div>
-							<div className="flex flex-row justify-between w-full">
-								{/* View toggle */}
-								<div className="flex justify-start gap-2">
-									<Button
-										variant={`${selectedView === "month" ? "" : "outline"}`}
-										onClick={() => setSelectedView("month")}
-										disabled={loading}
-									>
-										Month View
-									</Button>
-									<Button variant={`${selectedView === "week" ? "" : "outline"}`} onClick={() => setSelectedView("week")} disabled={loading}>
-										Week View
-									</Button>
-								</div>
-								<div className="flex items-center justify-center">
-									<span className="hidden md:block text-lg font-bold">
-										{selectedView === "month"
-											? `${format(currentMonth, "MMMM yyyy")}`
-											: `${weekstart_date.toLocaleDateString("default", { month: "short", day: "numeric" })} - ${new Date(
-													weekstart_date.getTime() + 6 * 24 * 60 * 60 * 1000
-											  ).toLocaleDateString("default", { month: "short", day: "numeric", year: "numeric" })}`}
-									</span>
-								</div>
-								<div className="flex items-center gap-2">
-									<Button variant="outline" onClick={navigatePrev}>
-										Prev
-									</Button>
-									<Button variant="outline" onClick={navigateNext}>
-										Next
-									</Button>
-								</div>
+							<div className="flex items-center gap-2">
+								<Button variant="outline" onClick={navigatePrev}>
+									Prev
+								</Button>
+								<Button variant="outline" onClick={navigateNext}>
+									Next
+								</Button>
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				{/* Calendar/Week View */}
-				<div className="bg-background p-1 overflow-x-auto">
-					{selectedView === "month" ? (
-						<Month
-							days={days}
-							data={tasks}
-							fetchData={fetchTasks}
-							currentMonth={currentMonth}
-							getTaskForDate={getTaskForDate}
-							statusColors={statusColors}
-							selectedUser={selectedUser}
-						/>
-					) : (
-						<Week
-							data={tasks}
-							fetchData={fetchTasks}
-							getWeekDays={getWeekDays}
-							getTimeSlots={getTimeSlots}
-							weekstart_date={weekstart_date}
-							isInTimeSlot={isInTimeSlot}
-							selectedUser={selectedUser}
-							statusColors={statusColors}
-						/>
-					)}
-				</div>
+			{/* Calendar/Week View */}
+			<div className="bg-background overflow-x-auto">
+				{selectedView === "month" ? (
+					<Month
+						days={days}
+						data={tasks}
+						fetchData={fetchTasks}
+						currentMonth={currentMonth}
+						getTaskForDate={getTaskForDate}
+						statusColors={statusColors}
+						selectedUser={selectedUser}
+					/>
+				) : (
+					<Week
+						data={tasks}
+						fetchData={fetchTasks}
+						getWeekDays={getWeekDays}
+						getTimeSlots={getTimeSlots}
+						weekstart_date={weekstart_date}
+						isInTimeSlot={isInTimeSlot}
+						selectedUser={selectedUser}
+						statusColors={statusColors}
+					/>
+				)}
 			</div>
 		</div>
 	);
