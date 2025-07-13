@@ -15,8 +15,8 @@ import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
-import UserProfileDetails from "@/components/design/UserProfile";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import UserDetails from "@/pages/Users/Show/details";
 
 export default function UserProfile() {
 	const { setUser: setUserAuth } = useAuthContext();
@@ -52,7 +52,6 @@ export default function UserProfile() {
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
 			setUserReports(reportsRes.data.data);
-			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -92,7 +91,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserProfileDetails user={user} handleUpdateUser={handleUpdateUser} handleDelete={handleDelete} />
+				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleDelete={handleDelete} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>

@@ -12,6 +12,7 @@ import Users from "./pages/Users/List/index";
 import Events from "./pages/Events/List/index";
 import Schedules from "./pages/Schedules";
 import Categories from "./pages/Categories/List";
+import Organization from "./pages/Organization";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -27,7 +28,10 @@ const router = createBrowserRouter([
 			{ path: "/users/:id", element: <UserProfile /> },
 			{
 				path: "/settings",
-				children: [{ path: "categories", element: <Categories /> }],
+				children: [
+					{ path: "categories", element: <Categories /> },
+					{ path: "organization", element: <Organization /> },
+				],
 			},
 			{ path: "", element: <Users /> },
 		],

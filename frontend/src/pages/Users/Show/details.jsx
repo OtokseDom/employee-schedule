@@ -3,12 +3,12 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 // Shadcn UI
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { Edit } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export default function UserProfileDetails({ user, handleUpdateUser, handleDelete }) {
+export default function UserDetails({ user, handleUpdateUser, handleDelete }) {
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
 	const { loading } = useLoadContext();
 	const {

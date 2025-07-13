@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import UserProfile from "./UserProfile";
+import UserProfile from "../../pages/Users/Show/details";
 
 export default function GalaxyProfileBanner({ children }) {
 	const canvasRef = useRef(null);
