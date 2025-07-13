@@ -108,7 +108,7 @@ export default function Organization() {
 							</div>
 						) : (
 							<div className="flex items-center flex-wrap mt-4 gap-2 md:gap-4 text-lg">
-								<span>Code: {showCode ? code : "••••••••••"}</span>
+								<span>Code: {showCode ? code : "•".repeat(code?.length || 10)}</span>
 								<button
 									type="button"
 									onClick={() => setShowCode((prev) => !prev)}
