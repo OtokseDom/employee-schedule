@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
     // User CRUD
+    Route::apiResource('/organization', OrganizationController::class);
     Route::apiResource('/user', UserController::class);
     Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/task', TaskController::class);
@@ -34,7 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     /* --------------------------------- Reports -------------------------------- */
     Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
     Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
+
+    /* ---------------------------------- OTHER --------------------------------- */
+    Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
 });
-Route::apiResource('/organization', OrganizationController::class);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);

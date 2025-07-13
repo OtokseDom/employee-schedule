@@ -18,6 +18,7 @@ export default function Organization() {
 	const [organization, setOrganization] = useState(null);
 	const { name = "Guardians of the Galaxy", description = "The ones who protect all celestial beings", code = "WEARETHEGUARDIANS" } = organization || {};
 	const [showCode, setShowCode] = useState(false);
+	const orgId = user?.data?.organization_id;
 
 	useEffect(() => {
 		document.title = "Task Management | Organization";
@@ -27,7 +28,6 @@ export default function Organization() {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			const orgId = user?.data?.organization_id;
 			if (orgId) {
 				const { data } = await axiosClient.get(`/organization/${orgId}`);
 				setOrganization(data.data); // assuming it's using Laravel's Resource response
@@ -40,7 +40,19 @@ export default function Organization() {
 	};
 
 	const handleUpdate = (organization) => {};
-	const generateCode = () => {};
+	const generateCode = async () => {
+		setLoading(true);
+		try {
+			if (orgId) {
+				const { data } = await axiosClient.patch(`/organization/${orgId}/generate-code`);
+				setOrganization(data.data); // Assuming Laravel resource response
+			}
+		} catch (e) {
+			console.error("Error generating code:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<div className={"flex flex-row items-center h-screen w-screen md:w-[800px] container p-5 md:p-0 sm:text-sm -mt-10"}>

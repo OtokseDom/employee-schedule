@@ -18,7 +18,6 @@ class OrganizationController extends Controller
         $organizations = Organization::orderBy("id", "DESC")->get();
 
         return apiResponse($organizations, 'Organizations fetched successfully');
-        // return response(compact('organizations'));
     }
 
     public function store(StoreOrganizationRequest $request)
@@ -30,7 +29,6 @@ class OrganizationController extends Controller
             return apiResponse(null, 'Organization creation failed', false, 404);
         }
         return apiResponse(new OrganizationResource($organization), 'Organization created successfully', true, 201);
-        // return response(new OrganizationResource($organization), 201);
     }
 
     public function show(Organization $organization)
@@ -42,7 +40,6 @@ class OrganizationController extends Controller
             return apiResponse(null, 'Organization not found', false, 404);
         }
         return apiResponse($organizationDetails, 'Organization details fetched successfully');
-        // return response()->json(['data' => $organizationDetails]);
     }
 
     public function update(UpdateOrganizationRequest $request, Organization $organization)
@@ -54,7 +51,6 @@ class OrganizationController extends Controller
         }
 
         return apiResponse(new OrganizationResource($organization), 'Organization updated successfully');
-        // return new OrganizationResource($organization);
     }
 
     public function destroy(Organization $organization)
@@ -71,6 +67,19 @@ class OrganizationController extends Controller
         $organizations = Organization::orderBy("id", "DESC")->get();
 
         return apiResponse(OrganizationResource::collection($organizations), 'Organization deleted successfully');
-        // return response(OrganizationResource::collection($organizations), 200);
+    }
+
+
+    public function generateCode(Organization $organization)
+    {
+        $newCode = strtoupper(uniqid('DOM-')); // Example: DOM-64CF46D5A1234
+
+        $organization->code = $newCode;
+
+        if (!$organization->save()) {
+            return apiResponse(null, 'Failed to update organization code.', false, 500);
+        }
+
+        return apiResponse(new OrganizationResource($organization), 'New organization code generated successfully');
     }
 }
