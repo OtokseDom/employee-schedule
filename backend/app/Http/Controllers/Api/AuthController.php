@@ -27,7 +27,7 @@ class AuthController extends Controller
             $organization = Organization::create([
                 'name' => $data['organization_name'],
                 'description' => '',
-                'code' => strtoupper(bin2hex(random_bytes(4))),
+                'code' => strtoupper(uniqid('DOM')),
             ]);
             $status = "active";
             if ($organization) {
