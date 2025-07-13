@@ -8,13 +8,20 @@ use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskHistoryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserReportController;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    // Route::get('/user-auth', function (Request $request) {
+    //     return $request->user();
+    // });
+    // Eager load organization
     Route::get('/user-auth', function (Request $request) {
-        return $request->user();
+        $user = User::with('organization')->find($request->user()->id);
+        return new UserResource($user);
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     /* --------------------------------- Masters -------------------------------- */
