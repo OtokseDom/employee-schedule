@@ -6,16 +6,19 @@ import axiosClient from "@/axios.client";
 
 import GalaxyProfileBanner from "../../components/design/galaxy";
 // Shadcn UI
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import OrganizationForm from "./form";
 
 export default function Organization() {
 	const { user } = useAuthContext(); // Get authenticated user details
 	const { loading, setLoading } = useLoadContext();
 	const [organization, setOrganization] = useState(null);
+	const [isOpen, setIsOpen] = useState(false);
 	const { name = "Guardians of the Galaxy", description = "The ones who protect all celestial beings", code = "WEARETHEGUARDIANS" } = organization || {};
 	const [showCode, setShowCode] = useState(false);
 	const orgId = user?.data?.organization_id;
@@ -39,7 +42,6 @@ export default function Organization() {
 		}
 	};
 
-	const handleUpdate = (organization) => {};
 	const generateCode = async () => {
 		setLoading(true);
 		try {
@@ -87,7 +89,7 @@ export default function Organization() {
 												</Button>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent align="end">
-												<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdate(user)}>
+												<DropdownMenuItem className="cursor-pointer" onClick={() => setIsOpen(true)}>
 													Update Organization
 												</DropdownMenuItem>
 												<DropdownMenuItem className="cursor-pointer" onClick={() => generateCode()}>
@@ -120,6 +122,18 @@ export default function Organization() {
 						)}
 					</div>
 				</div>
+
+				<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
+					{/* <SheetTrigger asChild>
+							<Button variant="">Update Organization</Button>
+						</SheetTrigger> */}
+					<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+						<SheetHeader>
+							<SheetTitle>Update Organization</SheetTitle>
+						</SheetHeader>
+						<OrganizationForm setIsOpen={setIsOpen} fetchData={fetchData} />
+					</SheetContent>
+				</Sheet>
 			</GalaxyProfileBanner>
 		</div>
 	);

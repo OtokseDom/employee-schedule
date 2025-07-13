@@ -48,7 +48,7 @@ const formSchema = z.object({
 
 export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	// const { loading, setLoading } = useLoadContext();
-	const { user } = useAuthContext();
+	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState();
 	const [categories, setCategories] = useState([]);
@@ -159,7 +159,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 
 			const parsedForm = {
 				...formData,
-				organization_id: user.organization_id,
+				organization_id: user_auth.data.organization_id,
 				start_date: formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : null,
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),
