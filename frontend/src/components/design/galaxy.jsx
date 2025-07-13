@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import UserProfile from "./UserProfile";
 
-export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDelete }) {
+export default function GalaxyProfileBanner({ children }) {
 	const canvasRef = useRef(null);
 
 	// Track theme (dark/light) by observing <html> class changes
@@ -187,8 +187,8 @@ export default function GalaxyProfileBanner({ user, handleUpdateUser, handleDele
 		<div className="relative w-full h-60 md:h-60 overflow-hidden rounded-2xl shadow-lg mb-5">
 			<canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
 
+			{children}
 			{/* Content overlay */}
-			<UserProfile user={user} handleDelete={handleDelete} handleUpdateUser={handleUpdateUser} />
 		</div>
 	);
 }

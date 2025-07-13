@@ -8,17 +8,10 @@ import { Edit } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export default function UserProfileDetails({ user, handleUpdateUser, handleDelete }) {
+export default function UserProfile({ user, handleUpdateUser, handleDelete }) {
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
 	const { loading } = useLoadContext();
-	const {
-		name = "Galactic Explorer",
-		position = "Captain of the Starship",
-		email = "captain@stardust.com",
-		role = "Stardust Collector",
-		status = "Active",
-		dob = "Unknown",
-	} = user || {};
+	const { organization = "Guardians of the Galaxy", description = "The ones who protect all celestial beings", token = "WEARETHEGUARDIANS" } = user || {};
 
 	return (
 		<div className="absolute inset-0 flex flex-col justify-center items-start p-6 bg-gradient-to-r from-black/50 to-transparent">
