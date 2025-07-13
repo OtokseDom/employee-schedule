@@ -4,8 +4,10 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 export default function Users() {
+	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [users, setUsers] = useState([]);
@@ -48,7 +50,7 @@ export default function Users() {
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 			<div>
-				<h1 className=" font-extrabold text-3xl">Users</h1>
+				<h1 className=" font-extrabold text-3xl">Users of {user?.data?.organization?.name}</h1>
 				<p>List of all users</p>
 			</div>
 

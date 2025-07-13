@@ -26,7 +26,7 @@ export default function AdminLayout() {
 
 	return (
 		<SidebarProvider defaultOpen={expanded} className="">
-			<AppSidebar user={user} setUser={setUser} setToken={setToken} />
+			<AppSidebar />
 			<SidebarTrigger className="block md:hidden fixed" />
 			<main className="flex w-screen min-h-screen flex-col items-center justify-between p-16">
 				<Outlet />

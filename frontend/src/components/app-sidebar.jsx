@@ -1,4 +1,4 @@
-import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown, Gauge } from "lucide-react";
+import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown, Gauge, Building } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "@/axios.client";
 import { sub } from "date-fns";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 // Menu items.
 const items = [
@@ -68,10 +69,18 @@ const items = [
 				collapsible: false,
 				subItems: [],
 			},
+			{
+				title: "Organization",
+				url: "/organization",
+				icon: Building,
+				collapsible: false,
+				subItems: [],
+			},
 		],
 	},
 ];
-export function AppSidebar({ user, setUser, setToken }) {
+export function AppSidebar() {
+	const { user, token, setToken, setUser } = useAuthContext();
 	// Darkmode set session
 	const [theme, setTheme] = useState(() => {
 		const savedMode = sessionStorage.getItem("theme");
@@ -211,15 +220,15 @@ export function AppSidebar({ user, setUser, setToken }) {
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<SidebarMenuButton>
-									<User2 /> {user.name}
+									<User2 /> {user?.data?.name}
 									<ChevronUp className="ml-auto" />
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
 								<DropdownMenuItem
 									onClick={() => {
-										setCurrentPath(`/users/${user.id}`);
-										navigate(`/users/${user.id}`);
+										setCurrentPath(`/users/${user?.data?.id}`);
+										navigate(`/users/${user?.data?.id}`);
 									}}
 								>
 									<span>Account</span>

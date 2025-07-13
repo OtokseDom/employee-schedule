@@ -34,7 +34,11 @@ export default function GuestLayout() {
 	}
 	return (
 		<div>
-			<button type="button" className="flex justify-center items-center bg-foreground text-background m-5 p-2 rounded-full" onClick={toggleDark}>
+			<button
+				type="button"
+				className="md:fixed z-10 flex justify-center items-center bg-foreground text-background m-5 p-2 rounded-full"
+				onClick={toggleDark}
+			>
 				{theme == "light" ? <MoonStar /> : <Sun />}
 			</button>
 			<Outlet />

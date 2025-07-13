@@ -24,7 +24,7 @@ class UpdateOrganizationRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'code' => 'required|string'
+            // 'code' => 'required|string'
         ];
     }
 }
