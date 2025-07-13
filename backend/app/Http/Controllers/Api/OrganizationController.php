@@ -72,7 +72,7 @@ class OrganizationController extends Controller
 
     public function generateCode(Organization $organization)
     {
-        $newCode = strtoupper(uniqid('DOM-')); // Example: DOM-64CF46D5A1234
+        $newCode = strtoupper(uniqid('DOM')); // Example: DOM-64CF46D5A1234
 
         $organization->code = $newCode;
 

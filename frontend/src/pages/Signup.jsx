@@ -53,6 +53,7 @@ export default function Signup() {
 			payload.organization_code = orgCodeRef.current.value;
 		} else {
 			payload.organization_name = orgNameRef.current.value;
+			payload.role = "Superadmin";
 		}
 		axiosClient
 			.post("/signup", payload)
