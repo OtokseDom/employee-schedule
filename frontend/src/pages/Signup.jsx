@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sun, Moon } from "lucide-react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export default function Signup() {
 	const { loading, setLoading } = useLoadContext();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
+	const canvasRef = useRef(null);
 
-	const [hasOrgCode, setHasOrgCode] = useState(true); // toggle between code or new org
+	const [hasOrgCode, setHasOrgCode] = useState(true);
 	const orgCodeRef = useRef();
 	const orgNameRef = useRef();
 	const nameRef = useRef();
@@ -19,8 +20,21 @@ export default function Signup() {
 	const dobRef = useRef();
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
+
+	// Track theme (dark/light) by observing <html> class changes
+	const [theme, setTheme] = useState(() => (document.documentElement.classList.contains("dark") ? "dark" : "light"));
+
 	useEffect(() => {
 		document.title = "Task Management | Sign Up";
+	}, []);
+
+	useEffect(() => {
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains("dark");
+			setTheme(isDark ? "dark" : "light");
+		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+		return () => observer.disconnect();
 	}, []);
 
 	const onSubmit = (e) => {
@@ -43,17 +57,13 @@ export default function Signup() {
 		axiosClient
 			.post("/signup", payload)
 			.then(({ data }) => {
-				// response will contain headers, status codes, data, ec
-				// just extract data
 				setUser(data.data.user);
 				setToken(data.data.token);
-
 				setLoading(false);
 			})
 			.catch((err) => {
 				const response = err.response;
 				if (response && response.status === 422) {
-					// Validation error
 					setErrors(response.data.errors);
 				} else {
 					setErrors(response.data.errors);
@@ -61,43 +71,160 @@ export default function Signup() {
 				setLoading(false);
 			});
 	};
+
 	return (
-		<div className="login-signup-form animated fadeInDown">
-			<div className="form bg-secondary">
-				<form onSubmit={onSubmit}>
-					<h1 className="title">Signup for Free</h1>
+		<div className="inset-0 flex items-center justify-center min-h-screen overflow-auto py-8">
+			<div className="w-full max-w-md mx-4">
+				<div
+					className={`backdrop-blur-md ${
+						theme === "dark" ? "bg-black/20 border-white/10" : "bg-white/80 border-gray-200/50"
+					} border rounded-2xl p-8 shadow-2xl`}
+				>
+					<div className="text-center mb-6">
+						<h1 className={`text-3xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>Create Account</h1>
+						<p className={`${theme === "dark" ? "text-purple-200" : "text-gray-600"}`}>Join our platform today</p>
+					</div>
+
 					{errors && (
-						<div className="alert text-sm text-red-600 space-y-1">
-							{Object.keys(errors).map((field) => errors[field].map((msg, index) => <p key={`${field}-${index}`}>{msg}</p>))}
+						<div className="bg-red-900/30 backdrop-blur-sm border border-red-500/30 rounded-lg p-3 mb-4">
+							<div className="text-red-200 text-sm space-y-1">
+								{Object.keys(errors).map((field) => errors[field].map((msg, index) => <p key={`${field}-${index}`}>{msg}</p>))}
+							</div>
 						</div>
 					)}
 
-					<div className="mb-4">
-						<label className="block text-sm mb-1">Organization</label>
-						{hasOrgCode ? (
-							<input ref={orgCodeRef} type="text" placeholder="Enter Organization Code" className="bg-background text-foreground" required />
-						) : (
-							<input ref={orgNameRef} type="text" placeholder="Enter New Organization Name" className="bg-background text-foreground" required />
-						)}
+					<form onSubmit={onSubmit} className="space-y-4">
+						<div>
+							<label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-purple-200" : "text-gray-700"}`}>Organization</label>
+							{hasOrgCode ? (
+								<input
+									ref={orgCodeRef}
+									type="text"
+									placeholder="Enter Organization Code"
+									className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+										theme === "dark"
+											? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+											: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+									}`}
+									required
+								/>
+							) : (
+								<input
+									ref={orgNameRef}
+									type="text"
+									placeholder="Enter New Organization Name"
+									className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+										theme === "dark"
+											? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+											: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+									}`}
+									required
+								/>
+							)}
+							<button
+								type="button"
+								className={`mt-2 text-sm underline transition-colors duration-300 ${
+									theme === "dark" ? "text-purple-300 hover:text-purple-100" : "text-purple-600 hover:text-purple-800"
+								}`}
+								onClick={() => setHasOrgCode((prev) => !prev)}
+							>
+								{hasOrgCode ? "Create a new organization" : "Join existing organization"}
+							</button>
+						</div>
 
-						<button type="button" className="mt-2 text-sm text-muted-foreground underline" onClick={() => setHasOrgCode((prev) => !prev)}>
-							{hasOrgCode ? "Don't have a code? Create a new organization" : "Have a code? Join existing organization"}
+						<div className="grid grid-cols-1 gap-4">
+							<input
+								ref={nameRef}
+								type="text"
+								placeholder="Full Name"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+							<input
+								ref={emailRef}
+								type="email"
+								placeholder="Email Address"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+							<input
+								ref={positionRef}
+								type="text"
+								placeholder="Job Position"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+							<input
+								ref={dobRef}
+								type="date"
+								placeholder="Date of Birth"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+							<input
+								ref={passwordRef}
+								type="password"
+								placeholder="Password"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+							<input
+								ref={passwordConfiramtionRef}
+								type="password"
+								placeholder="Confirm Password"
+								className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
+									theme === "dark"
+										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
+										: "bg-white/20 border-gray-300/30 text-gray-800 placeholder-gray-500"
+								}`}
+								required
+							/>
+						</div>
+
+						<button
+							type="submit"
+							disabled={loading}
+							className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+						>
+							{loading && <Loader2 className="animate-spin h-5 w-5" />}
+							{loading ? "Creating Account..." : "Create Account"}
 						</button>
+					</form>
+
+					<div className="text-center mt-6">
+						<p className={`${theme === "dark" ? "text-purple-200" : "text-gray-600"}`}>
+							Already have an account?{" "}
+							<Link
+								to="/login"
+								className={`font-medium transition-colors duration-300 ${
+									theme === "dark" ? "text-purple-300 hover:text-white" : "text-purple-600 hover:text-purple-800"
+								}`}
+							>
+								Sign In
+							</Link>
+						</p>
 					</div>
-					<input className="bg-background text-foreground" ref={nameRef} type="text" placeholder="Full Name" />
-					<input className="bg-background text-foreground" ref={emailRef} type="email" placeholder="Email" />
-					<input className="bg-background text-foreground" ref={positionRef} type="text" placeholder="Position" />
-					<input className="bg-background text-foreground" ref={dobRef} type="date" placeholder="Date of Birth" />
-					<input className="bg-background text-foreground" ref={passwordRef} type="password" placeholder="Password" />
-					<input className="bg-background text-foreground" ref={passwordConfiramtionRef} type="password" placeholder="Password Confirmation" />
-					<button className="btn btn-block flex justify-center">{loading && <Loader2 className="animate-spin mr-5 -ml-11" />} Sign Up</button>
-					<p className="message text-muted-foreground">
-						Already Registered?{" "}
-						<Link to="/login" className="text-foreground">
-							Login
-						</Link>
-					</p>
-				</form>
+				</div>
 			</div>
 		</div>
 	);
