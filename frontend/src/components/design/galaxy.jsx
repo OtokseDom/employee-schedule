@@ -25,21 +25,23 @@ export default function GalaxyProfileBanner({ children }) {
 		const flickerSpeed = 0.1; // Very slow flickering
 
 		// Get palette from CSS variables
-		const style = getComputedStyle(document.documentElement);
 		const isDarkMode = theme === "dark";
+		const style = getComputedStyle(document.documentElement);
+		const getVar = (name, fallback = "#000") => style.getPropertyValue(name).trim() || fallback;
+
 		const galaxyColors = [
-			style.getPropertyValue("--galaxy-nebula-1").trim(),
-			style.getPropertyValue("--galaxy-nebula-2").trim(),
-			style.getPropertyValue("--galaxy-nebula-3").trim(),
-			style.getPropertyValue("--galaxy-nebula-4").trim(),
-			style.getPropertyValue("--galaxy-nebula-5").trim(),
-			style.getPropertyValue("--galaxy-nebula-6").trim(),
+			getVar("--galaxy-nebula-1"),
+			getVar("--galaxy-nebula-2"),
+			getVar("--galaxy-nebula-3"),
+			getVar("--galaxy-nebula-4"),
+			getVar("--galaxy-nebula-5"),
+			getVar("--galaxy-nebula-6"),
 		];
-		const galaxyStar = style.getPropertyValue("--galaxy-star").trim();
-		const galaxyBg = style.getPropertyValue("--galaxy-bg").trim();
-		const galaxyGradient0 = style.getPropertyValue("--galaxy-gradient-0").trim();
-		const galaxyGradient05 = style.getPropertyValue("--galaxy-gradient-05").trim();
-		const galaxyGradient1 = style.getPropertyValue("--galaxy-gradient-1").trim();
+		const galaxyStar = getVar("--galaxy-star", "#ffffff");
+		const galaxyBg = getVar("--galaxy-bg", "#000000");
+		const galaxyGradient0 = getVar("--galaxy-gradient-0", "rgba(255,255,255,0.2)");
+		const galaxyGradient05 = getVar("--galaxy-gradient-05", "rgba(255,255,255,0.1)");
+		const galaxyGradient1 = getVar("--galaxy-gradient-1", "rgba(255,255,255,0.05)");
 
 		// Cloud positions and properties (fixed so they don't regenerate each frame)
 		const nebulaClouds = [
