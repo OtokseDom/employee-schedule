@@ -28,10 +28,29 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			cell: ({ row }) => {
 				const name = row.original.name;
 				const id = row.original.id;
+				const status = row.original.status;
 				return (
 					<div className="flex items-center gap-2">
-						<div className="w-14 h-14 bg-foreground rounded-full"></div>
-						{name} {user?.id === id && <span className="text-xs text-yellow-800"> (Me)</span>}
+						<div className="min-w-14 min-h-14 bg-foreground rounded-full"></div>
+						<div className="flex flex-col w-full">
+							{name} {user?.id === id && <span className="text-xs text-yellow-800"> (Me)</span>}
+							<span
+								className={`backdrop-blur-sm px-2 py-1 text-xs w-fit rounded-full items-center
+                            ${
+								status == "pending"
+									? "text-yellow-100 bg-yellow-900/50"
+									: status == "active"
+									? "text-green-100 bg-green-900/50"
+									: status == "inactive"
+									? "text-gray-100 bg-gray-900/50"
+									: status == "banned"
+									? "text-red-100 bg-red-900/50"
+									: ""
+							}`}
+							>
+								{status}
+							</span>
+						</div>
 					</div>
 				);
 			},
