@@ -19,7 +19,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserDetails from "@/pages/Users/Show/details";
 
 export default function UserProfile() {
-	const { setUser: setUserAuth } = useAuthContext();
+	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
 	const { setLoading } = useLoadContext();
@@ -59,19 +59,61 @@ export default function UserProfile() {
 		}
 	};
 
-	const handleUpdateUser = (user) => {
+	const handleApproval = async (action, id) => {
+		setLoading(true);
+		try {
+			if (action == 0) {
+				const userResponse = await axiosClient.delete(`/user/${id}`);
+				if (userResponse.data.success == true) {
+					showToast("Success!", userResponse.data.message, 3000);
+					navigate("/users");
+				} else {
+					showToast("Failed!", userResponse.message, 3000);
+				}
+			} else {
+				setLoading(true);
+				const form = {
+					...user.data,
+					status: "active",
+				};
+				try {
+					const userResponse = await axiosClient.put(`/user/${updateData?.id}`, form);
+					// fetch data to load user table and calendar
+					// fetchData();
+					setUser(userResponse);
+					showToast("Success!", "User updated.", 3000);
+				} catch (e) {
+					showToast("Failed!", e.response?.data?.message, 3000, "fail");
+					console.error("Error fetching data:", e);
+				} finally {
+					setLoading(false);
+				}
+			}
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+	};
+	const handleUpdateUser = async (user) => {
 		setIsOpenUser(true);
 		setUpdateDataUser(user);
-		axiosClient.get("/user-auth").then(({ data }) => {
-			setUserAuth(data);
-		});
+		// Update sidebar user if current user is updated
+		if (user.id == user_auth.id) {
+			axiosClient.get("/user-auth").then(({ data }) => {
+				setUserAuth(data);
+			});
+		}
 	};
+
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user/${id}`);
-			showToast("Success!", "User deleted.", 3000);
-			navigate("/users");
+			await axiosClient.delete(`/task/${id}`);
+			fetchData();
+			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
@@ -91,7 +133,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleDelete={handleDelete} />
+				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
@@ -106,41 +148,21 @@ export default function UserProfile() {
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						{/* <div className="mb-5">
-							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div> */}
 						<PieChartDonut report={userReports?.tasks_by_status} />
 					</div>
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						{/* <div className="mb-5">
-							<h1 className=" font-extrabold text-xl">Activity Timeline</h1>
-							<p>Daily Task Activity Timeline</p>
-						</div> */}
 						<AreaChartGradient report={userReports?.task_activity_timeline} />
 					</div>
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						{/* <div className="mb-5">
-							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div> */}
 						<RadarChartGridFilled report={userReports?.rating_per_category} />
 					</div>
 				</div>
 				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
 				<div className="flex flex-col lg:flex-row gap-4 w-full items-stretch">
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						{/* <div className="mb-5">
-							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div> */}
 						<ChartLineLabel report={userReports?.performance_rating_trend} />
 					</div>
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						{/* <div className="mb-5">
-							<h1 className=" font-extrabold text-xl">Tasks by Status</h1>
-							<p>Pie Chart of Tasks by Status</p>
-						</div> */}
 						<ChartBarMultiple report={userReports?.estimate_vs_actual} />
 					</div>
 				</div>
