@@ -7,10 +7,39 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { Edit } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import axiosClient from "@/axios.client";
+import { useToast } from "@/contexts/ToastContextProvider";
+import { useNavigate } from "react-router-dom";
 
-export default function UserDetails({ user, handleUpdateUser, handleDelete }) {
+export default function UserDetails({ user, handleUpdateUser, handleApproval }) {
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
-	const { loading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
+	const showToast = useToast();
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [dialogType, setDialogType] = useState(null); // "reject" or "delete"
+	const navigate = useNavigate();
+
+	const openDialog = (type) => {
+		setDialogType(type);
+		setDialogOpen(true);
+	};
+
+	const handleDelete = async (id) => {
+		setLoading(true);
+		try {
+			await axiosClient.delete(`/user/${id}`);
+			showToast("Success!", "User deleted.", 3000);
+			navigate("/users");
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
+	};
+
 	const {
 		name = "Galactic Explorer",
 		position = "Captain of the Starship",
@@ -43,7 +72,7 @@ export default function UserDetails({ user, handleUpdateUser, handleDelete }) {
 							</div>
 						</div>
 						{user_auth?.data?.role === "Superadmin" || user_auth?.data?.id === user?.id ? (
-							<Dialog>
+							<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 								<DropdownMenu modal={false}>
 									<DropdownMenuTrigger asChild>
 										<Button variant="default" className="flex items-center bg-foreground text-background">
@@ -51,11 +80,26 @@ export default function UserDetails({ user, handleUpdateUser, handleDelete }) {
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
+										{user?.status == "pending" ? (
+											<>
+												<DropdownMenuItem className="cursor-pointer text-green-500" onClick={() => handleApproval(1, user.id)}>
+													Approve User
+												</DropdownMenuItem>
+												<DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => openDialog("reject")}>
+													Reject User
+												</DropdownMenuItem>
+												<hr />
+											</>
+										) : (
+											""
+										)}
 										<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
 											Update Account
 										</DropdownMenuItem>
-										<DropdownMenuItem>
-											<DialogTrigger>Deactivate Account</DialogTrigger>
+										<DropdownMenuItem onClick={() => openDialog("delete")}>
+											<DialogTrigger asChild>
+												<span className="cursor-pointer">Deactivate Account</span>
+											</DialogTrigger>
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
@@ -70,7 +114,14 @@ export default function UserDetails({ user, handleUpdateUser, handleDelete }) {
 												Close
 											</Button>
 										</DialogClose>
-										<Button onClick={() => handleDelete(user.id)}>Yes, delete</Button>
+										<Button
+											onClick={() => {
+												if (dialogType === "reject") handleApproval(0, user.id);
+												else if (dialogType === "delete") handleDelete(user.id);
+											}}
+										>
+											Yes, delete
+										</Button>
 									</DialogFooter>
 								</DialogContent>
 							</Dialog>

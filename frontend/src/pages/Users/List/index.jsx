@@ -34,6 +34,7 @@ export default function Users() {
 	};
 
 	const handleDelete = async (id) => {
+		console.log(id);
 		setLoading(true);
 		try {
 			await axiosClient.delete(`/user/${id}`);
@@ -55,7 +56,7 @@ export default function Users() {
 			</div>
 
 			<DataTable
-				columns={columns({ handleDelete, setIsOpen, setUpdateData })}
+				columns={columns({ fetchData, handleDelete, setIsOpen, setUpdateData, updateData })}
 				data={users}
 				setUsers={setUsers}
 				isOpen={isOpen}

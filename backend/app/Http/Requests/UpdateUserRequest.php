@@ -28,7 +28,7 @@ class UpdateUserRequest extends FormRequest
             'position' => 'required|string|max:255',
             'dob' => 'required|date_format:Y-m-d',
             'email' => 'required|email|unique:users,email,' . $this->user->id, // Ignore the current user's email
-            'password' => 'required|string|min:8',
+            'password' => 'sometimes|nullable|string|min:8', //sometimes null if value is unchanged
             'status' => 'required|string|in:active,inactive,pending,banned',
         ];
     }

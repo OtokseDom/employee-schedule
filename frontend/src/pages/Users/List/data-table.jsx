@@ -52,7 +52,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 				/>
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-						{user?.role === "Superadmin" && (
+						{user?.data?.role === "Superadmin" && (
 							<SheetTrigger asChild>
 								<Button variant="">Add User</Button>
 							</SheetTrigger>

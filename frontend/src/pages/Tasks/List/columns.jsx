@@ -265,7 +265,16 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 									Update Task
 								</DropdownMenuItem>
 								<DropdownMenuItem>
-									<DialogTrigger>Delete Task</DialogTrigger>
+									<DialogTrigger asChild>
+										<button
+											className="w-full text-left"
+											onClick={(e) => {
+												e.stopPropagation();
+											}}
+										>
+											Delete Task
+										</button>
+									</DialogTrigger>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -280,7 +289,14 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 										Close
 									</Button>
 								</DialogClose>
-								<Button onClick={() => handleDelete(task.id)}>Yes, delete</Button>
+								<Button
+									onClick={(e) => {
+										e.stopPropagation();
+										handleDelete(task.id);
+									}}
+								>
+									Yes, delete
+								</Button>
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
