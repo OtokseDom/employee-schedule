@@ -10,7 +10,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 
-export const useUserColumns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) => {
+export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
 	const { setLoading } = useLoadContext();
 	const showToast = useToast();
