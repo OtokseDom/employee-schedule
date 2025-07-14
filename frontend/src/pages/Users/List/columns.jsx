@@ -4,15 +4,67 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
+import axiosClient from "@/axios.client";
 
-export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
+export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
+	const { loading, setLoading } = useLoadContext();
+	const showToast = useToast();
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [dialogType, setDialogType] = useState(null); // "reject" or "delete"
+	const [selectedUserId, setSelectedUserId] = useState(null); // pass user id here because using userRow.id in dialog gets wong id
+
+	const openDialog = (type) => {
+		setDialogType(type);
+		setDialogOpen(true);
+	};
 
 	const handleUpdateUser = (user, event) => {
 		event.stopPropagation();
 		setIsOpen(true);
 		setUpdateData(user);
+	};
+
+	const handleApproval = async (action, id, userRow = {}) => {
+		setLoading(true);
+		try {
+			if (action == 0) {
+				const userResponse = await axiosClient.delete(`/user/${id}`);
+				if (userResponse.data.success == true) {
+					showToast("Success!", userResponse.data.message, 3000);
+					navigate("/users");
+				} else {
+					showToast("Failed!", userResponse.message, 3000);
+				}
+			} else {
+				setLoading(true);
+				const form = {
+					...userRow,
+					status: "active",
+				};
+				try {
+					user;
+					const userResponse = await axiosClient.put(`/user/${id}`, form);
+					fetchData();
+					showToast("Success!", userResponse.data.message, 3000);
+				} catch (e) {
+					showToast("Failed!", e.response?.data?.message, 3000, "fail");
+					console.error("Error fetching data:", e);
+				} finally {
+					setLoading(false);
+				}
+			}
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			console.error("Error fetching data:", e);
+		} finally {
+			// Always stop loading when done
+			setLoading(false);
+		}
 	};
 	// TODO: Add user profile picture
 	// Define the base columns
@@ -85,13 +137,13 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	];
 
 	// Add Actions column only if user is Superadmin
-	if (user.data.role === "Superadmin") {
+	if (user?.data?.role === "Superadmin") {
 		columns.push({
 			id: "actions",
 			cell: ({ row }) => {
 				const userRow = row.original;
 				return (
-					<Dialog>
+					<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger
 								asChild
@@ -103,14 +155,48 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
+								{userRow?.status == "pending" ? (
+									<>
+										<DropdownMenuItem
+											className="cursor-pointer text-green-500"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleApproval(1, userRow?.id, userRow);
+											}}
+										>
+											Approve User
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											className="cursor-pointer text-red-500"
+											onClick={(e) => {
+												e.stopPropagation();
+												openDialog("reject");
+												setSelectedUserId(userRow.id);
+											}}
+										>
+											Reject User
+										</DropdownMenuItem>
+										<hr />
+									</>
+								) : (
+									""
+								)}
 								<DropdownMenuItem className="cursor-pointer">
 									<Link to={`/profile/` + userRow.id}>View Profile</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className="cursor-pointer" onClick={(event) => handleUpdateUser(userRow, event)}>
 									Update User
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={(event) => event.stopPropagation()}>
-									<DialogTrigger>Delete User</DialogTrigger>
+								<DropdownMenuItem
+									onClick={(e) => {
+										e.stopPropagation();
+										setSelectedUserId(userRow.id);
+										openDialog("delete");
+									}}
+								>
+									<DialogTrigger asChild>
+										<span className="cursor-pointer">Deactivate Account</span>
+									</DialogTrigger>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -125,7 +211,15 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 										Close
 									</Button>
 								</DialogClose>
-								<Button onClick={() => handleDelete(userRow.id)}>Yes, delete</Button>
+								<Button
+									onClick={() => {
+										if (dialogType === "reject") handleApproval(0, selectedUserId);
+										else if (dialogType === "delete") handleDelete(selectedUserId);
+										setDialogOpen(false);
+									}}
+								>
+									Yes, delete
+								</Button>
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
