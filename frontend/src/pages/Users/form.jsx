@@ -72,7 +72,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 	const handleSubmit = async (form) => {
 		const formattedData = {
 			...form,
-			organization_id: user.organization_id,
+			organization_id: user.data.organization_id,
 			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
 			password: "$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW", //password: admin123
 		};

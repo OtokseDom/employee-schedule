@@ -66,7 +66,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	];
 
 	// Add Actions column only if user is Superadmin
-	if (user.role === "Superadmin") {
+	if (user.data.role === "Superadmin") {
 		columns.push({
 			id: "actions",
 			cell: ({ row }) => {
