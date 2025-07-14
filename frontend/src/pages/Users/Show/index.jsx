@@ -73,15 +73,13 @@ export default function UserProfile() {
 			} else {
 				setLoading(true);
 				const form = {
-					...user.data,
+					...user,
 					status: "active",
 				};
 				try {
-					const userResponse = await axiosClient.put(`/user/${updateData?.id}`, form);
-					// fetch data to load user table and calendar
-					// fetchData();
-					setUser(userResponse);
-					showToast("Success!", "User updated.", 3000);
+					const userResponse = await axiosClient.put(`/user/${id}`, form);
+					setUser(userResponse.data.data);
+					showToast("Success!", userResponse.data.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
 					console.error("Error fetching data:", e);

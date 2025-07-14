@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useState } from "react";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function UserDetails({ user, handleUpdateUser, handleApproval }) {
 	const { user: user_auth } = useAuthContext(); // Get authenticated user details
@@ -17,6 +18,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null); // "reject" or "delete"
+	const navigate = useNavigate();
 
 	const openDialog = (type) => {
 		setDialogType(type);
@@ -34,7 +36,6 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
-			setDialogOpen(false);
 			setLoading(false);
 		}
 	};
