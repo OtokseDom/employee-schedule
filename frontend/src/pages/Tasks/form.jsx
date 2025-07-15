@@ -53,6 +53,12 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 	const [users, setUsers] = useState();
 	const [categories, setCategories] = useState([]);
 
+	// State for time_estimate and delay hour/minute fields
+	const [timeEstimateHour, setTimeEstimateHour] = useState("");
+	const [timeEstimateMinute, setTimeEstimateMinute] = useState("");
+	const [delayHour, setDelayHour] = useState("");
+	const [delayMinute, setDelayMinute] = useState("");
+
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -100,11 +106,9 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 	}, [isOpen]);
 
 	useEffect(() => {
-		// console.log(updateData);
-		// console.log(users);
 		if (updateData && users && categories) {
 			const {
-				calendar_add, //when update data is set on calendar cell click
+				calendar_add,
 				title,
 				description,
 				assignee_id,
@@ -141,8 +145,25 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				remarks: remarks || "",
 				status: status || undefined,
 			});
+			// Set hour/minute fields for time_estimate and delay
+			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
+				const te = parseFloat(time_estimate);
+				setTimeEstimateHour(Math.floor(te).toString());
+				setTimeEstimateMinute(Math.round((te % 1) * 60).toString());
+			} else {
+				setTimeEstimateHour("");
+				setTimeEstimateMinute("");
+			}
+			if (typeof delay === "number" || (typeof delay === "string" && delay !== "")) {
+				const d = parseFloat(delay);
+				setDelayHour(Math.floor(d).toString());
+				setDelayMinute(Math.round((d % 1) * 60).toString());
+			} else {
+				setDelayHour("");
+				setDelayMinute("");
+			}
 		}
-	}, [updateData, form, users]);
+	}, [updateData, form, users, categories]);
 
 	const handleSubmit = async (formData) => {
 		setLocalLoading(true);
@@ -150,12 +171,15 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 			// Parse numeric fields
 			const formatTime = (time) => {
 				if (!time) return "";
-				// If already in HH:mm:ss, return as is
 				if (/^\d{2}:\d{2}:\d{2}$/.test(time)) return time;
-				// If in HH:mm, append :00
 				if (/^\d{2}:\d{2}$/.test(time)) return `${time}:00`;
 				return time;
 			};
+
+			// Calculate decimal values for time_estimate and delay
+			const timeEstimateDecimal =
+				timeEstimateHour || timeEstimateMinute ? parseInt(timeEstimateHour || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60 : undefined;
+			const delayDecimal = delayHour || delayMinute ? parseInt(delayHour || "0", 10) + parseInt(delayMinute || "0", 10) / 60 : undefined;
 
 			const parsedForm = {
 				...formData,
@@ -164,14 +188,12 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
-				time_estimate: formData.time_estimate ? parseFloat(formData.time_estimate) : undefined,
+				time_estimate: timeEstimateDecimal,
 				time_taken: formData.time_taken ? parseFloat(formData.time_taken) : undefined,
-				delay: formData.delay ? parseFloat(formData.delay) : undefined,
+				delay: delayDecimal,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
-			// console.log(parsedForm);
 			if (Object.keys(updateData).length === 0) {
-				// console.log("add");
 				await axiosClient.post(`/task`, parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
@@ -206,6 +228,31 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 		}
 	};
 
+	// Auto-suggest time estimate based on start and end time
+	useEffect(() => {
+		const start = form.watch("start_time");
+		const end = form.watch("end_time");
+		if (start && end) {
+			// Parse times as HH:mm or HH:mm:ss
+			const parseTime = (t) => {
+				const [h, m, s] = t.split(":").map(Number);
+				return h * 60 + m + (s ? s / 60 : 0);
+			};
+			try {
+				const startMin = parseTime(start);
+				const endMin = parseTime(end);
+				let diff = endMin - startMin;
+				if (diff < 0) diff += 24 * 60; // handle overnight
+				const hours = Math.floor(diff / 60);
+				const minutes = Math.round(diff % 60);
+				setTimeEstimateHour(hours.toString());
+				setTimeEstimateMinute(minutes.toString());
+			} catch (e) {
+				// ignore parse errors
+			}
+		}
+	}, [form.watch("start_time"), form.watch("end_time")]);
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
@@ -217,6 +264,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
 								<Select
+									disbaled={!users?.length}
 									onValueChange={(value) => field.onChange(Number(value))}
 									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
 									value={field.value ? field.value.toString() : undefined}
@@ -252,7 +300,11 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 						return (
 							<FormItem>
 								<FormLabel>Category</FormLabel>
-								<Select onValueChange={(value) => field.onChange(Number(value))} value={field.value ? field.value.toString() : undefined}>
+								<Select
+									disbaled={!categories?.length}
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : undefined}
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a category">
@@ -379,21 +431,39 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="time_estimate"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Time Estimate &#40;hrs&#41;</FormLabel>
-								<FormControl>
-									<Input type="number" step="any" placeholder="Time estimate &#40;hrs&#41;" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
+				{/* Time Estimate (hr/min) */}
+				<FormItem>
+					<FormLabel>Time Estimate</FormLabel>
+					<div className="flex gap-2">
+						<Input
+							type="number"
+							min="0"
+							placeholder="hr"
+							value={timeEstimateHour}
+							onChange={(e) => {
+								const val = e.target.value.replace(/[^0-9]/g, "");
+								setTimeEstimateHour(val);
+							}}
+							className="w-20"
+						/>
+						<span>hr</span>
+						<Input
+							type="number"
+							min="0"
+							max="59"
+							placeholder="min"
+							value={timeEstimateMinute}
+							onChange={(e) => {
+								let val = e.target.value.replace(/[^0-9]/g, "");
+								if (parseInt(val, 10) > 59) val = "59";
+								setTimeEstimateMinute(val);
+							}}
+							className="w-20"
+						/>
+						<span>min</span>
+					</div>
+					<FormMessage />
+				</FormItem>
 				<FormField
 					control={form.control}
 					name="time_taken"
@@ -409,21 +479,39 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="delay"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Delay &#40;hrs&#41;</FormLabel>
-								<FormControl>
-									<Input type="number" step="any" placeholder="Delay &#40;hrs&#41;" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
+				{/* Delay (hr/min) */}
+				<FormItem>
+					<FormLabel>Delay</FormLabel>
+					<div className="flex gap-2">
+						<Input
+							type="number"
+							min="0"
+							placeholder="hr"
+							value={delayHour}
+							onChange={(e) => {
+								const val = e.target.value.replace(/[^0-9]/g, "");
+								setDelayHour(val);
+							}}
+							className="w-20"
+						/>
+						<span>hr</span>
+						<Input
+							type="number"
+							min="0"
+							max="59"
+							placeholder="min"
+							value={delayMinute}
+							onChange={(e) => {
+								let val = e.target.value.replace(/[^0-9]/g, "");
+								if (parseInt(val, 10) > 59) val = "59";
+								setDelayMinute(val);
+							}}
+							className="w-20"
+						/>
+						<span>min</span>
+					</div>
+					<FormMessage />
+				</FormItem>
 				<FormField
 					control={form.control}
 					name="delay_reason"
