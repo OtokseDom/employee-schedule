@@ -14,7 +14,7 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
-
+	// TODO: use sheet here. check week view
 	useEffect(() => {
 		if (taskAdded) {
 			fetchData();
@@ -54,7 +54,7 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 
 				const isDialogOpen = openDialogIndex === index; //added to prevent aria-hidden warning
 				return (
-					<Dialog key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)}>
+					<Dialog modal={true} key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)}>
 						<DialogTrigger
 							onClick={() => {
 								setUpdateData({
@@ -124,7 +124,7 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 								</div>
 							</div>
 						</DialogTrigger>
-						<DialogContent>
+						<DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
 							<DialogHeader className="text-left">
 								<DialogTitle>
 									<div className="flex flex-row gap-5">
