@@ -1,3 +1,4 @@
+"use client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";

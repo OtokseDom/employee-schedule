@@ -1,9 +1,11 @@
+"use client";
 import axiosClient from "@/axios.client";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
 import { Clock, Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,19 +29,6 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 	useEffect(() => {
 		setTasks(data);
 	}, [data]);
-	// const fetchData = async () => {
-	// 	setLoading(true);
-	// 	try {
-	// 		// Make both API calls concurrently using Promise.all
-	// 		const taskResponse = await axiosClient.get("/task");
-	// 		setTasks(taskResponse.data.data);
-	// 	} catch (e) {
-	// 		console.error("Error fetching data:", e);
-	// 	} finally {
-	// 		// Always stop loading when done
-	// 		setLoading(false);
-	// 	}
-	// };
 	return (
 		<div className="overflow-x-auto">
 			<div className="min-w-max grid grid-cols-8 gap-1">
@@ -59,14 +48,15 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 				</div>
 
 				{/* Days columns */}
-				{weekDays.map((day, dayIndex) => {
+				{weekDays.map((day, index) => {
 					const formattedDate = format(day, "yyyy-MM-dd");
 					const isToday = formattedDate === format(new Date(), "yyyy-MM-dd");
-					const isDialogOpen = openDialogIndex === dayIndex; //added to prevent aria-hidden warning
+					const isDialogOpen = openDialogIndex === index; //added to prevent aria-hidden warning
 
 					return (
-						<Dialog key={dayIndex} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? dayIndex : null)}>
-							<DialogTrigger
+						<Sheet key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)} modal={false}>
+							<SheetTrigger
+								asChild
 								onClick={() => {
 									setUpdateData({
 										calendar_add: true,
@@ -75,10 +65,10 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 										start_date: format(day, "yyyy-MM-dd"),
 										end_date: format(day, "yyyy-MM-dd"),
 									});
-									setOpenDialogIndex(dayIndex);
+									setOpenDialogIndex(index);
 								}}
 							>
-								<div key={dayIndex} className="col-span-1 min-w-32 text-left">
+								<div key={index} className="col-span-1 min-w-32 text-left cursor-pointer">
 									<div className={`h-12 p-2 text-center font-medium ${isToday ? "text-blue-600" : ""}`}>
 										<div>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day.getDay()]}</div>
 										<div className="text-sm">{day.getDate()}</div>
@@ -88,13 +78,13 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 										const tasksInSlot = (Array.isArray(tasks) ? tasks : []).filter((s) => isInTimeSlot(s, time, day));
 										return (
 											<div
-												key={`${dayIndex}-${timeIndex}`}
+												key={`${index}-${timeIndex}`}
 												// onClick={() => handleCellClick(day, time)}
 												className={`
                                                 h-16 p-1 border-t   relative
                                                 ${isToday ? "bg-blue-50" : "bg-sidebar"} 
                                                 ${timeIndex === timeSlots.length - 1 ? "border-b" : ""}
-                                                ${dayIndex === 6 ? "border-r" : ""}
+                                                ${index === 6 ? "border-r" : ""}
                                             `}
 											>
 												{loading ? (
@@ -133,7 +123,7 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 																e.stopPropagation();
 																setUpdateData({});
 																setTimeout(() => setUpdateData(task), 0);
-																setOpenDialogIndex(dayIndex);
+																setOpenDialogIndex(index);
 															}}
 															className={`
 														absolute left-0 right-0 mx-1 p-1 rounded border z-10 overflow-clip
@@ -157,34 +147,30 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 										);
 									})}
 								</div>
-							</DialogTrigger>
-							<DialogContent>
-								<DialogHeader className="text-left">
-									<DialogTitle>
+							</SheetTrigger>
+							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+								<SheetHeader>
+									<SheetTitle>
 										<div className="flex flex-row gap-5">
-											<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Task"}</span>
+											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
 											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 										</div>
-									</DialogTitle>
-									<DialogDescription>
-										{updateData?.calendar_add ? "Add task for" : "Update task for"} {selectedUser?.name}
-									</DialogDescription>
-								</DialogHeader>
-								<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
-									<TaskForm
-										// data={tasks}
-										localLoading={localLoading}
-										setLocalLoading={setLocalLoading}
-										isOpen={isDialogOpen}
-										setIsOpen={(open) => setOpenDialogIndex(open ? dayIndex : null)}
-										updateData={updateData}
-										setUpdateData={setUpdateData}
-										fetchData={fetchData}
-										setTaskAdded={setTaskAdded}
-									/>
-								</div>
-							</DialogContent>
-						</Dialog>
+									</SheetTitle>
+									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
+								</SheetHeader>
+								<TaskForm
+									// data={tasks}
+									localLoading={localLoading}
+									setLocalLoading={setLocalLoading}
+									isOpen={isDialogOpen}
+									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
+									updateData={updateData}
+									setUpdateData={setUpdateData}
+									fetchData={fetchData}
+									setTaskAdded={setTaskAdded}
+								/>
+							</SheetContent>
+						</Sheet>
 					);
 				})}
 			</div>
