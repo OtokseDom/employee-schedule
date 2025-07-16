@@ -83,6 +83,12 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 	});
 	return (
 		<div className="w-full scrollbar-custom">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					isOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div className="flex flex-col md:flex-row justify-between py-4">
 				<div className="flex flex-row gap-4">
 					{/* Input field to enter filter value */}

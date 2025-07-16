@@ -38,6 +38,12 @@ export function DataTableCategories({ columns, data, setCategories, isOpen, setI
 
 	return (
 		<div className="w-full scrollbar-custom">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					isOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div className="flex py-4">
 				<Input
 					placeholder={"filter name..."}

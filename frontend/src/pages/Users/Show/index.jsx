@@ -31,7 +31,6 @@ export default function UserProfile() {
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
 	const navigate = useNavigate();
-
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 		if (!isOpenUser) setUpdateDataUser({});
@@ -123,6 +122,12 @@ export default function UserProfile() {
 
 	return (
 		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					isOpenUser ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			{/* ------------------------------- Back button ------------------------------ */}
 			<Link to="/users">
 				<Button variant="ghost" className="flex items-center">

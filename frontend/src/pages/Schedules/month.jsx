@@ -16,7 +16,6 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
-	// TODO: use sheet in week view
 	useEffect(() => {
 		if (taskAdded) {
 			fetchData();
@@ -29,6 +28,12 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	}, [data]);
 	return (
 		<div className="grid grid-cols-7 gap-0 md:gap-1">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					openDialogIndex ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
 				<div key={day} className="p-2 font-semibold text-center text-foreground">
 					{day}

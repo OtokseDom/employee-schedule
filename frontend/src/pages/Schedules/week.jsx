@@ -31,6 +31,12 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 	}, [data]);
 	return (
 		<div className="overflow-x-auto">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					openDialogIndex ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div className="min-w-max grid grid-cols-8 gap-1">
 				{/* Time column */}
 				<div className="col-span-1">
