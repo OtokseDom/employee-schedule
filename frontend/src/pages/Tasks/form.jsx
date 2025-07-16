@@ -264,13 +264,12 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
 								<Select
-									disbaled={!users?.length}
 									onValueChange={(value) => field.onChange(Number(value))}
 									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger>
+										<SelectTrigger disabled={localLoading}>
 											<SelectValue placeholder="Select an assignee">
 												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
 											</SelectValue>
@@ -306,7 +305,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger>
+										<SelectTrigger disabled={localLoading}>
 											<SelectValue placeholder="Select a category">
 												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a category"}
 											</SelectValue>
