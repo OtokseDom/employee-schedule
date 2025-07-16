@@ -6,7 +6,7 @@ import axiosClient from "@/axios.client";
 
 import GalaxyProfileBanner from "../../components/design/galaxy";
 // Shadcn UI
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
@@ -136,6 +136,7 @@ export default function Organization() {
 					<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 						<SheetHeader>
 							<SheetTitle>Update Organization</SheetTitle>
+							<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 						</SheetHeader>
 						<OrganizationForm setIsOpen={setIsOpen} fetchData={fetchData} />
 					</SheetContent>

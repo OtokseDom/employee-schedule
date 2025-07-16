@@ -7,7 +7,7 @@ import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
@@ -143,6 +143,7 @@ export default function UserProfile() {
 				<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 					<SheetHeader>
 						<SheetTitle>Update User</SheetTitle>
+						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
 					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchData} />
 				</SheetContent>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
 								<SheetTitle>Add User</SheetTitle>
+								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
 							<UserForm
 								data={data}
