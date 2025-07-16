@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import TaskForm from "../Tasks/form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 
@@ -14,7 +15,7 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
-	// TODO: use sheet here. check week view
+	// TODO: use sheet in week view
 	useEffect(() => {
 		if (taskAdded) {
 			fetchData();
@@ -25,19 +26,6 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 	useEffect(() => {
 		setTasks(data);
 	}, [data]);
-	// const fetchData = async () => {
-	// 	setLoading(true);
-	// 	try {
-	// 		// Make both API calls concurrently using Promise.all
-	// 		const taskResponse = await axiosClient.get("/task");
-	// 		setTasks(taskResponse.data.data);
-	// 	} catch (e) {
-	// 		console.error("Error fetching data:", e);
-	// 	} finally {
-	// 		// Always stop loading when done
-	// 		setLoading(false);
-	// 	}
-	// };
 	return (
 		<div className="grid grid-cols-7 gap-0 md:gap-1">
 			{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
@@ -47,15 +35,14 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 			))}
 			{days.map((day, index) => {
 				const isCurrentMonth = day.getMonth() === currentMonth;
-				// const isToday = formatDate(day) === formatDate(new Date());
 				const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
 				const dayTasks = getTaskForDate(day, tasks);
-				// const dayTasks = schedules.filter((s) => formatDate(s.start_time) === formatDate(day));
 
 				const isDialogOpen = openDialogIndex === index; //added to prevent aria-hidden warning
 				return (
-					<Dialog modal={true} key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)}>
-						<DialogTrigger
+					<Sheet key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)} modal={false}>
+						<SheetTrigger
+							asChild
 							onClick={() => {
 								setUpdateData({
 									calendar_add: true,
@@ -123,34 +110,30 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 									)}
 								</div>
 							</div>
-						</DialogTrigger>
-						<DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-							<DialogHeader className="text-left">
-								<DialogTitle>
+						</SheetTrigger>
+						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+							<SheetHeader>
+								<SheetTitle>
 									<div className="flex flex-row gap-5">
-										<span>{updateData?.calendar_add ? "Add to Calendar" : "Update Task"}</span>
+										<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
 										<span>{localLoading && <Loader2 className="animate-spin" />}</span>
 									</div>
-								</DialogTitle>
-								<DialogDescription>
-									{updateData?.calendar_add ? "Add task for" : "Update task for"} {selectedUser?.name}
-								</DialogDescription>
-							</DialogHeader>
-							<div className="max-h-[80vh] overflow-y-auto scrollbar-custom">
-								<TaskForm
-									// data={tasks}
-									localLoading={localLoading}
-									setLocalLoading={setLocalLoading}
-									isOpen={isDialogOpen}
-									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
-									updateData={updateData}
-									setUpdateData={setUpdateData}
-									fetchData={fetchData}
-									setTaskAdded={setTaskAdded}
-								/>
-							</div>
-						</DialogContent>
-					</Dialog>
+								</SheetTitle>
+								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
+							</SheetHeader>
+							<TaskForm
+								// data={tasks}
+								localLoading={localLoading}
+								setLocalLoading={setLocalLoading}
+								isOpen={isDialogOpen}
+								setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
+								updateData={updateData}
+								setUpdateData={setUpdateData}
+								fetchData={fetchData}
+								setTaskAdded={setTaskAdded}
+							/>
+						</SheetContent>
+					</Sheet>
 				);
 			})}
 		</div>
