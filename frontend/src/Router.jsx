@@ -21,17 +21,66 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <AdminLayout />,
 		children: [
-			{ path: "/", element: <Navigate to="/dashboard" />, errorElement: <ErrorFallback /> },
-			{ path: "/dashboard", element: <Dashboard />, errorElement: <ErrorFallback /> },
-			{ path: "/calendar", element: <Schedules />, errorElement: <ErrorFallback /> },
-			{ path: "/task", element: <Tasks />, errorElement: <ErrorFallback /> },
-			{ path: "/users", element: <Users />, errorElement: <ErrorFallback /> },
-			{ path: "/users/:id", element: <UserProfile />, errorElement: <ErrorFallback /> },
+			{ path: "/", element: <Navigate to="/dashboard" /> },
+			{
+				path: "/dashboard",
+				element: (
+					<ErrorFallback>
+						<Dashboard />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/calendar",
+				element: (
+					<ErrorFallback>
+						<Schedules />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/task",
+				element: (
+					<ErrorFallback>
+						<Tasks />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/users",
+				element: (
+					<ErrorFallback>
+						<Users />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/users/:id",
+				element: (
+					<ErrorFallback>
+						<UserProfile />
+					</ErrorFallback>
+				),
+			},
 			{
 				path: "/settings",
 				children: [
-					{ path: "categories", element: <Categories />, errorElement: <ErrorFallback /> },
-					{ path: "organization", element: <Organization />, errorElement: <ErrorFallback /> },
+					{
+						path: "categories",
+						element: (
+							<ErrorFallback>
+								<Categories />
+							</ErrorFallback>
+						),
+					},
+					{
+						path: "organization",
+						element: (
+							<ErrorFallback>
+								<Organization />
+							</ErrorFallback>
+						),
+					},
 				],
 			},
 		],
@@ -40,8 +89,22 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <GuestLayout />,
 		children: [
-			{ path: "/login", element: <Login />, errorElement: <ErrorFallback /> },
-			{ path: "/signup", element: <Signup />, errorElement: <ErrorFallback /> },
+			{
+				path: "/login",
+				element: (
+					<ErrorFallback>
+						<Login />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/signup",
+				element: (
+					<ErrorFallback>
+						<Signup />
+					</ErrorFallback>
+				),
+			},
 		],
 	},
 ]);
