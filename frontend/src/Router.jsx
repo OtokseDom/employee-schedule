@@ -13,6 +13,7 @@ import Events from "./pages/Events/List/index";
 import Schedules from "./pages/Schedules";
 import Categories from "./pages/Categories/List";
 import Organization from "./pages/Organization";
+import ErrorFallback from "./pages/ErrorFallback";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -20,28 +21,27 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <AdminLayout />,
 		children: [
-			{ path: "/", element: <Navigate to="/dashboard" /> },
-			{ path: "/dashboard", element: <Dashboard /> },
-			{ path: "/calendar", element: <Schedules /> },
-			{ path: "/task", element: <Tasks /> },
-			{ path: "/users", element: <Users /> },
-			{ path: "/users/:id", element: <UserProfile /> },
+			{ path: "/", element: <Navigate to="/dashboard" />, errorElement: <ErrorFallback /> },
+			{ path: "/dashboard", element: <Dashboard />, errorElement: <ErrorFallback /> },
+			{ path: "/calendar", element: <Schedules />, errorElement: <ErrorFallback /> },
+			{ path: "/task", element: <Tasks />, errorElement: <ErrorFallback /> },
+			{ path: "/users", element: <Users />, errorElement: <ErrorFallback /> },
+			{ path: "/users/:id", element: <UserProfile />, errorElement: <ErrorFallback /> },
 			{
 				path: "/settings",
 				children: [
-					{ path: "categories", element: <Categories /> },
-					{ path: "organization", element: <Organization /> },
+					{ path: "categories", element: <Categories />, errorElement: <ErrorFallback /> },
+					{ path: "organization", element: <Organization />, errorElement: <ErrorFallback /> },
 				],
 			},
-			{ path: "", element: <Users /> },
 		],
 	},
 	{
 		path: "/",
 		element: <GuestLayout />,
 		children: [
-			{ path: "/login", element: <Login /> },
-			{ path: "/signup", element: <Signup /> },
+			{ path: "/login", element: <Login />, errorElement: <ErrorFallback /> },
+			{ path: "/signup", element: <Signup />, errorElement: <ErrorFallback /> },
 		],
 	},
 ]);
