@@ -151,19 +151,19 @@ export default function UserProfile() {
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
-						<SectionCard description="Task at Risk" showBadge={false} value={2} percentage={12.2} />
-					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
-						<SectionCard description="Avg Performance" showBadge={false} value={7.4} percentage={12.2} />
-					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
-						<SectionCard description="sample" showBadge={false} value={40} percentage={12.2} />
-					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
-						<SectionCard description="sample" showBadge={false} value={100} percentage={12.2} />
-					</div>
+				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
+					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
+					<SectionCard variant="" description="Task at Risk" showBadge={false} value={2} percentage={12.2} />
+					{/* </div> */}
+					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
+					<SectionCard variant="" description="Avg Performance" showBadge={false} value={7.4} percentage={12.2} />
+					{/* </div> */}
+					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
+					<SectionCard variant="" description="sample" showBadge={false} value={40} percentage={12.2} />
+					{/* </div> */}
+					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
+					<SectionCard variant="" description="sample" showBadge={false} value={100} percentage={12.2} />
+					{/* </div> */}
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
