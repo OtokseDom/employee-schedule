@@ -17,6 +17,7 @@ import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserDetails from "@/pages/Users/Show/details";
+import { SectionCard } from "@/components/chart/section-card";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
@@ -149,6 +150,21 @@ export default function UserProfile() {
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
+				{/* ---------------------------- Task and Insight ---------------------------- */}
+				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
+						<SectionCard description="Task at Risk" showBadge={false} value={2} percentage={12.2} />
+					</div>
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
+						<SectionCard description="Avg Performance" showBadge={false} value={7.4} percentage={12.2} />
+					</div>
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
+						<SectionCard description="sample" showBadge={false} value={40} percentage={12.2} />
+					</div>
+					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md">
+						<SectionCard description="sample" showBadge={false} value={100} percentage={12.2} />
+					</div>
+				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
 					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
