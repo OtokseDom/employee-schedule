@@ -47,17 +47,17 @@ export default function UserProfile() {
 				<p>Your workspace at a glance</p>
 			</div>
 			{/* Section Cards */}
-			<div className="md:col-span-3">
-				<SectionCard description="Active Members" showBadge={false} value={100} percentage={12.2} />
+			<div className="md:col-span-3 h-stretch">
+				<SectionCard description="Active Members" showBadge={false} value={100} variant="dashboard" />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="Avg Performance" showBadge={false} value={8.3} percentage={12.2} />
+				<SectionCard description="Avg Performance" showBadge={false} value={8.3} variant="dashboard" />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="Tasks at Risk" showBadge={false} value={3} percentage={12.2} />
+				<SectionCard description="Tasks at Risk" showBadge={false} value={3} variant="dashboard" />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="Avg Task Completion Time" showBadge={false} value={"4 hrs"} percentage={12.2} />
+				<SectionCard description="Avg Completion Time" showBadge={false} value={"4 hrs"} variant="dashboard" />
 			</div>
 
 			{/* Pie Chart */}
