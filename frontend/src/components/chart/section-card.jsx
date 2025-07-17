@@ -18,7 +18,7 @@ export function SectionCard({ description, value, showBadge = true, percentage, 
 					</div>
 					<CardTitle className="text-4xl font-semibold tabular-nums">{value ? value : "N/A"}</CardTitle>
 				</CardHeader>
-				<CardFooter className="flex-col items-start gap-1.5 text-sm">
+				{/* <CardFooter className="flex-col items-start gap-1.5 text-sm">
 					{insight ? (
 						<div className="line-clamp-1 items-center flex gap-2 font-medium">
 							{insight} {upward ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -27,7 +27,7 @@ export function SectionCard({ description, value, showBadge = true, percentage, 
 						""
 					)}
 					<div className="text-muted-foreground">{footer ? footer : ""}</div>
-				</CardFooter>
+				</CardFooter> */}
 			</Card>
 		</div>
 	);

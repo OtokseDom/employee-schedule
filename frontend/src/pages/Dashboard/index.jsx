@@ -12,6 +12,14 @@ import { ChartLineLabel } from "@/components/chart/line-chart-label";
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
+	// TODO: Add date filter
+	const [filters, setFilters] = useState({
+		date_from: null,
+		date_to: null,
+		// status: [],
+		// category: '',
+		// assignee: [],
+	});
 
 	useEffect(() => {
 		document.title = "Task Management";
@@ -33,24 +41,24 @@ export default function UserProfile() {
 	};
 
 	return (
-		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 auto-rows-auto bg-background rounded-2xl p-4 md:p-10 border border-border">
+		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-auto bg-background rounded-2xl p-4 md:p-10 border border-border">
 			<div className="md:col-span-12">
 				<h1 className="font-extrabold text-3xl">Dashboard</h1>
 				<p>Your workspace at a glance</p>
 			</div>
 			{/* Section Cards */}
-			{/* <div className="md:col-span-3">
-				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
+			<div className="md:col-span-3">
+				<SectionCard description="Active Members" showBadge={false} value={100} percentage={12.2} />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
+				<SectionCard description="Avg Performance" showBadge={false} value={8.3} percentage={12.2} />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
+				<SectionCard description="Tasks at Risk" showBadge={false} value={3} percentage={12.2} />
 			</div>
 			<div className="md:col-span-3">
-				<SectionCard description="test" value={100} percentage={12.2} insight="sample" footer="sample" />
-			</div> */}
+				<SectionCard description="Avg Task Completion Time" showBadge={false} value={"4 hrs"} percentage={12.2} />
+			</div>
 
 			{/* Pie Chart */}
 			<div className="md:col-span-4">
