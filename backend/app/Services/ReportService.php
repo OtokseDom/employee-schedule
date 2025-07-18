@@ -11,7 +11,7 @@ class ReportService
 {
     /* ----------------------------- SHARED REPORTS ----------------------------- */
     // Task status - Pie donut chart
-    public static function tasksByStatus($id, $variant = "")
+    public static function tasksByStatus($id, $variant = "", $filter)
     {
         if (!is_numeric($id) && $variant == "") {
             return apiResponse(null, 'Invalid user ID', false, 400);
@@ -51,6 +51,11 @@ class ReportService
                 ->where('organization_id', Auth::user()->organization_id)
                 ->where('status', $status['name']);
 
+            if ($filter && $filter['from'] && $filter['to']) {
+                $query->where('tasks.start_date', '>=', $filter['from'])
+                    ->where('tasks.start_date', '<=', $filter['to']);
+            }
+
             if ($variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }
@@ -67,7 +72,7 @@ class ReportService
     }
 
     // Performance Trend - Line chart label
-    public static function performanceRatingTrend($id, $variant = "")
+    public static function performanceRatingTrend($id, $variant = "", $filter)
     {
         // Calculate the last 6 months (including current)
         $months = [];
@@ -87,6 +92,11 @@ class ReportService
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
                 ->where('organization_id', Auth::user()->organization_id);
+
+            if ($filter && $filter['from'] && $filter['to']) {
+                $query->where('tasks.start_date', '>=', $filter['from'])
+                    ->where('tasks.start_date', '<=', $filter['to']);
+            }
 
             if ($variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
@@ -127,51 +137,10 @@ class ReportService
 
         return apiResponse($data, "Performance rating trend report fetched successfully");
     }
-    // Average Rating Per Category. Radar chart
-    public static function ratingPerCategory($id)
-    {
-        $ratings = DB::table('categories')
-            ->leftJoin('tasks', function ($join) use ($id) {
-                $join->on('tasks.category_id', '=', 'categories.id')
-                    ->where('tasks.assignee_id', '=', $id);
-            })
-            ->where('categories.organization_id', Auth::user()->organization_id)
-            ->select(
-                'categories.name as category',
-                DB::raw('AVG(tasks.performance_rating) as average_rating'),
-                DB::raw('COUNT(tasks.id) as task_count')
-            )
-            ->groupBy('categories.id', 'categories.name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'category' => $item->category,
-                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2),
-                    'task_count' => $item->task_count
-                ];
-            });
-        $task_count = $ratings->sum('task_count');
-        $highestRatingValue = $ratings->max('value');
-        $highestRatingCategory = $ratings->firstWhere('value', $highestRatingValue);
-        $highestRating = [
-            'category' => $highestRatingCategory ? $highestRatingCategory['category'] : null,
-            'value' => $highestRatingValue
-        ];
-        $data = [
-            "highest_rating" => $highestRating,
-            "ratings" => $ratings,
-            "task_count" => $task_count
-        ];
-        if (empty($data)) {
-            return apiResponse(null, 'Failed to fetch rating per category report', false, 404);
-        }
-
-        return apiResponse($data, "Rating per category report fetched successfully");
-    }
 
     /* ------------------------------ USER REPORTS ------------------------------ */
     // User Taskload. Area chart
-    public static function taskActivityTimeline($id)
+    public static function taskActivityTimeline($id, $filter)
     {
         // Calculate the last 6 months (including current)
         $months = [];
@@ -224,10 +193,51 @@ class ReportService
 
         return apiResponse($data, "Task activity timeline report fetched successfully");
     }
+    // Average Rating Per Category. Radar chart
+    public static function ratingPerCategory($id, $filter)
+    {
+        $ratings = DB::table('categories')
+            ->leftJoin('tasks', function ($join) use ($id) {
+                $join->on('tasks.category_id', '=', 'categories.id')
+                    ->where('tasks.assignee_id', '=', $id);
+            })
+            ->where('categories.organization_id', Auth::user()->organization_id)
+            ->select(
+                'categories.name as category',
+                DB::raw('AVG(tasks.performance_rating) as average_rating'),
+                DB::raw('COUNT(tasks.id) as task_count')
+            )
+            ->groupBy('categories.id', 'categories.name')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category' => $item->category,
+                    'value' => is_null($item->average_rating) ? 0 : round($item->average_rating, 2),
+                    'task_count' => $item->task_count
+                ];
+            });
+        $task_count = $ratings->sum('task_count');
+        $highestRatingValue = $ratings->max('value');
+        $highestRatingCategory = $ratings->firstWhere('value', $highestRatingValue);
+        $highestRating = [
+            'category' => $highestRatingCategory ? $highestRatingCategory['category'] : null,
+            'value' => $highestRatingValue
+        ];
+        $data = [
+            "highest_rating" => $highestRating,
+            "ratings" => $ratings,
+            "task_count" => $task_count
+        ];
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch rating per category report', false, 404);
+        }
+
+        return apiResponse($data, "Rating per category report fetched successfully");
+    }
     /**
      * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
      */
-    public static function userEstimateVsActual($id)
+    public static function userEstimateVsActual($id, $filter)
     {
         // Fetch the 10 most recent tasks for the user
         $tasks = DB::table('tasks')
@@ -291,20 +301,25 @@ class ReportService
     /**
      * Display report for users activity load. Horizontal Bar chart
      */
-    public static function usersTaskLoad()
+    public static function usersTaskLoad($filter)
     {
-        $chart_data = DB::table('users')
+        $query = DB::table('users')
             ->leftJoin('tasks', function ($join) {
                 $join->on('users.id', '=', 'tasks.assignee_id')
                     ->where('tasks.organization_id', Auth::user()->organization_id);
             })
-            ->where('users.organization_id', Auth::user()->organization_id)
-            ->select(
-                'users.name as user',
-                DB::raw('COUNT(tasks.id) as task')
-            )
-            ->groupBy('users.name')
-            ->get();
+            ->where('users.organization_id', Auth::user()->organization_id);
+
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->where('tasks.start_date', '>=', $filter['from'])
+                ->where('tasks.start_date', '<=', $filter['to']);
+        }
+
+        $chart_data = $query->select(
+            'users.name as user',
+            DB::raw('COUNT(tasks.id) as task')
+        )
+            ->groupBy('users.name')->get();
 
         // Get users with highest and lowest task load
         $highest = null;
@@ -332,19 +347,27 @@ class ReportService
     /**
      * Display report for leaderboards. Datatable
      */
-    public static function performanceLeaderboard()
+    public static function performanceLeaderboard($filter)
     {
-        $data = User::join('tasks', function ($join) {
+        $query = User::join('tasks', function ($join) {
             $join->on('users.id', '=', 'tasks.assignee_id')
                 ->where('tasks.organization_id', Auth::user()->organization_id);
         })
-            ->where('users.organization_id', Auth::user()->organization_id)
-            ->select(
-                'users.id',
-                'name',
-                'position',
-                DB::raw('ROUND(AVG(tasks.performance_rating),2) as avg_performance_rating')
-            )
+            ->where('users.organization_id', Auth::user()->organization_id);
+
+
+
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->where('tasks.start_date', '>=', $filter['from'])
+                ->where('tasks.start_date', '<=', $filter['to']);
+        }
+
+        $data = $query->select(
+            'users.id',
+            'name',
+            'position',
+            DB::raw('ROUND(AVG(tasks.performance_rating),2) as avg_performance_rating')
+        )
             ->groupBy('users.id', 'name', 'position')
             ->orderByDesc('avg_performance_rating')
             ->limit(10)
@@ -358,10 +381,10 @@ class ReportService
     }
 
     // estimate vs actual. Bar chart multiple
-    public static function estimateVsActual()
+    public static function estimateVsActual($filter)
     {
         // Fetch overall estimate and actual time
-        $chart_data = DB::table('tasks')
+        $query = DB::table('tasks')
             ->leftJoin('categories', 'categories.id', '=', 'tasks.category_id')
             ->select(
                 'categories.name as category',
@@ -369,8 +392,14 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN time_taken > time_estimate THEN time_taken - time_estimate ELSE 0 END),2) as overrun'),
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
-            ->where('tasks.organization_id', Auth::user()->organization_id)
-            ->groupBy('categories.name')
+            ->where('tasks.organization_id', Auth::user()->organization_id);
+
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->where('tasks.start_date', '>=', $filter['from'])
+                ->where('tasks.start_date', '<=', $filter['to']);
+        }
+
+        $chart_data = $query->groupBy('categories.name')
             ->get();
 
         $runs = [
