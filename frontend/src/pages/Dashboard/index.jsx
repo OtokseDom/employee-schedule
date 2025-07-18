@@ -14,17 +14,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import DateInput from "@/components/form/DateInput";
 import FilterForm from "./filter-form";
 import FilterTags from "@/components/form/FilterTags";
+// TODO: Section card reports
+// TODO: Report cards to show filter description instead of "All Time"
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
 	const [isOpen, setIsOpen] = useState(false);
-	// TODO: Add date filter
 	const [filters, setFilters] = useState({
 		"Date Range": null,
-		// date_to: null,
-		// status: [],
-		// category: '',
-		// assignee: [],
 	});
 
 	useEffect(() => {
@@ -45,7 +42,6 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
-
 	const handleRemoveFilter = async (key) => {
 		const updated = { ...filters };
 		delete updated[key];
@@ -90,7 +86,7 @@ export default function UserProfile() {
 									<DialogTitle>Apply filter</DialogTitle>
 									<DialogDescription className="sr-only">Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								<FilterForm setIsOpen={setIsOpen} setReports={setReports} setFilters={setFilters} />
+								<FilterForm setIsOpen={setIsOpen} setReports={setReports} filters={filters} setFilters={setFilters} />
 							</DialogContent>
 						</Dialog>
 					</div>
