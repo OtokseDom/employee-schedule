@@ -9,13 +9,19 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import DateInput from "@/components/form/DateInput";
+import FilterForm from "./filter-form";
+import FilterTags from "@/components/form/FilterTags";
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
+	const [isOpen, setIsOpen] = useState(false);
 	// TODO: Add date filter
 	const [filters, setFilters] = useState({
-		date_from: null,
-		date_to: null,
+		"Date Range": null,
+		// date_to: null,
 		// status: [],
 		// category: '',
 		// assignee: [],
@@ -40,11 +46,58 @@ export default function UserProfile() {
 		}
 	};
 
+	const handleRemoveFilter = async (key) => {
+		const updated = { ...filters };
+		delete updated[key];
+		setFilters(updated);
+		const from = updated["Date Range"]?.split(" to ")[0].toISOString().slice(0, 10) || "";
+		const to = updated["Date Range"]?.split(" to ")[1].toISOString().slice(0, 10) || "";
+
+		setLoading(true);
+		try {
+			// Fetch all user reports in one call
+			const reportsRes = await axiosClient.get(`/dashboard?from=${from}&to=${to}`);
+			setReports(reportsRes.data.data);
+			setLoading(false);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-auto bg-background rounded-2xl p-4 md:p-10 border border-border">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
+					isOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div className="md:col-span-12">
-				<h1 className="font-extrabold text-3xl">Dashboard</h1>
-				<p>Your workspace at a glance</p>
+				<div className="flex flex-col md:flex-row justify-between gap-6 md:items-center">
+					<div className="">
+						<h1 className="font-extrabold text-3xl">Dashboard</h1>
+						<p>Your workspace at a glance</p>
+					</div>
+					<div className="flex flex-row gap-2">
+						<Dialog modal={false} open={isOpen} onOpenChange={setIsOpen}>
+							<DialogTrigger asChild>
+								<Button variant="default">Filter</Button>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Apply filter</DialogTitle>
+									<DialogDescription className="sr-only">Apply available filters to view specific reports</DialogDescription>
+								</DialogHeader>
+								<FilterForm setIsOpen={setIsOpen} setReports={setReports} setFilters={setFilters} />
+							</DialogContent>
+						</Dialog>
+					</div>
+				</div>
+			</div>
+			<div className="md:col-span-12 flex flex-wrap justify-end gap-2">
+				<FilterTags filters={filters} onRemove={handleRemoveFilter} />
 			</div>
 			{/* Section Cards */}
 			<div className="md:col-span-3 h-stretch">
