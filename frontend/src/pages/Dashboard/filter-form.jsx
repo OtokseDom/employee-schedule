@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import DateInput from "@/components/form/DateInput";
 import { set } from "date-fns";
+import { useEffect } from "react";
 
 const formSchema = z
 	.object({
@@ -40,7 +41,7 @@ const formSchema = z
 		}
 	);
 
-export default function FilterForm({ setIsOpen, setReports, setFilters }) {
+export default function FilterForm({ setIsOpen, setReports, filters, setFilters }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -51,26 +52,29 @@ export default function FilterForm({ setIsOpen, setReports, setFilters }) {
 		},
 	});
 
+	useEffect(() => {
+		if (filters) {
+			const fromStr = filters["Date Range"]?.split(" to ")[0] || undefined;
+			const toStr = filters["Date Range"]?.split(" to ")[1] || undefined;
+			const from = fromStr ? new Date(fromStr) : undefined;
+			const to = fromStr ? new Date(toStr) : undefined;
+			form.reset({
+				from: from ?? undefined,
+				to: to ?? undefined,
+			});
+		}
+	}, [filters, form]);
+
 	const handleSubmit = async (filter) => {
 		setLoading(true);
 		try {
 			// TODO: Add filter parameter in dashboard report controller
-			const from = filter?.from ? filter.from.toISOString().slice(0, 10) : "";
-			const to = filter?.to ? filter.to.toISOString().slice(0, 10) : "";
-
+			const from = filter?.from ? filter.from.toLocaleDateString("en-CA") : "";
+			const to = filter?.to ? filter.to.toLocaleDateString("en-CA") : "";
 			const filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}`);
-			const formatDate = (dateStr) => {
-				if (!dateStr) return "";
-				const date = new Date(dateStr);
-				return date.toLocaleDateString("en-US", {
-					year: "numeric",
-					month: "short",
-					day: "numeric",
-				});
-			};
 
 			setFilters({
-				"Date Range": `${formatDate(from)} to ${formatDate(to)}`,
+				"Date Range": `${from} to ${to}`,
 			});
 			setReports(filteredReports.data.data);
 			showToast("Success!", "Filtered report fetched.", 3000);
