@@ -20,6 +20,7 @@ class DashboardReportController extends Controller
             'estimate_vs_actual' => ReportService::estimateVsActual($filter),
             'performance_leaderboard' => ReportService::performanceLeaderboard($filter),
             'performance_rating_trend' => ReportService::performanceRatingTrend(0, "dashboard", $filter),
+            'section_cards' => ReportService::sectionCards(),
         ];
 
         $data = [];
