@@ -44,9 +44,9 @@ class ReportService
                 'field' => 'on_hold',
             ],
         ];
-        $data = [];
+        $chart_data = [];
         foreach ($statuses as $index => $status) {
-            $data[$index]['status'] = $status['field'];
+            $chart_data[$index]['status'] = $status['field'];
             $query = DB::table('tasks')
                 ->where('organization_id', Auth::user()->organization_id)
                 ->where('status', $status['name']);
@@ -60,10 +60,14 @@ class ReportService
                 $query->where('assignee_id', $id);
             }
 
-            $data[$index]['tasks'] = $query->count();
-            $data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+            $chart_data[$index]['tasks'] = $query->count();
+            $chart_data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
         }
         // return response($data);
+        $data = [
+            'chart_data' => $chart_data,
+            'filters' => $filter,
+        ];
 
         if (empty($data)) {
             return apiResponse(null, 'Failed to fetch task by status report', false, 404);
