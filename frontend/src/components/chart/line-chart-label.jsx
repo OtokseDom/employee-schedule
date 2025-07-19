@@ -22,7 +22,15 @@ export function ChartLineLabel({ report, variant }) {
 		<Card className={`flex flex-col relative h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader>
 				<CardTitle>Performance Trends</CardTitle>
-				<CardDescription> {variant == "dashboard" ? "All Users" : ""} Performance Rating for the last 6 months</CardDescription>
+				<CardDescription>
+					{" "}
+					{variant == "dashboard" ? "All Users" : ""} Performance Rating for{" "}
+					{report?.filters?.from && report?.filters?.to
+						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+								report.filters.to
+						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+						: "the last 6 months"}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
@@ -97,12 +105,19 @@ export function ChartLineLabel({ report, variant }) {
 							)}
 						</div>
 						<div className="text-muted-foreground leading-none">
-							{report?.chart_data?.length > 0 && (
-								<div className="flex items-center gap-2 leading-none text-muted-foreground">
-									{report?.chart_data[0].month} {report?.chart_data[0].year == report?.chart_data[5].year ? "" : report?.chart_data[0].year} -{" "}
-									{report?.chart_data[5].month} {report?.chart_data[5].year}
-								</div>
-							)}
+							{report?.filters?.from && report?.filters?.to
+								? `${new Date(report.filters.from).toLocaleDateString("en-CA", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })} - ${new Date(report.filters.to).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+								: report?.chart_data?.length > 0 && (
+										<div className="flex items-center gap-2 leading-none text-muted-foreground">
+											{report?.chart_data[0].month}{" "}
+											{report?.chart_data[0].year == report?.chart_data[5].year ? "" : report?.chart_data[0].year} -{" "}
+											{report?.chart_data[5].month} {report?.chart_data[5].year}
+										</div>
+								  )}
 						</div>
 					</>
 				)}

@@ -40,7 +40,13 @@ export function ChartBarHorizontal({ report, variant }) {
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader>
 				<CardTitle>User Task Load</CardTitle>
-				<CardDescription>All Time</CardDescription>
+				<CardDescription>
+					{report?.filters?.from && report?.filters?.to
+						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+								report.filters.to
+						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+						: "All Time"}
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig}>

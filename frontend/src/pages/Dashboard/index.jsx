@@ -132,17 +132,30 @@ export default function UserProfile() {
 			{/* Datatable */}
 			<div className="md:col-span-6 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
 				<CardHeader>
-					<CardTitle>All Time Top Performers</CardTitle>
+					<CardTitle>
+						{reports?.performance_leaderboard?.filters?.from && reports?.performance_leaderboard?.filters?.to
+							? `${new Date(reports.performance_leaderboard.filters.from).toLocaleDateString("en-CA", {
+									month: "short",
+									day: "numeric",
+									year: "numeric",
+							  })} - ${new Date(reports.performance_leaderboard.filters.to).toLocaleDateString("en-CA", {
+									month: "short",
+									day: "numeric",
+									year: "numeric",
+							  })}`
+							: "All Time"}{" "}
+						Top Performers
+					</CardTitle>
 					<CardDescription>
 						Showing{" "}
-						{reports?.performance_leaderboard?.length == 1
+						{reports?.performance_leaderboard?.chart_data?.length == 1
 							? "(Top 1) user"
-							: reports?.performance_leaderboard?.length > 1
-							? "(Top " + reports?.performance_leaderboard?.length + ") users"
+							: reports?.performance_leaderboard?.chart_data?.length > 1
+							? "(Top " + reports?.performance_leaderboard?.chart_data?.length + ") users"
 							: ""}
 					</CardDescription>
 				</CardHeader>
-				<DataTable columns={columns} data={reports?.performance_leaderboard} />
+				<DataTable columns={columns} data={reports?.performance_leaderboard?.chart_data} />
 			</div>
 		</div>
 	);

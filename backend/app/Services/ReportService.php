@@ -132,7 +132,8 @@ class ReportService
         $data = [
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
-            'task_count' => $task_count
+            'task_count' => $task_count,
+            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {
@@ -339,7 +340,8 @@ class ReportService
             'chart_data' => $chart_data,
             'highest' => $highest,
             'lowest' => $lowest,
-            'count' => $chart_data->count()
+            'count' => $chart_data->count(),
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -366,7 +368,7 @@ class ReportService
                 ->where('tasks.start_date', '<=', $filter['to']);
         }
 
-        $data = $query->select(
+        $chart_data = $query->select(
             'users.id',
             'name',
             'position',
@@ -376,6 +378,11 @@ class ReportService
             ->orderByDesc('avg_performance_rating')
             ->limit(10)
             ->get();
+
+        $data = [
+            'chart_data' => $chart_data,
+            'filters' => $filter
+        ];
 
         if (empty($data)) {
             return apiResponse(null, 'Failed to fetch performance leaderboard report', false, 404);
@@ -417,7 +424,8 @@ class ReportService
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'task_count' => $categoryCount
+            'task_count' => $categoryCount,
+            'filters' => $filter
         ];
 
         if (empty($data)) {

@@ -40,7 +40,11 @@ export function ChartBarMultiple({ report, variant }) {
 				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
 					{/* Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated */}
-					All Time
+					{report?.filters?.from && report?.filters?.to
+						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+								report.filters.to
+						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+						: "All Time"}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
