@@ -83,8 +83,8 @@ export default function UserProfile() {
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
-									<DialogTitle>Apply filter</DialogTitle>
-									<DialogDescription className="sr-only">Apply available filters to view specific reports</DialogDescription>
+									<DialogTitle>Select filter</DialogTitle>
+									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
 								<FilterForm setIsOpen={setIsOpen} setReports={setReports} filters={filters} setFilters={setFilters} />
 							</DialogContent>

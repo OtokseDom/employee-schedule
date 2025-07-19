@@ -114,7 +114,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters 
 					/>
 				</div>
 				<Button type="submit" disabled={loading || !form.watch("from") || !form.watch("to")}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Submit
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Apply Filter
 				</Button>
 			</form>
 		</Form>
