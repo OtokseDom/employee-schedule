@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Skeleton } from "../ui/skeleton";
+import { useMemo } from "react";
 
 export const description = "A horizontal bar chart";
 
@@ -19,16 +20,12 @@ const chartData = [
 	{ user: "June", task: 214 },
 ];
 
-// const chartConfig = {
-// 	desktop: {
-// 		label: "Desktop",
-// 		color: "var(--chart-1)",
-// 	},
-// };
-
 export function ChartBarHorizontal({ report, variant }) {
 	const { loading, setLoading } = useLoadContext();
 
+	const totalTasks = useMemo(() => {
+		return report?.chart_data?.reduce((acc, curr) => acc + curr.tasks, 0);
+	}, [report]);
 	const chartConfig = {
 		task: {
 			label: "Task",
@@ -57,7 +54,7 @@ export function ChartBarHorizontal({ report, variant }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
-					) : report?.highest.task == 0 && report?.lowest.task == 0 ? (
+					) : totalTasks == 0 ? (
 						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart
@@ -94,17 +91,17 @@ export function ChartBarHorizontal({ report, variant }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
-				) : report?.highest.task == 0 && report?.lowest.task == 0 ? (
+				) : totalTasks == 0 ? (
 					""
 				) : (
 					<>
 						<div className="leading-none font-medium">
-							<ArrowBigUpDash size={16} className="inline text-green-500" /> <b> {report?.highest.user}</b> has the highest task load of{" "}
-							<b> {report?.highest.task}</b> tasks
+							<ArrowBigUpDash size={16} className="inline text-green-500" /> <b> {report?.highest?.user}</b> has the highest task load of{" "}
+							<b> {report?.highest?.task}</b> tasks
 						</div>
 						<div className="leading-none font-medium">
-							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest.user}</b> has the lowest task load of{" "}
-							<b> {report?.lowest.task}</b> tasks
+							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest?.user}</b> has the lowest task load of{" "}
+							<b> {report?.lowest?.task}</b> tasks
 						</div>
 						<div className="text-muted-foreground leading-none">Showing all {report?.count} users</div>
 					</>
