@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -303,6 +304,43 @@ class ReportService
 
     /* ---------------------------- DASHBOARD REPORTS --------------------------- */
 
+    /**
+     * Display report for active user count. Horizontal Bar chart
+     */
+    public static function sectionCards()
+    {
+        $user_count = User::where('status', 'active')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->count();
+
+
+        $avg_performance = Task::where('organization_id', Auth::user()->organization_id)
+            ->avg('performance_rating');
+
+        $task_at_risk = DB::table('tasks')
+            ->where('status', '!=', 'completed')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('end_date', '<=', now()->addDays(3))
+            ->where('end_date', '>=', now())
+            ->count();
+
+        $avg_completion_time = DB::table('tasks')
+            ->where('status', 'completed')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->avg('time_taken');
+
+        $data = [
+            'user_count' => $user_count,
+            'avg_performance' => round($avg_performance, 2),
+            'task_at_risk' => $task_at_risk,
+            'avg_completion_time' => round($avg_completion_time, 2)
+        ];
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch active users report', false, 404);
+        }
+
+        return apiResponse($data, "Active users report fetched successfully");
+    }
     /**
      * Display report for users activity load. Horizontal Bar chart
      */
