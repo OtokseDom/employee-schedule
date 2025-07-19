@@ -39,7 +39,8 @@ export function ChartBarMultiple({ report, variant }) {
 			<CardHeader className="">
 				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
-					Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated
+					{/* Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated */}
+					All Time
 				</CardDescription>
 			</CardHeader>
 			<CardContent>

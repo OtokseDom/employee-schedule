@@ -55,7 +55,13 @@ export function PieChartDonut({ report, variant }) {
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader className="items-center text-center pb-0">
 				<CardTitle>{variant == "dashboard" && "Overall "}Tasks by Status</CardTitle>
-				<CardDescription>All Time</CardDescription>
+				<CardDescription>
+					{report?.filters?.from && report?.filters?.to
+						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+								report.filters.to
+						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+						: "All Time"}
+				</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-0">
 				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
