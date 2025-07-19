@@ -48,7 +48,7 @@ export function PieChartDonut({ report, variant }) {
 		},
 	};
 	const totalTasks = useMemo(() => {
-		return report?.reduce((acc, curr) => acc + curr.tasks, 0);
+		return report?.chart_data?.reduce((acc, curr) => acc + curr.tasks, 0);
 	}, [report]);
 
 	return (
@@ -68,7 +68,7 @@ export function PieChartDonut({ report, variant }) {
 					) : (
 						<PieChart>
 							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-							<Pie data={report} dataKey="tasks" nameKey="status" innerRadius={60} strokeWidth={5}>
+							<Pie data={report?.chart_data} dataKey="tasks" nameKey="status" innerRadius={60} strokeWidth={5}>
 								<Label
 									content={({ viewBox }) => {
 										if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -100,7 +100,7 @@ export function PieChartDonut({ report, variant }) {
 					""
 				) : (
 					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
-						{report?.map((data, index) => (
+						{report?.chart_data?.map((data, index) => (
 							<div key={index} className="flex items-center gap-1">
 								<span className="font-bold">{data.tasks}</span> {chartConfig[data.status]?.label || data.status}
 							</div>
