@@ -74,13 +74,13 @@ _If problems arise, resolve them yourself_ 😝
     > email: admin@demo.com <br>
     > password: admin123
 
-Schedule Calendar
-![image](https://github.com/user-attachments/assets/91c306aa-073a-4203-8cd5-bc2b46d6a10c)
-Schedule Week View
-![image](https://github.com/user-attachments/assets/44817ff9-d192-4abc-a615-5374fbaf2804)
-Tasks Datatable
-![image](https://github.com/user-attachments/assets/553f50ea-c142-4dd3-b8a7-459b426b683c)
-Users Datatable
-![image](https://github.com/user-attachments/assets/988a2e51-2362-41ab-9e11-365d9d37b646)
+Dashboard
+<img width="1919" height="882" alt="image" src="https://github.com/user-attachments/assets/32a2cd83-53f0-47ea-b2a8-9c285b46c1ea" />
+<img width="1919" height="877" alt="image" src="https://github.com/user-attachments/assets/96a73441-9640-47c8-89a1-9bc3655a2b3b" />
+Calendar (month view)
+<img width="1919" height="875" alt="image" src="https://github.com/user-attachments/assets/fc165e3e-624b-4e2f-9098-38d95fcfdbd1" />
+Calendar (week view)
+<img width="1919" height="874" alt="image" src="https://github.com/user-attachments/assets/f8bfa2ba-b567-4131-988d-38a671f530ea" />
 User Profile
-![image](https://github.com/user-attachments/assets/388ac989-ef62-4a9e-941f-615c9a56d49a)
+<img width="1919" height="873" alt="image" src="https://github.com/user-attachments/assets/a715d63f-9292-4020-9be6-127ee4b66b24" />
+
