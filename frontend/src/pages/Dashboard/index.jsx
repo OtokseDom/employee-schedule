@@ -10,8 +10,7 @@ import { columns } from "./columns";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import DateInput from "@/components/form/DateInput";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import FilterForm from "./filter-form";
 import FilterTags from "@/components/form/FilterTags";
 // TODO: Section card reports

@@ -57,7 +57,7 @@ class ReportService
                     ->where('tasks.start_date', '<=', $filter['to']);
             }
 
-            if ($variant !== 'dashboard') {
+            if ($id && $variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }
 

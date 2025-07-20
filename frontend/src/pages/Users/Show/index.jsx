@@ -8,6 +8,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import UserForm from "../form";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
@@ -18,6 +19,8 @@ import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserDetails from "@/pages/Users/Show/details";
 import { SectionCard } from "@/components/chart/section-card";
+import FilterForm from "@/pages/Dashboard/filter-form";
+import FilterTags from "@/components/form/FilterTags";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
@@ -29,8 +32,12 @@ export default function UserProfile() {
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenUser, setIsOpenUser] = useState(false);
+	const [isOpenFilter, setIsOpenFilter] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
+	const [filters, setFilters] = useState({
+		"Date Range": null,
+	});
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -120,12 +127,31 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
+	const handleRemoveFilter = async (key) => {
+		const updated = { ...filters };
+		delete updated[key];
+		setFilters(updated);
+		const from = updated["Date Range"]?.split(" to ")[0].toISOString().slice(0, 10) || "";
+		const to = updated["Date Range"]?.split(" to ")[1].toISOString().slice(0, 10) || "";
+
+		setLoading(true);
+		try {
+			// Fetch all user reports in one call
+			const reportsRes = await axiosClient.get(`/user/${id}/reports?from=${from}&to=${to}`);
+			setUserReports(reportsRes.data.data);
+			setLoading(false);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 pointer-events-none ${
-					isOpenUser ? "opacity-100" : "opacity-0"
+					isOpenUser || isOpenFilter ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
@@ -150,12 +176,24 @@ export default function UserProfile() {
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
+				<div className="flex flex-wrap justify-start items-center gap-4">
+					<Dialog modal={false} open={isOpenFilter} onOpenChange={setIsOpenFilter}>
+						<DialogTrigger asChild>
+							<Button variant="default">Filter</Button>
+						</DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Select filter</DialogTitle>
+								<DialogDescription>Apply available filters to view specific reports</DialogDescription>
+							</DialogHeader>
+							<FilterForm setIsOpen={setIsOpenFilter} setReports={setUserReports} filters={filters} setFilters={setFilters} userId={id} />
+						</DialogContent>
+					</Dialog>
+					<FilterTags filters={filters} onRemove={handleRemoveFilter} />
+				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
-					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard variant="" description="Task at Risk" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
-					{/* </div> */}
-					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard
 						variant=""
 						description="Avg Performance"
@@ -163,13 +201,8 @@ export default function UserProfile() {
 						value={userReports?.section_cards?.avg_performance}
 						percentage={12.2}
 					/>
-					{/* </div> */}
-					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard variant="" description="sample" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
-					{/* </div> */}
-					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard variant="" description="sample" showBadge={false} value={100} percentage={12.2} />
-					{/* </div> */}
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">

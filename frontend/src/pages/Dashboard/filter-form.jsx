@@ -41,7 +41,7 @@ const formSchema = z
 		}
 	);
 
-export default function FilterForm({ setIsOpen, setReports, filters, setFilters }) {
+export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -71,8 +71,12 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters 
 			// TODO: Add filter parameter in dashboard report controller
 			const from = filter?.from ? filter.from.toLocaleDateString("en-CA") : "";
 			const to = filter?.to ? filter.to.toLocaleDateString("en-CA") : "";
-			const filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}`);
-
+			let filteredReports;
+			if (!userId) {
+				filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}`);
+			} else {
+				filteredReports = await axiosClient.get(`/user/${userId}/reports?from=${from}&to=${to}`);
+			}
 			setFilters({
 				"Date Range": `${from} to ${to}`,
 			});
