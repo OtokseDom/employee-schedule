@@ -243,12 +243,25 @@ export default function UserProfile() {
 					<div className="w-full overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 						<div>
 							<h1 className=" font-extrabold text-3xl">Tasks</h1>
-							<p>View list of all tasks</p>
+							<p>
+								View list of all tasks
+								{userReports?.user_tasks?.filters?.from && userReports?.user_tasks?.filters?.to
+									? ` from ${new Date(userReports?.user_tasks?.filters.from).toLocaleDateString("en-CA", {
+											month: "short",
+											day: "numeric",
+											year: "numeric",
+									  })} - ${new Date(userReports?.user_tasks?.filters.to).toLocaleDateString("en-CA", {
+											month: "short",
+											day: "numeric",
+											year: "numeric",
+									  })}`
+									: ""}
+							</p>
 						</div>
 
 						<DataTableTasks
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
-							data={userReports?.user_tasks || []}
+							data={userReports?.user_tasks?.data || []}
 							setTasks={setTasks}
 							updateData={updateData}
 							setUpdateData={setUpdateData}

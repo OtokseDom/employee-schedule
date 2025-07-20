@@ -11,6 +11,71 @@ use Illuminate\Support\Facades\DB;
 class ReportService
 {
     /* ----------------------------- SHARED REPORTS ----------------------------- */
+
+    /**
+     * Display reports for section cards. Section Cards
+     */
+    public static function sectionCards($id = null)
+    {
+        // User Count
+        $user_count = User::where('status', 'active')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->count();
+        // Average Performance
+        $avg_performance_query = Task::where('organization_id', Auth::user()->organization_id);
+        if ($id) {
+            $avg_performance_query->where('assignee_id', $id);
+        }
+        $avg_performance = $avg_performance_query->avg('performance_rating');
+        // Task at Risk
+        $task_at_risk_query = DB::table('tasks')
+            ->where('status', '!=', 'completed')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('end_date', '<=', now()->addDays(3))
+            ->where('end_date', '>=', now());
+        if ($id) {
+            $task_at_risk_query->where('assignee_id', $id);
+        }
+        $task_at_risk = $task_at_risk_query->count();
+        // Average Completion Time
+        $avg_completion_time = DB::table('tasks')
+            ->where('status', 'completed')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->avg('time_taken');
+        // Time Efficiency
+        $time_efficiency_query = DB::table('tasks')
+            ->where('status', 'completed')
+            ->where('organization_id', Auth::user()->organization_id);
+        if ($id) {
+            $time_efficiency_query->where('assignee_id', $id);
+        }
+        $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
+        // Task Completion Rate
+        $task_completion_query = DB::table('tasks')
+            ->where('organization_id', Auth::user()->organization_id);
+        if ($id) {
+            $task_completion_query->where('assignee_id', $id);
+        }
+        $total_tasks = (clone $task_completion_query)->count();
+        $completed_tasks = (clone $task_completion_query)
+            ->where('status', 'Completed')
+            ->count();
+        $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
+
+        $data = [
+            'user_count' => $user_count,
+            'avg_performance' => round($avg_performance, 2),
+            'task_at_risk' => $task_at_risk,
+            'avg_completion_time' => round($avg_completion_time, 2),
+            'time_efficiency' => round($time_efficiency, 2),
+            'completion_rate' => round($completion_rate, 2),
+        ];
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch active users report', false, 404);
+        }
+
+        return apiResponse($data, "Active users report fetched successfully");
+    }
     // Task status - Pie donut chart
     public static function tasksByStatus($id, $variant = "", $filter)
     {
@@ -151,11 +216,15 @@ class ReportService
 
         $userTasks = $query->get();
 
-        if ($userTasks->isEmpty()) {
+        $data = [
+            'data' => $userTasks,
+            'filters' => $filter
+        ];
+        if (empty($data)) {
             return apiResponse(null, 'No tasks assigned to this user', false, 404);
         }
 
-        return apiResponse($userTasks, 'User assigned tasks fetched successfully');
+        return apiResponse($data, 'User assigned tasks fetched successfully');
     }
     // User Taskload. Area chart
     public static function taskActivityTimeline($id, $filter)
@@ -326,71 +395,6 @@ class ReportService
     }
 
     /* ---------------------------- DASHBOARD REPORTS --------------------------- */
-
-    /**
-     * Display report for active user count. Horizontal Bar chart
-     */
-    public static function sectionCards($id = null)
-    {
-        // User Count
-        $user_count = User::where('status', 'active')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->count();
-        // Average Performance
-        $avg_performance_query = Task::where('organization_id', Auth::user()->organization_id);
-        if ($id) {
-            $avg_performance_query->where('assignee_id', $id);
-        }
-        $avg_performance = $avg_performance_query->avg('performance_rating');
-        // Task at Risk
-        $task_at_risk_query = DB::table('tasks')
-            ->where('status', '!=', 'completed')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('end_date', '<=', now()->addDays(3))
-            ->where('end_date', '>=', now());
-        if ($id) {
-            $task_at_risk_query->where('assignee_id', $id);
-        }
-        $task_at_risk = $task_at_risk_query->count();
-        // Average Completion Time
-        $avg_completion_time = DB::table('tasks')
-            ->where('status', 'completed')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->avg('time_taken');
-        // Time Efficiency
-        $time_efficiency_query = DB::table('tasks')
-            ->where('status', 'completed')
-            ->where('organization_id', Auth::user()->organization_id);
-        if ($id) {
-            $time_efficiency_query->where('assignee_id', $id);
-        }
-        $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
-        // Task Completion Rate
-        $task_completion_query = DB::table('tasks')
-            ->where('organization_id', Auth::user()->organization_id);
-        if ($id) {
-            $task_completion_query->where('assignee_id', $id);
-        }
-        $total_tasks = (clone $task_completion_query)->count();
-        $completed_tasks = (clone $task_completion_query)
-            ->where('status', 'Completed')
-            ->count();
-        $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
-
-        $data = [
-            'user_count' => $user_count,
-            'avg_performance' => round($avg_performance, 2),
-            'task_at_risk' => $task_at_risk,
-            'avg_completion_time' => round($avg_completion_time, 2),
-            'time_efficiency' => round($time_efficiency, 2),
-            'completion_rate' => round($completion_rate, 2),
-        ];
-        if (empty($data)) {
-            return apiResponse(null, 'Failed to fetch active users report', false, 404);
-        }
-
-        return apiResponse($data, "Active users report fetched successfully");
-    }
     /**
      * Display report for users activity load. Horizontal Bar chart
      */
