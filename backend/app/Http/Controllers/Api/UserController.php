@@ -35,23 +35,16 @@ class UserController extends Controller
       // return response(new UserResource($users), 201);
    }
 
-   public function show($id, Request $request) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
+   public function show($id) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
    {
-      $filter = $request->all();
       $userDetails = DB::table('users')->where('id', $id)->first();
       // Return API response when no user found
       if (!$userDetails || $userDetails->organization_id !== Auth::user()->organization_id)
          return apiResponse(null, 'User not found within your organization', false, 404);
 
-      $assignedTasksQuery = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $id);
-      if ($filter && $filter['from'] && $filter['to']) {
-         $assignedTasksQuery->whereBetween('start_date', [$filter['from'], $filter['to']]);
-      }
-      $assignedTasks = $assignedTasksQuery->get();
-
       $data = [
          'user' => $userDetails,
-         'assigned_tasks' => $assignedTasks
+         // 'assigned_tasks' => $assignedTasks
       ];
       return apiResponse($data, 'User details fetched successfully');
       // return response()->json([
