@@ -359,8 +359,8 @@ class ReportService
             'avg_performance' => round($avg_performance, 2),
             'task_at_risk' => $task_at_risk,
             'avg_completion_time' => round($avg_completion_time, 2),
-            'time_efficiency' => round($time_efficiency, 0),
-            'completion_rate' => round($completion_rate, 0),
+            'time_efficiency' => round($time_efficiency, 2),
+            'completion_rate' => round($completion_rate, 2),
         ];
         if (empty($data)) {
             return apiResponse(null, 'Failed to fetch active users report', false, 404);
