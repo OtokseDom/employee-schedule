@@ -145,6 +145,26 @@ class ReportService
     }
 
     /* ------------------------------ USER REPORTS ------------------------------ */
+    // User Assigned Tasks
+    public static function userTasks($id, $filter)
+    {
+        $query = Task::with(['assignee:id,name,email,role,position', 'category'])
+            ->orderBy('id', 'DESC')
+            ->where('assignee_id', $id)
+            ->where('organization_id', Auth::user()->organization_id);
+
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+
+        $userTasks = $query->get();
+
+        if ($userTasks->isEmpty()) {
+            return apiResponse(null, 'No tasks assigned to this user', false, 404);
+        }
+
+        return apiResponse($userTasks, 'User assigned tasks fetched successfully');
+    }
     // User Taskload. Area chart
     public static function taskActivityTimeline($id, $filter)
     {

@@ -24,6 +24,7 @@ class UserReportController extends Controller
         }
 
         $reports = [
+            'user_tasks' => ReportService::userTasks($id, $filter),
             'tasks_by_status' => ReportService::tasksByStatus($id, "", $filter),
             'task_activity_timeline' => ReportService::taskActivityTimeline($id, $filter),
             'rating_per_category' => ReportService::ratingPerCategory($id, $filter),

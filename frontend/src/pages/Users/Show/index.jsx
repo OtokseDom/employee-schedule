@@ -257,7 +257,7 @@ export default function UserProfile() {
 
 						<DataTableTasks
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
-							data={tasks}
+							data={userReports?.user_tasks || []}
 							setTasks={setTasks}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
