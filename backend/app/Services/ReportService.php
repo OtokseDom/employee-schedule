@@ -51,16 +51,12 @@ class ReportService
             $query = DB::table('tasks')
                 ->where('organization_id', Auth::user()->organization_id)
                 ->where('status', $status['name']);
-
             if ($filter && $filter['from'] && $filter['to']) {
-                $query->where('tasks.start_date', '>=', $filter['from'])
-                    ->where('tasks.start_date', '<=', $filter['to']);
+                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
-
             if ($id && $variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }
-
             $chart_data[$index]['tasks'] = $query->count();
             $chart_data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
         }
@@ -97,16 +93,12 @@ class ReportService
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
                 ->where('organization_id', Auth::user()->organization_id);
-
             if ($filter && $filter['from'] && $filter['to']) {
-                $query->where('tasks.start_date', '>=', $filter['from'])
-                    ->where('tasks.start_date', '<=', $filter['to']);
+                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
-
             if ($variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }
-
             $rating = $query->select(
                 DB::raw('AVG(performance_rating) as average_rating'),
                 DB::raw('COUNT(id) as task_count')
@@ -182,12 +174,16 @@ class ReportService
         $chart_data = [];
         $task_count = 0;
         foreach ($months as $m) {
-            $count = DB::table('tasks')
+            $query = DB::table('tasks')
                 ->where('assignee_id', $id)
                 ->where('organization_id', Auth::user()->organization_id)
                 ->whereYear('start_date', $m['year'])
-                ->whereMonth('start_date', $m['month_num'])
-                ->count();
+                ->whereMonth('start_date', $m['month_num']);
+
+            if ($filter && $filter['from'] && $filter['to']) {
+                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+            }
+            $count = $query->count();
 
             $chart_data[] = [
                 'year' => $m['year'],
@@ -222,17 +218,21 @@ class ReportService
     // Average Rating Per Category. Radar chart
     public static function ratingPerCategory($id, $filter)
     {
-        $ratings = DB::table('categories')
+        $query = DB::table('categories')
             ->leftJoin('tasks', function ($join) use ($id) {
                 $join->on('tasks.category_id', '=', 'categories.id')
                     ->where('tasks.assignee_id', '=', $id);
             })
-            ->where('categories.organization_id', Auth::user()->organization_id)
-            ->select(
-                'categories.name as category',
-                DB::raw('AVG(tasks.performance_rating) as average_rating'),
-                DB::raw('COUNT(tasks.id) as task_count')
-            )
+            ->where('categories.organization_id', Auth::user()->organization_id);
+
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
+        }
+        $ratings = $query->select(
+            'categories.name as category',
+            DB::raw('AVG(tasks.performance_rating) as average_rating'),
+            DB::raw('COUNT(tasks.id) as task_count')
+        )
             ->groupBy('categories.id', 'categories.name')
             ->get()
             ->map(function ($item) {
@@ -266,10 +266,13 @@ class ReportService
     public static function userEstimateVsActual($id, $filter)
     {
         // Fetch the 10 most recent tasks for the user
-        $tasks = DB::table('tasks')
+        $query = DB::table('tasks')
             ->where('assignee_id', $id)
-            ->where('organization_id', Auth::user()->organization_id)
-            ->orderBy('start_date', 'desc')
+            ->where('organization_id', Auth::user()->organization_id);
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        $tasks = $query->orderBy('start_date', 'desc')
             ->take(10)
             ->get(['title', 'time_estimate', 'time_taken', 'start_date']);
 
@@ -400,9 +403,9 @@ class ReportService
             })
             ->where('users.organization_id', Auth::user()->organization_id);
 
+
         if ($filter && $filter['from'] && $filter['to']) {
-            $query->where('tasks.start_date', '>=', $filter['from'])
-                ->where('tasks.start_date', '<=', $filter['to']);
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
 
         $chart_data = $query->select(
@@ -445,14 +448,9 @@ class ReportService
                 ->where('tasks.organization_id', Auth::user()->organization_id);
         })
             ->where('users.organization_id', Auth::user()->organization_id);
-
-
-
         if ($filter && $filter['from'] && $filter['to']) {
-            $query->where('tasks.start_date', '>=', $filter['from'])
-                ->where('tasks.start_date', '<=', $filter['to']);
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
-
         $chart_data = $query->select(
             'users.id',
             'name',
@@ -489,12 +487,9 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
             ->where('tasks.organization_id', Auth::user()->organization_id);
-
         if ($filter && $filter['from'] && $filter['to']) {
-            $query->where('tasks.start_date', '>=', $filter['from'])
-                ->where('tasks.start_date', '<=', $filter['to']);
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
-
         $chart_data = $query->groupBy('categories.name')
             ->get();
 
