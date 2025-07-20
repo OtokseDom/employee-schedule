@@ -29,6 +29,7 @@ class UserReportController extends Controller
             'rating_per_category' => ReportService::ratingPerCategory($id, $filter),
             'performance_rating_trend' => ReportService::performanceRatingTrend($id, "", $filter),
             'estimate_vs_actual' => ReportService::userEstimateVsActual($id, $filter),
+            'section_cards' => ReportService::sectionCards($id),
         ];
 
         $data = [];

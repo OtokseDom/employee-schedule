@@ -307,15 +307,18 @@ class ReportService
     /**
      * Display report for active user count. Horizontal Bar chart
      */
-    public static function sectionCards()
+    public static function sectionCards($id = null)
     {
         $user_count = User::where('status', 'active')
             ->where('organization_id', Auth::user()->organization_id)
             ->count();
 
 
-        $avg_performance = Task::where('organization_id', Auth::user()->organization_id)
-            ->avg('performance_rating');
+        $avg_performance_query = Task::where('organization_id', Auth::user()->organization_id);
+        if ($id) {
+            $avg_performance_query->where('assignee_id', $id);
+        }
+        $avg_performance = $avg_performance_query->avg('performance_rating');
 
         $task_at_risk = DB::table('tasks')
             ->where('status', '!=', 'completed')

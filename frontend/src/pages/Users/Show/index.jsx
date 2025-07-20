@@ -156,7 +156,13 @@ export default function UserProfile() {
 					<SectionCard variant="" description="Task at Risk" showBadge={false} value={2} percentage={12.2} />
 					{/* </div> */}
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
-					<SectionCard variant="" description="Avg Performance" showBadge={false} value={7.4} percentage={12.2} />
+					<SectionCard
+						variant=""
+						description="Avg Performance"
+						showBadge={false}
+						value={userReports?.section_cards?.avg_performance}
+						percentage={12.2}
+					/>
 					{/* </div> */}
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard variant="" description="sample" showBadge={false} value={40} percentage={12.2} />
