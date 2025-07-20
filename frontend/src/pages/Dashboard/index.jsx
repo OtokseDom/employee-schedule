@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import FilterForm from "./filter-form";
 import FilterTags from "@/components/form/FilterTags";
-// TODO: Section card reports
-// TODO: Report cards to show filter description instead of "All Time"
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();

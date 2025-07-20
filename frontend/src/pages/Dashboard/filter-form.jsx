@@ -68,7 +68,6 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 	const handleSubmit = async (filter) => {
 		setLoading(true);
 		try {
-			// TODO: Add filter parameter in dashboard report controller
 			const from = filter?.from ? filter.from.toLocaleDateString("en-CA") : "";
 			const to = filter?.to ? filter.to.toLocaleDateString("en-CA") : "";
 			let filteredReports;
