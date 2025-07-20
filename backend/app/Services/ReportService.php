@@ -389,7 +389,8 @@ class ReportService
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'task_count' => $taskCount
+            'task_count' => $taskCount,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
