@@ -1,26 +1,23 @@
-# 📅 Employee Schedule with Task Management and Reports (WIP) 📊
+# 📅 Organization-based Task Management WebApp 📊
 
-### **A simple Laravel-React Project for listing employee schedules in a Calendar layout.**
+### **A Project for managing user tasks and generate reports**
 
 **✨ Current Features:**
--   Mobile Responsive
--   Modern Design
--   Registration and Login
--   CRUD for all data
--   Dark Mode
--   Master Data Management
--   User specific reports
 
+-   Mobile Responsive | Modern Design | Dark Mode
+-   Login and Registration with approval (if joining existing organization)
+-   CRUD for all data
+-   Dashboard and User specific reports
+-   Calendar View and Week View of tasks per user
+-   Report Filters
 
 **🤩 Upcoming Features:**
-- Employees reports and leaderboards (dashboard)
-- Data export
-- Rules and Permissions
-- More
 
+-   Data export
+-   Role Based Control
 
 # ⭐ How to install
-    
+
 ## Requirements
 
 -   Code editor (I use VS Code)
@@ -87,6 +84,3 @@ Users Datatable
 ![image](https://github.com/user-attachments/assets/988a2e51-2362-41ab-9e11-365d9d37b646)
 User Profile
 ![image](https://github.com/user-attachments/assets/388ac989-ef62-4a9e-941f-615c9a56d49a)
-
-
-
