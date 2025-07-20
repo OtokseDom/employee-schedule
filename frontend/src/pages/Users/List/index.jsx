@@ -55,16 +55,25 @@ export default function Users() {
 				<p>List of all users</p>
 			</div>
 
-			<DataTable
-				columns={columns({ fetchData, handleDelete, setIsOpen, setUpdateData, updateData })}
-				data={users}
-				setUsers={setUsers}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				updateData={updateData}
-				setUpdateData={setUpdateData}
-				fetchData={fetchData}
-			/>
+			{/* Updated table to fix dialog per column issue */}
+			{(() => {
+				const { columns: userColumns, dialog } = columns({ fetchData, handleDelete, setIsOpen, setUpdateData, updateData });
+				return (
+					<>
+						<DataTable
+							columns={userColumns}
+							data={users}
+							setUsers={setUsers}
+							isOpen={isOpen}
+							setIsOpen={setIsOpen}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
+							fetchData={fetchData}
+						/>
+						{dialog}
+					</>
+				);
+			})()}
 		</div>
 	);
 }

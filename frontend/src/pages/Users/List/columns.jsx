@@ -20,11 +20,12 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	const [selectedUserId, setSelectedUserId] = useState(null);
 	const [selectedUserData, setSelectedUserData] = useState(null);
 
-	const openDialog = (type, userData) => {
+	const openDialog = (type, userData = {}) => {
 		setDialogType(type);
 		setDialogOpen(true);
 		setSelectedUserId(userData.id);
 		setSelectedUserData(userData);
+		// console.log("Dialog should open:", type, userData);
 	};
 
 	const handleUpdateUser = (user, event) => {
@@ -97,94 +98,100 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 			{ id: "role", accessorKey: "role", header: createHeader("Role") },
 			{ id: "email", accessorKey: "email", header: createHeader("Email") },
 			{ id: "position", accessorKey: "position", header: createHeader("Position") },
+			// ...existing code...
 		],
 		[user]
 	);
 
+	// Add actions column for Superadmin
 	if (user?.data?.role === "Superadmin") {
 		baseColumns.push({
 			id: "actions",
 			cell: ({ row }) => {
 				const userRow = row.original;
 				return (
-					<>
-						<DropdownMenu modal={false}>
-							<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-								<Button variant="ghost" className="h-8 w-8 p-0">
-									<MoreHorizontal className="h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{userRow.status === "pending" && (
-									<>
-										<DropdownMenuItem
-											className="text-green-500"
-											onClick={(e) => {
-												e.stopPropagation();
-												handleApproval(1, userRow.id, userRow);
-											}}
-										>
-											Approve User
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											className="text-red-500"
-											onClick={(e) => {
-												e.stopPropagation();
-												openDialog("reject", userRow);
-											}}
-										>
-											Reject User
-										</DropdownMenuItem>
-										<hr />
-									</>
-								)}
-								<DropdownMenuItem>
-									<Link to={`/profile/${userRow.id}`}>View Profile</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={(e) => handleUpdateUser(userRow, e)}>Update User</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={(e) => {
-										e.stopPropagation();
-										openDialog("delete", userRow);
-									}}
-								>
-									<DialogTrigger asChild>
-										<span className="cursor-pointer">Deactivate Account</span>
-									</DialogTrigger>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-							<DialogContent onClick={(e) => e.stopPropagation()}>
-								<DialogHeader>
-									<DialogTitle>Are you absolutely sure?</DialogTitle>
-									<DialogDescription>This action cannot be undone.</DialogDescription>
-								</DialogHeader>
-								<DialogFooter>
-									<DialogClose asChild>
-										<Button type="button" variant="secondary">
-											Close
-										</Button>
-									</DialogClose>
-									<Button
-										onClick={() => {
-											if (dialogType === "reject") handleApproval(0, selectedUserId);
-											else if (dialogType === "delete") handleDelete(selectedUserId);
+					<DropdownMenu modal={false}>
+						<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+							<Button variant="ghost" className="h-8 w-8 p-0">
+								<MoreHorizontal className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{userRow.status === "pending" && (
+								<>
+									<DropdownMenuItem
+										className="text-green-500 cursor-pointer"
+										onClick={(e) => {
+											e.stopPropagation();
+											handleApproval(1, userRow.id, userRow);
 										}}
 									>
-										Yes, delete
-									</Button>
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
-					</>
+										Approve User
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										className="text-red-500 cursor-pointer"
+										onClick={(e) => {
+											e.stopPropagation();
+											openDialog("reject", userRow);
+										}}
+									>
+										Reject User
+									</DropdownMenuItem>
+									<hr />
+								</>
+							)}
+							<DropdownMenuItem>
+								<Link to={`/profile/${userRow.id}`}>View Profile</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem className="cursor-pointer" onClick={(e) => handleUpdateUser(userRow, e)}>
+								Update User
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={(e) => {
+									e.stopPropagation();
+									openDialog("delete", userRow);
+								}}
+							>
+								Delete Account
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				);
 			},
 		});
 	}
 
-	return baseColumns;
+	// Render Dialog once per table, outside cell renderer
+	const dialog = (
+		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={true}>
+			<DialogContent onClick={(e) => e.stopPropagation()}>
+				<DialogHeader>
+					<DialogTitle>Are you absolutely sure?</DialogTitle>
+					<DialogDescription>This action cannot be undone.</DialogDescription>
+				</DialogHeader>
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button type="button" variant="secondary">
+							Close
+						</Button>
+					</DialogClose>
+					<Button
+						onClick={() => {
+							if (dialogType === "reject") handleApproval(0, selectedUserId);
+							else if (dialogType === "delete") handleDelete(selectedUserId);
+							setDialogOpen(false);
+						}}
+					>
+						Yes, delete
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+
+	// Return columns and dialog as an object (consumer should use columns and render dialog outside table)
+	return { columns: baseColumns, dialog };
 };
 
 const createHeader =
