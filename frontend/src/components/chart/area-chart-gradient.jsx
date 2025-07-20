@@ -22,7 +22,7 @@ export function AreaChartGradient({ report }) {
 		<Card className="flex flex-col relative h-full justify-between">
 			<CardHeader className="items-center text-center">
 				<CardTitle>Task Activity Timeline</CardTitle>
-				<CardDescription>Total tasks assigned for the last 6 months</CardDescription>
+				<CardDescription>Total tasks assigned (6 months)</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={chartConfig}>
@@ -52,12 +52,7 @@ export function AreaChartGradient({ report }) {
 									<stop offset="5%" stopColor="var(--color-task)" stopOpacity={0.8} />
 									<stop offset="95%" stopColor="var(--color-task)" stopOpacity={0.1} />
 								</linearGradient>
-								{/* <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.8} />
-								<stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
-							</linearGradient> */}
 							</defs>
-							{/* <Area dataKey="mobile" type="natural" fill="url(#fillMobile)" fillOpacity={0.4} stroke="var(--color-mobile)" stackId="a" /> */}
 							<Area dataKey="tasks" type="natural" fill="url(#fillTask)" fillOpacity={0.4} stroke="var(--color-task)" stackId="a" />
 						</AreaChart>
 					)}
@@ -94,12 +89,18 @@ export function AreaChartGradient({ report }) {
 									""
 								)}
 							</div>
-							{report?.chart_data?.length > 0 && (
+							{report?.filters?.from && report?.filters?.to ? (
+								`${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+									report.filters.to
+								).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+							) : report?.chart_data?.length > 0 ? (
 								<div className="flex items-center gap-2 leading-none text-muted-foreground">
 									{report?.chart_data?.length > 0 && report?.chart_data[0].month} -{" "}
 									{report?.chart_data?.length > 0 && report?.chart_data[5].month}{" "}
 									{report?.chart_data?.length > 0 && report?.chart_data[5].year}
 								</div>
+							) : (
+								""
 							)}
 						</div>
 					)}

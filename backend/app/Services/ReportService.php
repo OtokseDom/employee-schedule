@@ -231,8 +231,10 @@ class ReportService
     {
         // Calculate the last 6 months (including current)
         $months = [];
+        // Use filter['to'] as the starting month, default to current month if not set
+        $startDate = isset($filter['to']) ? \Carbon\Carbon::parse($filter['to'])->startOfMonth() : now()->startOfMonth();
         for ($i = 5; $i >= 0; $i--) {
-            $date = now()->startOfMonth()->subMonths($i);
+            $date = $startDate->copy()->subMonths($i);
             $months[] = [
                 'year' => $date->year,
                 'month' => $date->format('F'),
@@ -275,7 +277,8 @@ class ReportService
         $data = [
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
-            'task_count' => $task_count
+            'task_count' => $task_count,
+            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {

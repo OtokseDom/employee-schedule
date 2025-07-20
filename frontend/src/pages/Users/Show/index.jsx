@@ -246,7 +246,7 @@ export default function UserProfile() {
 							<p>
 								View list of all tasks
 								{userReports?.user_tasks?.filters?.from && userReports?.user_tasks?.filters?.to
-									? ` from ${new Date(userReports?.user_tasks?.filters.from).toLocaleDateString("en-CA", {
+									? ` for ${new Date(userReports?.user_tasks?.filters.from).toLocaleDateString("en-CA", {
 											month: "short",
 											day: "numeric",
 											year: "numeric",
