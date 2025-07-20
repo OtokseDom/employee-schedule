@@ -193,16 +193,23 @@ export default function UserProfile() {
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
-					<SectionCard variant="" description="Task at Risk" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 					<SectionCard
 						variant=""
-						description="Avg Performance"
+						description="Avg Performance Rating"
 						showBadge={false}
-						value={userReports?.section_cards?.avg_performance}
+						value={`${userReports?.section_cards?.avg_performance}/10`}
 						percentage={12.2}
 					/>
-					<SectionCard variant="" description="sample" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
-					<SectionCard variant="" description="sample" showBadge={false} value={100} percentage={12.2} />
+					<SectionCard
+						variant=""
+						description="Time Efficiency"
+						showBadge={false}
+						value={`${userReports?.section_cards?.time_efficiency}%`}
+						percentage={12.2}
+					/>
+					<SectionCard variant="" description="Completion Rate" showBadge={false} value={100} percentage={12.2} />
+					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
+					<SectionCard variant="" description="Overdue Tasks" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
