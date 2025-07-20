@@ -207,7 +207,13 @@ export default function UserProfile() {
 						value={`${userReports?.section_cards?.time_efficiency}%`}
 						percentage={12.2}
 					/>
-					<SectionCard variant="" description="Completion Rate" showBadge={false} value={100} percentage={12.2} />
+					<SectionCard
+						variant=""
+						description="Completion Rate"
+						showBadge={false}
+						value={`${userReports?.section_cards?.completion_rate}%`}
+						percentage={12.2}
+					/>
 					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 					<SectionCard variant="" description="Overdue Tasks" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 				</div>
