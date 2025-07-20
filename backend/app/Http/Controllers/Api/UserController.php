@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -34,14 +35,19 @@ class UserController extends Controller
       // return response(new UserResource($users), 201);
    }
 
-   public function show($id) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
+   public function show($id, Request $request) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
    {
+      $filter = $request->all();
       $userDetails = DB::table('users')->where('id', $id)->first();
       // Return API response when no user found
       if (!$userDetails || $userDetails->organization_id !== Auth::user()->organization_id)
          return apiResponse(null, 'User not found within your organization', false, 404);
 
-      $assignedTasks = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $id)->get();
+      $assignedTasksQuery = Task::with(['assignee:id,name,email,role,position', 'category'])->orderBy('id', 'DESC')->where('assignee_id', $id);
+      if ($filter && $filter['from'] && $filter['to']) {
+         $assignedTasksQuery->whereBetween('start_date', [$filter['from'], $filter['to']]);
+      }
+      $assignedTasks = $assignedTasksQuery->get();
 
       $data = [
          'user' => $userDetails,

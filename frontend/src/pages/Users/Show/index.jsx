@@ -45,6 +45,12 @@ export default function UserProfile() {
 	}, [isOpen, isOpenUser]);
 
 	useEffect(() => {
+		if (filters && filters["Date Range"]) {
+			fetchData();
+		}
+	}, [filters]);
+
+	useEffect(() => {
 		document.title = "Task Management | User Profile";
 		fetchData();
 	}, []);
@@ -52,8 +58,11 @@ export default function UserProfile() {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
+			const from = filters["Date Range"]?.split(" to ")[0].slice(0, 10) || "";
+			const to = filters["Date Range"]?.split(" to ")[1].slice(0, 10) || "";
+			// console.log("filters:", filters);
 			// Fetch user details and tasks
-			const response = await axiosClient.get(`/user/${id}`);
+			const response = await axiosClient.get(`/user/${id}?from=${from}&to=${to}`);
 			setUser(response.data.data.user);
 			setTasks(response.data.data.assigned_tasks);
 			// Fetch all user reports in one call
@@ -172,7 +181,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchData} />
+					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} />
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
