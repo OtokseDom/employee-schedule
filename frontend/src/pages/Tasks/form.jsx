@@ -55,6 +55,8 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 	// State for time_estimate and delay hour/minute fields
 	const [timeEstimateHour, setTimeEstimateHour] = useState("");
 	const [timeEstimateMinute, setTimeEstimateMinute] = useState("");
+	const [timeTakenHour, setTimeTakenHour] = useState("");
+	const [timeTakenMinute, setTimeTakenMinute] = useState("");
 	const [delayHour, setDelayHour] = useState("");
 	const [delayMinute, setDelayMinute] = useState("");
 
@@ -153,6 +155,14 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				setTimeEstimateHour("");
 				setTimeEstimateMinute("");
 			}
+			if (typeof time_taken === "number" || (typeof time_taken === "string" && time_taken !== "")) {
+				const d = parseFloat(time_taken);
+				setTimeTakenHour(Math.floor(d).toString());
+				setTimeTakenMinute(Math.round((d % 1) * 60).toString());
+			} else {
+				setTimeTakenHour("");
+				setTimeTakenMinute("");
+			}
 			if (typeof delay === "number" || (typeof delay === "string" && delay !== "")) {
 				const d = parseFloat(delay);
 				setDelayHour(Math.floor(d).toString());
@@ -178,6 +188,8 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 			// Calculate decimal values for time_estimate and delay
 			const timeEstimateDecimal =
 				timeEstimateHour || timeEstimateMinute ? parseInt(timeEstimateHour || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60 : undefined;
+			const timeTakenDecimal =
+				timeTakenHour || timeTakenMinute ? parseInt(timeTakenHour || "0", 10) + parseInt(timeTakenMinute || "0", 10) / 60 : undefined;
 			const delayDecimal = delayHour || delayMinute ? parseInt(delayHour || "0", 10) + parseInt(delayMinute || "0", 10) / 60 : undefined;
 
 			const parsedForm = {
@@ -188,7 +200,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
 				time_estimate: timeEstimateDecimal,
-				time_taken: formData.time_taken ? parseFloat(formData.time_taken) : undefined,
+				time_taken: timeTakenDecimal,
 				delay: delayDecimal,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
@@ -462,7 +474,40 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 					</div>
 					<FormMessage />
 				</FormItem>
-				<FormField
+				{/* Time Taken (hr/min) */}
+				<FormItem>
+					<FormLabel>Time Taken</FormLabel>
+					<div className="flex gap-2">
+						<Input
+							type="number"
+							min="0"
+							placeholder="hr"
+							value={timeTakenHour}
+							onChange={(e) => {
+								const val = e.target.value.replace(/[^0-9]/g, "");
+								setTimeTakenHour(val);
+							}}
+							className="w-20"
+						/>
+						<span>hr</span>
+						<Input
+							type="number"
+							min="0"
+							max="59"
+							placeholder="min"
+							value={timeTakenMinute}
+							onChange={(e) => {
+								let val = e.target.value.replace(/[^0-9]/g, "");
+								if (parseInt(val, 10) > 59) val = "59";
+								setTimeTakenMinute(val);
+							}}
+							className="w-20"
+						/>
+						<span>min</span>
+					</div>
+					<FormMessage />
+				</FormItem>
+				{/* <FormField
 					control={form.control}
 					name="time_taken"
 					render={({ field }) => {
@@ -476,7 +521,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 							</FormItem>
 						);
 					}}
-				/>
+				/> */}
 				{/* Delay (hr/min) */}
 				<FormItem>
 					<FormLabel>Delay</FormLabel>
