@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
@@ -71,7 +71,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 					const { name, id, status } = row.original;
 					return (
 						<div className="flex items-center gap-2">
-							<div className="min-w-14 min-h-14 bg-foreground rounded-full"></div>
+							<User2 size={60} />
 							<div className="flex flex-col w-full">
 								{name} {user?.id === id && <span className="text-xs text-yellow-800"> (Me)</span>}
 								<span

@@ -3,7 +3,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Edit } from "lucide-react";
+import { Edit, User2 } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
@@ -87,7 +87,8 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 						<div className="flex items-start justify-between w-full">
 							<div className="flex gap-5 items-center">
 								<div>
-									<div className="w-24 h-24 bg-foreground rounded-full"></div>
+									{/* <div className="w-24 h-24 bg-foreground rounded-full"></div> */}
+									<User2 className="text-white" size={80} />
 								</div>
 								<div className="w-full">
 									<span className="flex gap-3 text-md md:text-3xl font-bold text-white mb-0 md:mb-2">{name}</span>

@@ -195,9 +195,9 @@ export default function UserProfile() {
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
 					<SectionCard
 						variant=""
-						description="Avg Performance Rating"
+						description="Performance Rating (10)"
 						showBadge={false}
-						value={`${userReports?.section_cards?.avg_performance}/10`}
+						value={`${userReports?.section_cards?.avg_performance}`}
 						percentage={12.2}
 					/>
 					<SectionCard
