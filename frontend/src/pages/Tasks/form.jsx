@@ -199,9 +199,9 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
-				time_estimate: timeEstimateDecimal,
-				time_taken: timeTakenDecimal,
-				delay: delayDecimal,
+				time_estimate: timeEstimateDecimal !== undefined ? Number(timeEstimateDecimal.toFixed(2)) : undefined,
+				time_taken: timeTakenDecimal !== undefined ? Number(timeTakenDecimal.toFixed(2)) : undefined,
+				delay: delayDecimal !== undefined ? Number(delayDecimal.toFixed(2)) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
 			if (Object.keys(updateData).length === 0) {
