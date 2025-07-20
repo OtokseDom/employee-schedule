@@ -12,6 +12,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    // TODO: Implement role based restrictions
     // Somehow not working without these 2 lines
     protected $table = 'users';
     protected $connection = 'mysql';
