@@ -38,6 +38,7 @@ const formSchema = z.object({
 });
 
 export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { user: user_auth } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const { user, setUser } = useAuthContext();
 	const showToast = useToast();
@@ -203,7 +204,11 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 						return (
 							<FormItem>
 								<FormLabel>Status</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={updateData?.status || field.value}>
+								<Select
+									disabled={user_auth?.data?.role === "Employee"}
+									onValueChange={field.onChange}
+									defaultValue={updateData?.status || field.value}
+								>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a status"></SelectValue>
