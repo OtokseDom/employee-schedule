@@ -44,8 +44,8 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 		showLess
 			? {
 					// status: false,
-					"start date": false,
-					"end date": false,
+					"start date": true,
+					"end date": true,
 					"start time": false,
 					"end time": false,
 					"expected output": false,
