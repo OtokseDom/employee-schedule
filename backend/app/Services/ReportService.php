@@ -291,15 +291,16 @@ class ReportService
     public static function ratingPerCategory($id, $filter)
     {
         $query = DB::table('categories')
-            ->leftJoin('tasks', function ($join) use ($id) {
+            ->leftJoin('tasks', function ($join) use ($id, $filter) {
                 $join->on('tasks.category_id', '=', 'categories.id')
                     ->where('tasks.assignee_id', '=', $id);
+
+                if ($filter && $filter['from'] && $filter['to']) {
+                    $join->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
+                }
             })
             ->where('categories.organization_id', Auth::user()->organization_id);
 
-        if ($filter && $filter['from'] && $filter['to']) {
-            $query->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
-        }
         $ratings = $query->select(
             'categories.name as category',
             DB::raw('AVG(tasks.performance_rating) as average_rating'),
@@ -324,7 +325,8 @@ class ReportService
         $data = [
             "highest_rating" => $highestRating,
             "ratings" => $ratings,
-            "task_count" => $task_count
+            "task_count" => $task_count,
+            "filters" => $filter
         ];
         if (empty($data)) {
             return apiResponse(null, 'Failed to fetch rating per category report', false, 404);

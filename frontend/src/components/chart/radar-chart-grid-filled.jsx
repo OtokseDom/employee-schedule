@@ -53,7 +53,15 @@ export function RadarChartGridFilled({ report }) {
 						<div className="flex items-center gap-2 font-medium leading-none">
 							{report?.highest_rating?.category} has the highest rating: {report?.highest_rating?.value}
 						</div>
-						<div className="flex items-center gap-2 leading-none text-muted-foreground">All Time</div>
+						<div className="flex items-center gap-2 leading-none text-muted-foreground">
+							{report?.filters?.from && report?.filters?.to
+								? `${new Date(report.filters.from).toLocaleDateString("en-CA", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })} - ${new Date(report.filters.to).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
+								: "All Time"}
+						</div>
 					</>
 				)}
 			</CardFooter>
