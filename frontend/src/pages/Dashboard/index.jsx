@@ -95,12 +95,12 @@ export default function UserProfile() {
 				<FilterTags filters={filters} onRemove={handleRemoveFilter} />
 			</div>
 			{/* Section Cards */}
-			<div className="flex flex-col md:flex-row gap-4 md:col-span-12">
-				<SectionCard description="Active Members" showBadge={false} value={reports?.section_cards?.user_count} variant="dashboard" />
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description={`Active Members`} showBadge={false} value={reports?.section_cards?.user_count} variant="dashboard" />
 				<SectionCard description="Members Avg Performance (10)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
+				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
+				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
 				<SectionCard description="Tasks Due Soon" showBadge={false} value={reports?.section_cards?.task_at_risk} variant="dashboard" />
-				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
-				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
 			</div>
 
 			{/* Pie Chart */}
