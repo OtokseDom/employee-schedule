@@ -320,12 +320,15 @@ class ReportService
         }
         $avg_performance = $avg_performance_query->avg('performance_rating');
 
-        $task_at_risk = DB::table('tasks')
+        $task_at_risk_query = DB::table('tasks')
             ->where('status', '!=', 'completed')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('end_date', '<=', now()->addDays(3))
-            ->where('end_date', '>=', now())
-            ->count();
+            ->where('end_date', '>=', now());
+        if ($id) {
+            $task_at_risk_query->where('assignee_id', $id);
+        }
+        $task_at_risk = $task_at_risk_query->count();
 
         $avg_completion_time = DB::table('tasks')
             ->where('status', 'completed')

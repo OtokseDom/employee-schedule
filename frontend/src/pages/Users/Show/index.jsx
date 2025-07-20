@@ -153,7 +153,7 @@ export default function UserProfile() {
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
-					<SectionCard variant="" description="Task at Risk" showBadge={false} value={2} percentage={12.2} />
+					<SectionCard variant="" description="Task at Risk" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 					{/* </div> */}
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard
@@ -165,7 +165,7 @@ export default function UserProfile() {
 					/>
 					{/* </div> */}
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
-					<SectionCard variant="" description="sample" showBadge={false} value={40} percentage={12.2} />
+					<SectionCard variant="" description="sample" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
 					{/* </div> */}
 					{/* <div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-4 shadow-md"> */}
 					<SectionCard variant="" description="sample" showBadge={false} value={100} percentage={12.2} />
