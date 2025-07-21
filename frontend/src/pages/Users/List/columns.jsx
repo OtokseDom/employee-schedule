@@ -57,7 +57,6 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 			setLoading(false);
 		}
 	};
-
 	const baseColumns = useMemo(
 		() => [
 			{
@@ -104,7 +103,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	);
 
 	// Add actions column for Superadmin
-	if (user?.data?.role === "Superadmin") {
+	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin") {
 		baseColumns.push({
 			id: "actions",
 			cell: ({ row }) => {

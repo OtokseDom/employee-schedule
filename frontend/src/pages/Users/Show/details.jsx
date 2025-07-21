@@ -115,9 +115,15 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 												<hr />
 											</>
 										)}
-										<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateUser(user)}>
+										<button
+											className="w-full text-left px-2 py-1.5 text-sm cursor-pointer hover:bg-accent"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleUpdateUser(user);
+											}}
+										>
 											Update Account
-										</DropdownMenuItem>
+										</button>
 										<DropdownMenuItem onClick={() => openDialog("delete")}>
 											<DialogTrigger asChild>
 												<span className="cursor-pointer">Delete Account</span>
