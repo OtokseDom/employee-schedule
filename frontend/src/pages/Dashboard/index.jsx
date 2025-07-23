@@ -16,9 +16,18 @@ import FilterTags from "@/components/form/FilterTags";
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
+	const [users, setUsers] = useState();
 	const [isOpen, setIsOpen] = useState(false);
 	const [filters, setFilters] = useState({
-		"Date Range": null,
+		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
+		values: {
+			"Date Range": null,
+			Members: [],
+		},
+		display: {
+			"Date Range": null,
+			Members: [],
+		},
 	});
 
 	useEffect(() => {
@@ -32,6 +41,15 @@ export default function UserProfile() {
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(`/dashboard`);
 			setReports(reportsRes.data.data);
+			// fetch users only if not already fetched
+			if (!users) {
+				const userResponse = await axiosClient.get("/user");
+				const mappedUsers = userResponse.data.data.map((user) => ({
+					value: user.id,
+					label: user.name,
+				}));
+				setUsers(mappedUsers);
+			}
 			setLoading(false);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -40,16 +58,29 @@ export default function UserProfile() {
 		}
 	};
 	const handleRemoveFilter = async (key) => {
-		const updated = { ...filters };
-		delete updated[key];
+		// Deep copy filters to avoid mutating state directly
+		const updated = {
+			values: { ...filters.values },
+			display: { ...filters.display },
+		};
+		console.log(updated);
+		delete updated.values[key];
+		delete updated.display[key];
 		setFilters(updated);
-		const from = updated["Date Range"]?.split(" to ")[0].toISOString().slice(0, 10) || "";
-		const to = updated["Date Range"]?.split(" to ")[1].toISOString().slice(0, 10) || "";
-
+		let from = "";
+		let to = "";
+		let members = "";
+		if (updated.values["Date Range"]) {
+			from = updated.values["Date Range"]?.split(" to ")[0]?.toISOString?.().slice(0, 10) || "";
+			to = updated.values["Date Range"]?.split(" to ")[1]?.toISOString?.().slice(0, 10) || "";
+		}
+		if (updated.values["Members"]) {
+			members = updated.values["Members"];
+		}
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/dashboard?from=${from}&to=${to}`);
+			const reportsRes = await axiosClient.get(`/dashboard?from=${from}&to=${to}&users=${members}`);
 			setReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {
@@ -83,14 +114,14 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								<FilterForm setIsOpen={setIsOpen} setReports={setReports} filters={filters} setFilters={setFilters} />
+								<FilterForm setIsOpen={setIsOpen} setReports={setReports} filters={filters} setFilters={setFilters} users={users} />
 							</DialogContent>
 						</Dialog>
 					</div>
 				</div>
 			</div>
 			<div className="md:col-span-12 flex flex-wrap justify-end gap-2">
-				<FilterTags filters={filters} onRemove={handleRemoveFilter} />
+				<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
 			</div>
 			{/* Section Cards */}
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">

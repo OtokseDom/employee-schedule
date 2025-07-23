@@ -19,17 +19,17 @@ export default function FilterTags({ filters, onRemove }) {
 						displayValue = `${format(start)} to ${format(end)}`;
 					}
 				}
+				// Skip if value is falsy or an empty array
+				if (!value || (Array.isArray(value) && value.length === 0)) return null;
 				return (
-					value && (
-						<div key={key} className="flex items-center gap-1 bg-secondary text-foreground text-sm px-3 py-1 rounded-md">
-							<span>
-								{key}: {displayValue}
-							</span>
-							<button onClick={() => onRemove(key)} className="hover:text-red-500">
-								<X size={14} />
-							</button>
-						</div>
-					)
+					<div key={key} className="flex items-center gap-1 bg-secondary text-foreground text-sm px-3 py-1 rounded-md">
+						<span>
+							{key}: {displayValue}
+						</span>
+						<button onClick={() => onRemove(key)} className="hover:text-red-500">
+							<X size={14} />
+						</button>
+					</div>
 				);
 			})}
 		</div>
