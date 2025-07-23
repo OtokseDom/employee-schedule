@@ -168,6 +168,10 @@ class ReportService
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
+            if ($filter && isset($filter['users']) && $variant === 'dashboard') {
+                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+                $query->whereIn('assignee_id', $userIds);
+            }
             if ($variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }

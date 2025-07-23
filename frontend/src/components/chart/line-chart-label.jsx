@@ -23,8 +23,7 @@ export function ChartLineLabel({ report, variant }) {
 			<CardHeader>
 				<CardTitle>Performance Trends</CardTitle>
 				<CardDescription>
-					{" "}
-					{variant == "dashboard" ? "All Users" : ""} Performance Rating for{" "}
+					Performance Rating for{" "}
 					{report?.filters?.from && report?.filters?.to
 						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
 								report.filters.to
