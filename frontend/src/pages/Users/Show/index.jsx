@@ -131,13 +131,11 @@ export default function UserProfile() {
 		const updated = { ...filters };
 		delete updated[key];
 		setFilters(updated);
-		const from = updated["Date Range"]?.split(" to ")[0].toISOString().slice(0, 10) || "";
-		const to = updated["Date Range"]?.split(" to ")[1].toISOString().slice(0, 10) || "";
-
+		// Since we only have date filter, we just remove params on handleRemoveFilter
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/user/${id}/reports?from=${from}&to=${to}`);
+			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
 			setUserReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {

@@ -29,7 +29,7 @@ export default function UserProfile() {
 			Members: [],
 		},
 	});
-
+	// TODO: Update filter populate users
 	useEffect(() => {
 		document.title = "Task Management";
 		fetchData();
@@ -71,8 +71,8 @@ export default function UserProfile() {
 		let to = "";
 		let members = "";
 		if (updated.values["Date Range"]) {
-			from = updated.values["Date Range"]?.split(" to ")[0]?.toISOString?.().slice(0, 10) || "";
-			to = updated.values["Date Range"]?.split(" to ")[1]?.toISOString?.().slice(0, 10) || "";
+			from = updated.values["Date Range"]?.split(" to ")[0];
+			to = updated.values["Date Range"]?.split(" to ")[1];
 		}
 		if (updated.values["Members"]) {
 			members = updated.values["Members"];
