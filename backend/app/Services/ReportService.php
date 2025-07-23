@@ -423,12 +423,13 @@ class ReportService
                     ->where('tasks.organization_id', Auth::user()->organization_id);
             })
             ->where('users.organization_id', Auth::user()->organization_id);
-
-
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
-
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $query->whereIn('assignee_id', $userIds);
+        }
         $chart_data = $query->select(
             'users.name as user',
             DB::raw('COUNT(tasks.id) as task')
