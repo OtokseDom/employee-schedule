@@ -39,12 +39,12 @@ export function ChartBarMultiple({ report, variant }) {
 			<CardHeader className="">
 				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
 				<CardDescription>
-					{/* Underruns: Tasks finished earlier than estimated <br /> Overruns: Tasks took longer than estimated */}
+					Showing {report?.task_count} {variant == "dashboard" ? "categories" : "most recent tasks "}
 					{report?.filters?.from && report?.filters?.to
-						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
+						? `(${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
 								report.filters.to
-						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
-						: "All Time"}
+						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })})`
+						: ""}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -94,9 +94,6 @@ export function ChartBarMultiple({ report, variant }) {
 					""
 				) : (
 					<>
-						<div className="flex flex-row gap-2 text-muted-foreground leading-none">
-							Showing {report?.task_count} {variant == "dashboard" ? "categories" : "most recent tasks"}
-						</div>
 						{/* Underruns */}
 						{Math.abs(report?.runs["under"]) > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
