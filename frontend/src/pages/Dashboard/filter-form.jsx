@@ -78,19 +78,22 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			let filteredReports;
 			if (!userId) {
 				filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}&users=${selected_users.join(",")}`);
+				setFilters({
+					values: {
+						"Date Range": `${from && to ? from + " to " + to : ""}`,
+						Members: selectedUserObjects?.map((u) => u.value).join(", ") || "",
+					},
+					display: {
+						"Date Range": `${from && to ? from + " to " + to : ""}`,
+						Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
+					},
+				});
 			} else {
 				filteredReports = await axiosClient.get(`/user/${userId}/reports?from=${from}&to=${to}`);
+				setFilters({
+					"Date Range": `${from && to ? from + " to " + to : ""}`,
+				});
 			}
-			setFilters({
-				values: {
-					"Date Range": `${from && to ? from + " to " + to : ""}`,
-					Members: selectedUserObjects?.map((u) => u.value).join(", ") || "",
-				},
-				display: {
-					"Date Range": `${from && to ? from + " to " + to : ""}`,
-					Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
-				},
-			});
 			setReports(filteredReports.data.data);
 			showToast("Success!", "Filtered report fetched.", 3000);
 		} catch (e) {
@@ -134,28 +137,30 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						)}
 					/>
 				</div>
-				<FormField
-					control={form.control}
-					name="selected_users"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormControl>
-									<MultiSelect
-										field={field}
-										options={users || []}
-										onValueChange={setSelectedUsers}
-										defaultValue={selectedUsers}
-										placeholder="Select users"
-										variant="inverted"
-										animation={2}
-										maxCount={3}
-									/>
-								</FormControl>
-							</FormItem>
-						);
-					}}
-				/>
+				{!userId && (
+					<FormField
+						control={form.control}
+						name="selected_users"
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormControl>
+										<MultiSelect
+											field={field}
+											options={users || []}
+											onValueChange={setSelectedUsers}
+											defaultValue={selectedUsers}
+											placeholder="Select users"
+											variant="inverted"
+											animation={2}
+											maxCount={3}
+										/>
+									</FormControl>
+								</FormItem>
+							);
+						}}
+					/>
+				)}
 				<Button
 					type="submit"
 					disabled={loading || ((!form.watch("from") || !form.watch("to")) && selectedUsers.length === 0)}
