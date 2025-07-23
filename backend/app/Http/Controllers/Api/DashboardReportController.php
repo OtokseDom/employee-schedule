@@ -15,12 +15,12 @@ class DashboardReportController extends Controller
     {
         $filter = $request->all();
         $reports = [
-            'tasks_by_status' => ReportService::tasksByStatus(0, "dashboard", $filter),
+            'tasks_by_status' => ReportService::tasksByStatus(null, "dashboard", $filter),
             'users_task_load' => ReportService::usersTaskLoad($filter),
             'estimate_vs_actual' => ReportService::estimateVsActual($filter),
             'performance_leaderboard' => ReportService::performanceLeaderboard($filter),
-            'performance_rating_trend' => ReportService::performanceRatingTrend(0, "dashboard", $filter),
-            'section_cards' => ReportService::sectionCards(),
+            'performance_rating_trend' => ReportService::performanceRatingTrend(null, "dashboard", $filter),
+            'section_cards' => ReportService::sectionCards(null, $filter),
         ];
 
         $data = [];

@@ -15,19 +15,27 @@ class ReportService
     /**
      * Display reports for section cards. Section Cards
      */
-    public static function sectionCards($id = null)
+    public static function sectionCards($id = null, $filter)
     {
         // User Count
-        $user_count = User::where('status', 'active')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->count();
-        // Average Performance
+        // $user_count = User::where('status', 'active')
+        //     ->where('organization_id', Auth::user()->organization_id)
+        //     ->count();
+        /* ------------------------- // Average Performance ------------------------- */
         $avg_performance_query = Task::where('organization_id', Auth::user()->organization_id);
+
         if ($id) {
             $avg_performance_query->where('assignee_id', $id);
         }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $avg_performance_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $avg_performance_query->whereIn('assignee_id', $userIds);
+        }
         $avg_performance = $avg_performance_query->avg('performance_rating');
-        // Task at Risk
+        /* ----------------------------- // Task at Risk ---------------------------- */
         $task_at_risk_query = DB::table('tasks')
             ->where('status', '!=', 'completed')
             ->where('organization_id', Auth::user()->organization_id)
@@ -36,25 +44,46 @@ class ReportService
         if ($id) {
             $task_at_risk_query->where('assignee_id', $id);
         }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $task_at_risk_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $task_at_risk_query->whereIn('assignee_id', $userIds);
+        }
         $task_at_risk = $task_at_risk_query->count();
-        // Average Completion Time
+        /* ----------------------- // Average Completion Time ----------------------- */
         $avg_completion_time = DB::table('tasks')
             ->where('status', 'completed')
             ->where('organization_id', Auth::user()->organization_id)
             ->avg('time_taken');
-        // Time Efficiency
+        /* --------------------------- // Time Efficiency --------------------------- */
         $time_efficiency_query = DB::table('tasks')
             ->where('status', 'completed')
             ->where('organization_id', Auth::user()->organization_id);
         if ($id) {
             $time_efficiency_query->where('assignee_id', $id);
         }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $time_efficiency_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $time_efficiency_query->whereIn('assignee_id', $userIds);
+        }
         $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
-        // Task Completion Rate
+        /* ------------------------- // Task Completion Rate ------------------------ */
         $task_completion_query = DB::table('tasks')
             ->where('organization_id', Auth::user()->organization_id);
         if ($id) {
             $task_completion_query->where('assignee_id', $id);
+        }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $task_completion_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $task_completion_query->whereIn('assignee_id', $userIds);
         }
         $total_tasks = (clone $task_completion_query)->count();
         $completed_tasks = (clone $task_completion_query)
@@ -63,7 +92,7 @@ class ReportService
         $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
 
         $data = [
-            'user_count' => $user_count,
+            // 'user_count' => $user_count,
             'avg_performance' => round($avg_performance, 2),
             'task_at_risk' => $task_at_risk,
             'avg_completion_time' => round($avg_completion_time, 2),
