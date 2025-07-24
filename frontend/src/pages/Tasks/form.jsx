@@ -46,7 +46,6 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 // TODO: Restrict employee to only update their own tasks
-// TODO: Restrict employee on updating
 export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
@@ -535,36 +534,40 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="performance_rating"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Rating &#40;1-10&#41;</FormLabel>
-								<FormControl>
-									<Input type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="remarks"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Remarks</FormLabel>
-								<FormControl>
-									<Textarea placeholder="Remarks" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
+				{user_auth?.data?.role !== "Employee" && (
+					<>
+						<FormField
+							control={form.control}
+							name="performance_rating"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+										<FormControl>
+											<Input type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="remarks"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Remarks</FormLabel>
+										<FormControl>
+											<Textarea placeholder="Remarks" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+					</>
+				)}
 				<FormField
 					control={form.control}
 					name="status"

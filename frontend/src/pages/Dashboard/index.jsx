@@ -31,7 +31,6 @@ export default function UserProfile() {
 	});
 	const [selectedUsers, setSelectedUsers] = useState([]);
 
-	// TODO: Update filter populate users
 	useEffect(() => {
 		document.title = "Task Management";
 		fetchData();
