@@ -34,17 +34,21 @@ export default function ScheduleCalendar() {
 	const [tasks, setTasks] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
+	const [categories, setCategories] = useState(users || null);
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
-		fetchUsers();
+		fetchSelection();
 		fetchTasks();
 	}, []);
 
-	const fetchUsers = async () => {
-		setLoading(true);
+	const fetchSelection = async () => {
+		// setLocalLoading(true);
 		try {
+			setLoading(true);
 			const userResponse = await axiosClient.get("/user");
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 			setSelectedUser(userResponse.data.data[0]);
 		} catch (e) {
@@ -236,6 +240,8 @@ export default function ScheduleCalendar() {
 					<Month
 						days={days}
 						data={tasks}
+						users={users}
+						categories={categories}
 						fetchData={fetchTasks}
 						currentMonth={currentMonth}
 						getTaskForDate={getTaskForDate}

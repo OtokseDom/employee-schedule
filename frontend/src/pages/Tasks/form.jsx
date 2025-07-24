@@ -45,12 +45,10 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	// const { loading, setLoading } = useLoadContext();
+export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
-	const [users, setUsers] = useState();
-	const [categories, setCategories] = useState([]);
 
 	// State for time_estimate and delay hour/minute fields
 	const [timeEstimateHour, setTimeEstimateHour] = useState("");
@@ -82,25 +80,6 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 			status: undefined,
 		},
 	});
-
-	useEffect(() => {
-		if (isOpen) fetchSelection();
-	}, [isOpen]);
-
-	const fetchSelection = async () => {
-		// setLocalLoading(true);
-		try {
-			setLocalLoading(true);
-			const userResponse = await axiosClient.get("/user");
-			const categoryResponse = await axiosClient.get("/category");
-			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.data);
-		} catch (e) {
-			console.error("Error fetching data:", e);
-		} finally {
-			setLocalLoading(false);
-		}
-	};
 
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -175,7 +154,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 	}, [updateData, form, users, categories]);
 
 	const handleSubmit = async (formData) => {
-		setLocalLoading(true);
+		setLoading(true);
 		try {
 			// Parse numeric fields
 			const formatTime = (time) => {
@@ -235,7 +214,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 				});
 			}
 		} finally {
-			setLocalLoading(false);
+			setLoading(false);
 		}
 	};
 
@@ -280,7 +259,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger disabled={localLoading}>
+										<SelectTrigger disabled={loading}>
 											<SelectValue placeholder="Select an assignee">
 												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
 											</SelectValue>
@@ -316,7 +295,7 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger disabled={localLoading}>
+										<SelectTrigger disabled={loading}>
 											<SelectValue placeholder="Select a category">
 												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a category"}
 											</SelectValue>
@@ -507,22 +486,6 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 					</div>
 					<FormMessage />
 				</FormItem>
-				{/* <FormField
-					control={form.control}
-					name="time_taken"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Time Taken &#40;hrs&#41;</FormLabel>
-								<FormControl>
-									<Input type="number" step="any" placeholder="Time taken &#40;hrs&#41;" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/> */}
-				{/* Delay (hr/min) */}
 				<FormItem>
 					<FormLabel>Delay</FormLabel>
 					<div className="flex gap-2">
@@ -642,8 +605,8 @@ export default function TaskForm({ localLoading, setLocalLoading, setTaskAdded, 
 						);
 					}}
 				/>
-				<Button type="submit" disabled={localLoading}>
-					{localLoading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+				<Button type="submit" disabled={loading}>
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
 					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 				</Button>
 			</form>

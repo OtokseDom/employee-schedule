@@ -9,9 +9,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 
-export default function Month({ data, fetchData, days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
+export default function Month({ data, users, categories, fetchData, days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
 	const { loading, setLoading } = useLoadContext();
-	const [localLoading, setLocalLoading] = useState(false);
 	const [tasks, setTasks] = useState(data);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
@@ -122,15 +121,14 @@ export default function Month({ data, fetchData, days, currentMonth, getTaskForD
 								<SheetTitle>
 									<div className="flex flex-row gap-5">
 										<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
-										<span>{localLoading && <Loader2 className="animate-spin" />}</span>
+										<span>{loading && <Loader2 className="animate-spin" />}</span>
 									</div>
 								</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
 							<TaskForm
-								// data={tasks}
-								localLoading={localLoading}
-								setLocalLoading={setLocalLoading}
+								users={users}
+								categories={categories}
 								isOpen={isDialogOpen}
 								setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 								updateData={updateData}
