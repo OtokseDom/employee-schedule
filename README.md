@@ -10,11 +10,13 @@
 -   Dashboard and User specific reports
 -   Calendar View and Week View of tasks per user
 -   Report Filters
+-   Role Based Control
 
 **🤩 Upcoming Features:**
 
 -   Data export
--   Role Based Control
+-   Task activity logs
+-   Task comments/discussions
 
 # ⭐ How to install
 
@@ -83,4 +85,3 @@ Calendar (week view)
 <img width="1919" height="874" alt="image" src="https://github.com/user-attachments/assets/f8bfa2ba-b567-4131-988d-38a671f530ea" />
 User Profile
 <img width="1919" height="873" alt="image" src="https://github.com/user-attachments/assets/a715d63f-9292-4020-9be6-127ee4b66b24" />
-
