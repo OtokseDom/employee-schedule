@@ -12,9 +12,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryForm from "../form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 // Convert the DataTable component to JavaScript
 export function DataTableCategories({ columns, data, setCategories, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -53,9 +55,12 @@ export function DataTableCategories({ columns, data, setCategories, isOpen, setI
 				/>
 				<div className="flex gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-						<SheetTrigger asChild>
-							<Button variant="">Add Category</Button>
-						</SheetTrigger>
+						{loading ||
+							(user?.data?.role !== "Employee" && (
+								<SheetTrigger asChild>
+									<Button variant="">Add Category</Button>
+								</SheetTrigger>
+							))}
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
 								<SheetTitle>{updateData?.id ? "Update Category" : "Add Category"}</SheetTitle>

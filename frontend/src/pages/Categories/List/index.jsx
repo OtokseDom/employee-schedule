@@ -11,6 +11,7 @@ export default function Categories() {
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+	const [dialogOpen, setDialogOpen] = useState(false);
 
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -44,6 +45,7 @@ export default function Categories() {
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
+			setDialogOpen(false);
 			setLoading(false);
 		}
 	};
@@ -53,16 +55,25 @@ export default function Categories() {
 				<h1 className=" font-extrabold text-3xl">Categories</h1>
 				<p>View list of all categories</p>
 			</div>
-			<DataTableCategories
-				columns={columnsCategory({ handleDelete, setIsOpen, setUpdateData })}
-				data={categories}
-				setCategories={setCategories}
-				updateData={updateData}
-				setUpdateData={setUpdateData}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				fetchData={fetchData}
-			/>
+			{/* Updated table to fix dialog per column issue */}
+			{(() => {
+				const { columnsCategory: categoryColumns, dialog } = columnsCategory({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen });
+				return (
+					<>
+						<DataTableCategories
+							columns={categoryColumns}
+							data={categories}
+							setCategories={setCategories}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
+							isOpen={isOpen}
+							setIsOpen={setIsOpen}
+							fetchData={fetchData}
+						/>
+						{dialog}
+					</>
+				);
+			})()}
 		</div>
 	);
 }

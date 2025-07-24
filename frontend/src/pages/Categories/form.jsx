@@ -45,7 +45,7 @@ export default function CategoryForm({ data, setCategories, setIsOpen, updateDat
 	}, [updateData, form]);
 
 	const handleSubmit = async (form) => {
-		form.organization_id = user.organization_id;
+		form.organization_id = user.data.organization_id;
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
