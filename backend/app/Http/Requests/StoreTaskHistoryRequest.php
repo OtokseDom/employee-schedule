@@ -24,7 +24,7 @@ class StoreTaskHistoryRequest extends FormRequest
         return [
             'organization_id' => 'required|exists:organizations,id',
             'task_id' => 'required|exists:tasks,id',
-            'status' => 'required|in:Pending,In Progress,Completed,Delayed,Cancelled,On Hold',
+            'status' => 'required|in:Pending,In Progress,For Review,Completed,Delayed,Cancelled,On Hold',
             'changed_by' => 'required|exists:users,id',
             'changed_at' => 'required|date',
             'remarks' => 'nullable|string',
