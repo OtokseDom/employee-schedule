@@ -47,7 +47,8 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 		dob = "Unknown",
 	} = user || {};
 
-	const isEditable = user_auth?.data?.role === "Superadmin" || user_auth?.data?.role === "Admin" || user_auth?.data?.id === user?.id;
+	const isEditable =
+		user_auth?.data?.role === "Superadmin" || user_auth?.data?.role === "Admin" || user_auth?.data?.role === "Manager" || user_auth?.data?.id === user?.id;
 
 	return (
 		<div className="absolute inset-0 flex flex-col justify-center items-start p-6 bg-gradient-to-r from-black/50 to-transparent">

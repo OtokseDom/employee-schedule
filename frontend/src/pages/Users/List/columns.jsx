@@ -18,13 +18,13 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
 	const [selectedUserId, setSelectedUserId] = useState(null);
-	const [selectedUserData, setSelectedUserData] = useState(null);
+	// const [selectedUserData, setSelectedUserData] = useState(null);
 
 	const openDialog = (type, userData = {}) => {
 		setDialogType(type);
 		setDialogOpen(true);
 		setSelectedUserId(userData.id);
-		setSelectedUserData(userData);
+		// setSelectedUserData(userData);
 		// console.log("Dialog should open:", type, userData);
 	};
 
@@ -103,7 +103,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	);
 
 	// Add actions column for Superadmin
-	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin") {
+	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin" || user?.data?.role === "Manager") {
 		baseColumns.push({
 			id: "actions",
 			cell: ({ row }) => {

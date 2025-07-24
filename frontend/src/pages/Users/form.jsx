@@ -118,42 +118,48 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="role"
-					render={({ field }) => {
-						const roles = [
-							{ id: 1, name: "Superadmin" },
-							{ id: 2, name: "Admin" },
-							{ id: 3, name: "Manager" },
-							{ id: 4, name: "Employee" },
-						];
-						return (
-							<FormItem>
-								<FormLabel>Role</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={updateData?.role || field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select a role"></SelectValue>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{Array.isArray(roles) && roles.length > 0 ? (
-											roles?.map((role) => (
-												<SelectItem key={role?.id} value={role?.name}>
-													{role?.name}
-												</SelectItem>
-											))
-										) : (
-											<SelectItem disabled>No roles available</SelectItem>
-										)}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
+				{user_auth?.data?.role !== "Employee" && (
+					<FormField
+						control={form.control}
+						name="role"
+						render={({ field }) => {
+							const roles = [
+								{ id: 1, name: "Superadmin" },
+								{ id: 2, name: "Admin" },
+								{ id: 3, name: "Manager" },
+								{ id: 4, name: "Employee" },
+							];
+							return (
+								<FormItem>
+									<FormLabel>Role</FormLabel>
+									<Select
+										onValueChange={field.onChange}
+										defaultValue={updateData?.role || field.value}
+										disabled={user_auth?.data?.role === "Employee"}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select a role"></SelectValue>
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											{Array.isArray(roles) && roles.length > 0 ? (
+												roles?.map((role) => (
+													<SelectItem key={role?.id} value={role?.name}>
+														{role?.name}
+													</SelectItem>
+												))
+											) : (
+												<SelectItem disabled>No roles available</SelectItem>
+											)}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							);
+						}}
+					/>
+				)}
 				<FormField
 					control={form.control}
 					name="email"
@@ -191,46 +197,48 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 						return <DateInput field={field} label={"Birthday"} placeholder={"Pick a date"} disableFuture={true} />;
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="status"
-					render={({ field }) => {
-						const statuses = [
-							{ id: 1, name: "Pending" },
-							{ id: 2, name: "Active" },
-							{ id: 3, name: "Inactive" },
-							{ id: 4, name: "Banned" },
-						];
-						return (
-							<FormItem>
-								<FormLabel>Status</FormLabel>
-								<Select
-									disabled={user_auth?.data?.role === "Employee"}
-									onValueChange={field.onChange}
-									defaultValue={updateData?.status || field.value}
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select a status"></SelectValue>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{Array.isArray(statuses) && statuses.length > 0 ? (
-											statuses?.map((status) => (
-												<SelectItem key={status?.id} value={status?.name.toLowerCase()}>
-													{status?.name}
-												</SelectItem>
-											))
-										) : (
-											<SelectItem disabled>No statuses available</SelectItem>
-										)}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
+				{user_auth?.data?.role !== "Employee" && (
+					<FormField
+						control={form.control}
+						name="status"
+						render={({ field }) => {
+							const statuses = [
+								{ id: 1, name: "Pending" },
+								{ id: 2, name: "Active" },
+								{ id: 3, name: "Inactive" },
+								{ id: 4, name: "Banned" },
+							];
+							return (
+								<FormItem>
+									<FormLabel>Status</FormLabel>
+									<Select
+										disabled={user_auth?.data?.role === "Employee"}
+										onValueChange={field.onChange}
+										defaultValue={updateData?.status || field.value}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select a status"></SelectValue>
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											{Array.isArray(statuses) && statuses.length > 0 ? (
+												statuses?.map((status) => (
+													<SelectItem key={status?.id} value={status?.name.toLowerCase()}>
+														{status?.name}
+													</SelectItem>
+												))
+											) : (
+												<SelectItem disabled>No statuses available</SelectItem>
+											)}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							);
+						}}
+					/>
+				)}
 				<Button type="submit" disabled={loading}>
 					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} {Object.keys(updateData).length === 0 ? "Submit" : "Update"}
 				</Button>
