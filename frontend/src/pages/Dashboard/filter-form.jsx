@@ -42,10 +42,9 @@ const formSchema = z
 		}
 	);
 
-export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null, users }) {
+export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null, users, selectedUsers, setSelectedUsers }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
-	const [selectedUsers, setSelectedUsers] = useState([]);
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -53,12 +52,25 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			to: undefined,
 		},
 	});
+	// useEffect(() => {
+	// }, [selectedUsers]);
+
 	useEffect(() => {
+		console.log("Selected Users:", selectedUsers);
 		if (filters.values) {
 			const fromStr = filters.values["Date Range"]?.split(" to ")[0] || undefined;
 			const toStr = filters.values["Date Range"]?.split(" to ")[1] || undefined;
 			const from = fromStr ? new Date(fromStr) : undefined;
 			const to = fromStr ? new Date(toStr) : undefined;
+			// Users
+			const membersRaw = filters.values["Members"];
+			const userIds = Array.isArray(membersRaw)
+				? membersRaw.map((id) => parseInt(id))
+				: typeof membersRaw === "string"
+				? membersRaw.split(",").map((id) => parseInt(id.trim()))
+				: [];
+			// TODO: selectedUsers becomes empty when form opens
+			setSelectedUsers(userIds); // crucial
 			form.reset({
 				from: from ?? undefined,
 				to: to ?? undefined,
@@ -88,6 +100,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
 					},
 				});
+				// setSelectedUsers(selectedUserObjects?.map((u) => u.value).join(", ") || "");
 			} else {
 				filteredReports = await axiosClient.get(`/user/${userId}/reports?from=${from}&to=${to}`);
 				setFilters({
@@ -149,6 +162,10 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 											field={field}
 											options={users || []}
 											onValueChange={setSelectedUsers}
+											// onValueChange={(val) => {
+											// 	setSelectedUsers(val);
+											// 	field.onChange(val);
+											// }}
 											defaultValue={selectedUsers}
 											placeholder="Select users"
 											variant="inverted"

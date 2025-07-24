@@ -29,6 +29,8 @@ export default function UserProfile() {
 			Members: [],
 		},
 	});
+	const [selectedUsers, setSelectedUsers] = useState([]);
+
 	// TODO: Update filter populate users
 	useEffect(() => {
 		document.title = "Task Management";
@@ -63,7 +65,6 @@ export default function UserProfile() {
 			values: { ...filters.values },
 			display: { ...filters.display },
 		};
-		console.log(updated);
 		delete updated.values[key];
 		delete updated.display[key];
 		setFilters(updated);
@@ -114,7 +115,15 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								<FilterForm setIsOpen={setIsOpen} setReports={setReports} filters={filters} setFilters={setFilters} users={users} />
+								<FilterForm
+									setIsOpen={setIsOpen}
+									setReports={setReports}
+									filters={filters}
+									setFilters={setFilters}
+									users={users}
+									selectedUsers={selectedUsers}
+									setSelectedUsers={setSelectedUsers}
+								/>
 							</DialogContent>
 						</Dialog>
 					</div>
