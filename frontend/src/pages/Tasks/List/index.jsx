@@ -9,9 +9,11 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [categories, setCategories] = useState([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
-	const [deleted, setDeleted] = useState(false);
+	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	// Add comments from users
 	useEffect(() => {
@@ -20,6 +22,7 @@ export default function Tasks() {
 	useEffect(() => {
 		document.title = "Task Management | Tasks";
 		fetchData();
+		fetchSelection();
 	}, []);
 	const fetchData = async () => {
 		setLoading(true);
@@ -31,6 +34,19 @@ export default function Tasks() {
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
+			setLoading(false);
+		}
+	};
+	const fetchSelection = async () => {
+		try {
+			setLoading(true);
+			const userResponse = await axiosClient.get("/user");
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
+			setUsers(userResponse.data.data);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
 			setLoading(false);
 		}
 	};
@@ -58,6 +74,8 @@ export default function Tasks() {
 			<DataTableTasks
 				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
 				data={tasks}
+				users={users}
+				categories={categories}
 				setTasks={setTasks}
 				updateData={updateData}
 				setUpdateData={setUpdateData}

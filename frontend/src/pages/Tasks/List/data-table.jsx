@@ -15,9 +15,8 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 
 // Convert the DataTable component to JavaScript
-export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
+export function DataTableTasks({ columns, data, users, categories, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
 	const { loading, setLoading } = useLoadContext();
-	const [localLoading, setLocalLoading] = useState(false);
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
@@ -128,15 +127,15 @@ export function DataTableTasks({ columns, data, setTasks, isOpen, setIsOpen, upd
 									<SheetTitle>
 										<div className="flex flex-row gap-5">
 											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
-											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
+											<span>{loading && <Loader2 className="animate-spin" />}</span>
 										</div>
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
 								<TaskForm
 									// data={data}
-									localLoading={localLoading}
-									setLocalLoading={setLocalLoading}
+									users={users}
+									categories={categories}
 									setTasks={setTasks}
 									isOpen={isOpen}
 									setIsOpen={setIsOpen}
