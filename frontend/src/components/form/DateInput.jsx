@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
-export default function DateInput({ field, label, placeholder, disableFuture = false }) {
+export default function DateInput({ field, label, placeholder, disabled = false, disableFuture = false }) {
 	/* -------------------------------------------------------------------------- */
 	/*                                 Date field                                 */
 	/* -------------------------------------------------------------------------- */
@@ -66,7 +66,11 @@ export default function DateInput({ field, label, placeholder, disableFuture = f
 			<Popover>
 				<PopoverTrigger asChild>
 					<FormControl>
-						<Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+						<Button
+							disabled={disabled}
+							variant={"outline"}
+							className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+						>
 							{field.value ? format(field.value, "PPP") : <span>{placeholder}</span>}
 							<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 						</Button>
@@ -110,7 +114,7 @@ export default function DateInput({ field, label, placeholder, disableFuture = f
 							setMonth(newMonth.getMonth());
 							setYear(newMonth.getFullYear());
 						}}
-						disabled={(disableFuture ? (date) => date > new Date() : "") || date < new Date("2000-01-01")}
+						disabled={(disableFuture ? (date) => date > new Date() : "") || date < new Date("2000-01-01") || disabled}
 						initialFocus
 					/>
 				</PopoverContent>

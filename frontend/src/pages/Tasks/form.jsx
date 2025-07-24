@@ -244,6 +244,13 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 		}
 	}, [form.watch("start_time"), form.watch("end_time")]);
 
+	const isEditable =
+		user_auth?.data?.role === "Superadmin" ||
+		user_auth?.data?.role === "Admin" ||
+		user_auth?.data?.role === "Manager" ||
+		Object.keys(updateData).length === 0 ||
+		updateData?.calendar_add ||
+		(updateData?.assignee_id === user_auth?.data?.id && user_auth?.data?.role === "Employee");
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
@@ -255,12 +262,13 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Assignee</FormLabel>
 								<Select
+									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
 									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger disabled={loading}>
+										<SelectTrigger>
 											<SelectValue placeholder="Select an assignee">
 												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
 											</SelectValue>
@@ -291,12 +299,12 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Category</FormLabel>
 								<Select
-									disbaled={!categories?.length}
+									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
 									value={field.value ? field.value.toString() : undefined}
 								>
 									<FormControl>
-										<SelectTrigger disabled={loading}>
+										<SelectTrigger>
 											<SelectValue placeholder="Select a category">
 												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a category"}
 											</SelectValue>
@@ -327,7 +335,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Title</FormLabel>
 								<FormControl>
-									<Input placeholder="Title" {...field} />
+									<Input disabled={!isEditable} placeholder="Title" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -342,7 +350,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Description</FormLabel>
 								<FormControl>
-									<Textarea placeholder="Description" {...field} />
+									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -357,7 +365,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Expected output</FormLabel>
 								<FormControl>
-									<Textarea placeholder="Expected output" {...field} />
+									<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -368,14 +376,14 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					control={form.control}
 					name="start_date"
 					render={({ field }) => {
-						return <DateInput field={field} label={"Start date"} placeholder={"Select start date"} />;
+						return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
 					}}
 				/>
 				<FormField
 					control={form.control}
 					name="end_date"
 					render={({ field }) => {
-						return <DateInput field={field} label={"End date"} placeholder={"Select end date"} />;
+						return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
 					}}
 				/>
 				<FormField
@@ -387,6 +395,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 								<FormLabel>Start Time</FormLabel>
 								<FormControl>
 									<Input
+										disabled={!isEditable}
 										type="time"
 										step="60"
 										inputMode="numeric"
@@ -409,6 +418,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 								<FormLabel>End Time</FormLabel>
 								<FormControl>
 									<Input
+										disabled={!isEditable}
 										type="time"
 										step="any"
 										// placeholder="Rating &#40;1-10&#41;"
@@ -426,6 +436,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					<FormLabel>Time Estimate</FormLabel>
 					<div className="flex gap-2">
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							placeholder="hr"
@@ -438,6 +449,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						/>
 						<span>hr</span>
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							max="59"
@@ -459,6 +471,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					<FormLabel>Time Taken</FormLabel>
 					<div className="flex gap-2">
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							placeholder="hr"
@@ -471,6 +484,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						/>
 						<span>hr</span>
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							max="59"
@@ -491,6 +505,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					<FormLabel>Delay</FormLabel>
 					<div className="flex gap-2">
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							placeholder="hr"
@@ -503,6 +518,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						/>
 						<span>hr</span>
 						<Input
+							disabled={!isEditable}
 							type="number"
 							min="0"
 							max="59"
@@ -527,7 +543,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 							<FormItem>
 								<FormLabel>Delay reason</FormLabel>
 								<FormControl>
-									<Textarea placeholder="Delay reason" {...field} />
+									<Textarea disabled={!isEditable} placeholder="Delay reason" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -544,7 +560,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 									<FormItem>
 										<FormLabel>Rating &#40;1-10&#41;</FormLabel>
 										<FormControl>
-											<Input type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+											<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -559,7 +575,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 									<FormItem>
 										<FormLabel>Remarks</FormLabel>
 										<FormControl>
-											<Textarea placeholder="Remarks" {...field} />
+											<Textarea disabled={!isEditable} placeholder="Remarks" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -575,16 +591,17 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						const statuses = [
 							{ id: 1, name: "Pending" },
 							{ id: 2, name: "In Progress" },
-							{ id: 2, name: "For Review" },
-							{ id: 3, name: "Completed" },
-							{ id: 4, name: "Delayed" },
-							{ id: 5, name: "On Hold" },
-							{ id: 6, name: "Cancelled" },
+							{ id: 3, name: "For Review" },
+							{ id: 4, name: "Completed" },
+							{ id: 5, name: "Delayed" },
+							{ id: 6, name: "On Hold" },
+							{ id: 7, name: "Cancelled" },
 						];
 						return (
 							<FormItem>
 								<FormLabel>Status</FormLabel>
 								<Select
+									disabled={!isEditable}
 									onValueChange={field.onChange}
 									value={field.value || undefined}
 									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
@@ -611,10 +628,14 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						);
 					}}
 				/>
-				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
-					{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
-				</Button>
+				{isEditable ? (
+					<Button type="submit" disabled={loading}>
+						{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+						{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
+					</Button>
+				) : (
+					""
+				)}
 			</form>
 		</Form>
 	);
