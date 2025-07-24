@@ -50,7 +50,7 @@ const items = [
 		subItems: [],
 	},
 	{
-		title: "Users",
+		title: "Members",
 		url: "/users",
 		icon: Users2,
 		collapsible: false,

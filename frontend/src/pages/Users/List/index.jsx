@@ -51,8 +51,8 @@ export default function Users() {
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 			<div>
-				<h1 className=" font-extrabold text-3xl">Users of {user?.data?.organization?.name}</h1>
-				<p>List of all users</p>
+				<h1 className=" font-extrabold text-3xl">Members of {user?.data?.organization?.name}</h1>
+				<p>List of all organization members</p>
 			</div>
 
 			{/* Updated table to fix dialog per column issue */}
