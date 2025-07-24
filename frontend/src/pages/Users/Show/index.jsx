@@ -27,7 +27,8 @@ export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
 	const { setLoading } = useLoadContext();
-	const [tasks, setTasks] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [categories, setCategories] = useState([]);
 	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,7 @@ export default function UserProfile() {
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
 		fetchData();
+		fetchSelection();
 	}, []);
 
 	const fetchData = async () => {
@@ -55,10 +57,22 @@ export default function UserProfile() {
 			// Fetch user details and tasks
 			const response = await axiosClient.get(`/user/${id}`);
 			setUser(response.data.data.user);
-			setTasks(response.data.data.assigned_tasks);
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
 			setUserReports(reportsRes.data.data);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchSelection = async () => {
+		try {
+			setLoading(true);
+			const userResponse = await axiosClient.get("/user");
+			const categoryResponse = await axiosClient.get("/category");
+			setCategories(categoryResponse.data.data);
+			setUsers(userResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -260,7 +274,8 @@ export default function UserProfile() {
 						<DataTableTasks
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 							data={userReports?.user_tasks?.data || []}
-							setTasks={setTasks}
+							users={users}
+							categories={categories}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}

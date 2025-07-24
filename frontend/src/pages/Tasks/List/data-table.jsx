@@ -136,7 +136,6 @@ export function DataTableTasks({ columns, data, users, categories, setTasks, isO
 									// data={data}
 									users={users}
 									categories={categories}
-									setTasks={setTasks}
 									isOpen={isOpen}
 									setIsOpen={setIsOpen}
 									updateData={updateData}

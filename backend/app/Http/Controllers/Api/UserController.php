@@ -44,13 +44,8 @@ class UserController extends Controller
 
       $data = [
          'user' => $userDetails,
-         // 'assigned_tasks' => $assignedTasks
       ];
       return apiResponse($data, 'User details fetched successfully');
-      // return response()->json([
-      //    'user' => $userDetails,
-      //    'assigned_tasks' => $assignedTasks
-      // ]);
    }
 
    public function update(UpdateUserRequest $request, User $user)
