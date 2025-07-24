@@ -251,6 +251,8 @@ export default function ScheduleCalendar() {
 				) : (
 					<Week
 						data={tasks}
+						users={users}
+						categories={categories}
 						fetchData={fetchTasks}
 						getWeekDays={getWeekDays}
 						getTimeSlots={getTimeSlots}

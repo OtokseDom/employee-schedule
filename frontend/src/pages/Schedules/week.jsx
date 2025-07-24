@@ -9,9 +9,19 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot, statusColors, selectedUser }) {
+export default function Week({
+	data,
+	users,
+	categories,
+	fetchData,
+	getWeekDays,
+	getTimeSlots,
+	weekstart_date: weekStartDate,
+	isInTimeSlot,
+	statusColors,
+	selectedUser,
+}) {
 	const { loading, setLoading } = useLoadContext();
-	const [localLoading, setLocalLoading] = useState(false);
 	const [tasks, setTasks] = useState(data);
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
@@ -159,15 +169,14 @@ export default function Week({ data, fetchData, getWeekDays, getTimeSlots, weeks
 									<SheetTitle>
 										<div className="flex flex-row gap-5">
 											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
-											<span>{localLoading && <Loader2 className="animate-spin" />}</span>
+											<span>{loading && <Loader2 className="animate-spin" />}</span>
 										</div>
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
 								<TaskForm
-									// data={tasks}
-									localLoading={localLoading}
-									setLocalLoading={setLocalLoading}
+									users={users}
+									categories={categories}
 									isOpen={isDialogOpen}
 									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
