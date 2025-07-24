@@ -123,6 +123,10 @@ class ReportService
                 'field' => 'in_progress',
             ],
             [
+                'name' => 'For Review',
+                'field' => 'for_review',
+            ],
+            [
                 'name' => 'Completed',
                 'field' => 'completed',
             ],

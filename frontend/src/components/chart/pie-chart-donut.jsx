@@ -26,24 +26,29 @@ export function PieChartDonut({ report, variant }) {
 			color: "hsl(var(--chart-1))",
 			// color: "hsl(220 70% 50%)", // Blue
 		},
+		for_review: {
+			label: "For Review",
+			color: "hsl(var(--chart-3))",
+			// color: "hsl(220 70% 50%)", // Blue
+		},
 		completed: {
 			label: "Completed",
-			color: "hsl(var(--chart-3))",
+			color: "hsl(var(--chart-5))",
 			// color: "hsl(160 60% 45%)", // Green
 		},
 		delayed: {
 			label: "Delayed",
-			color: "hsl(var(--chart-5))",
+			color: "hsl(var(--chart-7))",
 			// color: "hsl(340 75% 65%)", // Pink
 		},
 		cancelled: {
 			label: "Cancelled",
-			color: "hsl(var(--chart-7))",
+			color: "hsl(var(--chart-9))",
 			// color: "hsl(340 75% 55%)", // Dark Pink
 		},
 		on_hold: {
 			label: "On Hold",
-			color: "hsl(var(--chart-9))",
+			color: "hsl(var(--chart-11))",
 			// color: "hsl(340 75% 45%)", // Darkest Pink
 		},
 	};
