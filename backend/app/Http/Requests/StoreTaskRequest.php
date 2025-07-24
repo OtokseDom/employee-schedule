@@ -28,7 +28,7 @@ class StoreTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
             'assignee_id' => 'nullable|exists:users,id',
-            'status' => 'required|in:Pending,In Progress,Completed,Delayed,Cancelled,On Hold',
+            'status' => 'required|in:Pending,In Progress,For Review,Completed,Delayed,Cancelled,On Hold',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i:s',

@@ -29,7 +29,7 @@ class TaskFactory extends Factory
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,
             'assignee_id' => User::inRandomOrder()->value('id'),
-            'status' => $this->faker->randomElement(['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
+            'status' => $this->faker->randomElement(['Pending', 'In Progress', 'For Review', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'start_date' => $startDate = fake()->dateTimeBetween('-6 months', 'now'),
             'end_date' => $startDate,
             'start_time' => $this->faker->randomElement(['07:30:00', '08:00:00', '08:20:00', '09:45:00', '10:00:00']),
