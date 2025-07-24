@@ -45,6 +45,8 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
+// TODO: Restrict employee to only update their own tasks
+// TODO: Restrict employee on updating
 export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
@@ -570,6 +572,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						const statuses = [
 							{ id: 1, name: "Pending" },
 							{ id: 2, name: "In Progress" },
+							{ id: 2, name: "For Review" },
 							{ id: 3, name: "Completed" },
 							{ id: 4, name: "Delayed" },
 							{ id: 5, name: "On Hold" },

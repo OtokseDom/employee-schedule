@@ -14,6 +14,7 @@ import Month from "./month";
 // Status colors
 const statusColors = {
 	"In Progress": "bg-blue-100 border-blue-300 text-blue-800",
+	"For Review": "bg-orange-100 border-orange-300 text-orange-800",
 	Pending: "bg-yellow-100 border-yellow-300 text-yellow-800",
 	Completed: "bg-green-100 border-green-300 text-green-800",
 	"On Hold": "bg-gray-100 border-gray-300 text-gray-800",
