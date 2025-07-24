@@ -52,11 +52,8 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			to: undefined,
 		},
 	});
-	// useEffect(() => {
-	// }, [selectedUsers]);
 
 	useEffect(() => {
-		console.log("Selected Users:", selectedUsers);
 		if (filters.values) {
 			const fromStr = filters.values["Date Range"]?.split(" to ")[0] || undefined;
 			const toStr = filters.values["Date Range"]?.split(" to ")[1] || undefined;
@@ -69,7 +66,6 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 				: typeof membersRaw === "string"
 				? membersRaw.split(",").map((id) => parseInt(id.trim()))
 				: [];
-			// TODO: selectedUsers becomes empty when form opens
 			setSelectedUsers(userIds); // crucial
 			form.reset({
 				from: from ?? undefined,
@@ -85,8 +81,6 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			const to = form_filter?.to ? form_filter.to.toLocaleDateString("en-CA") : "";
 			const selected_users = form_filter?.selected_users || []; // this only gets the IDs of selected users
 			const selectedUserObjects = users?.filter((u) => selected_users.includes(u.value)); // this maps the IDs to user objects
-			// console.log(selectedUserObjects);
-			// setSelectedUsers(selectedUserObjects);
 			let filteredReports;
 			if (!userId) {
 				filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}&users=${selected_users.join(",")}`);
@@ -100,7 +94,6 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
 					},
 				});
-				// setSelectedUsers(selectedUserObjects?.map((u) => u.value).join(", ") || "");
 			} else {
 				filteredReports = await axiosClient.get(`/user/${userId}/reports?from=${from}&to=${to}`);
 				setFilters({
@@ -162,10 +155,6 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 											field={field}
 											options={users || []}
 											onValueChange={setSelectedUsers}
-											// onValueChange={(val) => {
-											// 	setSelectedUsers(val);
-											// 	field.onChange(val);
-											// }}
 											defaultValue={selectedUsers}
 											placeholder="Select users"
 											variant="inverted"
@@ -180,7 +169,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 				)}
 				<Button
 					type="submit"
-					disabled={loading || ((!form.watch("from") || !form.watch("to")) && selectedUsers.length === 0)}
+					disabled={loading || ((!form.watch("from") || !form.watch("to")) && (selectedUsers?.length === 0 || !selectedUsers))}
 					className="w-full"
 					variant="default"
 				>
