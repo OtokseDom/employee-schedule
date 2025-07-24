@@ -86,7 +86,7 @@ export default function Organization() {
 										<span className="text-xs md:text-lg text-purple-200">{description}</span>
 									</div>
 								</div>
-								{user?.data?.role === "Superadmin" ? (
+								{user?.data?.role === "Superadmin" || user?.data?.role === "Admin" ? (
 									<Dialog>
 										<DropdownMenu modal={false}>
 											<DropdownMenuTrigger asChild>
@@ -114,7 +114,7 @@ export default function Organization() {
 							<div className="flex gap-5">
 								<Skeleton className="w-24 h-8 rounded-full" />
 							</div>
-						) : (
+						) : user?.data?.role !== "Employee" ? (
 							<div className="flex items-center flex-wrap mt-4 gap-2 md:gap-4 text-lg">
 								<span>Code: {showCode ? code : "•".repeat(code?.length || 10)}</span>
 								<button
@@ -125,6 +125,8 @@ export default function Organization() {
 									{showCode ? <EyeOff size={20} /> : <Eye size={20} />}
 								</button>
 							</div>
+						) : (
+							""
 						)}
 					</div>
 				</div>
