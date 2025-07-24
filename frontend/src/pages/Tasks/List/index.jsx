@@ -4,8 +4,8 @@ import { columnsTask } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
-// TODO: Task History Logs Screen for Admin
-// TODO: Fliters and Export for tasks
+// TODO: Task History Logs Panel
+// TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);

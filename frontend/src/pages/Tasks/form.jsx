@@ -45,7 +45,6 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-// TODO: Restrict employee to only update their own tasks
 export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
