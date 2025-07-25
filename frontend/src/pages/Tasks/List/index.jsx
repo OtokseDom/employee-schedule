@@ -15,9 +15,13 @@ export default function Tasks() {
 	const [isOpen, setIsOpen] = useState(false);
 	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
+	const [showHistory, setShowHistory] = useState(false);
 	// Add comments from users
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
+		if (!isOpen) {
+			setUpdateData({});
+			setShowHistory(false);
+		}
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Tasks";
@@ -82,6 +86,8 @@ export default function Tasks() {
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
 				fetchData={fetchData}
+				showHistory={showHistory}
+				setShowHistory={setShowHistory}
 			/>
 		</div>
 	);

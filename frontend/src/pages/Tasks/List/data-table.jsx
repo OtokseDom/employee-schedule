@@ -15,13 +15,26 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 
 // Convert the DataTable component to JavaScript
-export function DataTableTasks({ columns, data, users, categories, setTasks, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true }) {
+export function DataTableTasks({
+	columns,
+	data,
+	users,
+	categories,
+	setTasks,
+	isOpen,
+	setIsOpen,
+	updateData,
+	setUpdateData,
+	fetchData,
+	showLess = true,
+	showHistory,
+	setShowHistory,
+}) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
-
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
@@ -125,28 +138,84 @@ export function DataTableTasks({ columns, data, users, categories, setTasks, isO
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
 									<SheetTitle>
-										<div className="flex flex-row gap-5">
-											<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
-											<span>{loading && <Loader2 className="animate-spin" />}</span>
-										</div>
+										{Object.keys(updateData).length > 0 ? (
+											<div>
+												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
+													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
+														<button onClick={() => setShowHistory(false)}>Update Task</button>
+													</div>
+													<div className={`w-fit py-2 px-5 ${showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
+														<button onClick={() => setShowHistory(true)}>History</button>
+													</div>
+												</div>
+												{/* {!showHistory ? <span>{updateData?.id ? "Update Task" : "Add Task"}</span> : <span>Task History</span>} */}
+												<span>{loading && <Loader2 className="animate-spin" />}</span>
+											</div>
+										) : (
+											"Add Task"
+										)}
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
-								<TaskForm
-									// data={data}
-									users={users}
-									categories={categories}
-									isOpen={isOpen}
-									setIsOpen={setIsOpen}
-									updateData={updateData}
-									setUpdateData={setUpdateData}
-									fetchData={fetchData}
-								/>
+								{showHistory ? (
+									<div className="flex flex-col text-sm">
+										<div className="w-full overflow-y-auto text-muted-foreground p-5">
+											<div>
+												<span className="font-bold">Joshua Karl</span> created this task
+											</div>
+											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
+										</div>
+										<div className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
+											<div>
+												<span className="font-bold">Joshua Karl</span> updated this task
+											</div>
+											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
+											<div className="flex flex-col gap-4 text-foreground mt-2">
+												<div className="flex flex-col px-5 border-l-2 border-primary">
+													<span className="font-bold text-muted-foreground">Original</span>
+													<span>Title: Hello there</span>
+													<span>Category: Documentation</span>
+												</div>
+												<div className="flex flex-col px-5 border-l-2 border-primary">
+													<span className="font-bold text-muted-foreground">Updated</span>
+													<span>Title: Hello there</span>
+													<span>Category: Documentation</span>
+												</div>
+											</div>
+										</div>
+										<div className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
+											<div>
+												<span className="font-bold">Joshua Karl</span> updated this task
+											</div>
+											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
+											<div className="flex flex-col gap-4 text-foreground mt-2">
+												<div className="flex flex-col px-5 border-l-2 border-primary">
+													<span className="font-bold text-muted-foreground">Original</span>
+													<span>Title: Hello there</span>
+													<span>Category: Documentation</span>
+												</div>
+												<div className="flex flex-col px-5 border-l-2 border-primary">
+													<span className="font-bold text-muted-foreground">Updated</span>
+													<span>Title: Hello there</span>
+													<span>Category: Documentation</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								) : (
+									<TaskForm
+										// data={data}
+										users={users}
+										categories={categories}
+										isOpen={isOpen}
+										setIsOpen={setIsOpen}
+										updateData={updateData}
+										setUpdateData={setUpdateData}
+										fetchData={fetchData}
+									/>
+								)}
 							</SheetContent>
 						</Sheet>
-						{/* <Link to="/products/add">
-						<Button variant="">Add Product</Button>
-					</Link> */}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="outline">Columns</Button>
