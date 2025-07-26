@@ -141,7 +141,7 @@ export default function Month({
 									<div className="flex flex-row gap-5">
 										{/* <span>{updateData?.id ? "Update Task" : "Add Task"}</span> */}
 										{Object.keys(updateData).length > 0 && !updateData?.calendar_add ? (
-											<div className="flex flex-row justify-between">
+											<div className="flex flex-row items-center">
 												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
 													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
 														<button onClick={() => setShowHistory(false)}>Update Task</button>
@@ -156,7 +156,6 @@ export default function Month({
 										) : (
 											"Add Task"
 										)}
-										<span>{loading && <Loader2 className="animate-spin" />}</span>
 									</div>
 								</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
