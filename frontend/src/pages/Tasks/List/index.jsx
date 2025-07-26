@@ -9,6 +9,8 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState([]);
+	const [taskHistory, setTaskHistory] = useState([]);
+	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const showToast = useToast();
@@ -33,7 +35,8 @@ export default function Tasks() {
 		try {
 			// Make both API calls concurrently using Promise.all
 			const taskResponse = await axiosClient.get("/task");
-			setTasks(taskResponse.data.data);
+			setTasks(taskResponse.data.data.tasks);
+			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -76,8 +79,9 @@ export default function Tasks() {
 				<p>View list of all tasks</p>
 			</div>
 			<DataTableTasks
-				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
+				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory })}
 				data={tasks}
+				selectedTaskHistory={selectedTaskHistory}
 				users={users}
 				categories={categories}
 				setTasks={setTasks}

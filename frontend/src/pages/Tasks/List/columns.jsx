@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
+export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
+		const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
+		setSelectedTaskHistory(filteredHistory);
 	};
 
 	// Define color classes based on status value

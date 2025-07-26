@@ -15,7 +15,7 @@ class TaskHistoryController extends Controller
     {
         $taskHistories = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
             ->where('organization_id', Auth::user()->organization_id)
-            ->orderBy('id', 'DESC')->get();
+            ->orderBy('id', 'ASC')->get();
         return apiResponse(TaskHistoryResource::collection($taskHistories), 'Task history fetched successfully');
         // return TaskHistoryResource::collection($taskHistories);
     }

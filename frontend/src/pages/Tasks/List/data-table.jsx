@@ -13,11 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
+import { format } from "date-fns";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({
 	columns,
 	data,
+	selectedTaskHistory,
 	users,
 	categories,
 	setTasks,
@@ -159,48 +161,47 @@ export function DataTableTasks({
 								</SheetHeader>
 								{showHistory ? (
 									<div className="flex flex-col text-sm">
-										<div className="w-full overflow-y-auto text-muted-foreground p-5">
-											<div>
-												<span className="font-bold">Joshua Karl</span> created this task
-											</div>
-											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
-										</div>
-										<div className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
-											<div>
-												<span className="font-bold">Joshua Karl</span> updated this task
-											</div>
-											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
-											<div className="flex flex-col gap-4 text-foreground mt-2">
-												<div className="flex flex-col px-5 border-l-2 border-primary">
-													<span className="font-bold text-muted-foreground">Original</span>
-													<span>Title: Hello there</span>
-													<span>Category: Documentation</span>
-												</div>
-												<div className="flex flex-col px-5 border-l-2 border-primary">
-													<span className="font-bold text-muted-foreground">Updated</span>
-													<span>Title: Hello there</span>
-													<span>Category: Documentation</span>
-												</div>
-											</div>
-										</div>
-										<div className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
-											<div>
-												<span className="font-bold">Joshua Karl</span> updated this task
-											</div>
-											<div className="text-blue-500">January 1, 2025, 4:00 PM</div>
-											<div className="flex flex-col gap-4 text-foreground mt-2">
-												<div className="flex flex-col px-5 border-l-2 border-primary">
-													<span className="font-bold text-muted-foreground">Original</span>
-													<span>Title: Hello there</span>
-													<span>Category: Documentation</span>
-												</div>
-												<div className="flex flex-col px-5 border-l-2 border-primary">
-													<span className="font-bold text-muted-foreground">Updated</span>
-													<span>Title: Hello there</span>
-													<span>Category: Documentation</span>
-												</div>
-											</div>
-										</div>
+										{selectedTaskHistory.map((history, index) => {
+											if (history?.remarks === "Task Added") {
+												return (
+													<div key={index} className="w-full overflow-y-auto text-muted-foreground p-5">
+														<div>
+															<span className="font-bold">{history?.changedBy?.name}</span> created this task
+														</div>
+														<div className="text-blue-500">{format(new Date(history?.created_at), "MMMM dd, yyyy, hh:mm a")}</div>
+													</div>
+												);
+											} else {
+												return (
+													<div key={index} className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
+														<div>
+															<span className="font-bold">{history?.changedBy?.name}</span> updated this task
+														</div>
+														<div className="text-blue-500">{format(new Date(history?.changed_at), "MMMM dd, yyyy, hh:mm a")}</div>
+														<div className="flex flex-col gap-4 text-foreground mt-2">
+															<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
+																<span className="font-bold text-muted-foreground">Original</span>
+																{Object.entries(history.remarks).map(([key, value]) => (
+																	<span key={key}>
+																		<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
+																		{value.from}
+																	</span>
+																))}
+															</div>
+															<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
+																<span className="font-bold text-muted-foreground">Updated</span>
+																{Object.entries(history.remarks).map(([key, value]) => (
+																	<span key={key}>
+																		<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
+																		{value.to}
+																	</span>
+																))}
+															</div>
+														</div>
+													</div>
+												);
+											}
+										})}
 									</div>
 								) : (
 									<TaskForm
@@ -212,6 +213,7 @@ export function DataTableTasks({
 										updateData={updateData}
 										setUpdateData={setUpdateData}
 										fetchData={fetchData}
+										selectedTaskHistory={selectedTaskHistory}
 									/>
 								)}
 							</SheetContent>
@@ -281,7 +283,10 @@ export function DataTableTasks({
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} onClick={() => handleUpdate(row.original)}>
+								<TableRow
+									key={row.id}
+									// onClick={() => handleUpdate(row.original)}
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
