@@ -30,7 +30,7 @@ class TaskHistoryController extends Controller
 
     public function show($id)
     {
-        $taskHistory = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
+        $taskHistory = TaskHistory::with(['task:id,title', 'changedBy:id,name'])
             ->where('id', $id)
             ->where('organization_id', Auth::user()->organization_id)
             ->first();

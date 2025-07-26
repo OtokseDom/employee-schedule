@@ -21,7 +21,7 @@ class TaskHistoryResource extends JsonResource
             'status' => $this->status,
             'changed_by' => $this->changed_by,
             'changed_at' => $this->changed_at->format('Y-m-d H:i:s'),
-            'remarks' => $this->remarks,
+            'remarks' => $this->parseRemarks($this->remarks),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'task' => $this->whenLoaded('task', function () {
@@ -31,10 +31,14 @@ class TaskHistoryResource extends JsonResource
             }),
             'changedBy' => $this->whenLoaded('changedBy', function () {
                 return [
-                    'name' => $this->changedBy->name,
-                    'email' => $this->changedBy->email,
+                    'name' => $this->changedBy->name
                 ];
             }),
         ];
+    }
+    protected function parseRemarks($remarks)
+    {
+        $decoded = json_decode($remarks, true);
+        return json_last_error() === JSON_ERROR_NONE ? $decoded : $remarks;
     }
 }
