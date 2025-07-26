@@ -7,7 +7,9 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
+use App\Models\Category;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -80,8 +82,30 @@ class TaskController extends Controller
                 $val = $value ? date('Y-m-d', strtotime($value)) : null;
                 if ($orig !== $val) {
                     $changes[$key] = [
-                        'from' => $original[$key],
+                        'from' => $orig,
                         'to' => $value,
+                    ];
+                }
+            } else if (in_array($key, ['category_id'])) {
+                // save category name instead of id in task history
+                $orig = $original[$key] ? optional(Category::find($original[$key]))->name : null;
+                $val = $value ? optional(Category::find($value))->name : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
+                    ];
+                }
+            } else if (in_array($key, ['assignee_id'])) {
+                // save assignee name instead of id in task history
+                $orig = $original[$key] ? optional(User::find($original[$key]))->name : null;
+                $val = $value ? optional(User::find($value))->name : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
                     ];
                 }
             } else {
