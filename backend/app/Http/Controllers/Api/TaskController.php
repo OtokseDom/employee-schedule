@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,16 @@ class TaskController extends Controller
         $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])
             ->where('organization_id', Auth::user()->organization_id)
             ->orderBy('id', 'DESC')->get();
-        return apiResponse(TaskResource::collection($tasks), 'Tasks fetched successfully');
+        // $task_history = TaskHistoryController::index();
+
+        // Get task history using the controller method
+        $task_history_response = app(TaskHistoryController::class)->index();
+        $task_history = $task_history_response->getData()->data ?? [];
+        $data = [
+            'tasks' => TaskResource::collection($tasks),
+            'task_history' => $task_history,
+        ];
+        return apiResponse($data, 'Tasks fetched successfully');
         // return TaskResource::collection($tasks);
     }
 

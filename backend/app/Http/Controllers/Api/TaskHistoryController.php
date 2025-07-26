@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskHistoryController extends Controller
 {
-    public function index()
+    public static function index()
     {
         $taskHistories = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
             ->where('organization_id', Auth::user()->organization_id)
