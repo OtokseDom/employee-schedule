@@ -57,7 +57,8 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 	const [timeTakenMinute, setTimeTakenMinute] = useState("");
 	const [delayHour, setDelayHour] = useState("");
 	const [delayMinute, setDelayMinute] = useState("");
-
+	const [estimateError, setEstimateError] = useState("");
+	const [delayError, setDelayError] = useState("");
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -219,18 +220,18 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 	};
 
 	// Auto-suggest time estimate based on start and end time
-	useEffect(() => {
-		const start = form.watch("start_time");
-		const end = form.watch("end_time");
-		if (start && end) {
+	const calculateEstimate = () => {
+		const { start_time, end_time } = form.getValues();
+		if (start_time && end_time) {
+			setEstimateError("");
 			// Parse times as HH:mm or HH:mm:ss
 			const parseTime = (t) => {
 				const [h, m, s] = t.split(":").map(Number);
 				return h * 60 + m + (s ? s / 60 : 0);
 			};
 			try {
-				const startMin = parseTime(start);
-				const endMin = parseTime(end);
+				const startMin = parseTime(start_time);
+				const endMin = parseTime(end_time);
 				let diff = endMin - startMin;
 				if (diff < 0) diff += 24 * 60; // handle overnight
 				const hours = Math.floor(diff / 60);
@@ -238,10 +239,40 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				setTimeEstimateHour(hours.toString());
 				setTimeEstimateMinute(minutes.toString());
 			} catch (e) {
-				// ignore parse errors
+				setEstimateError("Invalid time format.");
 			}
+		} else {
+			setEstimateError("Start and End Time is requred to calculate Estimate");
 		}
-	}, [form.watch("start_time"), form.watch("end_time")]);
+	};
+	// Auto-suggest delay time based on estimate and actual
+	const calculateDelay = () => {
+		if (timeEstimateHour && timeEstimateMinute && timeTakenHour && timeTakenMinute) {
+			setDelayError("");
+			// Parse times as HH:mm or HH:mm:ss
+			const parseTime = (h, m) => {
+				return h * 60 + m;
+			};
+			try {
+				const estimate = parseTime(parseInt(timeEstimateHour), parseInt(timeEstimateMinute));
+				const actual = parseTime(parseInt(timeTakenHour), parseInt(timeTakenMinute));
+				let delay = actual - estimate;
+				console.log(actual, "-", estimate, " = ", delay);
+				if (delay > 0) {
+					setDelayHour(Math.floor(delay / 60) > 0 ? Math.floor(delay / 60).toString() : "0");
+					setDelayMinute(Math.floor(delay % 60).toString());
+					console.log(delay / 60, ":", delay % 60);
+				} else {
+					setDelayHour("");
+					setDelayMinute("");
+				}
+			} catch (e) {
+				setDelayError("Invalid time format.");
+			}
+		} else {
+			setDelayError("Estimate and Time Taken is requred to calculate Delay");
+		}
+	};
 
 	const isEditable =
 		user_auth?.data?.role === "Superadmin" ||
@@ -433,35 +464,43 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				{/* Time Estimate (hr/min) */}
 				<FormItem>
 					<FormLabel>Time Estimate</FormLabel>
-					<div className="flex gap-2">
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							placeholder="hr"
-							value={timeEstimateHour}
-							onChange={(e) => {
-								const val = e.target.value.replace(/[^0-9]/g, "");
-								setTimeEstimateHour(val);
-							}}
-							className="w-20"
-						/>
-						<span>hr</span>
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							max="59"
-							placeholder="min"
-							value={timeEstimateMinute}
-							onChange={(e) => {
-								let val = e.target.value.replace(/[^0-9]/g, "");
-								if (parseInt(val, 10) > 59) val = "59";
-								setTimeEstimateMinute(val);
-							}}
-							className="w-20"
-						/>
-						<span>min</span>
+					<div>
+						<div className="flex flex-row justify-between gap-2">
+							<div className="flex flex-row gap-2">
+								<Input
+									disabled={!isEditable}
+									type="number"
+									min="0"
+									placeholder="hr"
+									value={timeEstimateHour}
+									onChange={(e) => {
+										const val = e.target.value.replace(/[^0-9]/g, "");
+										setTimeEstimateHour(val);
+									}}
+									className="w-20"
+								/>
+								<span>hr</span>
+								<Input
+									disabled={!isEditable}
+									type="number"
+									min="0"
+									max="59"
+									placeholder="min"
+									value={timeEstimateMinute}
+									onChange={(e) => {
+										let val = e.target.value.replace(/[^0-9]/g, "");
+										if (parseInt(val, 10) > 59) val = "59";
+										setTimeEstimateMinute(val);
+									}}
+									className="w-20"
+								/>
+								<span>min</span>
+							</div>
+							<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
+								Auto Calculate
+							</Button>
+						</div>
+						{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
 					</div>
 					<FormMessage />
 				</FormItem>
@@ -502,37 +541,45 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				</FormItem>
 				<FormItem>
 					<FormLabel>Delay</FormLabel>
-					<div className="flex gap-2">
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							placeholder="hr"
-							value={delayHour}
-							onChange={(e) => {
-								const val = e.target.value.replace(/[^0-9]/g, "");
-								setDelayHour(val);
-							}}
-							className="w-20"
-						/>
-						<span>hr</span>
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							max="59"
-							placeholder="min"
-							value={delayMinute}
-							onChange={(e) => {
-								let val = e.target.value.replace(/[^0-9]/g, "");
-								if (parseInt(val, 10) > 59) val = "59";
-								setDelayMinute(val);
-							}}
-							className="w-20"
-						/>
-						<span>min</span>
+					<div>
+						<div className="flex flex-row gap-2">
+							<div className="flex gap-2">
+								<Input
+									disabled={!isEditable}
+									type="number"
+									min="0"
+									placeholder="hr"
+									value={delayHour}
+									onChange={(e) => {
+										const val = e.target.value.replace(/[^0-9]/g, "");
+										setDelayHour(val);
+									}}
+									className="w-20"
+								/>
+								<span>hr</span>
+								<Input
+									disabled={!isEditable}
+									type="number"
+									min="0"
+									max="59"
+									placeholder="min"
+									value={delayMinute}
+									onChange={(e) => {
+										let val = e.target.value.replace(/[^0-9]/g, "");
+										if (parseInt(val, 10) > 59) val = "59";
+										setDelayMinute(val);
+									}}
+									className="w-20"
+								/>
+								<span>min</span>
+							</div>
+
+							<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
+								Auto Calculate
+							</Button>
+						</div>
+						{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
 					</div>
-					<FormMessage />
 				</FormItem>
 				<FormField
 					control={form.control}
