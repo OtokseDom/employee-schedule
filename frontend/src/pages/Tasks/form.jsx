@@ -257,11 +257,9 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				const estimate = parseTime(parseInt(timeEstimateHour), parseInt(timeEstimateMinute));
 				const actual = parseTime(parseInt(timeTakenHour), parseInt(timeTakenMinute));
 				let delay = actual - estimate;
-				console.log(actual, "-", estimate, " = ", delay);
 				if (delay > 0) {
 					setDelayHour(Math.floor(delay / 60) > 0 ? Math.floor(delay / 60).toString() : "0");
 					setDelayMinute(Math.floor(delay % 60).toString());
-					console.log(delay / 60, ":", delay % 60);
 				} else {
 					setDelayHour("");
 					setDelayMinute("");
