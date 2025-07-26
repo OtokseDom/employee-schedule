@@ -141,7 +141,7 @@ export function DataTableTasks({
 								<SheetHeader>
 									<SheetTitle>
 										{Object.keys(updateData).length > 0 ? (
-											<div>
+											<div className="flex flex-row items-center">
 												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
 													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
 														<button onClick={() => setShowHistory(false)}>Update Task</button>
@@ -180,22 +180,40 @@ export function DataTableTasks({
 														<div className="text-blue-500">{format(new Date(history?.changed_at), "MMMM dd, yyyy, hh:mm a")}</div>
 														<div className="flex flex-col gap-4 text-foreground mt-2">
 															<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
-																<span className="font-bold text-muted-foreground">Original</span>
-																{Object.entries(history.remarks).map(([key, value]) => (
-																	<span key={key}>
-																		<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
-																		{value.from}
-																	</span>
-																))}
+																<span className="font-bold text-muted-foreground">From</span>
+																{Object.entries(history.remarks).map(([key, value]) => {
+																	const label = key.endsWith("_id")
+																		? key.replace(/_id$/, "") // remove '_id' at the end
+																		: key;
+
+																	const formattedLabel = label
+																		.replace(/_/g, " ")
+																		.replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
+
+																	return (
+																		<span key={key}>
+																			<span className="text-muted-foreground">{formattedLabel}:</span> {value.from}
+																		</span>
+																	);
+																})}
 															</div>
 															<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
-																<span className="font-bold text-muted-foreground">Updated</span>
-																{Object.entries(history.remarks).map(([key, value]) => (
-																	<span key={key}>
-																		<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
-																		{value.to}
-																	</span>
-																))}
+																<span className="font-bold text-muted-foreground">To</span>
+																{Object.entries(history.remarks).map(([key, value]) => {
+																	const label = key.endsWith("_id")
+																		? key.replace(/_id$/, "") // remove '_id' at the end
+																		: key;
+
+																	const formattedLabel = label
+																		.replace(/_/g, " ")
+																		.replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
+
+																	return (
+																		<span key={key}>
+																			<span className="text-muted-foreground">{formattedLabel}:</span> {value.to}
+																		</span>
+																	);
+																})}
 															</div>
 														</div>
 													</div>
