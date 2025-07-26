@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade')->onUpdate('cascade');
-            $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'On Hold']);
+            $table->enum('status', ['Pending', 'In Progress', 'For Review', 'Completed', 'Delayed', 'Cancelled', 'On Hold']);
             $table->foreignId('changed_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('changed_at')->useCurrent();
             $table->text('remarks')->nullable();
