@@ -25,14 +25,16 @@ const statusColors = {
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
-	const [currentDate, setCurrentDate] = useState(new Date());
+	const [showHistory, setShowHistory] = useState(false);
 
+	const [currentDate, setCurrentDate] = useState(new Date());
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const start_date = startOfWeek(startOfMonth(currentMonth));
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
 	const [tasks, setTasks] = useState([]);
+	const [taskHistory, setTaskHistory] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 	const [categories, setCategories] = useState(users || null);
@@ -62,7 +64,8 @@ export default function ScheduleCalendar() {
 		setLoading(true);
 		try {
 			const taskResponse = await axiosClient.get(`/task`);
-			setTasks(taskResponse.data.data);
+			setTasks(taskResponse.data.data.tasks);
+			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -248,6 +251,9 @@ export default function ScheduleCalendar() {
 						getTaskForDate={getTaskForDate}
 						statusColors={statusColors}
 						selectedUser={selectedUser}
+						showHistory={showHistory}
+						setShowHistory={setShowHistory}
+						taskHistory={taskHistory}
 					/>
 				) : (
 					<Week
@@ -261,6 +267,9 @@ export default function ScheduleCalendar() {
 						isInTimeSlot={isInTimeSlot}
 						selectedUser={selectedUser}
 						statusColors={statusColors}
+						showHistory={showHistory}
+						setShowHistory={setShowHistory}
+						taskHistory={taskHistory}
 					/>
 				)}
 			</div>

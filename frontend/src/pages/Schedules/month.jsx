@@ -9,12 +9,26 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 
-export default function Month({ data, users, categories, fetchData, days, currentMonth, getTaskForDate, statusColors, selectedUser }) {
+export default function Month({
+	data,
+	users,
+	categories,
+	fetchData,
+	days,
+	currentMonth,
+	getTaskForDate,
+	statusColors,
+	selectedUser,
+	showHistory,
+	setShowHistory,
+	taskHistory,
+}) {
 	const { loading, setLoading } = useLoadContext();
 	const [tasks, setTasks] = useState(data);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
+	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	useEffect(() => {
 		if (taskAdded) {
 			fetchData();
@@ -25,6 +39,9 @@ export default function Month({ data, users, categories, fetchData, days, curren
 	useEffect(() => {
 		setTasks(data);
 	}, [data]);
+	useEffect(() => {
+		if (!openDialogIndex) setShowHistory(false);
+	}, [openDialogIndex]);
 	return (
 		<div className="grid grid-cols-7 gap-0 md:gap-1">
 			<div
@@ -99,6 +116,8 @@ export default function Month({ data, users, categories, fetchData, days, curren
 														setUpdateData({});
 														setTimeout(() => setUpdateData(task), 0);
 														setOpenDialogIndex(index);
+														const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
+														setSelectedTaskHistory(filteredHistory);
 													}}
 													className={`
 											text-xxs md:text-xs py-1 md:p-1 rounded border truncate
@@ -120,22 +139,84 @@ export default function Month({ data, users, categories, fetchData, days, curren
 							<SheetHeader>
 								<SheetTitle>
 									<div className="flex flex-row gap-5">
-										<span>{updateData?.id ? "Update Task" : "Add Task"}</span>
+										{/* <span>{updateData?.id ? "Update Task" : "Add Task"}</span> */}
+										{Object.keys(updateData).length > 0 && !updateData?.calendar_add ? (
+											<div className="flex flex-row justify-between">
+												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
+													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
+														<button onClick={() => setShowHistory(false)}>Update Task</button>
+													</div>
+													<div className={`w-fit py-2 px-5 ${showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
+														<button onClick={() => setShowHistory(true)}>History</button>
+													</div>
+												</div>
+												{/* {!showHistory ? <span>{updateData?.id ? "Update Task" : "Add Task"}</span> : <span>Task History</span>} */}
+												<span>{loading && <Loader2 className="animate-spin" />}</span>
+											</div>
+										) : (
+											"Add Task"
+										)}
 										<span>{loading && <Loader2 className="animate-spin" />}</span>
 									</div>
 								</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
-							<TaskForm
-								users={users}
-								categories={categories}
-								isOpen={isDialogOpen}
-								setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-								setTaskAdded={setTaskAdded}
-							/>
+							{showHistory ? (
+								<div className="flex flex-col text-sm">
+									{selectedTaskHistory.map((history, index) => {
+										if (history?.remarks === "Task Added") {
+											return (
+												<div key={index} className="w-full overflow-y-auto text-muted-foreground p-5">
+													<div>
+														<span className="font-bold">{history?.changedBy?.name}</span> created this task
+													</div>
+													<div className="text-blue-500">{format(new Date(history?.created_at), "MMMM dd, yyyy, hh:mm a")}</div>
+												</div>
+											);
+										} else {
+											return (
+												<div key={index} className="w-full overflow-y-auto text-muted-foreground p-5 border-t">
+													<div>
+														<span className="font-bold">{history?.changedBy?.name}</span> updated this task
+													</div>
+													<div className="text-blue-500">{format(new Date(history?.changed_at), "MMMM dd, yyyy, hh:mm a")}</div>
+													<div className="flex flex-col gap-4 text-foreground mt-2">
+														<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
+															<span className="font-bold text-muted-foreground">Original</span>
+															{Object.entries(history.remarks).map(([key, value]) => (
+																<span key={key}>
+																	<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
+																	{value.from}
+																</span>
+															))}
+														</div>
+														<div className="flex flex-col px-5 border-l-2 border-muted-foreground">
+															<span className="font-bold text-muted-foreground">Updated</span>
+															{Object.entries(history.remarks).map(([key, value]) => (
+																<span key={key}>
+																	<span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>
+																	{value.to}
+																</span>
+															))}
+														</div>
+													</div>
+												</div>
+											);
+										}
+									})}
+								</div>
+							) : (
+								<TaskForm
+									users={users}
+									categories={categories}
+									isOpen={isDialogOpen}
+									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
+									updateData={updateData}
+									setUpdateData={setUpdateData}
+									fetchData={fetchData}
+									setTaskAdded={setTaskAdded}
+								/>
+							)}
 						</SheetContent>
 					</Sheet>
 				);
