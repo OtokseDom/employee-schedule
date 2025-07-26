@@ -540,7 +540,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				<FormItem>
 					<FormLabel>Delay</FormLabel>
 					<div>
-						<div className="flex flex-row gap-2">
+						<div className="flex flex-row justify-between gap-2">
 							<div className="flex gap-2">
 								<Input
 									disabled={!isEditable}
