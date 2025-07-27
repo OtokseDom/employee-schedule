@@ -9,7 +9,7 @@ import GalaxyProfileBanner from "../../components/design/galaxy";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
-import { Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
+import { Building, Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import OrganizationForm from "./form";
@@ -79,10 +79,10 @@ export default function Organization() {
 							<div className="flex items-start justify-between w-full">
 								<div className="flex gap-5 items-center">
 									<div>
-										<div className="w-24 h-24 bg-foreground rounded-full"></div>
+										<Building size={64} />
 									</div>
 									<div className="w-full">
-										<span className="flex gap-3 text-md md:text-3xl  font-bold text-white mb-0 md:mb-2">{name}</span>
+										<span className="flex gap-3 text-2xl md:text-3xl  font-bold text-white mb-0 md:mb-2">{name}</span>
 										<span className="text-xs md:text-lg text-purple-200">{description}</span>
 									</div>
 								</div>

@@ -226,6 +226,7 @@ export default function Signup() {
 						</p>
 					</div>
 				</div>
+				<div className="mt-5 text-muted-foreground text-center">© 2025 Dominic Escoto. All rights reserved.</div>
 			</div>
 		</div>
 	);

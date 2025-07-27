@@ -61,7 +61,7 @@ export default function Login() {
 	};
 
 	return (
-		<div className="fixed inset-0 flex items-center justify-center min-h-screen overflow-hidden">
+		<div className="inset-0 flex items-center justify-center min-h-screen overflow-hidden">
 			<div className="relative z-10 w-full max-w-md mx-4">
 				<div
 					className={`backdrop-blur-md ${
@@ -80,8 +80,23 @@ export default function Login() {
 					>
 						<div className={`${theme === "dark" ? "text-purple-200" : "text-purple-700"} text-sm text-center`}>
 							<p className="mb-1">Demo Credentials</p>
-							<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin@demo.com</p>
-							<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin123</p>
+							<div className="flex flex-row justify-between text-xxs">
+								<div className="text-center">
+									<h1 className="font-bold">Admin</h1>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin@demo.com</p>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin123</p>
+								</div>
+								<div className="text-center">
+									<h1 className="font-bold">Manager</h1>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>manager@demo.com</p>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin123</p>
+								</div>
+								<div className="text-center">
+									<h1 className="font-bold">Employee</h1>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>employee@demo.com</p>
+									<p className={`${theme === "dark" ? "text-purple-100" : "text-purple-800"} font-medium`}>admin123</p>
+								</div>
+							</div>
 						</div>
 					</div>
 
@@ -150,6 +165,7 @@ export default function Login() {
 						</p>
 					</div>
 				</div>
+				<div className="mt-10 text-muted-foreground text-center">© 2025 Dominic Escoto. All rights reserved.</div>
 			</div>
 		</div>
 	);

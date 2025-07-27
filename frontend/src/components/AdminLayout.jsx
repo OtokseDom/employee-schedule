@@ -28,8 +28,9 @@ export default function AdminLayout() {
 		<SidebarProvider defaultOpen={expanded} className="">
 			<AppSidebar />
 			<SidebarTrigger className="block md:hidden fixed" />
-			<main className="flex w-screen min-h-screen flex-col items-center justify-between p-16">
+			<main className="flex w-screen min-h-screen flex-col items-center justify-between p-8">
 				<Outlet />
+				<div className="pt-5 text-muted-foreground">© 2025 Dominic Escoto. All rights reserved.</div>
 			</main>
 		</SidebarProvider>
 	);
