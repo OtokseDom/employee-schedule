@@ -20,4 +20,9 @@ class Category extends Model
     {
         return $this->belongsTo(Organization::class);
     }
+
+    public function getCategories($organization_id)
+    {
+        return  $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
+    }
 }

@@ -12,13 +12,19 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
+
+    // TODO: Add constructs on all controller
+    // TODO: Move logic to models
+    // TODO: Use common variables globally (auth)
+    protected $userData;
+    public function __construct(protected Category $category = new Category())
+    {
+        $this->userData = Auth::user();
+    }
+
     public function index()
     {
-        // $categories = Category::orderBy("id", "DESC")->paginate(10);
-        $categories = Category::orderBy("id", "DESC")->where('organization_id', Auth::user()->organization_id)->get();
-
-        return apiResponse($categories, 'Categories fetched successfully');
-        // return response(compact('categories'));
+        return apiResponse($this->category->getCategories($this->userData->organization_id), 'Categories fetched successfully');
     }
 
     public function store(StoreCategoryRequest $request)
@@ -30,7 +36,6 @@ class CategoryController extends Controller
             return apiResponse(null, 'Category creation failed', false, 404);
         }
         return apiResponse(new CategoryResource($category), 'Category created successfully', true, 201);
-        // return response(new CategoryResource($category), 201);
     }
 
     public function show(Category $category)
@@ -42,19 +47,16 @@ class CategoryController extends Controller
             return apiResponse(null, 'Category not found', false, 404);
         }
         return apiResponse($categoryDetails, 'Category details fetched successfully');
-        // return response()->json(['data' => $categoryDetails]);
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $data = $request->validated();
-        // $category->update($data);
         if (!$category->update($data)) {
             return apiResponse(null, 'Failed to update category.', false, 500);
         }
 
         return apiResponse(new CategoryResource($category), 'Category updated successfully');
-        // return new CategoryResource($category);
     }
 
     public function destroy(Category $category)
@@ -71,6 +73,5 @@ class CategoryController extends Controller
         $categories = Category::where('organization_id', Auth::user()->organization_id)->orderBy("id", "DESC")->get();
 
         return apiResponse(CategoryResource::collection($categories), 'Category deleted successfully');
-        // return response(CategoryResource::collection($categories), 200);
     }
 }
