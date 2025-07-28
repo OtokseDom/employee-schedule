@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\DashboardReportController;
-use App\Http\Controllers\Api\OrganizationController;
-use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\TaskHistoryController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\UserReportController;
+use App\Http\Controllers\Api\v1\AuthController;
+use App\Http\Controllers\Api\v1\CategoryController;
+use App\Http\Controllers\Api\v1\DashboardReportController;
+use App\Http\Controllers\Api\v1\OrganizationController;
+use App\Http\Controllers\Api\v1\TaskController;
+use App\Http\Controllers\Api\v1\TaskHistoryController;
+use App\Http\Controllers\Api\v1\UserController;
+use App\Http\Controllers\Api\v1\UserReportController;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
