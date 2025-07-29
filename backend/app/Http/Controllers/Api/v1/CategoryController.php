@@ -40,13 +40,11 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $categoryDetails = DB::table('categories')->where('id', $category->id)->where('organization_id', Auth::user()->organization_id)->first();
-
-
-        if (!$categoryDetails) {
+        $details = $this->category->getByOrganization($this->userData->organization_id, $category->id);
+        if (!$details) {
             return apiResponse(null, 'Category not found', false, 404);
         }
-        return apiResponse($categoryDetails, 'Category details fetched successfully');
+        return apiResponse($details, 'Category details fetched successfully');
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)

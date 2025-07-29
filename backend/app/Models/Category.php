@@ -23,6 +23,13 @@ class Category extends Model
 
     public function getCategories($organization_id)
     {
-        return  $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
+        return $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
+    }
+
+    public function showCategory($organization_id, $category_id)
+    {
+        return $this->where('id', $category_id)
+            ->where('organization_id', $organization_id)
+            ->first();
     }
 }
