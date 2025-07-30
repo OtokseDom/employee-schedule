@@ -16,9 +16,11 @@ class CategoryController extends Controller
     // TODO: Add constructs on all controller
     // TODO: Move logic to models
     // TODO: Use common variables globally (auth)
+    protected Category $category;
     protected $userData;
-    public function __construct(protected Category $category = new Category())
+    public function __construct(Category $category)
     {
+        $this->category = $category;
         $this->userData = Auth::user();
     }
 
@@ -29,8 +31,7 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $data = $request->validated();
-        $category = Category::create($data);
+        $category = Category::create($request->validated());
 
         if (!$category) {
             return apiResponse(null, 'Category creation failed', false, 404);
@@ -40,7 +41,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $details = $this->category->getByOrganization($this->userData->organization_id, $category->id);
+        $details = $this->category->showCategory($this->userData->organization_id, $category->id);
         if (!$details) {
             return apiResponse(null, 'Category not found', false, 404);
         }
@@ -49,8 +50,7 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $data = $request->validated();
-        if (!$category->update($data)) {
+        if (!$category->update($request->validated())) {
             return apiResponse(null, 'Failed to update category.', false, 500);
         }
 
