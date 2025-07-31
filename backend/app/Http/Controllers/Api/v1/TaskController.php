@@ -9,27 +9,32 @@ use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
 use App\Models\Category;
 use App\Models\Task;
+use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
+    protected Task $task;
+    protected TaskHistory $task_history;
+    protected User $user;
+    protected $userData;
+    public function __construct(User $user, Task $task, TaskHistory $task_history)
+    {
+        $this->user = $user;
+        $this->task = $task;
+        $this->task_history = $task_history;
+        $this->userData = Auth::user();
+    }
     public function index()
     {
-        $tasks = Task::with(['assignee:id,name,email,role,position', 'category'])
-            ->where('organization_id', Auth::user()->organization_id)
-            ->orderBy('id', 'DESC')->get();
-        // $task_history = TaskHistoryController::index();
-
-        // Get task history using the controller method
-        $task_history_response = app(TaskHistoryController::class)->index();
-        $task_history = $task_history_response->getData()->data ?? [];
+        $tasks = $this->task->getTasks($this->userData->organization_id);
+        $task_history = $this->task_history->getTaskHistories($this->userData->organization_id);
         $data = [
             'tasks' => TaskResource::collection($tasks),
             'task_history' => $task_history,
         ];
         return apiResponse($data, 'Tasks fetched successfully');
-        // return TaskResource::collection($tasks);
     }
 
     public function store(StoreTaskRequest $request)

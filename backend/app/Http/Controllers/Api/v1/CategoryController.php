@@ -15,7 +15,6 @@ class CategoryController extends Controller
 
     // TODO: Add constructs on all controller
     // TODO: Move logic to models
-    // TODO: Use common variables globally (auth)
     protected Category $category;
     protected $userData;
     public function __construct(Category $category)

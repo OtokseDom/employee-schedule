@@ -51,4 +51,11 @@ class Task extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function getTasks($organization_id)
+    {
+        return $this->with(['assignee:id,name,email,role,position', 'category'])
+            ->where('organization_id', $organization_id)
+            ->orderBy('id', 'DESC')->get();
+    }
 }
