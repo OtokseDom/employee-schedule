@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Resources\TaskHistoryResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,5 +33,12 @@ class TaskHistory extends Model
     public function changedBy()
     {
         return $this->belongsTo(User::class, 'changed_by');
+    }
+
+    public function getTaskHistories($organization_id)
+    {
+        return TaskHistoryResource::collection($this->with(['task:id,title', 'changedBy:id,name,email'])
+            ->where('organization_id', $organization_id)
+            ->orderBy('id', 'ASC')->get());
     }
 }

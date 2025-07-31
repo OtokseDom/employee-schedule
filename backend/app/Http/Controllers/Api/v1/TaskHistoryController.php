@@ -11,13 +11,18 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskHistoryController extends Controller
 {
-    public static function index()
+    protected TaskHistory $task_history;
+    protected $userData;
+    public function __construct(TaskHistory $task_history)
     {
-        $taskHistories = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
-            ->where('organization_id', Auth::user()->organization_id)
-            ->orderBy('id', 'ASC')->get();
+        $this->task_history = $task_history;
+        $this->userData = Auth::user();
+    }
+
+    public function index()
+    {
+        $taskHistories = $this->task_history->getTaskHistories($this->userData->organization_id);
         return apiResponse(TaskHistoryResource::collection($taskHistories), 'Task history fetched successfully');
-        // return TaskHistoryResource::collection($taskHistories);
     }
 
     public function store(StoreTaskHistoryRequest $request)
