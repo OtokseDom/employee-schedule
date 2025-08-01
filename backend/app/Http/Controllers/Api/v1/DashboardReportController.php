@@ -8,23 +8,26 @@ use Illuminate\Http\Request;
 
 class DashboardReportController extends Controller
 {
-    /**
-     * Fetch all reports in one call for dashboard.
-     */
+
+    protected ReportService $report_service;
+    public function __construct(ReportService $report_service)
+    {
+        $this->report_service = $report_service;
+    }
     public function dashboardReports(Request $request)
     {
         $filter = $request->all();
         $reports = [
-            'tasks_by_status' => ReportService::tasksByStatus(null, "dashboard", $filter),
-            'users_task_load' => ReportService::usersTaskLoad($filter),
-            'estimate_vs_actual' => ReportService::estimateVsActual($filter),
-            'performance_leaderboard' => ReportService::performanceLeaderboard($filter),
-            'performance_rating_trend' => ReportService::performanceRatingTrend(null, "dashboard", $filter),
-            'section_cards' => ReportService::sectionCards(null, $filter),
+            'tasks_by_status' => $this->report_service->tasksByStatus(null, "dashboard", $filter),
+            'users_task_load' => $this->report_service->usersTaskLoad($filter),
+            'estimate_vs_actual' => $this->report_service->estimateVsActual($filter),
+            'performance_leaderboard' => $this->report_service->performanceLeaderboard($filter),
+            'performance_rating_trend' => $this->report_service->performanceRatingTrend(null, "dashboard", $filter),
+            'section_cards' => $this->report_service->sectionCards(null, $filter),
         ];
 
         $data = [];
-
+        // Mass check data for success response on each function
         foreach ($reports as $key => $report) {
             $payload = $report->getData(true);
             $data[$key] = $payload['success'] ? $payload['data'] : null;

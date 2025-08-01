@@ -60,7 +60,6 @@ class AuthController extends Controller
             'user' => new UserResource($user),
             'token' => $token,
         ], 'Successfully Registered');
-        // return response(compact('user', 'token'));
     }
 
     public function login(LoginRequest $request)
