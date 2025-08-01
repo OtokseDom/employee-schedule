@@ -22,44 +22,30 @@ class TaskHistoryController extends Controller
     public function index()
     {
         $taskHistories = $this->task_history->getTaskHistories($this->userData->organization_id);
-        return apiResponse(TaskHistoryResource::collection($taskHistories), 'Task history fetched successfully');
+        return apiResponse($taskHistories, 'Task history fetched successfully');
     }
 
     public function store(StoreTaskHistoryRequest $request)
     {
-        $taskHistory = TaskHistory::create($request->validated());
-        $taskHistory->load(['task:id,title', 'changedBy:id,name,email']);
-        return apiResponse(new TaskHistoryResource($taskHistory), 'Task history created successfully');
-        // return new TaskHistoryResource($taskHistory);
+        $task_history = $this->task_history->storeTaskHistory($request);
+        return apiResponse($task_history, 'Task history created successfully');
     }
 
     public function show($id)
     {
-        $taskHistory = TaskHistory::with(['task:id,title', 'changedBy:id,name'])
-            ->where('id', $id)
-            ->where('organization_id', Auth::user()->organization_id)
-            ->first();
-
-        // Return API response when no task found
-        if (!$taskHistory || $taskHistory->organization_id !== Auth::user()->organization_id)
-            return apiResponse(null, 'Task history not found within your organization', false, 404);
-
-        return apiResponse(new TaskHistoryResource($taskHistory), 'Task history details fetched successfully');
-        // return new TaskHistoryResource($taskHistory);
+        $task_history = $this->task_history->showTaskHistory($id, $this->userData->organization_id);
+        return apiResponse($task_history, 'Task history details fetched successfully');
     }
 
-    public function update(UpdateTaskHistoryRequest $request, TaskHistory $taskHistory)
+    public function update(UpdateTaskHistoryRequest $request, TaskHistory $task_history)
     {
-        $taskHistory->update($request->validated());
-        $taskHistory->load(['task:id,title', 'changedBy:id,name,email']);
-        return apiResponse(new TaskHistoryResource($taskHistory), 'Task history updated successfully');
-        // return new TaskHistoryResource($taskHistory);
+        $details = $this->task_history->updateTaskHistory($request, $task_history);
+        return apiResponse($details, 'Task history updated successfully');
     }
 
     public function destroy(TaskHistory $taskHistory)
     {
         $taskHistory->delete();
         return apiResponse('', 'Task history deleted successfully');
-        // return response()->json(['message' => 'Task History successfully deleted'], 200);
     }
 }

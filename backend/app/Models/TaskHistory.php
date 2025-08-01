@@ -41,4 +41,29 @@ class TaskHistory extends Model
             ->where('organization_id', $organization_id)
             ->orderBy('id', 'ASC')->get());
     }
+
+    public function storeTaskHistory($request)
+    {
+        $taskHistory = $this->create($request->validated());
+        $taskHistory->load(['task:id,title', 'changedBy:id,name,email']);
+        return new TaskHistoryResource($taskHistory);
+    }
+
+    public function showTaskHistory($id, $organization_id)
+    {
+        $task_history = $this->with(['task:id,title', 'changedBy:id,name'])
+            ->where('id', $id)
+            ->where('organization_id', $organization_id)
+            ->first();
+        if (!$task_history || $task_history->organization_id !== $organization_id)
+            return apiResponse(null, 'Task history not found within your organization', false, 404);
+        return new TaskHistoryResource($task_history);
+    }
+
+    public function updateTaskHistory($request, $task_history)
+    {
+        $task_history->update($request->validated());
+        $task_history->load(['task:id,title', 'changedBy:id,name,email']);
+        return new TaskHistoryResource($task_history);
+    }
 }
