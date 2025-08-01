@@ -3,34 +3,32 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class UserReportController extends Controller
 {
-    /**
-     * Fetch all reports in one call for a user.
-     */
+    protected ReportService $report_service;
+    public function __construct(ReportService $report_service)
+    {
+        $this->report_service = $report_service;
+    }
     public function userReports($id, Request $request)
     {
         $filter = $request->all();
         if (!is_numeric($id)) {
             return apiResponse('', 'Invalid user ID', false, 400);
         }
-        $user = DB::table('users')->where('id', $id)->first();
-        if (!$user) {
-            return apiResponse('', 'User not found', false, 404);
-        }
 
         $reports = [
-            'user_tasks' => ReportService::userTasks($id, $filter),
-            'tasks_by_status' => ReportService::tasksByStatus($id, "", $filter),
-            'task_activity_timeline' => ReportService::taskActivityTimeline($id, $filter),
-            'rating_per_category' => ReportService::ratingPerCategory($id, $filter),
-            'performance_rating_trend' => ReportService::performanceRatingTrend($id, "", $filter),
-            'estimate_vs_actual' => ReportService::userEstimateVsActual($id, $filter),
-            'section_cards' => ReportService::sectionCards($id, $filter),
+            'user_tasks' => $this->report_service->userTasks($id, $filter),
+            'tasks_by_status' => $this->report_service->tasksByStatus($id, "", $filter),
+            'task_activity_timeline' => $this->report_service->taskActivityTimeline($id, $filter),
+            'rating_per_category' => $this->report_service->ratingPerCategory($id, $filter),
+            'performance_rating_trend' => $this->report_service->performanceRatingTrend($id, "", $filter),
+            'estimate_vs_actual' => $this->report_service->userEstimateVsActual($id, $filter),
+            'section_cards' => $this->report_service->sectionCards($id, $filter),
         ];
 
         $data = [];
