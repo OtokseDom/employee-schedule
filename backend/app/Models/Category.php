@@ -44,7 +44,8 @@ class Category extends Model
 
     public function updateCategory($request, $category)
     {
-        return $category->update($request->validated());
+        $category->update($request->validated());
+        return $category;
     }
 
     public function deleteCategory($category, $organization_id)
