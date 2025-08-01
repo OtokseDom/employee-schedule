@@ -4,6 +4,7 @@ import axiosClient from "../axios.client";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import { Loader2, Sun, Moon } from "lucide-react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { API } from "@/constants/api";
 
 export default function Login() {
 	const { loading, setLoading } = useLoadContext();
@@ -37,7 +38,7 @@ export default function Login() {
 			password: passwordRef.current.value,
 		};
 		axiosClient
-			.post("/login", payload)
+			.post(API().login, payload)
 			.then(({ data }) => {
 				setUser(data.user);
 				setToken(data.token);
