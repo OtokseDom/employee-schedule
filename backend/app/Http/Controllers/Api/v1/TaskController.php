@@ -5,9 +5,6 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
-use App\Http\Resources\TaskHistoryResource;
-use App\Http\Resources\TaskResource;
-use App\Models\Category;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Models\User;
@@ -26,6 +23,7 @@ class TaskController extends Controller
         $this->task_history = $task_history;
         $this->userData = Auth::user();
     }
+
     public function index()
     {
         $tasks = $this->task->getTasks($this->userData->organization_id);
