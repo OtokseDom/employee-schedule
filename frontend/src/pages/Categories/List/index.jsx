@@ -38,8 +38,8 @@ export default function Categories() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(API().category(id));
-			fetchData();
+			const categoryResponse = await axiosClient.delete(API().category(id));
+			setCategories(categoryResponse.data.data);
 			showToast("Success!", "Category deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
