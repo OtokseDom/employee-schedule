@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
@@ -27,24 +28,39 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $category = $this->category->storeCategory($request);
-        return apiResponse($category, 'Category created successfully', true, 201);
+        if (!$category) {
+            return apiResponse(null, 'Category creation failed', false, 404);
+        }
+        return apiResponse(new CategoryResource($category), 'Category created successfully', true, 201);
     }
 
     public function show(Category $category)
     {
         $details = $this->category->showCategory($this->userData->organization_id, $category->id);
-        return apiResponse($details, 'Category details fetched successfully');
+        if (!$details) {
+            return apiResponse(null, 'Category not found', false, 404);
+        }
+        return apiResponse(new CategoryResource($details), 'Category details fetched successfully');
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $category = $this->category->updateCategory($request, $category);
-        return apiResponse($category, 'Category updated successfully');
+        $updated = $this->category->updateCategory($request, $category);
+        if (!$updated) {
+            return apiResponse(null, 'Failed to update category.', false, 500);
+        }
+        return apiResponse(new CategoryResource($updated), 'Category updated successfully');
     }
 
     public function destroy(Category $category)
     {
-        $categories = $this->category->deleteCategory($category, $this->userData->organization_id);
-        return apiResponse($categories, 'Category deleted successfully');
+        $result = $this->category->deleteCategory($category, $this->userData->organization_id);
+        if ($result === false) {
+            return apiResponse(null, 'Category cannot be deleted because they have assigned tasks.', false, 400);
+        }
+        if ($result === null) {
+            return apiResponse(null, 'Failed to delete category.', false, 500);
+        }
+        return apiResponse(CategoryResource::collection($result), 'Category deleted successfully');
     }
 }
