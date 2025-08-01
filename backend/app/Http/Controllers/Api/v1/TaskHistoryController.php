@@ -34,6 +34,9 @@ class TaskHistoryController extends Controller
     public function show($id)
     {
         $task_history = $this->task_history->showTaskHistory($id, $this->userData->organization_id);
+        if (!$task_history)
+            return apiResponse(null, 'Task history not found within your organization', false, 404);
+
         return apiResponse($task_history, 'Task history details fetched successfully');
     }
 

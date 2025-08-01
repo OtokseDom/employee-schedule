@@ -35,6 +35,9 @@ class TaskHistory extends Model
         return $this->belongsTo(User::class, 'changed_by');
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                          Controller Logic Function                         */
+    /* -------------------------------------------------------------------------- */
     public function getTaskHistories($organization_id)
     {
         return TaskHistoryResource::collection($this->with(['task:id,title', 'changedBy:id,name,email'])
@@ -56,7 +59,7 @@ class TaskHistory extends Model
             ->where('organization_id', $organization_id)
             ->first();
         if (!$task_history || $task_history->organization_id !== $organization_id)
-            return apiResponse(null, 'Task history not found within your organization', false, 404);
+            return null;
         return new TaskHistoryResource($task_history);
     }
 
