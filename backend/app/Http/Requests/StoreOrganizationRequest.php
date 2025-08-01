@@ -24,7 +24,7 @@ class StoreOrganizationRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'code' => 'required|string|unique'
+            'code' => 'required|string|unique:organizations,code'
         ];
     }
 }
