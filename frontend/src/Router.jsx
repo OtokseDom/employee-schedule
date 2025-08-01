@@ -9,7 +9,6 @@ import AdminLayout from "./components/AdminLayout";
 import UserProfile from "./pages/Users/Show/index";
 import Tasks from "./pages/Tasks/List/index";
 import Users from "./pages/Users/List/index";
-import Events from "./pages/Events/List/index";
 import Schedules from "./pages/Schedules";
 import Categories from "./pages/Categories/List";
 import Organization from "./pages/Organization";
