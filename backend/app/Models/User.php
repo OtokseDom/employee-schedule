@@ -90,12 +90,12 @@ class User extends Authenticatable
         return new UserResource($user);
     }
 
-    public function deleteUser($user)
+    public function deleteUser($user, $organization_id)
     {
         if (Task::where('assignee_id', $user->id)->exists()) {
             return false;
         }
         $user->delete();
-        return $this->orderBy("id", "DESC")->get();
+        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
     }
 }
