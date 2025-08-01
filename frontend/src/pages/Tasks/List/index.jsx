@@ -5,7 +5,6 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
-// TODO: Task History Logs Panel
 // TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
