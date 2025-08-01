@@ -46,51 +46,36 @@ class Organization extends Model
 
     public function storeOrganization($request)
     {
-        $organization = $this->create($request->validated());
-        if (!$organization) {
-            return apiResponse(null, 'Organization creation failed', false, 404);
-        }
-        return new OrganizationResource($organization);
+        return $this->create($request->validated());
     }
 
     public function showOrganization($organization)
     {
-        $details = $this->where('id', $organization->id)->first();
-        if (!$details) {
-            return apiResponse(null, 'Organization not found', false, 404);
-        }
-        return $details;
+        return $this->find($organization->id);
     }
 
     public function updateOrganization($request, $organization)
     {
-        if (!$organization->update($request->validated())) {
-            return apiResponse(null, 'Failed to update organization.', false, 500);
+        if ($organization->update($request->validated())) {
+            return $organization;
         }
-        return new OrganizationResource($organization);
+        return null;
     }
 
     public function deleteOrganization($organization)
     {
-        // Check if the organization has existing data
         $hasTasks = Task::where('organization_id', $organization->id)->exists();
-        if ($hasTasks) {
-            return apiResponse(null, 'Organization cannot be deleted because it has existing data.', false, 400);
+        if ($hasTasks) return false;
+
+        if ($organization->delete()) {
+            return $this->orderBy("id", "DESC")->get();
         }
-        if (!$organization->delete()) {
-            return apiResponse(null, 'Failed to delete organization.', false, 500);
-        }
-        $organizations = $this->orderBy("id", "DESC")->get();
-        return OrganizationResource::collection($organizations);
+        return null;
     }
 
     public function generateCode($organization)
     {
-        $newCode = strtoupper(uniqid('DOM')); // Example: DOM-64CF46D5A1234
-        $organization->code = $newCode;
-        if (!$organization->save()) {
-            return apiResponse(null, 'Failed to update organization code.', false, 500);
-        }
-        return new OrganizationResource($organization);
+        $organization->code = strtoupper(uniqid('DOM'));
+        return $organization->save() ? $organization : null;
     }
 }
