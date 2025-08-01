@@ -25,7 +25,7 @@ export default function Categories() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const categoryResponse = await axiosClient.get(API().categories());
+			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -38,7 +38,7 @@ export default function Categories() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(API().categories(id));
+			await axiosClient.delete(API().category(id));
 			fetchData();
 			showToast("Success!", "Category deleted.", 3000);
 		} catch (e) {
