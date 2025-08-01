@@ -87,7 +87,7 @@ class Task extends Model
             ->where('organization_id', $organization_id)
             ->first();
         if (!$task || $task->organization_id !== $organization_id)
-            return apiResponse(null, 'Task not found within your organization', false, 404);
+            return null;
         return new TaskResource($task);
     }
 

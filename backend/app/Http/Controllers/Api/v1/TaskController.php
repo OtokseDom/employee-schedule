@@ -37,20 +37,32 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
-        $task = $this->task->storeTask($request, $this->userData);
-        return apiResponse($task, 'Task created successfully', true, 201);
+        return apiResponse(
+            $this->task->storeTask($request, $this->userData),
+            'Task created successfully',
+            true,
+            201
+        );
     }
 
     public function show($id)
     {
         $task = $this->task->showTask($id, $this->userData->organization_id);
-        return apiResponse($task, 'Task details fetched successfully');
+        if (!$task)
+            apiResponse(null, 'Organization not found', false, 404);
+
+        return apiResponse(
+            $task,
+            'Task details fetched successfully'
+        );
     }
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task = $this->task->updateTask($request, $task, $this->userData);
-        return apiResponse($task, 'Task updated successfully');
+        return apiResponse(
+            $this->task->updateTask($request, $task, $this->userData),
+            'Task updated successfully'
+        );
     }
 
     public function destroy(Task $task)
