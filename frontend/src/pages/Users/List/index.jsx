@@ -35,11 +35,10 @@ export default function Users() {
 	};
 
 	const handleDelete = async (id) => {
-		console.log(id);
 		setLoading(true);
 		try {
-			await axiosClient.delete(API().user(id));
-			fetchData();
+			const userResponse = await axiosClient.delete(API().user(id));
+			setUsers(userResponse.data.data);
 			showToast("Success!", "User deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
