@@ -39,14 +39,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 		}
 	};
 
-	const {
-		name = "Galactic Explorer",
-		position = "Captain of the Starship",
-		email = "captain@stardust.com",
-		role = "Stardust Collector",
-		status = "Active",
-		dob = "Unknown",
-	} = user || {};
+	const { name = "Not Found", position = "", email = "", role = "", status = "", dob = "" } = user || {};
 
 	const isEditable =
 		user_auth?.data?.role === "Superadmin" || user_auth?.data?.role === "Admin" || user_auth?.data?.role === "Manager" || user_auth?.data?.id === user?.id;
