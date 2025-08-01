@@ -29,6 +29,9 @@ export default function UserProfile() {
 	const [user, setUser] = useState(null); // State for user details
 	const { setLoading } = useLoadContext();
 	const [users, setUsers] = useState([]);
+	const [taskHistory, setTaskHistory] = useState([]);
+	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
+	const [showHistory, setShowHistory] = useState(false);
 	const [categories, setCategories] = useState([]);
 	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
@@ -57,10 +60,11 @@ export default function UserProfile() {
 		try {
 			// Fetch user details and tasks
 			const response = await axiosClient.get(API().user(id));
-			setUser(response.data.data.user);
+			setUser(response.data.data);
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes.data.data);
+			setTaskHistory(reportsRes.data.data?.user_tasks?.task_history);
 		} catch (e) {
 			console.error("Error fetching data:", e);
 		} finally {
@@ -273,8 +277,9 @@ export default function UserProfile() {
 						</div>
 
 						<DataTableTasks
-							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
+							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }, false)}
 							data={userReports?.user_tasks?.data || []}
+							selectedTaskHistory={selectedTaskHistory}
 							users={users}
 							categories={categories}
 							updateData={updateData}
@@ -283,6 +288,8 @@ export default function UserProfile() {
 							setIsOpen={setIsOpen}
 							fetchData={fetchData}
 							showLess={true}
+							showHistory={showHistory}
+							setShowHistory={setShowHistory}
 						/>
 					</div>
 				</div>

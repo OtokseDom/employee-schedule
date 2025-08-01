@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Http\Resources\TaskHistoryResource;
 use App\Models\Task;
+use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-// TODO: Add excel export
+// TODO: Use construct
 class ReportService
 {
     /* ----------------------------- SHARED REPORTS ----------------------------- */
@@ -258,9 +260,16 @@ class ReportService
         }
 
         $userTasks = $query->get();
+        $taskIds = $userTasks->pluck('id');
+
+        $task_history = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
+            ->where('organization_id', Auth::user()->organization_id)
+            ->whereIn('task_id', $taskIds)
+            ->orderBy('id', 'ASC')->get();
 
         $data = [
             'data' => $userTasks,
+            'task_history' => TaskHistoryResource::collection($task_history),
             'filters' => $filter
         ];
         if (empty($data)) {
