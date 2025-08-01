@@ -19,8 +19,9 @@ import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserDetails from "@/pages/Users/Show/details";
 import { SectionCard } from "@/components/chart/section-card";
-import FilterForm from "@/pages/Dashboard/filter-form";
+import FilterForm from "@/components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
+import { API } from "@/constants/api";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
@@ -55,10 +56,10 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// Fetch user details and tasks
-			const response = await axiosClient.get(`/user/${id}`);
+			const response = await axiosClient.get(API().user(id));
 			setUser(response.data.data.user);
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
+			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -69,8 +70,8 @@ export default function UserProfile() {
 	const fetchSelection = async () => {
 		try {
 			setLoading(true);
-			const userResponse = await axiosClient.get("/user");
-			const categoryResponse = await axiosClient.get("/category");
+			const userResponse = await axiosClient.get(API().user());
+			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 		} catch (e) {
@@ -84,7 +85,7 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			if (action == 0) {
-				const userResponse = await axiosClient.delete(`/user/${id}`);
+				const userResponse = await axiosClient.delete(API().user(id));
 				if (userResponse.data.success == true) {
 					showToast("Success!", userResponse.data.message, 3000);
 					navigate("/users");
@@ -98,7 +99,7 @@ export default function UserProfile() {
 					status: "active",
 				};
 				try {
-					const userResponse = await axiosClient.put(`/user/${id}`, form);
+					const userResponse = await axiosClient.put(API().user(id), form);
 					setUser(userResponse.data.data);
 					showToast("Success!", userResponse.data.message, 3000);
 				} catch (e) {
@@ -121,7 +122,7 @@ export default function UserProfile() {
 		setUpdateDataUser(user);
 		// Update sidebar user if current user is updated
 		if (user.id == user_auth.id) {
-			axiosClient.get("/user-auth").then(({ data }) => {
+			axiosClient.get(API().user_auth).then(({ data }) => {
 				setUserAuth(data);
 			});
 		}
@@ -130,7 +131,7 @@ export default function UserProfile() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/task/${id}`);
+			await axiosClient.delete(API().task(id));
 			fetchData();
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
@@ -149,7 +150,7 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/user/${id}/reports`);
+			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {

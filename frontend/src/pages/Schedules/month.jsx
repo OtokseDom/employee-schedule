@@ -4,9 +4,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import TaskForm from "../Tasks/form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 
 export default function Month({
@@ -80,7 +78,6 @@ export default function Month({
 								{/* Calendar cell Clickable */}
 								<div
 									key={index}
-									// onClick={() => handleCellClick(day)}
 									className={`
 										min-h-24 p-1 border transition-colors duration-200 cursor-pointer rounded-sm
 										${isCurrentMonth ? "bg-white" : "bg-sidebar text-gray-400"} 
@@ -139,7 +136,6 @@ export default function Month({
 							<SheetHeader>
 								<SheetTitle>
 									<div className="flex flex-row gap-5">
-										{/* <span>{updateData?.id ? "Update Task" : "Add Task"}</span> */}
 										{Object.keys(updateData).length > 0 && !updateData?.calendar_add ? (
 											<div className="flex flex-row items-center">
 												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
@@ -150,7 +146,6 @@ export default function Month({
 														<button onClick={() => setShowHistory(true)}>History</button>
 													</div>
 												</div>
-												{/* {!showHistory ? <span>{updateData?.id ? "Update Task" : "Add Task"}</span> : <span>Task History</span>} */}
 												<span>{loading && <Loader2 className="animate-spin" />}</span>
 											</div>
 										) : (

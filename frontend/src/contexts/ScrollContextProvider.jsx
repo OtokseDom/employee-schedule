@@ -6,7 +6,7 @@ const ScrollContext = createContext({
 });
 // Create context provider
 export const ScrollContextProvider = ({ children }) => {
-	const [scrolled, setScrolled] = useState({});
+	const [scrolled, setScrolled] = useState(false);
 	useEffect(() => {
 		const onScroll = () => {
 			if (window.scrollY > 50) {

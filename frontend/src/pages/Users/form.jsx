@@ -80,11 +80,11 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
-				await axiosClient.post(`/user`, formattedData);
+				await axiosClient.post(API().user(), formattedData);
 				fetchData();
 				showToast("Success!", "User added.", 3000);
 			} else {
-				const userResponse = await axiosClient.put(`/user/${updateData?.id}`, formattedData);
+				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
 				// fetch data to load user table and calendar
 				fetchData();
 				if (user.id === userResponse.data.data.id) setUser(userResponse.data.data);

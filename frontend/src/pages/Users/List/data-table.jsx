@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 // import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import UserForm from "../form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Convert the DataTable component to JavaScript
 export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {

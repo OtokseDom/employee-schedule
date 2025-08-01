@@ -25,6 +25,7 @@ import axiosClient from "@/axios.client";
 import { sub } from "date-fns";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { API } from "@/constants/api";
 
 // Menu items.
 const items = [
@@ -109,7 +110,7 @@ export function AppSidebar() {
 
 	const onLogout = (e) => {
 		e.preventDefault();
-		axiosClient.post("/logout").then(() => {
+		axiosClient.post(API().logout()).then(() => {
 			setUser({});
 			setToken(null);
 		});

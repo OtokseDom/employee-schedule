@@ -12,6 +12,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { API } from "@/constants/api";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -37,7 +38,7 @@ export default function OrganizationForm({ setIsOpen, fetchData }) {
 		setLoading(true);
 		try {
 			if (orgId) {
-				const response = await axiosClient.put(`/organization/${orgId}`, form);
+				const response = await axiosClient.put(API().organization(orgId), form);
 				const updatedOrg = response.data.data;
 				// Update only organization.name and organization.description
 				setUser((prev) => ({

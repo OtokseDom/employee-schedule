@@ -11,8 +11,9 @@ import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import FilterForm from "./filter-form";
+import FilterForm from "../../components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
+import { API } from "@/constants/api";
 export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
@@ -40,11 +41,11 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/dashboard`);
+			const reportsRes = await axiosClient.get(API().dashboard());
 			setReports(reportsRes.data.data);
 			// fetch users only if not already fetched
 			if (!users) {
-				const userResponse = await axiosClient.get("/user");
+				const userResponse = await axiosClient.get(API().user());
 				const mappedUsers = userResponse.data.data.map((user) => ({
 					value: user.id,
 					label: user.name,
@@ -80,7 +81,7 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(`/dashboard?from=${from}&to=${to}&users=${members}`);
+			const reportsRes = await axiosClient.get(API().dashboard(from, to, members));
 			setReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {

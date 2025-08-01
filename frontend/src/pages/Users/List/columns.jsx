@@ -9,6 +9,7 @@ import { useState, useMemo } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
 
 export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) => {
 	const { user } = useAuthContext();
@@ -38,7 +39,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 		setLoading(true);
 		try {
 			if (action === 0) {
-				const res = await axiosClient.delete(`/user/${id}`);
+				const res = await axiosClient.delete(API().user(id));
 				if (res.data.success) {
 					showToast("Success!", res.data.message, 3000);
 					navigate("/users");
@@ -47,7 +48,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 				}
 			} else {
 				const form = { ...userRow, status: "active" };
-				const res = await axiosClient.put(`/user/${id}`, form);
+				const res = await axiosClient.put(API().user(id), form);
 				fetchData();
 				showToast("Success!", res.data.message, 3000);
 			}

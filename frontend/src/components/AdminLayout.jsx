@@ -5,6 +5,7 @@ import axiosClient from "../axios.client";
 import { useSidebarContext } from "@/contexts/SidebarContextProvider";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { API } from "@/constants/api";
 
 export default function AdminLayout() {
 	const { user, token, setToken, setUser } = useAuthContext();
@@ -15,7 +16,7 @@ export default function AdminLayout() {
 	}
 
 	useEffect(() => {
-		axiosClient.get("/user-auth").then(({ data }) => {
+		axiosClient.get(API().user_auth).then(({ data }) => {
 			setUser(data);
 		});
 	}, []);

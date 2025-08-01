@@ -10,6 +10,7 @@ import { useState } from "react";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useNavigate } from "react-router-dom";
+import { API } from "@/constants/api";
 
 export default function UserDetails({ user, handleUpdateUser, handleApproval }) {
 	const { user: user_auth } = useAuthContext();
@@ -27,7 +28,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user/${id}`);
+			await axiosClient.delete(API().user(id));
 			showToast("Success!", "User deleted.", 3000);
 			navigate("/users");
 		} catch (e) {

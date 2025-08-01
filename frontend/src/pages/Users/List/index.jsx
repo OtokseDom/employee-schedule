@@ -5,6 +5,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { API } from "@/constants/api";
 
 export default function Users() {
 	const { user } = useAuthContext();
@@ -23,7 +24,7 @@ export default function Users() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const userResponse = await axiosClient.get("/user");
+			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -37,7 +38,7 @@ export default function Users() {
 		console.log(id);
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/user/${id}`);
+			await axiosClient.delete(API().user(id));
 			fetchData();
 			showToast("Success!", "User deleted.", 3000);
 		} catch (e) {
@@ -55,7 +56,6 @@ export default function Users() {
 				<p>List of all organization members</p>
 			</div>
 
-			{/* Updated table to fix dialog per column issue */}
 			{(() => {
 				const { columns: userColumns, dialog } = columns({ fetchData, handleDelete, setIsOpen, setUpdateData, updateData });
 				return (

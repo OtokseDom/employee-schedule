@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
-import { Loader2, Sun, Moon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { API } from "@/constants/api";
 
 export default function Signup() {
 	const { loading, setLoading } = useLoadContext();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
-	const canvasRef = useRef(null);
 
 	const [hasOrgCode, setHasOrgCode] = useState(true);
 	const orgCodeRef = useRef();
@@ -56,7 +56,7 @@ export default function Signup() {
 			payload.role = "Superadmin";
 		}
 		axiosClient
-			.post("/signup", payload)
+			.post(API().signup(), payload)
 			.then(({ data }) => {
 				setUser(data.data.user);
 				setToken(data.data.token);

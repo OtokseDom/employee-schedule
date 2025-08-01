@@ -12,6 +12,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useEffect } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { API } from "@/constants/api";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -49,14 +50,14 @@ export default function CategoryForm({ data, setCategories, setIsOpen, updateDat
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
-				const categoryResponse = await axiosClient.post(`/category`, form);
+				const categoryResponse = await axiosClient.post(API().category(), form);
 				const addedCategory = categoryResponse.data.data;
 				// Insert added category in categories array
 				const updatedCategories = [addedCategory, ...data];
 				setCategories(updatedCategories);
 				showToast("Success!", "Category added.", 3000);
 			} else {
-				await axiosClient.put(`/category/${updateData?.id}`, form);
+				await axiosClient.put(API().category(updateData?.id), form);
 				fetchData();
 				showToast("Success!", "Category updated.", 3000);
 			}

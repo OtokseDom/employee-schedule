@@ -4,6 +4,7 @@ import { columnsTask } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { API } from "@/constants/api";
 // TODO: Task History Logs Panel
 // TODO: Task discussion/comment section
 export default function Tasks() {
@@ -34,7 +35,7 @@ export default function Tasks() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get("/task");
+			const taskResponse = await axiosClient.get(API().task());
 			setTasks(taskResponse.data.data.tasks);
 			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
@@ -47,8 +48,8 @@ export default function Tasks() {
 	const fetchSelection = async () => {
 		try {
 			setLoading(true);
-			const userResponse = await axiosClient.get("/user");
-			const categoryResponse = await axiosClient.get("/category");
+			const userResponse = await axiosClient.get(API().user());
+			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 		} catch (e) {
@@ -61,7 +62,7 @@ export default function Tasks() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/task/${id}`);
+			await axiosClient.delete(API().task(id));
 			fetchData();
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {

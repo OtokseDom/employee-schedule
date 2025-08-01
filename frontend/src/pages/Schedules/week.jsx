@@ -1,10 +1,8 @@
 "use client";
-import axiosClient from "@/axios.client";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { format } from "date-fns";
-import { Clock, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -102,7 +100,6 @@ export default function Week({
 										return (
 											<div
 												key={`${index}-${timeIndex}`}
-												// onClick={() => handleCellClick(day, time)}
 												className={`
                                                 h-16 p-1 border-t   relative
                                                 ${isToday ? "bg-blue-50" : "bg-sidebar"} 
@@ -186,7 +183,6 @@ export default function Week({
 														<button onClick={() => setShowHistory(true)}>History</button>
 													</div>
 												</div>
-												{/* {!showHistory ? <span>{updateData?.id ? "Update Task" : "Add Task"}</span> : <span>Task History</span>} */}
 												<span>{loading && <Loader2 className="animate-spin" />}</span>
 											</div>
 										) : (

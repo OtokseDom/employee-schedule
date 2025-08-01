@@ -4,6 +4,7 @@ import { columnsCategory } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableCategories } from "./data-table";
+import { API } from "@/constants/api";
 
 export default function Categories() {
 	const { loading, setLoading } = useLoadContext();
@@ -24,7 +25,7 @@ export default function Categories() {
 		setLoading(true);
 		try {
 			// Make both API calls concurrently using Promise.all
-			const categoryResponse = await axiosClient.get("/category");
+			const categoryResponse = await axiosClient.get(API().categories());
 			setCategories(categoryResponse.data.data);
 		} catch (e) {
 			console.error("Error fetching data:", e);
@@ -37,7 +38,7 @@ export default function Categories() {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(`/category/${id}`);
+			await axiosClient.delete(API().categories(id));
 			fetchData();
 			showToast("Success!", "Category deleted.", 3000);
 		} catch (e) {

@@ -13,6 +13,7 @@ import { Building, Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import OrganizationForm from "./form";
+import { API } from "@/constants/api";
 
 export default function Organization() {
 	const { user } = useAuthContext(); // Get authenticated user details
@@ -32,7 +33,7 @@ export default function Organization() {
 		setLoading(true);
 		try {
 			if (orgId) {
-				const { data } = await axiosClient.get(`/organization/${orgId}`);
+				const { data } = await axiosClient.get(API().organization(orgId));
 				setOrganization(data.data); // assuming it's using Laravel's Resource response
 			}
 		} catch (e) {
@@ -46,7 +47,7 @@ export default function Organization() {
 		setLoading(true);
 		try {
 			if (orgId) {
-				const { data } = await axiosClient.patch(`/organization/${orgId}/generate-code`);
+				const { data } = await axiosClient.patch(API().organization_generate_code(orgId));
 				setOrganization(data.data); // Assuming Laravel resource response
 			}
 		} catch (e) {

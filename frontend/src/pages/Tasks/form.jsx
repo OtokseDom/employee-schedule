@@ -15,6 +15,7 @@ import { format, parseISO } from "date-fns";
 import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { API } from "@/constants/api";
 
 const formSchema = z.object({
 	assignee_id: z.number({
@@ -185,18 +186,18 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
 			if (Object.keys(updateData).length === 0) {
-				await axiosClient.post(`/task`, parsedForm);
+				await axiosClient.post(API().task(), parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
 				setIsOpen(false);
 			} else if (updateData?.calendar_add) {
-				await axiosClient.post(`/task`, parsedForm);
+				await axiosClient.post(API().task(), parsedForm);
 				fetchData();
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
 				setTaskAdded(true);
 			} else {
-				await axiosClient.put(`/task/${updateData?.id}`, parsedForm);
+				await axiosClient.put(API().task(updateData?.id), parsedForm);
 				fetchData();
 				showToast("Success!", "Task updated.", 3000);
 				setIsOpen(false);

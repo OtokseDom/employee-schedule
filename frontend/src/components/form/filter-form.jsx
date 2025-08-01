@@ -12,6 +12,7 @@ import DateInput from "@/components/form/DateInput";
 import { set } from "date-fns";
 import { useEffect, useState } from "react";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { API } from "@/constants/api";
 
 const formSchema = z
 	.object({
@@ -83,7 +84,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			const selectedUserObjects = users?.filter((u) => selected_users.includes(u.value)); // this maps the IDs to user objects
 			let filteredReports;
 			if (!userId) {
-				filteredReports = await axiosClient.get(`/dashboard?from=${from}&to=${to}&users=${selected_users.join(",")}`);
+				filteredReports = await axiosClient.get(API().dashboard(from, to, selected_users.join(",")));
 				setFilters({
 					values: {
 						"Date Range": `${from && to ? from + " to " + to : ""}`,
@@ -95,7 +96,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 					},
 				});
 			} else {
-				filteredReports = await axiosClient.get(`/user/${userId}/reports?from=${from}&to=${to}`);
+				filteredReports = await axiosClient.get(API().user_reports(userId, from, to));
 				setFilters({
 					"Date Range": `${from && to ? from + " to " + to : ""}`,
 				});

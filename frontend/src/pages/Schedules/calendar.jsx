@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import Week from "./week";
 import Month from "./month";
+import { API } from "@/constants/api";
 
 // Status colors
 const statusColors = {
@@ -49,8 +50,8 @@ export default function ScheduleCalendar() {
 		// setLocalLoading(true);
 		try {
 			setLoading(true);
-			const userResponse = await axiosClient.get("/user");
-			const categoryResponse = await axiosClient.get("/category");
+			const userResponse = await axiosClient.get(API().user());
+			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 			setSelectedUser(userResponse.data.data[0]);
@@ -63,7 +64,7 @@ export default function ScheduleCalendar() {
 	const fetchTasks = async () => {
 		setLoading(true);
 		try {
-			const taskResponse = await axiosClient.get(`/task`);
+			const taskResponse = await axiosClient.get(API().task());
 			setTasks(taskResponse.data.data.tasks);
 			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
