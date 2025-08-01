@@ -36,7 +36,7 @@ export default function Signup() {
 		observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 		return () => observer.disconnect();
 	}, []);
-
+	// TODO: joining organization will not auto login. require approval
 	const onSubmit = (e) => {
 		setLoading(true);
 		e.preventDefault();
@@ -56,7 +56,7 @@ export default function Signup() {
 			payload.role = "Superadmin";
 		}
 		axiosClient
-			.post(API().signup(), payload)
+			.post(API().signup, payload)
 			.then(({ data }) => {
 				setUser(data.data.user);
 				setToken(data.data.token);

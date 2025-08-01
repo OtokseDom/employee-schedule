@@ -38,7 +38,7 @@ export default function Login() {
 			password: passwordRef.current.value,
 		};
 		axiosClient
-			.post(API().login(), payload)
+			.post(API().login, payload)
 			.then(({ data }) => {
 				setUser(data.user);
 				setToken(data.token);

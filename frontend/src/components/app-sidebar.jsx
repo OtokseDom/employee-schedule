@@ -110,7 +110,7 @@ export function AppSidebar() {
 
 	const onLogout = (e) => {
 		e.preventDefault();
-		axiosClient.post(API().logout()).then(() => {
+		axiosClient.post(API().logout).then(() => {
 			setUser({});
 			setToken(null);
 		});
