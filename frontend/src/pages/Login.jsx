@@ -5,9 +5,11 @@ import { useAuthContext } from "../contexts/AuthContextProvider";
 import { Loader2, Sun, Moon } from "lucide-react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
+import { useToast } from "@/contexts/ToastContextProvider";
 
 export default function Login() {
 	const { loading, setLoading } = useLoadContext();
+	const showToast = useToast();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
 	const emailRef = useRef();
@@ -40,8 +42,18 @@ export default function Login() {
 		axiosClient
 			.post(API().login, payload)
 			.then(({ data }) => {
-				setUser(data.user);
-				setToken(data.token);
+				if (data.user.status == "pending") {
+					showToast("Login Failed", "Your request has not been approved yet.", 10000, "warning");
+				} else if (data.user.status == "rejected") {
+					showToast("Login Failed", "Your request to join has been rejected by the organization.", 10000, "fail");
+				} else if (data.user.status == "inactive") {
+					showToast("Login Failed", "Your account is no longer active. Ask your organization to reactivate it.", 10000, "warning");
+				} else if (data.user.status == "banned") {
+					showToast("Login Failed", "Your account has been banned from this organization.", 10000, "fail");
+				} else {
+					setUser(data.user);
+					setToken(data.token);
+				}
 				setLoading(false);
 			})
 			.catch((err) => {
