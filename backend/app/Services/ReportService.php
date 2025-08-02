@@ -3,27 +3,38 @@
 namespace App\Services;
 
 use App\Http\Resources\TaskHistoryResource;
+use App\Models\Category;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-// TODO: Use construct
+
 class ReportService
 {
+
+    protected Task $task;
+    protected TaskHistory $task_history;
+    protected Category $category;
+    protected User $user;
+    protected $organization_id;
+    public function __construct(Task $task, TaskHistory $task_history, Category $category, User $user)
+    {
+        $this->task = $task;
+        $this->task_history = $task_history;
+        $this->category = $category;
+        $this->user = $user;
+        $this->organization_id = Auth::user()->organization_id;
+    }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
 
     /**
      * Display reports for section cards. Section Cards
      */
-    public static function sectionCards($id = null, $filter)
+    public function sectionCards($id = null, $filter)
     {
-        // User Count
-        // $user_count = User::where('status', 'active')
-        //     ->where('organization_id', Auth::user()->organization_id)
-        //     ->count();
         /* ------------------------- // Average Performance ------------------------- */
-        $avg_performance_query = Task::where('organization_id', Auth::user()->organization_id);
+        $avg_performance_query = $this->task->where('organization_id', $this->organization_id);
 
         if ($id) {
             $avg_performance_query->where('assignee_id', $id);
@@ -37,9 +48,9 @@ class ReportService
         }
         $avg_performance = $avg_performance_query->avg('performance_rating');
         /* ----------------------------- // Task at Risk ---------------------------- */
-        $task_at_risk_query = DB::table('tasks')
+        $task_at_risk_query = $this->task
             ->where('status', '!=', 'completed')
-            ->where('organization_id', Auth::user()->organization_id)
+            ->where('organization_id', $this->organization_id)
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
         if ($id) {
@@ -54,14 +65,14 @@ class ReportService
         }
         $task_at_risk = $task_at_risk_query->count();
         /* ----------------------- // Average Completion Time ----------------------- */
-        $avg_completion_time = DB::table('tasks')
+        $avg_completion_time = $this->task
             ->where('status', 'completed')
-            ->where('organization_id', Auth::user()->organization_id)
+            ->where('organization_id', $this->organization_id)
             ->avg('time_taken');
         /* --------------------------- // Time Efficiency --------------------------- */
-        $time_efficiency_query = DB::table('tasks')
+        $time_efficiency_query = $this->task
             ->where('status', 'completed')
-            ->where('organization_id', Auth::user()->organization_id);
+            ->where('organization_id', $this->organization_id);
         if ($id) {
             $time_efficiency_query->where('assignee_id', $id);
         }
@@ -74,8 +85,8 @@ class ReportService
         }
         $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
         /* ------------------------- // Task Completion Rate ------------------------ */
-        $task_completion_query = DB::table('tasks')
-            ->where('organization_id', Auth::user()->organization_id);
+        $task_completion_query = $this->task
+            ->where('organization_id', $this->organization_id);
         if ($id) {
             $task_completion_query->where('assignee_id', $id);
         }
@@ -107,7 +118,7 @@ class ReportService
         return apiResponse($data, "Active users report fetched successfully");
     }
     // Task status - Pie donut chart
-    public static function tasksByStatus($id, $variant = "", $filter)
+    public function tasksByStatus($id, $variant = "", $filter)
     {
         if (!is_numeric($id) && $variant == "") {
             return apiResponse(null, 'Invalid user ID', false, 400);
@@ -147,8 +158,8 @@ class ReportService
         $chart_data = [];
         foreach ($statuses as $index => $status) {
             $chart_data[$index]['status'] = $status['field'];
-            $query = DB::table('tasks')
-                ->where('organization_id', Auth::user()->organization_id)
+            $query = $this->task
+                ->where('organization_id', $this->organization_id)
                 ->where('status', $status['name']);
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -176,7 +187,7 @@ class ReportService
     }
 
     // Performance Trend - Line chart label
-    public static function performanceRatingTrend($id, $variant = "", $filter)
+    public function performanceRatingTrend($id, $variant = "", $filter)
     {
 
         // Calculate the last 6 months (including current)
@@ -195,10 +206,10 @@ class ReportService
         $chart_data = [];
         $task_count = 0;
         foreach ($months as $m) {
-            $query = DB::table('tasks')
+            $query = $this->task
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
-                ->where('organization_id', Auth::user()->organization_id);
+                ->where('organization_id', $this->organization_id);
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
@@ -248,12 +259,12 @@ class ReportService
 
     /* ------------------------------ USER REPORTS ------------------------------ */
     // User Assigned Tasks
-    public static function userTasks($id, $filter)
+    public function userTasks($id, $filter)
     {
-        $query = Task::with(['assignee:id,name,email,role,position', 'category'])
+        $query = $this->task->with(['assignee:id,name,email,role,position', 'category'])
             ->orderBy('id', 'DESC')
             ->where('assignee_id', $id)
-            ->where('organization_id', Auth::user()->organization_id);
+            ->where('organization_id', $this->organization_id);
 
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -262,8 +273,8 @@ class ReportService
         $userTasks = $query->get();
         $taskIds = $userTasks->pluck('id');
 
-        $task_history = TaskHistory::with(['task:id,title', 'changedBy:id,name,email'])
-            ->where('organization_id', Auth::user()->organization_id)
+        $task_history = $this->task_history->with(['task:id,title', 'changedBy:id,name,email'])
+            ->where('organization_id', $this->organization_id)
             ->whereIn('task_id', $taskIds)
             ->orderBy('id', 'ASC')->get();
 
@@ -279,7 +290,7 @@ class ReportService
         return apiResponse($data, 'User assigned tasks fetched successfully');
     }
     // User Taskload. Area chart
-    public static function taskActivityTimeline($id, $filter)
+    public function taskActivityTimeline($id, $filter)
     {
         // Calculate the last 6 months (including current)
         $months = [];
@@ -297,9 +308,9 @@ class ReportService
         $chart_data = [];
         $task_count = 0;
         foreach ($months as $m) {
-            $query = DB::table('tasks')
+            $query = $this->task
                 ->where('assignee_id', $id)
-                ->where('organization_id', Auth::user()->organization_id)
+                ->where('organization_id', $this->organization_id)
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num']);
 
@@ -340,9 +351,9 @@ class ReportService
         return apiResponse($data, "Task activity timeline report fetched successfully");
     }
     // Average Rating Per Category. Radar chart
-    public static function ratingPerCategory($id, $filter)
+    public function ratingPerCategory($id, $filter)
     {
-        $query = DB::table('categories')
+        $query = $this->category
             ->leftJoin('tasks', function ($join) use ($id, $filter) {
                 $join->on('tasks.category_id', '=', 'categories.id')
                     ->where('tasks.assignee_id', '=', $id);
@@ -351,7 +362,7 @@ class ReportService
                     $join->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
                 }
             })
-            ->where('categories.organization_id', Auth::user()->organization_id);
+            ->where('categories.organization_id', $this->organization_id);
 
         $ratings = $query->select(
             'categories.name as category',
@@ -389,12 +400,12 @@ class ReportService
     /**
      * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
      */
-    public static function userEstimateVsActual($id, $filter)
+    public function userEstimateVsActual($id, $filter)
     {
         // Fetch the 10 most recent tasks for the user
-        $query = DB::table('tasks')
+        $query = $this->task
             ->where('assignee_id', $id)
-            ->where('organization_id', Auth::user()->organization_id);
+            ->where('organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
@@ -456,14 +467,14 @@ class ReportService
     /**
      * Display report for users activity load. Horizontal Bar chart
      */
-    public static function usersTaskLoad($filter)
+    public function usersTaskLoad($filter)
     {
-        $query = DB::table('users')
+        $query = $this->user
             ->leftJoin('tasks', function ($join) {
                 $join->on('users.id', '=', 'tasks.assignee_id')
-                    ->where('tasks.organization_id', Auth::user()->organization_id);
+                    ->where('tasks.organization_id', $this->organization_id);
             })
-            ->where('users.organization_id', Auth::user()->organization_id);
+            ->where('users.organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
@@ -504,13 +515,13 @@ class ReportService
     /**
      * Display report for leaderboards. Datatable
      */
-    public static function performanceLeaderboard($filter)
+    public function performanceLeaderboard($filter)
     {
-        $query = User::join('tasks', function ($join) {
+        $query = $this->user->join('tasks', function ($join) {
             $join->on('users.id', '=', 'tasks.assignee_id')
-                ->where('tasks.organization_id', Auth::user()->organization_id);
+                ->where('tasks.organization_id', $this->organization_id);
         })
-            ->where('users.organization_id', Auth::user()->organization_id);
+            ->where('users.organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
@@ -542,10 +553,10 @@ class ReportService
     }
 
     // estimate vs actual. Bar chart multiple
-    public static function estimateVsActual($filter)
+    public function estimateVsActual($filter)
     {
         // Fetch overall estimate and actual time
-        $query = DB::table('tasks')
+        $query = $this->task
             ->leftJoin('categories', 'categories.id', '=', 'tasks.category_id')
             ->select(
                 'categories.name as category',
@@ -553,7 +564,7 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN time_taken > time_estimate THEN time_taken - time_estimate ELSE 0 END),2) as overrun'),
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
-            ->where('tasks.organization_id', Auth::user()->organization_id);
+            ->where('tasks.organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
