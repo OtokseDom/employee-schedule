@@ -18,15 +18,13 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	const navigate = useNavigate();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
-	const [selectedUserId, setSelectedUserId] = useState(null);
+	const [selectedUser, setSelectedUser] = useState(null);
 	// const [selectedUserData, setSelectedUserData] = useState(null);
 
 	const openDialog = (type, userData = {}) => {
 		setDialogType(type);
 		setDialogOpen(true);
-		setSelectedUserId(userData.id);
-		// setSelectedUserData(userData);
-		// console.log("Dialog should open:", type, userData);
+		setSelectedUser(userData);
 	};
 
 	const handleUpdateUser = (user, event) => {
@@ -35,22 +33,27 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 		setUpdateData(user);
 	};
 
-	const handleApproval = async (action, id, userRow = {}) => {
+	const handleApproval = async (action, userRow = {}) => {
 		setLoading(true);
 		try {
 			if (action === 0) {
-				const res = await axiosClient.delete(API().user(id));
+				const form = { ...userRow, status: "rejected" };
+				const res = await axiosClient.put(API().user(userRow?.id), form);
 				if (res.data.success) {
 					showToast("Success!", res.data.message, 3000);
-					navigate("/users");
+					fetchData();
 				} else {
 					showToast("Failed!", res.message, 3000);
 				}
 			} else {
 				const form = { ...userRow, status: "active" };
-				const res = await axiosClient.put(API().user(id), form);
-				fetchData();
-				showToast("Success!", res.data.message, 3000);
+				const res = await axiosClient.put(API().user(userRow?.id), form);
+				if (res.data.success) {
+					showToast("Success!", res.data.message, 3000);
+					fetchData();
+				} else {
+					showToast("Failed!", res.message, 3000);
+				}
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -82,9 +85,11 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 											: status === "active"
 											? "text-green-100 bg-green-900/50"
 											: status === "inactive"
-											? "text-gray-100 bg-gray-900/50"
-											: status === "banned"
+											? "text-gray-100 bg-gray-700/50"
+											: status === "rejected"
 											? "text-red-100 bg-red-900/50"
+											: status === "banned"
+											? "text-purple-100 bg-purple-900/50"
 											: ""
 									}`}
 								>
@@ -123,7 +128,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 										className="text-green-500 cursor-pointer"
 										onClick={(e) => {
 											e.stopPropagation();
-											handleApproval(1, userRow.id, userRow);
+											handleApproval(1, userRow);
 										}}
 									>
 										Approve User
@@ -168,7 +173,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 			<DialogContent onClick={(e) => e.stopPropagation()}>
 				<DialogHeader>
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogDescription>{dialogType === "delete" ? "This action cannot be undone." : "You can update user status anytime."}</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
 					<DialogClose asChild>
@@ -178,12 +183,12 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 					</DialogClose>
 					<Button
 						onClick={() => {
-							if (dialogType === "reject") handleApproval(0, selectedUserId);
-							else if (dialogType === "delete") handleDelete(selectedUserId);
+							if (dialogType === "reject") handleApproval(0, selectedUser);
+							else if (dialogType === "delete") handleDelete(selectedUser.id);
 							setDialogOpen(false);
 						}}
 					>
-						Yes, delete
+						{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
