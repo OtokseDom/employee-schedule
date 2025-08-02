@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContextProvider";
 import axiosClient from "../axios.client";
 import { Loader2 } from "lucide-react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
+import { useToast } from "@/contexts/ToastContextProvider";
 
 export default function Signup() {
 	const { loading, setLoading } = useLoadContext();
 	const [errors, setErrors] = useState(null);
 	const { setUser, setToken } = useAuthContext();
+	const showToast = useToast();
+	const navigate = useNavigate();
 
 	const [hasOrgCode, setHasOrgCode] = useState(true);
 	const orgCodeRef = useRef();
@@ -36,7 +39,6 @@ export default function Signup() {
 		observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 		return () => observer.disconnect();
 	}, []);
-	// TODO: joining organization will not auto login. require approval
 	const onSubmit = (e) => {
 		setLoading(true);
 		e.preventDefault();
@@ -58,8 +60,13 @@ export default function Signup() {
 		axiosClient
 			.post(API().signup, payload)
 			.then(({ data }) => {
-				setUser(data.data.user);
-				setToken(data.data.token);
+				if (!hasOrgCode) {
+					setUser(data.data.user);
+					setToken(data.data.token);
+				} else {
+					showToast("Account Successfully Created", "Wait for your organization's approval and try to login.", 10000);
+					navigate(`/login`);
+				}
 				setLoading(false);
 			})
 			.catch((err) => {
