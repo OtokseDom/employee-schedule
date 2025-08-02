@@ -23,7 +23,13 @@ export function ToastContextProvider({ children }) {
 			<Toast.Provider swipeDirection="right">
 				<Toast.Root
 					className={`border ${
-						toast.status == "success" ? "border-green-500" : toast.status == "fail" ? "border-red-800" : "border-foreground"
+						toast.status == "success"
+							? "border-green-500"
+							: toast.status == "fail"
+							? "border-red-800"
+							: toast.status == "warning"
+							? "border-yellow-500"
+							: "border-foreground"
 					} bg-background text-foreground w-64 p-4 rounded shadow-lg fixed top-4 right-4 animate-fadeIn z-[999]`}
 					open={toast.open}
 					onOpenChange={(open) => setToast((prev) => ({ ...prev, open }))}
@@ -32,7 +38,13 @@ export function ToastContextProvider({ children }) {
 					<div className="flex flex-row justify-between mb-2">
 						<Toast.Title
 							className={`font-bold ${
-								toast.status == "success" ? "text-green-500" : toast.status == "fail" ? "text-red-800" : "text-foreground"
+								toast.status == "success"
+									? "text-green-500"
+									: toast.status == "fail"
+									? "text-red-800"
+									: toast.status == "warning"
+									? "text-yellow-500"
+									: "text-foreground"
 							}`}
 						>
 							{toast.title}
@@ -45,6 +57,7 @@ export function ToastContextProvider({ children }) {
 					</div>
 					<Toast.Description>{toast.description}</Toast.Description>
 				</Toast.Root>
+
 				<Toast.Viewport className="fixed bottom-4 right-4 flex flex-col gap-2" />
 			</Toast.Provider>
 		</ToastContext.Provider>
