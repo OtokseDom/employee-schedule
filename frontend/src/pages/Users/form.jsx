@@ -207,7 +207,8 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 								{ id: 1, name: "Pending" },
 								{ id: 2, name: "Active" },
 								{ id: 3, name: "Inactive" },
-								{ id: 4, name: "Banned" },
+								{ id: 4, name: "Rejected" },
+								{ id: 5, name: "Banned" },
 							];
 							return (
 								<FormItem>

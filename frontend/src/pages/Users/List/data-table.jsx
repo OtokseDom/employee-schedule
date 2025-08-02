@@ -141,9 +141,9 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
 								<TableRow
-									className="cursor-pointer"
+									// className="cursor-pointer"
 									key={row.id}
-									onClick={() => navigate(`/users/${row.original.id}`)} // Redirect on row click
+									// onClick={() => navigate(`/users/${row.original.id}`)} // Redirect on row click
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
