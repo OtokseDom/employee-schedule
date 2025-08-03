@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'http://localhost:8000', 'https://https://employee-schedule-i9lr.onrender.com'],
+    'allowed_origins' => ['http://localhost:3000', 'http://localhost:8000', 'https://employee-schedule-i9lr.onrender.com'],
 
     'allowed_origins_patterns' => [],
 
