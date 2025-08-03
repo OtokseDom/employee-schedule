@@ -12,7 +12,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useNavigate } from "react-router-dom";
 import { API } from "@/constants/api";
 
-export default function UserDetails({ user, handleUpdateUser, handleApproval }) {
+export default function UserDetails({ user, handleUpdateUser, handleApproval, detailsLoading }) {
 	const { user: user_auth } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -70,7 +70,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 				</DialogContent>
 
 				<div className="flex flex-col gap-3 w-full">
-					{loading ? (
+					{detailsLoading ? (
 						<div className="flex gap-5">
 							<Skeleton className="w-24 h-24 rounded-full" />
 							<div className="flex flex-col gap-2">
@@ -130,7 +130,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval }) 
 						</div>
 					)}
 
-					{loading ? (
+					{detailsLoading ? (
 						<div className="flex gap-5">
 							<Skeleton className="w-24 h-8 rounded-full" />
 							<Skeleton className="w-24 h-8 rounded-full" />

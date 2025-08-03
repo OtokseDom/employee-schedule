@@ -28,6 +28,7 @@ export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
 	const { setLoading } = useLoadContext();
+	const [detailsLoading, setDetailsLoading] = useState(false);
 	const [users, setUsers] = useState([]);
 	const [taskHistory, setTaskHistory] = useState([]);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
@@ -51,17 +52,25 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		fetchData();
+		fetchDetails();
 		fetchSelection();
+		fetchData();
 	}, []);
 
+	const fetchDetails = async () => {
+		setDetailsLoading(true);
+		try {
+			const response = await axiosClient.get(API().user(id));
+			setUser(response.data.data);
+		} catch (e) {
+			console.error("Error fetching data:", e);
+		} finally {
+			setDetailsLoading(false);
+		}
+	};
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			// Fetch user details and tasks
-			const response = await axiosClient.get(API().user(id));
-			setUser(response.data.data);
-			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes.data.data);
 			setTaskHistory(reportsRes.data.data?.user_tasks?.task_history);
@@ -72,8 +81,9 @@ export default function UserProfile() {
 		}
 	};
 	const fetchSelection = async () => {
+		setLoading(true);
 		try {
-			setLoading(true);
+			// selection items
 			const userResponse = await axiosClient.get(API().user());
 			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse.data.data);
@@ -86,7 +96,7 @@ export default function UserProfile() {
 	};
 
 	const handleApproval = async (action, id) => {
-		setLoading(true);
+		setDetailsLoading(true);
 		try {
 			if (action == 0) {
 				const userResponse = await axiosClient.delete(API().user(id));
@@ -97,7 +107,6 @@ export default function UserProfile() {
 					showToast("Failed!", userResponse.message, 3000);
 				}
 			} else {
-				setLoading(true);
 				const form = {
 					...user,
 					status: "active",
@@ -109,8 +118,6 @@ export default function UserProfile() {
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
 					console.error("Error fetching data:", e);
-				} finally {
-					setLoading(false);
 				}
 			}
 		} catch (e) {
@@ -118,7 +125,7 @@ export default function UserProfile() {
 			console.error("Error fetching data:", e);
 		} finally {
 			// Always stop loading when done
-			setLoading(false);
+			setDetailsLoading(false);
 		}
 	};
 	const handleUpdateUser = async (user) => {
@@ -180,7 +187,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} />
+				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
@@ -189,7 +196,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchData} />
+					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchSelection} />
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
