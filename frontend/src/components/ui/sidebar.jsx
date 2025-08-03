@@ -194,7 +194,7 @@ const Sidebar = React.forwardRef(({ side = "left", variant = "sidebar", collapsi
 Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef(({ className, onClick, ...props }, ref) => {
-	const { toggleSidebar } = useSidebar();
+	const { isMobile, toggleSidebar } = useSidebar();
 	const { expanded } = useSidebarContext();
 
 	return (
