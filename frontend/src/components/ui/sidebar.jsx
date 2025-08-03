@@ -210,7 +210,7 @@ const SidebarTrigger = React.forwardRef(({ className, onClick, ...props }, ref) 
 			}}
 			{...props}
 		>
-			{expanded ? <ArrowLeftToLine /> : <MenuIcon />}
+			{expanded && !isMobile ? <ArrowLeftToLine /> : <MenuIcon />}
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
