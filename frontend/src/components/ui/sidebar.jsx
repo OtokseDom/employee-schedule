@@ -194,7 +194,7 @@ const Sidebar = React.forwardRef(({ side = "left", variant = "sidebar", collapsi
 Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef(({ className, onClick, ...props }, ref) => {
-	const { toggleSidebar } = useSidebar();
+	const { isMobile, toggleSidebar } = useSidebar();
 	const { expanded } = useSidebarContext();
 
 	return (
@@ -210,7 +210,7 @@ const SidebarTrigger = React.forwardRef(({ className, onClick, ...props }, ref) 
 			}}
 			{...props}
 		>
-			{expanded ? <ArrowLeftToLine /> : <MenuIcon />}
+			{expanded && !isMobile ? <ArrowLeftToLine /> : <MenuIcon />}
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
