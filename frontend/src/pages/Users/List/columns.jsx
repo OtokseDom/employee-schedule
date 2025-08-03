@@ -146,7 +146,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 								</>
 							)}
 							<DropdownMenuItem>
-								<Link to={`/profile/${userRow.id}`}>View Profile</Link>
+								<Link to={`/users/${userRow.id}`}>View Profile</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem className="cursor-pointer" onClick={(e) => handleUpdateUser(userRow, e)}>
 								Update User
