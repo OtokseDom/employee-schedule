@@ -97,7 +97,7 @@ export default function OrganizationForm({ setIsOpen, fetchData }) {
 					}}
 				/>
 				<Button type="submit" disabled={loading}>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Update
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />} Update
 				</Button>
 			</form>
 		</Form>

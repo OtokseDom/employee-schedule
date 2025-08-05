@@ -675,7 +675,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				/>
 				{isEditable ? (
 					<Button type="submit" disabled={loading}>
-						{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />}{" "}
+						{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />}{" "}
 						{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
 					</Button>
 				) : (

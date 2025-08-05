@@ -17,6 +17,7 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
+	useSidebar, // for auto closing sidebar on mobile location change
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -80,8 +81,11 @@ const items = [
 		],
 	},
 ];
+
 export function AppSidebar() {
 	const { user, token, setToken, setUser } = useAuthContext();
+	const { isMobile, openMobile, setOpenMobile } = useSidebar(); // Add this line
+
 	// Darkmode set session
 	const [theme, setTheme] = useState(() => {
 		const savedMode = sessionStorage.getItem("theme");
@@ -89,6 +93,14 @@ export function AppSidebar() {
 	});
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	// Close mobile sidebar when route changes
+	useEffect(() => {
+		if (isMobile && openMobile) {
+			setOpenMobile(false);
+		}
+	}, [location.pathname]);
+
 	useEffect(() => {
 		sessionStorage.setItem("theme", JSON.stringify(theme));
 		if (theme == "dark") {
