@@ -289,7 +289,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Assignee</FormLabel>
+								<FormLabel>Assignee *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -322,11 +322,47 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				/>
 				<FormField
 					control={form.control}
+					name="project_id"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Project *</FormLabel>
+								<Select
+									disabled={!isEditable}
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : undefined}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a project">
+												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a project"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(categories) && categories.length > 0 ? (
+											categories.map((category) => (
+												<SelectItem key={category.id} value={category.id.toString()}>
+													{category.name}
+												</SelectItem>
+											))
+										) : (
+											<></>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
 					name="category_id"
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Category</FormLabel>
+								<FormLabel>Category *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -362,7 +398,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Title</FormLabel>
+								<FormLabel>Title *</FormLabel>
 								<FormControl>
 									<Input disabled={!isEditable} placeholder="Title" {...field} />
 								</FormControl>
@@ -377,7 +413,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Description</FormLabel>
+								<FormLabel>Description *</FormLabel>
 								<FormControl>
 									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>
@@ -644,7 +680,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						];
 						return (
 							<FormItem>
-								<FormLabel>Status</FormLabel>
+								<FormLabel>Status *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={field.onChange}
