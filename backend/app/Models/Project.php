@@ -36,4 +36,12 @@ class Project extends Model
     {
         return $this->hasMany(Task::class, 'project_id');
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                          Controller Logic Function                         */
+    /* -------------------------------------------------------------------------- */
+    public function getProjects($organization_id)
+    {
+        return $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
+    }
 }
