@@ -21,6 +21,9 @@ const formSchema = z.object({
 	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
+	project_id: z.number({
+		required_error: "Project is required.",
+	}),
 	category_id: z.number({
 		required_error: "Category is required.",
 	}),
@@ -46,7 +49,7 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ projects, users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
@@ -67,7 +70,8 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 			title: "",
 			description: "",
 			assignee_id: undefined,
-			category: "",
+			project_id: undefined,
+			category: undefined,
 			expected_output: "",
 			start_date: undefined,
 			end_date: undefined,
@@ -88,12 +92,13 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 	}, [isOpen]);
 
 	useEffect(() => {
-		if (updateData && users && categories) {
+		if (updateData && projects && users && categories) {
 			const {
 				calendar_add,
 				title,
 				description,
 				assignee_id,
+				project_id,
 				category_id,
 				expected_output,
 				start_date,
@@ -113,6 +118,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				title: title || "",
 				description: description || "",
 				assignee_id: assignee_id || undefined,
+				project_id: project_id || undefined,
 				category_id: category_id || undefined,
 				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
@@ -153,7 +159,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				setDelayMinute("");
 			}
 		}
-	}, [updateData, form, users, categories]);
+	}, [updateData, form, projects, users, categories]);
 
 	const handleSubmit = async (formData) => {
 		setLoading(true);
@@ -335,15 +341,15 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a project">
-												{field.value ? categories?.find((category) => category.id == field.value)?.name : "Select a project"}
+												{field.value ? projects?.find((project) => project.id == field.value)?.title : "Select a project"}
 											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{Array.isArray(categories) && categories.length > 0 ? (
-											categories.map((category) => (
-												<SelectItem key={category.id} value={category.id.toString()}>
-													{category.name}
+										{Array.isArray(projects) && projects.length > 0 ? (
+											projects.map((project) => (
+												<SelectItem key={project.id} value={project.id.toString()}>
+													{project.title}
 												</SelectItem>
 											))
 										) : (
