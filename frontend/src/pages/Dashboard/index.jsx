@@ -74,20 +74,14 @@ export default function UserProfile() {
 		delete updated.values[key];
 		delete updated.display[key];
 		setFilters(updated);
-		let from = "";
-		let to = "";
-		let members = "";
-		if (updated.values["Date Range"]) {
-			from = updated.values["Date Range"]?.split(" to ")[0];
-			to = updated.values["Date Range"]?.split(" to ")[1];
-		}
-		if (updated.values["Members"]) {
-			members = updated.values["Members"];
-		}
+		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
+		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
+		const project = updated.values["Projects"] ?? "";
+		const members = updated.values["Members"] ?? "";
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(API().dashboard(from, to, members));
+			const reportsRes = await axiosClient.get(API().dashboard(from, to, members, project));
 			setReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {

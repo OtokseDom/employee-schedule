@@ -58,23 +58,28 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 	});
 
 	useEffect(() => {
+		// Populating form when has active filter values
 		if (filters.values) {
 			const fromStr = filters.values["Date Range"]?.split(" to ")[0] || undefined;
 			const toStr = filters.values["Date Range"]?.split(" to ")[1] || undefined;
 			const from = fromStr ? new Date(fromStr) : undefined;
 			const to = fromStr ? new Date(toStr) : undefined;
+			const project_id = filters.values["Project"];
 			// Users
 			const membersRaw = filters.values["Members"];
 			const userIds = Array.isArray(membersRaw)
 				? membersRaw.map((id) => parseInt(id))
 				: typeof membersRaw === "string"
-				? membersRaw.split(",").map((id) => parseInt(id.trim()))
+				? membersRaw
+						?.split(",")
+						.map((id) => parseInt(id.trim()))
+						.filter((id) => !isNaN(id)) // to avoid [NaN] when membersRaw is empty or non numeric
 				: [];
 			setSelectedUsers(userIds); // crucial
 			form.reset({
 				from: from ?? undefined,
 				to: to ?? undefined,
-				// project_id: project_id ?? undefined,
+				project_id: project_id ?? undefined,
 			});
 		}
 	}, [filters, form]);
@@ -84,25 +89,29 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 		try {
 			const from = form_filter?.from ? form_filter.from.toLocaleDateString("en-CA") : "";
 			const to = form_filter?.to ? form_filter.to.toLocaleDateString("en-CA") : "";
+			const project = form_filter.project_id ? projects?.find((project) => project.id == form_filter.project_id) : "";
 			const selected_users = form_filter?.selected_users || []; // this only gets the IDs of selected users
 			const selectedUserObjects = users?.filter((u) => selected_users.includes(u.value)); // this maps the IDs to user objects
 			let filteredReports;
 			if (!userId) {
-				filteredReports = await axiosClient.get(API().dashboard(from, to, selected_users.join(",")));
+				filteredReports = await axiosClient.get(API().dashboard(from, to, selected_users.join(","), project?.id));
 				setFilters({
 					values: {
 						"Date Range": `${from && to ? from + " to " + to : ""}`,
 						Members: selectedUserObjects?.map((u) => u.value).join(", ") || "",
+						Project: project.id || null,
 					},
 					display: {
 						"Date Range": `${from && to ? from + " to " + to : ""}`,
 						Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
+						Project: project.title || "",
 					},
 				});
 			} else {
-				filteredReports = await axiosClient.get(API().user_reports(userId, from, to));
+				filteredReports = await axiosClient.get(API().user_reports(userId, from, to, project?.id));
 				setFilters({
 					"Date Range": `${from && to ? from + " to " + to : ""}`,
+					Project: project.id || null,
 				});
 			}
 			setReports(filteredReports.data.data);
@@ -207,7 +216,9 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 				)}
 				<Button
 					type="submit"
-					disabled={loading || ((!form.watch("from") || !form.watch("to")) && (selectedUsers?.length === 0 || !selectedUsers))}
+					disabled={
+						loading || ((!form.watch("from") || !form.watch("to")) && (selectedUsers?.length === 0 || !selectedUsers) && !form.watch("project_id"))
+					}
 					className="w-full"
 					variant="default"
 				>
