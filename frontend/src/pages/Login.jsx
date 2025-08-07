@@ -133,7 +133,7 @@ export default function Login() {
 								ref={emailRef}
 								type="email"
 								placeholder="Email"
-								value="admin@demo.com"
+								defaultValue="admin@demo.com"
 								className={`w-full px-4 py-3 ${
 									theme === "dark"
 										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
@@ -147,7 +147,7 @@ export default function Login() {
 								ref={passwordRef}
 								type="password"
 								placeholder="Password"
-								value="admin123"
+								defaultValue="admin123"
 								className={`w-full px-4 py-3 ${
 									theme === "dark"
 										? "bg-black/20 border-white/10 text-white placeholder-purple-300"
