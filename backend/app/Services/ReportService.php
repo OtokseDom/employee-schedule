@@ -42,6 +42,9 @@ class ReportService
         if ($filter && $filter['from'] && $filter['to']) {
             $avg_performance_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
+        if ($filter && $filter['project']) {
+            $avg_performance_query->where('project_id', $filter['project']);
+        }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
             $avg_performance_query->whereIn('assignee_id', $userIds);
@@ -58,6 +61,9 @@ class ReportService
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $task_at_risk_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && $filter['project']) {
+            $task_at_risk_query->where('project_id', $filter['project']);
         }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
@@ -79,6 +85,9 @@ class ReportService
         if ($filter && $filter['from'] && $filter['to']) {
             $time_efficiency_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
+        if ($filter && $filter['project']) {
+            $time_efficiency_query->where('project_id', $filter['project']);
+        }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
             $time_efficiency_query->whereIn('assignee_id', $userIds);
@@ -92,6 +101,9 @@ class ReportService
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $task_completion_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && $filter['project']) {
+            $task_completion_query->where('project_id', $filter['project']);
         }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
@@ -164,6 +176,9 @@ class ReportService
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
+            if ($filter && $filter['project']) {
+                $query->where('project_id', $filter['project']);
+            }
             if ($filter && isset($filter['users']) && $variant === 'dashboard') {
                 $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
                 $query->whereIn('assignee_id', $userIds);
@@ -212,6 +227,9 @@ class ReportService
                 ->where('organization_id', $this->organization_id);
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+            }
+            if ($filter && $filter['project']) {
+                $query->where('project_id', $filter['project']);
             }
             if ($filter && isset($filter['users']) && $variant === 'dashboard') {
                 $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
@@ -269,6 +287,9 @@ class ReportService
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
+        if ($filter && $filter['project']) {
+            $query->where('project_id', $filter['project']);
+        }
 
         $userTasks = $query->get();
         $taskIds = $userTasks->pluck('id');
@@ -317,6 +338,9 @@ class ReportService
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
+            if ($filter && $filter['project']) {
+                $query->where('project_id', $filter['project']);
+            }
             $count = $query->count();
 
             $chart_data[] = [
@@ -360,6 +384,9 @@ class ReportService
 
                 if ($filter && $filter['from'] && $filter['to']) {
                     $join->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
+                }
+                if ($filter && $filter['project']) {
+                    $join->where('project_id', $filter['project']);
                 }
             })
             ->where('categories.organization_id', $this->organization_id);
@@ -408,6 +435,9 @@ class ReportService
             ->where('organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && $filter['project']) {
+            $query->where('project_id', $filter['project']);
         }
         $tasks = $query->orderBy('start_date', 'desc')
             ->take(10)
@@ -478,6 +508,9 @@ class ReportService
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
+        if ($filter && $filter['project']) {
+            $query->where('project_id', $filter['project']);
+        }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
             $query->whereIn('assignee_id', $userIds);
@@ -525,6 +558,9 @@ class ReportService
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
+        if ($filter && $filter['project']) {
+            $query->where('project_id', $filter['project']);
+        }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
             $query->whereIn('assignee_id', $userIds);
@@ -567,6 +603,9 @@ class ReportService
             ->where('tasks.organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && $filter['project']) {
+            $query->where('project_id', $filter['project']);
         }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
