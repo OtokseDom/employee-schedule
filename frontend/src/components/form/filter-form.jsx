@@ -3,6 +3,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
@@ -18,6 +19,7 @@ const formSchema = z
 	.object({
 		from: z.date().optional(),
 		to: z.date().optional(),
+		project_id: z.number().optional(),
 	})
 	.refine(
 		(data) => {
@@ -43,7 +45,7 @@ const formSchema = z
 		}
 	);
 
-export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null, users, selectedUsers, setSelectedUsers }) {
+export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null, projects, users, selectedUsers, setSelectedUsers }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -51,6 +53,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 		defaultValues: {
 			from: undefined,
 			to: undefined,
+			project_id: undefined,
 		},
 	});
 
@@ -71,6 +74,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			form.reset({
 				from: from ?? undefined,
 				to: to ?? undefined,
+				// project_id: project_id ?? undefined,
 			});
 		}
 	}, [filters, form]);
@@ -144,6 +148,38 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						)}
 					/>
 				</div>
+				<FormField
+					control={form.control}
+					name="project_id"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Project</FormLabel>
+								<Select onValueChange={(value) => field.onChange(Number(value))} value={field.value ? field.value.toString() : undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a project">
+												{field.value ? projects?.find((project) => project.id == field.value)?.title : "Select a project"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(projects) && projects.length > 0 ? (
+											projects.map((project) => (
+												<SelectItem key={project.id} value={project.id.toString()}>
+													{project.title}
+												</SelectItem>
+											))
+										) : (
+											<></>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
 				{!userId && (
 					<FormField
 						control={form.control}
@@ -151,6 +187,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						render={({ field }) => {
 							return (
 								<FormItem>
+									<FormLabel>Members</FormLabel>
 									<FormControl>
 										<MultiSelect
 											field={field}

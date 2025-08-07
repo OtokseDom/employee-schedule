@@ -18,6 +18,7 @@ export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
 	const [users, setUsers] = useState();
+	const [projects, setProjects] = useState();
 	const [isOpen, setIsOpen] = useState(false);
 	const [filters, setFilters] = useState({
 		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
@@ -51,6 +52,11 @@ export default function UserProfile() {
 					label: user.name,
 				}));
 				setUsers(mappedUsers);
+			}
+			// fetch projects only if not already fetched
+			if (!projects) {
+				const projectResponse = await axiosClient.get(API().project());
+				setProjects(projectResponse.data.data);
 			}
 			setLoading(false);
 		} catch (e) {
@@ -120,6 +126,7 @@ export default function UserProfile() {
 									setReports={setReports}
 									filters={filters}
 									setFilters={setFilters}
+									projects={projects}
 									users={users}
 									selectedUsers={selectedUsers}
 									setSelectedUsers={setSelectedUsers}
