@@ -42,6 +42,12 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Relationship with Project
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
     // Relationship with TaskHistory
     public function taskHistories()
     {
@@ -59,7 +65,7 @@ class Task extends Model
     /* -------------------------------------------------------------------------- */
     public function getTasks($organization_id)
     {
-        return TaskResource::collection($this->with(['assignee:id,name,email,role,position', 'category'])
+        return TaskResource::collection($this->with(['assignee:id,name,email,role,position', 'category', 'project:id,title'])
             ->where('organization_id', $organization_id)
             ->orderBy('id', 'DESC')->get());
     }

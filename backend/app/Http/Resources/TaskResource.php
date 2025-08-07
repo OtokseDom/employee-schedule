@@ -44,6 +44,19 @@ class TaskResource extends JsonResource
                     'position' => $this->assignee->position,
                 ];
             }),
+            'project' => $this->whenLoaded('project', function () {
+                return [
+                    'title' => $this->project->title,
+                    // 'organization_id',
+                    // 'title',
+                    // 'description',
+                    // 'target_date',
+                    // 'estimated_date',
+                    // 'priority',
+                    // 'status',
+                    // 'remarks'
+                ];
+            }),
             'category' => new CategoryResource($this->whenLoaded('category')),
         ];
     }
