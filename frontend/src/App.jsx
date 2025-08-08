@@ -1,8 +1,10 @@
 import "./index.css";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
 	return (
 		<div>
+			<Analytics />
 			<head>
 				<meta charset="UTF-8" />
 				<link rel="icon" type="image/svg+xml" href="/vite.svg" />
