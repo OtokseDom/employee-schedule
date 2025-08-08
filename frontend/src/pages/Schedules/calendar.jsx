@@ -59,7 +59,7 @@ export default function ScheduleCalendar() {
 			setUsers(userResponse.data.data);
 			setSelectedUser(userResponse.data.data[0]);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -71,7 +71,7 @@ export default function ScheduleCalendar() {
 			setTasks(taskResponse.data.data.tasks);
 			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}

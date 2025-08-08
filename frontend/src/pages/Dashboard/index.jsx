@@ -60,7 +60,7 @@ export default function UserProfile() {
 			}
 			setLoading(false);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -85,7 +85,7 @@ export default function UserProfile() {
 			setReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}

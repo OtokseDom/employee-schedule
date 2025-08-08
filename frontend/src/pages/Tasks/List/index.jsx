@@ -39,7 +39,7 @@ export default function Tasks() {
 			setTasks(taskResponse.data.data.tasks);
 			setTaskHistory(taskResponse.data.data.task_history);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
@@ -55,7 +55,7 @@ export default function Tasks() {
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -69,7 +69,7 @@ export default function Tasks() {
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
