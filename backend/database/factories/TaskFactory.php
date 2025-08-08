@@ -24,6 +24,7 @@ class TaskFactory extends Factory
     {
         return [
             'organization_id' => 1,
+            'project_id' => 1,
             'category_id' => Category::inRandomOrder()->value('id'),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,

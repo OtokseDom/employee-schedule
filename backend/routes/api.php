@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\CategoryController;
 use App\Http\Controllers\Api\v1\DashboardReportController;
 use App\Http\Controllers\Api\v1\OrganizationController;
+use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
 use App\Http\Controllers\Api\v1\UserController;
@@ -29,6 +30,7 @@ Route::prefix('v1')->group(function () {
         // User CRUD
         Route::apiResource('/organization', OrganizationController::class);
         Route::apiResource('/user', UserController::class);
+        Route::apiResource('/project', ProjectController::class);
         Route::apiResource('/category', CategoryController::class);
         Route::apiResource('/task', TaskController::class);
         Route::apiResource('/task-history', TaskHistoryController::class);

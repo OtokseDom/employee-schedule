@@ -11,6 +11,7 @@ export default function Tasks() {
 	const [tasks, setTasks] = useState([]);
 	const [taskHistory, setTaskHistory] = useState([]);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
+	const [projects, setProjects] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const showToast = useToast();
@@ -47,8 +48,10 @@ export default function Tasks() {
 	const fetchSelection = async () => {
 		try {
 			setLoading(true);
+			const projectResponse = await axiosClient.get(API().project());
 			const userResponse = await axiosClient.get(API().user());
 			const categoryResponse = await axiosClient.get(API().category());
+			setProjects(projectResponse.data.data);
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 		} catch (e) {
@@ -82,6 +85,7 @@ export default function Tasks() {
 				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory })}
 				data={tasks}
 				selectedTaskHistory={selectedTaskHistory}
+				projects={projects}
 				users={users}
 				categories={categories}
 				setTasks={setTasks}
