@@ -27,7 +27,7 @@ export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
 	const [user, setUser] = useState(null); // State for user details
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const [users, setUsers] = useState([]);
 	const [projects, setProjects] = useState();
@@ -208,9 +208,7 @@ export default function UserProfile() {
 			<div className="flex flex-col gap-4 w-full">
 				<div className="flex flex-wrap justify-start items-center gap-4">
 					<Dialog modal={false} open={isOpenFilter} onOpenChange={setIsOpenFilter}>
-						<DialogTrigger asChild>
-							<Button variant="default">Filter</Button>
-						</DialogTrigger>
+						<DialogTrigger asChild>{!loading && <Button variant="default">Filter</Button>}</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>Select filter</DialogTitle>

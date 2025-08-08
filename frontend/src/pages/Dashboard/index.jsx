@@ -15,7 +15,7 @@ import FilterForm from "../../components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 export default function UserProfile() {
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
 	const [users, setUsers] = useState();
 	const [projects, setProjects] = useState();
@@ -107,9 +107,7 @@ export default function UserProfile() {
 					</div>
 					<div className="flex flex-row gap-2">
 						<Dialog modal={false} open={isOpen} onOpenChange={setIsOpen}>
-							<DialogTrigger asChild>
-								<Button variant="default">Filter</Button>
-							</DialogTrigger>
+							<DialogTrigger asChild>{!loading && <Button variant="default">Filter</Button>}</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
 									<DialogTitle>Select filter</DialogTitle>
