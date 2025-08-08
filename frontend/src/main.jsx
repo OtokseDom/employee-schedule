@@ -23,7 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 							<LoadContextProvider>
 								<ThemeProvider>
 									<RouterProvider router={router} />
-									<Analytics />
+									{process.env.NODE_ENV === "production" && <Analytics />}
 								</ThemeProvider>
 							</LoadContextProvider>
 						</ScrollContextProvider>
