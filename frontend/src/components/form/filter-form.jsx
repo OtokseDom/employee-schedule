@@ -111,7 +111,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 				filteredReports = await axiosClient.get(API().user_reports(userId, from, to, project?.id));
 				setFilters({
 					"Date Range": `${from && to ? from + " to " + to : ""}`,
-					Project: project.id || null,
+					Project: project.title || null,
 				});
 			}
 			setReports(filteredReports.data.data);
@@ -222,7 +222,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 					className="w-full"
 					variant="default"
 				>
-					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-foreground" />} Apply Filter
+					{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />} Apply Filter
 				</Button>
 			</form>
 		</Form>
