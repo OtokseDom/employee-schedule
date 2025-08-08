@@ -37,7 +37,7 @@ export default function Organization() {
 				setOrganization(data.data); // assuming it's using Laravel's Resource response
 			}
 		} catch (e) {
-			console.error("Error fetching organization:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -51,7 +51,7 @@ export default function Organization() {
 				setOrganization(data.data); // Assuming Laravel resource response
 			}
 		} catch (e) {
-			console.error("Error generating code:", e);
+			if (e.message !== "Request aborted") console.error("Error generating code:", e.message);
 		} finally {
 			setLoading(false);
 		}

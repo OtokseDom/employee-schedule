@@ -63,7 +63,7 @@ export default function UserProfile() {
 			const response = await axiosClient.get(API().user(id));
 			setUser(response.data.data);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setDetailsLoading(false);
 		}
@@ -75,7 +75,7 @@ export default function UserProfile() {
 			setUserReports(reportsRes.data.data);
 			setTaskHistory(reportsRes.data.data?.user_tasks?.task_history);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -89,7 +89,7 @@ export default function UserProfile() {
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -117,12 +117,12 @@ export default function UserProfile() {
 					showToast("Success!", userResponse.data.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
-					console.error("Error fetching data:", e);
+					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 				}
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			// Always stop loading when done
 			setDetailsLoading(false);
@@ -147,7 +147,7 @@ export default function UserProfile() {
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			// Always stop loading when done
 			setLoading(false);
@@ -165,7 +165,7 @@ export default function UserProfile() {
 			setUserReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {
-			console.error("Error fetching data:", e);
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
