@@ -36,6 +36,7 @@ export default function ScheduleCalendar() {
 	// API Data
 	const [tasks, setTasks] = useState([]);
 	const [taskHistory, setTaskHistory] = useState([]);
+	const [projects, setProjects] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [selectedUser, setSelectedUser] = useState(users || null);
 	const [categories, setCategories] = useState(users || null);
@@ -50,8 +51,10 @@ export default function ScheduleCalendar() {
 		// setLocalLoading(true);
 		try {
 			setLoading(true);
+			const projectResponse = await axiosClient.get(API().project());
 			const userResponse = await axiosClient.get(API().user());
 			const categoryResponse = await axiosClient.get(API().category());
+			setProjects(projectResponse.data.data);
 			setCategories(categoryResponse.data.data);
 			setUsers(userResponse.data.data);
 			setSelectedUser(userResponse.data.data[0]);
@@ -245,6 +248,7 @@ export default function ScheduleCalendar() {
 					<Month
 						days={days}
 						data={tasks}
+						projects={projects}
 						users={users}
 						categories={categories}
 						fetchData={fetchTasks}
@@ -259,6 +263,7 @@ export default function ScheduleCalendar() {
 				) : (
 					<Week
 						data={tasks}
+						projects={projects}
 						users={users}
 						categories={categories}
 						fetchData={fetchTasks}

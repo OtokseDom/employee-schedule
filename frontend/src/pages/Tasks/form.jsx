@@ -21,6 +21,9 @@ const formSchema = z.object({
 	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
+	project_id: z.number({
+		required_error: "Project is required.",
+	}),
 	category_id: z.number({
 		required_error: "Category is required.",
 	}),
@@ -46,7 +49,7 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ projects, users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
@@ -67,7 +70,8 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 			title: "",
 			description: "",
 			assignee_id: undefined,
-			category: "",
+			project_id: undefined,
+			category: undefined,
 			expected_output: "",
 			start_date: undefined,
 			end_date: undefined,
@@ -88,12 +92,13 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 	}, [isOpen]);
 
 	useEffect(() => {
-		if (updateData && users && categories) {
+		if (updateData && projects && users && categories) {
 			const {
 				calendar_add,
 				title,
 				description,
 				assignee_id,
+				project_id,
 				category_id,
 				expected_output,
 				start_date,
@@ -113,6 +118,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				title: title || "",
 				description: description || "",
 				assignee_id: assignee_id || undefined,
+				project_id: project_id || undefined,
 				category_id: category_id || undefined,
 				expected_output: expected_output || "",
 				start_date: start_date ? parseISO(start_date) : undefined,
@@ -153,7 +159,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				setDelayMinute("");
 			}
 		}
-	}, [updateData, form, users, categories]);
+	}, [updateData, form, projects, users, categories]);
 
 	const handleSubmit = async (formData) => {
 		setLoading(true);
@@ -289,7 +295,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Assignee</FormLabel>
+								<FormLabel>Assignee *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -322,11 +328,47 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 				/>
 				<FormField
 					control={form.control}
+					name="project_id"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Project *</FormLabel>
+								<Select
+									disabled={!isEditable}
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : undefined}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a project">
+												{field.value ? projects?.find((project) => project.id == field.value)?.title : "Select a project"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(projects) && projects.length > 0 ? (
+											projects.map((project) => (
+												<SelectItem key={project.id} value={project.id.toString()}>
+													{project.title}
+												</SelectItem>
+											))
+										) : (
+											<></>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
 					name="category_id"
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Category</FormLabel>
+								<FormLabel>Category *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -362,7 +404,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Title</FormLabel>
+								<FormLabel>Title *</FormLabel>
 								<FormControl>
 									<Input disabled={!isEditable} placeholder="Title" {...field} />
 								</FormControl>
@@ -377,7 +419,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Description</FormLabel>
+								<FormLabel>Description *</FormLabel>
 								<FormControl>
 									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>
@@ -644,7 +686,7 @@ export default function TaskForm({ users, categories, setTaskAdded, isOpen, setI
 						];
 						return (
 							<FormItem>
-								<FormLabel>Status</FormLabel>
+								<FormLabel>Status *</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={field.onChange}

@@ -12,6 +12,7 @@ class Task extends Model
 
     protected $fillable = [
         'organization_id',
+        'project_id',
         'category_id',
         'title',
         'description',
@@ -41,6 +42,12 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Relationship with Project
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
     // Relationship with TaskHistory
     public function taskHistories()
     {
@@ -58,7 +65,7 @@ class Task extends Model
     /* -------------------------------------------------------------------------- */
     public function getTasks($organization_id)
     {
-        return TaskResource::collection($this->with(['assignee:id,name,email,role,position', 'category'])
+        return TaskResource::collection($this->with(['assignee:id,name,email,role,position', 'category', 'project:id,title'])
             ->where('organization_id', $organization_id)
             ->orderBy('id', 'DESC')->get());
     }
@@ -111,10 +118,23 @@ class Task extends Model
                         'to' => $value,
                     ];
                 }
+            } else if (in_array($key, ['project_id'])) {
+                // save project name instead of id in task history
+                $project = new Project();
+                $orig = isset($original[$key]) ? optional($project->find($original[$key]))->title : null;
+                $val = $value ? optional($project->find($value))->title : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
+                    ];
+                }
             } else if (in_array($key, ['category_id'])) {
                 // save category name instead of id in task history
-                $orig = $original[$key] ? optional(Category::find($original[$key]))->name : null;
-                $val = $value ? optional(Category::find($value))->name : null;
+                $category = new Category();
+                $orig = isset($original[$key]) ? optional($category->find($original[$key]))->name : null;
+                $val = $value ? optional($category->find($value))->name : null;
 
                 if ($orig !== $val) {
                     $changes[$key] = [
@@ -124,8 +144,9 @@ class Task extends Model
                 }
             } else if (in_array($key, ['assignee_id'])) {
                 // save assignee name instead of id in task history
-                $orig = $original[$key] ? optional(User::find($original[$key]))->name : null;
-                $val = $value ? optional(User::find($value))->name : null;
+                $user = new User();
+                $orig = isset($original[$key]) ? optional($user->find($original[$key]))->name : null;
+                $val = $value ? optional($user->find($value))->name : null;
 
                 if ($orig !== $val) {
                     $changes[$key] = [

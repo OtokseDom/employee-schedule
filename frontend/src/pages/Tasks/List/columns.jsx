@@ -69,6 +69,17 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistor
 			},
 		},
 		{
+			id: "project",
+			accessorKey: "project.title",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Project <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+		},
+		{
 			id: "category",
 			accessorKey: "category.name",
 			header: ({ column }) => {

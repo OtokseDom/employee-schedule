@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Week({
 	data,
+	projects,
 	users,
 	categories,
 	fetchData,
@@ -255,6 +256,7 @@ export default function Week({
 									</div>
 								) : (
 									<TaskForm
+										projects={projects}
 										users={users}
 										categories={categories}
 										isOpen={isDialogOpen}

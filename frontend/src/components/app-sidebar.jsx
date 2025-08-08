@@ -1,4 +1,19 @@
-import { ChevronUp, MoonStar, Sun, User2, Calendar, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown, Gauge, Building } from "lucide-react";
+import {
+	ChevronUp,
+	MoonStar,
+	Sun,
+	User2,
+	Calendar,
+	ClipboardList,
+	Users2,
+	CalendarClock,
+	Settings,
+	Tag,
+	ChevronDown,
+	Gauge,
+	Building,
+	FolderKanban,
+} from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -46,8 +61,15 @@ const items = [
 	},
 	{
 		title: "Tasks",
-		url: "/task",
+		url: "/tasks",
 		icon: ClipboardList,
+		collapsible: false,
+		subItems: [],
+	},
+	{
+		title: "Projects",
+		url: "/projects",
+		icon: FolderKanban,
 		collapsible: false,
 		subItems: [],
 	},

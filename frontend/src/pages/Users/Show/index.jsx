@@ -30,6 +30,7 @@ export default function UserProfile() {
 	const { setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const [users, setUsers] = useState([]);
+	const [projects, setProjects] = useState();
 	const [taskHistory, setTaskHistory] = useState([]);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	const [showHistory, setShowHistory] = useState(false);
@@ -61,7 +62,7 @@ export default function UserProfile() {
 		setDetailsLoading(true);
 		try {
 			const response = await axiosClient.get(API().user(id));
-			setUser(response.data.data);
+			setUser(response?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -72,8 +73,14 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
-			setUserReports(reportsRes.data.data);
-			setTaskHistory(reportsRes.data.data?.user_tasks?.task_history);
+			setUserReports(reportsRes?.data?.data);
+			setTaskHistory(reportsRes?.data?.data?.user_tasks?.task_history);
+
+			// fetch projects only if not already fetched
+			if (!projects) {
+				const projectResponse = await axiosClient.get(API().project());
+				setProjects(projectResponse?.data?.data);
+			}
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -84,10 +91,9 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// selection items
-			const userResponse = await axiosClient.get(API().user());
-			const categoryResponse = await axiosClient.get(API().category());
-			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.data);
+			const [userResponse, categoryResponse] = await Promise.all([axiosClient.get(API().user()), axiosClient.get(API().category())]);
+			setCategories(categoryResponse?.data?.data);
+			setUsers(userResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -100,11 +106,11 @@ export default function UserProfile() {
 		try {
 			if (action == 0) {
 				const userResponse = await axiosClient.delete(API().user(id));
-				if (userResponse.data.success == true) {
-					showToast("Success!", userResponse.data.message, 3000);
+				if (userResponse?.data?.success == true) {
+					showToast("Success!", userResponse?.data?.message, 3000);
 					navigate("/users");
 				} else {
-					showToast("Failed!", userResponse.message, 3000);
+					showToast("Failed!", userResponse?.message, 3000);
 				}
 			} else {
 				const form = {
@@ -113,8 +119,8 @@ export default function UserProfile() {
 				};
 				try {
 					const userResponse = await axiosClient.put(API().user(id), form);
-					setUser(userResponse.data.data);
-					showToast("Success!", userResponse.data.message, 3000);
+					setUser(userResponse?.data?.data);
+					showToast("Success!", userResponse?.data?.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
 					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -162,7 +168,7 @@ export default function UserProfile() {
 		try {
 			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(API().user_reports(id));
-			setUserReports(reportsRes.data.data);
+			setUserReports(reportsRes?.data?.data);
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -210,7 +216,14 @@ export default function UserProfile() {
 								<DialogTitle>Select filter</DialogTitle>
 								<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 							</DialogHeader>
-							<FilterForm setIsOpen={setIsOpenFilter} setReports={setUserReports} filters={filters} setFilters={setFilters} userId={id} />
+							<FilterForm
+								setIsOpen={setIsOpenFilter}
+								setReports={setUserReports}
+								filters={filters}
+								setFilters={setFilters}
+								projects={projects}
+								userId={id}
+							/>
 						</DialogContent>
 					</Dialog>
 					<FilterTags filters={filters} onRemove={handleRemoveFilter} />

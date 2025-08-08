@@ -23,6 +23,7 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
+            'project_id' => 'required|exists:projects,id',
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -51,6 +52,7 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id.required' => 'Organization is required.',
+            'project_id.required' => 'Project is required.',
             'category_id.required' => 'Category is required.',
             'title.required' => 'Title is required.',
             'status.required' => 'Status is required.',

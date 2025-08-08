@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 
 export default function Month({
 	data,
+	projects,
 	users,
 	categories,
 	fetchData,
@@ -215,6 +216,7 @@ export default function Month({
 								</div>
 							) : (
 								<TaskForm
+									projects={projects}
 									users={users}
 									categories={categories}
 									isOpen={isDialogOpen}

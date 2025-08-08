@@ -20,6 +20,7 @@ export function DataTableTasks({
 	columns,
 	data,
 	selectedTaskHistory,
+	projects,
 	users,
 	categories,
 	setTasks,
@@ -224,6 +225,7 @@ export function DataTableTasks({
 								) : (
 									<TaskForm
 										// data={data}
+										projects={projects}
 										users={users}
 										categories={categories}
 										isOpen={isOpen}
