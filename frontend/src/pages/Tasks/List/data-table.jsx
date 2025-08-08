@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 import { format } from "date-fns";
-import History from "@/components/task/history";
+import History from "@/components/task/History";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({

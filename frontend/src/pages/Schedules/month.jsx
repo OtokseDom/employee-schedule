@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import TaskForm from "../Tasks/form";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Loader2 } from "lucide-react";
-import History from "@/components/task/history";
+import History from "@/components/task/History";
 
 export default function Month({
 	data,

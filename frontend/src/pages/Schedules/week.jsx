@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
-import History from "@/components/task/history";
+import History from "@/components/task/History";
 
 export default function Week({
 	data,
