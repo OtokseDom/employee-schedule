@@ -13,6 +13,7 @@ import Schedules from "./pages/Schedules";
 import Categories from "./pages/Categories/List";
 import Organization from "./pages/Organization";
 import ErrorFallback from "./pages/ErrorFallback";
+import Projects from "./pages/Projects/List";
 
 const router = createBrowserRouter([
 	{ path: "*", element: <NotFound /> },
@@ -38,10 +39,18 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/task",
+				path: "/tasks",
 				element: (
 					<ErrorFallback>
 						<Tasks />
+					</ErrorFallback>
+				),
+			},
+			{
+				path: "/projects",
+				element: (
+					<ErrorFallback>
+						<Projects />
 					</ErrorFallback>
 				),
 			},
