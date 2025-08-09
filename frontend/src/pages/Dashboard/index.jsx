@@ -25,13 +25,16 @@ export default function UserProfile() {
 		values: {
 			"Date Range": null,
 			Members: [],
+			Projects: [],
 		},
 		display: {
 			"Date Range": null,
 			Members: [],
+			Projects: [],
 		},
 	});
 	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [selectedProjects, setSelectedProjects] = useState([]);
 
 	useEffect(() => {
 		document.title = "Task Management";
@@ -56,7 +59,11 @@ export default function UserProfile() {
 			// fetch projects only if not already fetched
 			if (!projects) {
 				const projectResponse = await axiosClient.get(API().project());
-				setProjects(projectResponse.data.data);
+				const mappedProjects = projectResponse.data.data.map((project) => ({
+					value: project.id,
+					label: project.title,
+				}));
+				setProjects(mappedProjects);
 			}
 			setLoading(false);
 		} catch (e) {
@@ -76,12 +83,12 @@ export default function UserProfile() {
 		setFilters(updated);
 		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
 		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
-		const project = updated.values["Projects"] ?? "";
+		const projects = updated.values["Projects"] ?? "";
 		const members = updated.values["Members"] ?? "";
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(API().dashboard(from, to, members, project));
+			const reportsRes = await axiosClient.get(API().dashboard(from, to, members, projects));
 			setReports(reportsRes.data.data);
 			setLoading(false);
 		} catch (e) {
@@ -119,6 +126,8 @@ export default function UserProfile() {
 									filters={filters}
 									setFilters={setFilters}
 									projects={projects}
+									selectedProjects={selectedProjects}
+									setSelectedProjects={setSelectedProjects}
 									users={users}
 									selectedUsers={selectedUsers}
 									setSelectedUsers={setSelectedUsers}

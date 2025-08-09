@@ -11,5 +11,5 @@ export const API = (version = "v1") => ({
 	task: (id = "") => `/${version}/task${id ? `/${id}` : ""}`,
 	organization: (id = "") => `/${version}/organization${id ? `/${id}` : ""}`,
 	organization_generate_code: (id) => `/${version}/organization/${id}/generate-code`,
-	dashboard: (from = "", to = "", users = "", project = "") => `/${version}/dashboard?from=${from}&to=${to}&users=${users}&project=${project}`,
+	dashboard: (from = "", to = "", users = "", projects = "") => `/${version}/dashboard?from=${from}&to=${to}&users=${users}&projects=${projects}`,
 });

@@ -19,7 +19,7 @@ const formSchema = z
 	.object({
 		from: z.date().optional(),
 		to: z.date().optional(),
-		project_id: z.number().optional(),
+		// project_id: z.number().optional(),
 	})
 	.refine(
 		(data) => {
@@ -45,7 +45,19 @@ const formSchema = z
 		}
 	);
 
-export default function FilterForm({ setIsOpen, setReports, filters, setFilters, userId = null, projects, users, selectedUsers, setSelectedUsers }) {
+export default function FilterForm({
+	setIsOpen,
+	setReports,
+	filters,
+	setFilters,
+	userId = null,
+	projects,
+	selectedProjects,
+	setSelectedProjects,
+	users,
+	selectedUsers,
+	setSelectedUsers,
+}) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -53,7 +65,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 		defaultValues: {
 			from: undefined,
 			to: undefined,
-			project_id: undefined,
+			// project_id: undefined,
 		},
 	});
 
@@ -64,7 +76,18 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			const toStr = filters.values["Date Range"]?.split(" to ")[1] || undefined;
 			const from = fromStr ? new Date(fromStr) : undefined;
 			const to = fromStr ? new Date(toStr) : undefined;
-			const project_id = filters.values["Project"];
+			// const project_id = filters.values["Project"];
+			// Projects
+			const projectsRaw = filters.values["Projects"];
+			const projectIds = Array.isArray(projectsRaw)
+				? projectsRaw.map((id) => parseInt(id))
+				: typeof projectsRaw === "string"
+				? projectsRaw
+						?.split(",")
+						.map((id) => parseInt(id.trim()))
+						.filter((id) => !isNaN(id)) // to avoid [NaN] when projectsRaw is empty or non numeric
+				: [];
+			setSelectedProjects(projectIds); // crucial
 			// Users
 			const membersRaw = filters.values["Members"];
 			const userIds = Array.isArray(membersRaw)
@@ -79,7 +102,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			form.reset({
 				from: from ?? undefined,
 				to: to ?? undefined,
-				project_id: project_id ?? undefined,
+				// project_id: project_id ?? undefined,
 			});
 		}
 	}, [filters, form]);
@@ -89,29 +112,31 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 		try {
 			const from = form_filter?.from ? form_filter.from.toLocaleDateString("en-CA") : "";
 			const to = form_filter?.to ? form_filter.to.toLocaleDateString("en-CA") : "";
-			const project = form_filter.project_id ? projects?.find((project) => project.id == form_filter.project_id) : "";
+			// const project = form_filter.project_id ? projects?.find((project) => project.id == form_filter.project_id) : "";
+			const selected_projects = form_filter?.selected_projects || []; // this only gets the IDs of selected projects
+			const selectedProjectObjects = projects?.filter((p) => selected_projects.includes(p.value)); // this maps the IDs to project objects
 			const selected_users = form_filter?.selected_users || []; // this only gets the IDs of selected users
 			const selectedUserObjects = users?.filter((u) => selected_users.includes(u.value)); // this maps the IDs to user objects
 			let filteredReports;
 			if (!userId) {
-				filteredReports = await axiosClient.get(API().dashboard(from, to, selected_users.join(","), project?.id));
+				filteredReports = await axiosClient.get(API().dashboard(from, to, selected_users.join(","), selected_projects.join(",")));
 				setFilters({
 					values: {
 						"Date Range": `${from && to ? from + " to " + to : ""}`,
 						Members: selectedUserObjects?.map((u) => u.value).join(", ") || "",
-						Project: project.id || null,
+						Projects: selectedProjectObjects?.map((p) => p.value).join(", ") || "",
 					},
 					display: {
 						"Date Range": `${from && to ? from + " to " + to : ""}`,
 						Members: selectedUserObjects?.map((u) => u.label).join(", ") || "",
-						Project: project.title || "",
+						Projects: selectedProjectObjects?.map((p) => p.label).join(", ") || "",
 					},
 				});
 			} else {
-				filteredReports = await axiosClient.get(API().user_reports(userId, from, to, project?.id));
+				filteredReports = await axiosClient.get(API().user_reports(userId, from, to, selected_projects.join(",")));
 				setFilters({
 					"Date Range": `${from && to ? from + " to " + to : ""}`,
-					Project: project.title || null,
+					Projects: selectedProjectObjects?.map((p) => p.label).join(", ") || "",
 				});
 			}
 			setReports(filteredReports.data.data);
@@ -129,7 +154,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 			<form
 				onSubmit={form.handleSubmit((form_filter) => {
 					// Include selectedUsers in the filter object
-					handleSubmit({ ...form_filter, selected_users: selectedUsers });
+					handleSubmit({ ...form_filter, selected_users: selectedUsers, selected_projects: selectedProjects });
 				})}
 				className="flex flex-col gap-4 max-w-md w-full"
 			>
@@ -157,7 +182,7 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 						)}
 					/>
 				</div>
-				<FormField
+				{/* <FormField
 					control={form.control}
 					name="project_id"
 					render={({ field }) => {
@@ -185,6 +210,29 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 									</SelectContent>
 								</Select>
 								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/> */}
+				<FormField
+					control={form.control}
+					name="selected_projects"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Projects</FormLabel>
+								<FormControl>
+									<MultiSelect
+										field={field}
+										options={projects || []}
+										onValueChange={setSelectedProjects}
+										defaultValue={selectedProjects}
+										placeholder="Select projects"
+										variant="inverted"
+										animation={2}
+										maxCount={3}
+									/>
+								</FormControl>
 							</FormItem>
 						);
 					}}
@@ -217,7 +265,10 @@ export default function FilterForm({ setIsOpen, setReports, filters, setFilters,
 				<Button
 					type="submit"
 					disabled={
-						loading || ((!form.watch("from") || !form.watch("to")) && (selectedUsers?.length === 0 || !selectedUsers) && !form.watch("project_id"))
+						loading ||
+						((!form.watch("from") || !form.watch("to")) &&
+							(selectedUsers?.length === 0 || !selectedUsers) &&
+							(selectedProjects?.length === 0 || !selectedProjects))
 					}
 					className="w-full"
 					variant="default"
