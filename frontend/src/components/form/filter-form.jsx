@@ -89,16 +89,18 @@ export default function FilterForm({
 				: [];
 			setSelectedProjects(projectIds); // crucial
 			// Users
-			const membersRaw = filters.values["Members"];
-			const userIds = Array.isArray(membersRaw)
-				? membersRaw.map((id) => parseInt(id))
-				: typeof membersRaw === "string"
-				? membersRaw
-						?.split(",")
-						.map((id) => parseInt(id.trim()))
-						.filter((id) => !isNaN(id)) // to avoid [NaN] when membersRaw is empty or non numeric
-				: [];
-			setSelectedUsers(userIds); // crucial
+			if (!userId) {
+				const membersRaw = filters.values["Members"];
+				const userIds = Array.isArray(membersRaw)
+					? membersRaw.map((id) => parseInt(id))
+					: typeof membersRaw === "string"
+					? membersRaw
+							?.split(",")
+							.map((id) => parseInt(id.trim()))
+							.filter((id) => !isNaN(id)) // to avoid [NaN] when membersRaw is empty or non numeric
+					: [];
+				setSelectedUsers(userIds); // crucial
+			}
 			form.reset({
 				from: from ?? undefined,
 				to: to ?? undefined,
@@ -135,8 +137,14 @@ export default function FilterForm({
 			} else {
 				filteredReports = await axiosClient.get(API().user_reports(userId, from, to, selected_projects.join(",")));
 				setFilters({
-					"Date Range": `${from && to ? from + " to " + to : ""}`,
-					Projects: selectedProjectObjects?.map((p) => p.label).join(", ") || "",
+					values: {
+						"Date Range": `${from && to ? from + " to " + to : ""}`,
+						Projects: selectedProjectObjects?.map((p) => p.value).join(", ") || "",
+					},
+					display: {
+						"Date Range": `${from && to ? from + " to " + to : ""}`,
+						Projects: selectedProjectObjects?.map((p) => p.label).join(", ") || "",
+					},
 				});
 			}
 			setReports(filteredReports.data.data);

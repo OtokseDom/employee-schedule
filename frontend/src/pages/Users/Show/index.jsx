@@ -43,8 +43,17 @@ export default function UserProfile() {
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
 	const [filters, setFilters] = useState({
-		"Date Range": null,
+		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
+		values: {
+			"Date Range": null,
+			Projects: [],
+		},
+		display: {
+			"Date Range": null,
+			Projects: [],
+		},
 	});
+	const [selectedProjects, setSelectedProjects] = useState([]);
 	const navigate = useNavigate();
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
@@ -75,11 +84,14 @@ export default function UserProfile() {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes?.data?.data);
 			setTaskHistory(reportsRes?.data?.data?.user_tasks?.task_history);
-
 			// fetch projects only if not already fetched
 			if (!projects) {
 				const projectResponse = await axiosClient.get(API().project());
-				setProjects(projectResponse?.data?.data);
+				const mappedProjects = projectResponse.data.data.map((project) => ({
+					value: project.id,
+					label: project.title,
+				}));
+				setProjects(mappedProjects);
 			}
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -160,14 +172,21 @@ export default function UserProfile() {
 		}
 	};
 	const handleRemoveFilter = async (key) => {
-		const updated = { ...filters };
-		delete updated[key];
+		// const updated = { ...filters };
+		const updated = {
+			values: { ...filters.values },
+			display: { ...filters.display },
+		};
+		delete updated.values[key];
+		delete updated.display[key];
 		setFilters(updated);
-		// Since we only have date filter, we just remove params on handleRemoveFilter
+		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
+		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
+		const projects = updated.values["Projects"] ?? "";
 		setLoading(true);
 		try {
 			// Fetch all user reports in one call
-			const reportsRes = await axiosClient.get(API().user_reports(id));
+			const reportsRes = await axiosClient.get(API().user_reports(id, from, to, projects));
 			setUserReports(reportsRes?.data?.data);
 			setLoading(false);
 		} catch (e) {
@@ -220,11 +239,13 @@ export default function UserProfile() {
 								filters={filters}
 								setFilters={setFilters}
 								projects={projects}
+								selectedProjects={selectedProjects}
+								setSelectedProjects={setSelectedProjects}
 								userId={id}
 							/>
 						</DialogContent>
 					</Dialog>
-					<FilterTags filters={filters} onRemove={handleRemoveFilter} />
+					<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
