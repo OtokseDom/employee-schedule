@@ -150,6 +150,7 @@ export default function UserProfile() {
 							? "Overall Progress (Filtered)"
 							: "Overall Progress (All Time)"
 					}
+					variant="dashboard"
 					className="w-full"
 				/>
 			</div>

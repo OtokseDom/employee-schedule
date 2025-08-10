@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-export default function GalaxyProgressBar({ progress = 0, label = "Overall Progress", showPercentage = true }) {
+export default function GalaxyProgressBar({ progress = 0, label = "Overall Progress", showPercentage = true, variant = "" }) {
 	const [animatedProgress, setAnimatedProgress] = useState(0);
 
 	// Track theme (dark/light) by observing <html> class changes
@@ -54,10 +54,11 @@ export default function GalaxyProgressBar({ progress = 0, label = "Overall Progr
 
 	return (
 		<div
-			className="w-full mx-auto p-5 backdrop-blur-sm rounded-md border relative overflow-hidden"
+			className="w-full mx-auto p-5 backdrop-blur-sm border relative overflow-hidden"
 			style={{
 				background: `linear-gradient(to bottom right, ${galaxyGradient05}, ${galaxyGradient1}), ${galaxyBg}`,
-				borderColor: galaxyColors[2],
+				borderColor: galaxyColors[6],
+				borderRadius: variant == "dashboard" ? "6px" : "16px",
 				// boxShadow: `0 0 5px ${galaxyColors[6]}55`,
 			}}
 		>
