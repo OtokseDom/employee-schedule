@@ -65,7 +65,7 @@ export default function GalaxyProgressBar({ progress = 0, label = "Overall Progr
 			<div
 				className="absolute inset-0 pointer-events-none z-[5]"
 				style={{
-					backgroundColor: "rgba(120, 0, 128, 0.15)", // adjust alpha for intensity
+					backgroundColor: "rgba(120, 0, 128, 0.05)", // adjust alpha for intensity
 					mixBlendMode: "screen", // try 'overlay', 'screen', or 'soft-light'
 				}}
 			></div>

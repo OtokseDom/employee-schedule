@@ -29,6 +29,7 @@ class UserReportController extends Controller
             'performance_rating_trend' => $this->report_service->performanceRatingTrend($id, "", $filter),
             'estimate_vs_actual' => $this->report_service->userEstimateVsActual($id, $filter),
             'section_cards' => $this->report_service->sectionCards($id, $filter),
+            'overall_progress' => $this->report_service->overallProgress($id, $filter),
         ];
 
         $data = [];

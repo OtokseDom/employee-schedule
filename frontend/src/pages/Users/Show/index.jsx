@@ -22,6 +22,7 @@ import { SectionCard } from "@/components/chart/section-card";
 import FilterForm from "@/components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
+import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
@@ -246,6 +247,10 @@ export default function UserProfile() {
 						</DialogContent>
 					</Dialog>
 					<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
+				</div>
+				{/* Overall Progress */}
+				<div className="md:col-span-12 w-full">
+					<GalaxyProgressBar progress={userReports?.overall_progress?.progress} className="w-full" />
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">

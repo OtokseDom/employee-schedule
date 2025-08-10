@@ -141,11 +141,11 @@ export default function UserProfile() {
 			<div className="md:col-span-12 flex flex-wrap justify-end gap-2">
 				<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
 			</div>
-			{/* Section Cards */}
-			{/* <div className="col-span-12 text-center"> */}
+			{/* Overall Progress */}
 			<div className="md:col-span-12 w-full">
 				<GalaxyProgressBar progress={reports?.overall_progress?.progress} className="w-full" />
 			</div>
+			{/* Section Cards */}
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
 				{/* <SectionCard description={`Active Members`} showBadge={false} value={reports?.section_cards?.user_count} variant="dashboard" /> */}
 				<SectionCard description="Members Avg Performance (10)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
