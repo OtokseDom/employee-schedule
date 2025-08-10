@@ -24,6 +24,7 @@ class DashboardReportController extends Controller
             'performance_leaderboard' => $this->report_service->performanceLeaderboard($filter),
             'performance_rating_trend' => $this->report_service->performanceRatingTrend(null, "dashboard", $filter),
             'section_cards' => $this->report_service->sectionCards(null, $filter),
+            'overall_progress' => $this->report_service->overallProgress(null, $filter),
         ];
 
         $data = [];

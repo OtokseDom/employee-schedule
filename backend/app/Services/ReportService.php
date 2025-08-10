@@ -31,6 +31,46 @@ class ReportService
     /**
      * Display reports for section cards. Section Cards
      */
+    public function overallProgress($id = null, $filter)
+    {
+        $progress_query = $this->task->where('organization_id', $this->organization_id);
+
+        if ($id) {
+            $progress_query->where('assignee_id', $id);
+        }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $progress_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['projects'])) {
+            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
+            $progress_query->whereIn('project_id', $projectIds);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $progress_query->whereIn('assignee_id', $userIds);
+        }
+        // Total tasks excluding cancelled
+        $totalTasks = (clone $progress_query)->where('status', '!=', 'cancelled')->count();
+        // Completed tasks count
+        $completedTasks = (clone $progress_query)->where('status', 'completed')->count();
+
+        $progress = $totalTasks > 0
+            ? round(($completedTasks / $totalTasks) * 100, 2)
+            : 0;
+
+        $data = [
+            'progress' => $progress,
+        ];
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch progress', false, 404);
+        }
+
+        return apiResponse($data, "Progress report fetched successfully");
+    }
+    /**
+     * Display reports for section cards. Section Cards
+     */
     public function sectionCards($id = null, $filter)
     {
         /* ------------------------- // Average Performance ------------------------- */
@@ -197,7 +237,6 @@ class ReportService
         // return response($data);
         $data = [
             'chart_data' => $chart_data,
-            'filters' => $filter,
         ];
 
         if (empty($data)) {
@@ -271,7 +310,6 @@ class ReportService
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
             'task_count' => $task_count,
-            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {
@@ -309,7 +347,6 @@ class ReportService
         $data = [
             'data' => $userTasks,
             'task_history' => TaskHistoryResource::collection($task_history),
-            'filters' => $filter
         ];
         if (empty($data)) {
             return apiResponse(null, 'No tasks assigned to this user', false, 404);
@@ -373,7 +410,6 @@ class ReportService
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
             'task_count' => $task_count,
-            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {
@@ -493,7 +529,6 @@ class ReportService
             'chart_data' => $chart_data,
             'runs' => $runs,
             'task_count' => $taskCount,
-            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -547,7 +582,6 @@ class ReportService
             'highest' => $highest,
             'lowest' => $lowest,
             'count' => $chart_data->count(),
-            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -590,7 +624,6 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
-            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -639,7 +672,6 @@ class ReportService
             'chart_data' => $chart_data,
             'runs' => $runs,
             'task_count' => $categoryCount,
-            'filters' => $filter
         ];
 
         if (empty($data)) {
