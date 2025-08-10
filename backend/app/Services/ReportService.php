@@ -60,6 +60,7 @@ class ReportService
 
         $data = [
             'progress' => $progress,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -166,6 +167,7 @@ class ReportService
             'avg_completion_time' => round($avg_completion_time, 2),
             'time_efficiency' => round($time_efficiency, 2),
             'completion_rate' => round($completion_rate, 2),
+            'filters' => $filter
         ];
         if (empty($data)) {
             return apiResponse(null, 'Failed to fetch active users report', false, 404);
@@ -237,6 +239,7 @@ class ReportService
         // return response($data);
         $data = [
             'chart_data' => $chart_data,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -310,6 +313,7 @@ class ReportService
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
             'task_count' => $task_count,
+            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {
@@ -347,6 +351,7 @@ class ReportService
         $data = [
             'data' => $userTasks,
             'task_history' => TaskHistoryResource::collection($task_history),
+            'filters' => $filter
         ];
         if (empty($data)) {
             return apiResponse(null, 'No tasks assigned to this user', false, 404);
@@ -410,6 +415,7 @@ class ReportService
             'percentage_difference' => $percentageDifference,
             'chart_data' => $chart_data,
             'task_count' => $task_count,
+            'filters' => $filter
         ];
 
         if (empty($data['chart_data'])) {
@@ -529,6 +535,7 @@ class ReportService
             'chart_data' => $chart_data,
             'runs' => $runs,
             'task_count' => $taskCount,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -582,6 +589,7 @@ class ReportService
             'highest' => $highest,
             'lowest' => $lowest,
             'count' => $chart_data->count(),
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -624,6 +632,7 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
@@ -672,6 +681,7 @@ class ReportService
             'chart_data' => $chart_data,
             'runs' => $runs,
             'task_count' => $categoryCount,
+            'filters' => $filter
         ];
 
         if (empty($data)) {
