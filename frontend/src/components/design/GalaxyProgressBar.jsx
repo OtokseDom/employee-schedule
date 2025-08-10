@@ -131,7 +131,7 @@ export default function GalaxyProgressBar({ progress = 0, label = "Overall Progr
 				{showPercentage && (
 					<div className="flex justify-end mt-2">
 						<span className="text-sm font-medium" style={{ color: galaxyColors[6] }}>
-							{Math.round(animatedProgress)}%
+							{animatedProgress}%
 						</span>
 					</div>
 				)}

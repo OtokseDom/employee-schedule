@@ -143,7 +143,15 @@ export default function UserProfile() {
 			</div>
 			{/* Overall Progress */}
 			<div className="md:col-span-12 w-full">
-				<GalaxyProgressBar progress={reports?.overall_progress?.progress} className="w-full" />
+				<GalaxyProgressBar
+					progress={reports?.overall_progress?.progress}
+					label={
+						reports?.overall_progress?.filters && !Object.values(reports.overall_progress.filters).every((value) => value === null)
+							? "Overall Progress (Filtered)"
+							: "Overall Progress (All Time)"
+					}
+					className="w-full"
+				/>
 			</div>
 			{/* Section Cards */}
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
