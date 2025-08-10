@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import FilterForm from "../../components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
+import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const [reports, setReports] = useState();
@@ -141,6 +142,10 @@ export default function UserProfile() {
 				<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
 			</div>
 			{/* Section Cards */}
+			{/* <div className="col-span-12 text-center"> */}
+			<div className="md:col-span-12 w-full">
+				<GalaxyProgressBar progress={reports?.overall_progress?.progress} className="w-full" />
+			</div>
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
 				{/* <SectionCard description={`Active Members`} showBadge={false} value={reports?.section_cards?.user_count} variant="dashboard" /> */}
 				<SectionCard description="Members Avg Performance (10)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
