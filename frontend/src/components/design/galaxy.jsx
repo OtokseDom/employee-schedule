@@ -109,8 +109,9 @@ export default function GalaxyProfileBanner({ children }) {
 			if (!drawNebula.bgGradient || drawNebula.bgW !== canvas.width || drawNebula.bgH !== canvas.height) {
 				drawNebula.bgGradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
 				drawNebula.bgGradient.addColorStop(0, galaxyGradient0);
-				drawNebula.bgGradient.addColorStop(0.5, galaxyGradient05);
+				drawNebula.bgGradient.addColorStop(0.5, galaxyGradient1);
 				drawNebula.bgGradient.addColorStop(1, galaxyGradient1);
+
 				drawNebula.bgW = canvas.width;
 				drawNebula.bgH = canvas.height;
 			}
