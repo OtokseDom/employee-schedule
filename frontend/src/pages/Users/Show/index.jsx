@@ -32,6 +32,7 @@ export default function UserProfile() {
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const [users, setUsers] = useState([]);
 	const [projects, setProjects] = useState();
+	const [filterProjects, setFilterProjects] = useState();
 	const [taskHistory, setTaskHistory] = useState([]);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	const [showHistory, setShowHistory] = useState(false);
@@ -85,15 +86,6 @@ export default function UserProfile() {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes?.data?.data);
 			setTaskHistory(reportsRes?.data?.data?.user_tasks?.task_history);
-			// fetch projects only if not already fetched
-			if (!projects) {
-				const projectResponse = await axiosClient.get(API().project());
-				const mappedProjects = projectResponse.data.data.map((project) => ({
-					value: project.id,
-					label: project.title,
-				}));
-				setProjects(mappedProjects);
-			}
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -104,7 +96,17 @@ export default function UserProfile() {
 		setLoading(true);
 		try {
 			// selection items
-			const [userResponse, categoryResponse] = await Promise.all([axiosClient.get(API().user()), axiosClient.get(API().category())]);
+			const [projectResponse, userResponse, categoryResponse] = await Promise.all([
+				axiosClient.get(API().project()),
+				axiosClient.get(API().user()),
+				axiosClient.get(API().category()),
+			]);
+			const mappedProjects = projectResponse.data.data.map((project) => ({
+				value: project.id,
+				label: project.title,
+			}));
+			setFilterProjects(mappedProjects);
+			setProjects(projectResponse?.data?.data);
 			setCategories(categoryResponse?.data?.data);
 			setUsers(userResponse?.data?.data);
 		} catch (e) {
@@ -239,7 +241,7 @@ export default function UserProfile() {
 								setReports={setUserReports}
 								filters={filters}
 								setFilters={setFilters}
-								projects={projects}
+								projects={filterProjects}
 								selectedProjects={selectedProjects}
 								setSelectedProjects={setSelectedProjects}
 								userId={id}
@@ -324,6 +326,7 @@ export default function UserProfile() {
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }, false)}
 							data={userReports?.user_tasks?.data || []}
 							selectedTaskHistory={selectedTaskHistory}
+							projects={projects}
 							users={users}
 							categories={categories}
 							updateData={updateData}
