@@ -35,8 +35,8 @@ class TaskResource extends JsonResource
             'delay_reason' => $this->delay_reason,
             'performance_rating' => $this->performance_rating,
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'assignee' => $this->whenLoaded('assignee', function () {
                 return [
                     'name' => $this->assignee->name,
@@ -64,18 +64,18 @@ class TaskResource extends JsonResource
                     'title' => $this->parent->title,
                 ];
             }),
+            // 'children' => $this->whenLoaded('children', function () {
+            //     return $this->children->map(function ($child) {
+            //         if ($child instanceof \Illuminate\Http\Resources\MissingValue) {
+            //             return null; // or skip this child
+            //         }
+            //         return (new self($child))->toArray(request());
+            //     })->filter(); // remove nulls
+            // }),
             'children' => $this->whenLoaded('children', function () {
                 return $this->children->map(function ($child) {
-                    return [
-                        'id' => $child->id,
-                        'title' => $child->title,
-                        'description' => $child->description,
-                        'status' => $child->status,
-                        'assignee' => $child->assignee ? [
-                            'name' => $child->assignee->name,
-                            'email' => $child->assignee->email,
-                        ] : null,
-                    ];
+                    // Use the same resource recursively to include full fields
+                    return (new self($child))->toArray(request());
                 });
             }),
 

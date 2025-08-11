@@ -83,11 +83,17 @@ class Task extends Model
             'category',
             'project:id,title',
             'parent:id,title',
-            'children:id,parent_id,title,description,status,assignee_id',
-            'children.assignee:id,name,email'
+            'children' => function ($query) {
+                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    ->with([
+                        'assignee:id,name,email,role,position',
+                        'project:id,title',
+                        'category'
+                    ]);
+            },
         ])
             ->where('organization_id', $organization_id)
-            ->orderBy('id', 'DESC')->get());
+            ->orderBy('id', 'ASC')->get());
     }
 
     public function storeTask($request, $userData)
@@ -98,8 +104,14 @@ class Task extends Model
             'category',
             'project:id,title',
             'parent:id,title',
-            'children:id,parent_id,title,description,status,assignee_id',
-            'children.assignee:id,name,email'
+            'children' => function ($query) {
+                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    ->with([
+                        'assignee:id,name,email,role,position',
+                        'project:id,title',
+                        'category'
+                    ]);
+            },
         ]);
 
         // Record Addition in Task History
@@ -121,8 +133,14 @@ class Task extends Model
             'category',
             'project:id,title',
             'parent:id,title',
-            'children:id,parent_id,title,description,status,assignee_id',
-            'children.assignee:id,name,email'
+            'children' => function ($query) {
+                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    ->with([
+                        'assignee:id,name,email,role,position',
+                        'project:id,title',
+                        'category'
+                    ]);
+            },
         ])
             ->where('id', $id)
             ->where('organization_id', $organization_id)
@@ -142,8 +160,14 @@ class Task extends Model
             'category',
             'project:id,title',
             'parent:id,title',
-            'children:id,parent_id,title,description,status,assignee_id',
-            'children.assignee:id,name,email'
+            'children' => function ($query) {
+                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    ->with([
+                        'assignee:id,name,email,role,position',
+                        'project:id,title',
+                        'category'
+                    ]);
+            },
         ]);
 
         // Build changes as a JSON object for task history
