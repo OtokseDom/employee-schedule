@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('cascade')->onUpdate('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('expected_output')->nullable();
