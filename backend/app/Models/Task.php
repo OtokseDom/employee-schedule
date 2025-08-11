@@ -14,6 +14,7 @@ class Task extends Model
         'organization_id',
         'project_id',
         'category_id',
+        'parent_id',
         'title',
         'description',
         'expected_output',
@@ -48,6 +49,18 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
+    // A task may have a parent
+    public function parent()
+    {
+        return $this->belongsTo(Task::class, 'parent_id');
+    }
+
+    // A task may have many children
+    public function children()
+    {
+        return $this->hasMany(Task::class, 'parent_id');
+    }
+
     // Relationship with TaskHistory
     public function taskHistories()
     {
@@ -65,7 +78,14 @@ class Task extends Model
     /* -------------------------------------------------------------------------- */
     public function getTasks($organization_id)
     {
-        return TaskResource::collection($this->with(['assignee:id,name,email,role,position', 'category', 'project:id,title'])
+        return TaskResource::collection($this->with([
+            'assignee:id,name,email,role,position',
+            'category',
+            'project:id,title',
+            'parent:id,title',
+            'children:id,parent_id,title,description,status,assignee_id',
+            'children.assignee:id,name,email'
+        ])
             ->where('organization_id', $organization_id)
             ->orderBy('id', 'DESC')->get());
     }
@@ -73,7 +93,14 @@ class Task extends Model
     public function storeTask($request, $userData)
     {
         $task = $this->create($request->validated());
-        $task->load(['assignee:id,name,email', 'category']);
+        $task->load([
+            'assignee:id,name,email',
+            'category',
+            'project:id,title',
+            'parent:id,title',
+            'children:id,parent_id,title,description,status,assignee_id',
+            'children.assignee:id,name,email'
+        ]);
 
         // Record Addition in Task History
         $task->taskHistories()->create([
@@ -89,7 +116,14 @@ class Task extends Model
 
     public function showTask($id, $organization_id)
     {
-        $task = $this->with(['assignee:id,name,email,role,position', 'category'])
+        $task = $this->with([
+            'assignee:id,name,email,role,position',
+            'category',
+            'project:id,title',
+            'parent:id,title',
+            'children:id,parent_id,title,description,status,assignee_id',
+            'children.assignee:id,name,email'
+        ])
             ->where('id', $id)
             ->where('organization_id', $organization_id)
             ->first();
@@ -103,7 +137,14 @@ class Task extends Model
         $original = $task->getOriginal();
         $validated = $request->validated();
         $task->update($validated);
-        $task->load(['assignee:id,name,email,role,position']);
+        $task->load([
+            'assignee:id,name,email,role,position',
+            'category',
+            'project:id,title',
+            'parent:id,title',
+            'children:id,parent_id,title,description,status,assignee_id',
+            'children.assignee:id,name,email'
+        ]);
 
         // Build changes as a JSON object for task history
         $changes = [];
@@ -147,6 +188,17 @@ class Task extends Model
                 $user = new User();
                 $orig = isset($original[$key]) ? optional($user->find($original[$key]))->name : null;
                 $val = $value ? optional($user->find($value))->name : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
+                    ];
+                }
+            } else if (in_array($key, ['parent_id'])) {
+                // save parent title instead of id in task history
+                $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
+                $val = $value ? optional($this->find($value))->title : null;
 
                 if ($orig !== $val) {
                     $changes[$key] = [
