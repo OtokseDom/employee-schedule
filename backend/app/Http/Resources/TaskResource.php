@@ -67,6 +67,7 @@ class TaskResource extends JsonResource
             'children' => $this->whenLoaded('children', function () {
                 return $this->children->map(function ($child) {
                     return [
+                        'id' => $child->id,
                         'title' => $child->title,
                         'description' => $child->description,
                         'status' => $child->status,
