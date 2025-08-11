@@ -15,106 +15,113 @@ import Organization from "./pages/Organization";
 import ErrorFallback from "./pages/ErrorFallback";
 import Projects from "./pages/Projects/List";
 
-const router = createBrowserRouter([
-	{ path: "*", element: <NotFound /> },
+const router = createBrowserRouter(
+	[
+		{ path: "*", element: <NotFound /> },
+		{
+			path: "/",
+			element: <AdminLayout />,
+			children: [
+				{ path: "/", element: <Navigate to="/dashboard" /> },
+				{
+					path: "/dashboard",
+					element: (
+						<ErrorFallback>
+							<Dashboard />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/calendar",
+					element: (
+						<ErrorFallback>
+							<Schedules />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/tasks",
+					element: (
+						<ErrorFallback>
+							<Tasks />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/projects",
+					element: (
+						<ErrorFallback>
+							<Projects />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/users",
+					element: (
+						<ErrorFallback>
+							<Users />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/users/:id",
+					element: (
+						<ErrorFallback>
+							<UserProfile />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/settings",
+					children: [
+						{
+							path: "categories",
+							element: (
+								<ErrorFallback>
+									<Categories />
+								</ErrorFallback>
+							),
+						},
+						{
+							path: "organization",
+							element: (
+								<ErrorFallback>
+									<Organization />
+								</ErrorFallback>
+							),
+						},
+					],
+				},
+			],
+		},
+		{
+			path: "/",
+			element: <GuestLayout />,
+			children: [
+				{
+					path: "/login",
+					element: (
+						<ErrorFallback>
+							<Login />
+						</ErrorFallback>
+					),
+				},
+				{
+					path: "/signup",
+					element: (
+						<ErrorFallback>
+							<Signup />
+						</ErrorFallback>
+					),
+				},
+			],
+		},
+	],
 	{
-		path: "/",
-		element: <AdminLayout />,
-		children: [
-			{ path: "/", element: <Navigate to="/dashboard" /> },
-			{
-				path: "/dashboard",
-				element: (
-					<ErrorFallback>
-						<Dashboard />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/calendar",
-				element: (
-					<ErrorFallback>
-						<Schedules />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/tasks",
-				element: (
-					<ErrorFallback>
-						<Tasks />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/projects",
-				element: (
-					<ErrorFallback>
-						<Projects />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/users",
-				element: (
-					<ErrorFallback>
-						<Users />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/users/:id",
-				element: (
-					<ErrorFallback>
-						<UserProfile />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/settings",
-				children: [
-					{
-						path: "categories",
-						element: (
-							<ErrorFallback>
-								<Categories />
-							</ErrorFallback>
-						),
-					},
-					{
-						path: "organization",
-						element: (
-							<ErrorFallback>
-								<Organization />
-							</ErrorFallback>
-						),
-					},
-				],
-			},
-		],
-	},
-	{
-		path: "/",
-		element: <GuestLayout />,
-		children: [
-			{
-				path: "/login",
-				element: (
-					<ErrorFallback>
-						<Login />
-					</ErrorFallback>
-				),
-			},
-			{
-				path: "/signup",
-				element: (
-					<ErrorFallback>
-						<Signup />
-					</ErrorFallback>
-				),
-			},
-		],
-	},
-]);
+		future: {
+			v7_startTransition: true,
+		},
+	}
+);
 
 export default router;
