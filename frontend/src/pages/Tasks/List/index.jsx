@@ -19,6 +19,34 @@ export default function Tasks() {
 	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [showHistory, setShowHistory] = useState(false);
+	// Show children on table
+	function flattenTasks(tasks) {
+		// Get IDs of all children
+		const childIds = new Set();
+		tasks.forEach((task) => {
+			task.children?.forEach((child) => {
+				childIds.add(child.id);
+			});
+		});
+
+		// Filter only tasks NOT in children list (top-level only)
+		const topLevelTasks = tasks.filter((task) => !childIds.has(task.id));
+
+		const flatten = (taskList, depth = 0) => {
+			let flat = [];
+			for (const task of taskList) {
+				flat.push({ ...task, depth });
+				if (task.children?.length) {
+					flat = flat.concat(flatten(task.children, depth + 1));
+				}
+			}
+			return flat;
+		};
+
+		return flatten(topLevelTasks);
+	}
+
+	const tableData = flattenTasks(tasks);
 	// Add comments from users
 	useEffect(() => {
 		if (!isOpen) {
@@ -83,7 +111,7 @@ export default function Tasks() {
 			</div>
 			<DataTableTasks
 				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory })}
-				data={tasks}
+				data={tableData}
 				selectedTaskHistory={selectedTaskHistory}
 				projects={projects}
 				users={users}

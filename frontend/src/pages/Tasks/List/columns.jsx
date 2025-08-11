@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, CornerDownRight } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -35,11 +35,12 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistor
 				);
 			},
 			cell: ({ row }) => {
-				const status = row.original.status;
+				const { status, depth } = row.original;
 
 				return (
-					<div className=" min-w-24">
-						<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
+					<div className="flex flex-row min-w-24" style={{ paddingLeft: depth * 40 }}>
+						{depth == 1 ? <CornerDownRight size={18} /> : ""}
+						<span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
 							{status.replace("_", " ")}
 						</span>
 					</div>
