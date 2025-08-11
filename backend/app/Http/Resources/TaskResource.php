@@ -19,6 +19,7 @@ class TaskResource extends JsonResource
             'organization_id' => $this->organization_id,
             'project_id' => $this->project_id,
             'category_id' => $this->category_id,
+            'parent_id' => $this->parent_id,
             'title' => $this->title,
             'description' => $this->description,
             'expected_output' => $this->expected_output,
@@ -58,6 +59,26 @@ class TaskResource extends JsonResource
                 ];
             }),
             'category' => new CategoryResource($this->whenLoaded('category')),
+            'parent' => $this->whenLoaded('parent', function () {
+                return [
+                    'title' => $this->parent->title,
+                ];
+            }),
+            'children' => $this->whenLoaded('children', function () {
+                return $this->children->map(function ($child) {
+                    return [
+                        'title' => $child->title,
+                        'description' => $child->description,
+                        'status' => $child->status,
+                        'assignee' => $child->assignee ? [
+                            'name' => $child->assignee->name,
+                            'email' => $child->assignee->email,
+                        ] : null,
+                    ];
+                });
+            }),
+
+
         ];
     }
 }
