@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -14,6 +15,13 @@ class UpdateTaskRequest extends FormRequest
         return true;
     }
 
+    // Used for validating no_grandchildren in AppServiceProvider
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'id' => $this->route('task') ? $this->route('task')->id : null,
+        ]);
+    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,6 +33,17 @@ class UpdateTaskRequest extends FormRequest
             'organization_id' => 'required|exists:organizations,id',
             'project_id' => 'required|exists:projects,id',
             'category_id' => 'required|exists:categories,id',
+            'parent_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('tasks', 'id'),
+                'no_grandchildren',
+                function ($attribute, $value, $fail) {
+                    if ($value && $this->id && (int) $value === (int) $this->id) {
+                        $fail('A task cannot be its own parent.');
+                    }
+                },
+            ],
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
@@ -54,6 +73,8 @@ class UpdateTaskRequest extends FormRequest
             'organization_id.required' => 'Organization is required.',
             'project_id.required' => 'Project is required.',
             'category_id.required' => 'Category is required.',
+            'parent_id.exists' => 'The selected parent task does not exist.',
+            'parent_id.no_grandchildren' => 'Tasks can only be a parent or a child, but not both (no grandchildren allowed).',
             'title.required' => 'Title is required.',
             'status.required' => 'Status is required.',
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
