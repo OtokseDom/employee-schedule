@@ -62,7 +62,7 @@ export function DataTableProjects({ columns, data, setProjects, isOpen, setIsOpe
 						)}
 						<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 							<SheetHeader>
-								<SheetTitle>{updateData?.id ? "Update Category" : "Add Category"}</SheetTitle>
+								<SheetTitle>{updateData?.id ? "Update Project" : "Add Project"}</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
 							<ProjectForm
