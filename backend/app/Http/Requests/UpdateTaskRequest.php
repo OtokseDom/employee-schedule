@@ -21,6 +21,9 @@ class UpdateTaskRequest extends FormRequest
         $this->merge([
             'id' => $this->route('task') ? $this->route('task')->id : null,
         ]);
+        if ($this->parent_id === 0 || $this->parent_id === '0') {
+            $this->merge(['parent_id' => null]);
+        }
     }
     /**
      * Get the validation rules that apply to the request.
