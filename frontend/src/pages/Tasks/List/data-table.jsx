@@ -165,7 +165,7 @@ export function DataTableTasks({
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : (
 									<TaskForm
-										// data={data}
+										tasks={data}
 										projects={projects}
 										users={users}
 										categories={categories}

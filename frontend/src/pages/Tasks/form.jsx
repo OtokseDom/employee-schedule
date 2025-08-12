@@ -18,6 +18,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 
 const formSchema = z.object({
+	parent_id: z.number().optional(),
 	assignee_id: z.number({
 		required_error: "Assignee is required.",
 	}),
@@ -49,10 +50,13 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ projects, users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ tasks, projects, users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
+	const parentTasks = () => {
+		return tasks.filter((task) => task.parent_id == null) || [];
+	};
 
 	// State for time_estimate and delay hour/minute fields
 	const [timeEstimateHour, setTimeEstimateHour] = useState("");
@@ -69,6 +73,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 			calendar_add: false,
 			title: "",
 			description: "",
+			parent_id: undefined,
 			assignee_id: undefined,
 			project_id: undefined,
 			category: undefined,
@@ -97,6 +102,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 				calendar_add,
 				title,
 				description,
+				parent_id,
 				assignee_id,
 				project_id,
 				category_id,
@@ -117,6 +123,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 				calendar_add: calendar_add || false,
 				title: title || "",
 				description: description || "",
+				parent_id: parent_id || undefined,
 				assignee_id: assignee_id || undefined,
 				project_id: project_id || undefined,
 				category_id: category_id || undefined,
@@ -327,6 +334,50 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 											))
 										) : (
 											<SelectItem disabled>No status available</SelectItem>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="parent_id"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Parent Task</FormLabel>
+								<Select
+									disabled={!isEditable}
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : ""}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a parent task">
+												{field.value ? parentTasks()?.find((task) => task.id == field.value)?.title : "Select a task"}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										<SelectItem className="w-full bg-secondary x-auto" value={0}>
+											Clear Selection
+										</SelectItem>
+										{Array.isArray(tasks) && tasks.length > 0 ? (
+											parentTasks()?.map((task) => (
+												<SelectItem key={task.id} value={task.id.toString()}>
+													<div className="flex flex-col">
+														<span> {task.title}</span>
+														<span className="text-muted-foreground opacity-50">
+															{task.project.title} | {task.status}
+														</span>
+													</div>
+												</SelectItem>
+											))
+										) : (
+											<></>
 										)}
 									</SelectContent>
 								</Select>
