@@ -5,6 +5,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
+import { flattenTasks } from "@/utils/taskHelpers";
 // TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
@@ -19,34 +20,10 @@ export default function Tasks() {
 	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [showHistory, setShowHistory] = useState(false);
-	// Show children on table
-	function flattenTasks(tasks) {
-		// Get IDs of all children
-		const childIds = new Set();
-		tasks.forEach((task) => {
-			task.children?.forEach((child) => {
-				childIds.add(child.id);
-			});
-		});
 
-		// Filter only tasks NOT in children list (top-level only)
-		const topLevelTasks = tasks.filter((task) => !childIds.has(task.id));
-
-		const flatten = (taskList, depth = 0) => {
-			let flat = [];
-			for (const task of taskList) {
-				flat.push({ ...task, depth });
-				if (task.children?.length) {
-					flat = flat.concat(flatten(task.children, depth + 1));
-				}
-			}
-			return flat;
-		};
-
-		return flatten(topLevelTasks);
-	}
-
+	// Flatten tasks for datatable usage (also groups children below parent)
 	const tableData = flattenTasks(tasks);
+
 	// Add comments from users
 	useEffect(() => {
 		if (!isOpen) {
