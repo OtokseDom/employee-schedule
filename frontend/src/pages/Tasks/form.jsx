@@ -304,7 +304,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 						];
 						return (
 							<FormItem>
-								<FormLabel>Status *</FormLabel>
+								<FormLabel>
+									Status <span className="text-red-500">*</span>
+								</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={field.onChange}
@@ -339,7 +341,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Assignee *</FormLabel>
+								<FormLabel>
+									Assignee <span className="text-red-500">*</span>
+								</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -376,7 +380,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Project *</FormLabel>
+								<FormLabel>
+									Project <span className="text-red-500">*</span>
+								</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -412,7 +418,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Category *</FormLabel>
+								<FormLabel>
+									Category <span className="text-red-500">*</span>
+								</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -448,7 +456,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Title *</FormLabel>
+								<FormLabel>
+									Title <span className="text-red-500">*</span>
+								</FormLabel>
 								<FormControl>
 									<Input disabled={!isEditable} placeholder="Title" {...field} />
 								</FormControl>
@@ -463,7 +473,9 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>Description *</FormLabel>
+								<FormLabel>
+									Description <span className="text-red-500">*</span>
+								</FormLabel>
 								<FormControl>
 									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>

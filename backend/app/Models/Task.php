@@ -93,7 +93,7 @@ class Task extends Model
             },
         ])
             ->where('organization_id', $organization_id)
-            ->orderBy('id', 'ASC')->get());
+            ->orderBy('id', 'DESC')->get());
     }
 
     public function storeTask($request, $userData)
