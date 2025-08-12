@@ -310,7 +310,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 								<Select
 									disabled={!isEditable}
 									onValueChange={field.onChange}
-									value={field.value || undefined}
+									value={field.value || ""}
 									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
 								>
 									<FormControl>
@@ -348,7 +348,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
 									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
-									value={field.value ? field.value.toString() : undefined}
+									value={field.value ? field.value.toString() : ""}
 								>
 									<FormControl>
 										<SelectTrigger>
@@ -386,7 +386,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
-									value={field.value ? field.value.toString() : undefined}
+									value={field.value ? field.value.toString() : ""}
 								>
 									<FormControl>
 										<SelectTrigger>
@@ -424,7 +424,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
-									value={field.value ? field.value.toString() : undefined}
+									value={field.value ? field.value.toString() : ""}
 								>
 									<FormControl>
 										<SelectTrigger>
