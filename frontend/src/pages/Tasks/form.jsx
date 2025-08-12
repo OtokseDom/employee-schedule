@@ -55,7 +55,7 @@ export default function TaskForm({ tasks, projects, users, categories, setTaskAd
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
 	const parentTasks = () => {
-		return tasks.filter((task) => task.parent_id == null) || [];
+		return tasks.filter((task) => task.parent_id == null && task.id !== updateData?.id) || [];
 	};
 
 	// State for time_estimate and delay hour/minute fields
