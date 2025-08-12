@@ -291,6 +291,50 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
 				<FormField
 					control={form.control}
+					name="status"
+					render={({ field }) => {
+						const statuses = [
+							{ id: 1, name: "Pending" },
+							{ id: 2, name: "In Progress" },
+							{ id: 3, name: "For Review" },
+							{ id: 4, name: "Completed" },
+							{ id: 5, name: "Delayed" },
+							{ id: 6, name: "On Hold" },
+							{ id: 7, name: "Cancelled" },
+						];
+						return (
+							<FormItem>
+								<FormLabel>Status *</FormLabel>
+								<Select
+									disabled={!isEditable}
+									onValueChange={field.onChange}
+									value={field.value || undefined}
+									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a status"></SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(statuses) && statuses.length > 0 ? (
+											statuses?.map((status) => (
+												<SelectItem key={status?.id} value={status?.name}>
+													{status?.name}
+												</SelectItem>
+											))
+										) : (
+											<SelectItem disabled>No status available</SelectItem>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
 					name="assignee_id"
 					render={({ field }) => {
 						return (
@@ -671,55 +715,13 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 						/>
 					</>
 				)}
-				<FormField
-					control={form.control}
-					name="status"
-					render={({ field }) => {
-						const statuses = [
-							{ id: 1, name: "Pending" },
-							{ id: 2, name: "In Progress" },
-							{ id: 3, name: "For Review" },
-							{ id: 4, name: "Completed" },
-							{ id: 5, name: "Delayed" },
-							{ id: 6, name: "On Hold" },
-							{ id: 7, name: "Cancelled" },
-						];
-						return (
-							<FormItem>
-								<FormLabel>Status *</FormLabel>
-								<Select
-									disabled={!isEditable}
-									onValueChange={field.onChange}
-									value={field.value || undefined}
-									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select a status"></SelectValue>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{Array.isArray(statuses) && statuses.length > 0 ? (
-											statuses?.map((status) => (
-												<SelectItem key={status?.id} value={status?.name}>
-													{status?.name}
-												</SelectItem>
-											))
-										) : (
-											<SelectItem disabled>No status available</SelectItem>
-										)}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
 				{isEditable ? (
-					<Button type="submit" disabled={loading}>
-						{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />}{" "}
-						{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
-					</Button>
+					<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150 p-4 mt-auto">
+						<Button type="submit" disabled={loading} className="w-full">
+							{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />}{" "}
+							{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
+						</Button>
+					</div>
 				) : (
 					""
 				)}
