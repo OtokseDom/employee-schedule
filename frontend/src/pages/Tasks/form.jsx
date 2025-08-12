@@ -211,7 +211,7 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e);
+			console.error("Error fetching data:", e.response?.data?.message);
 			if (e.response?.data?.errors) {
 				const backendErrors = e.response.data.errors;
 				Object.keys(backendErrors).forEach((field) => {
@@ -558,49 +558,59 @@ export default function TaskForm({ projects, users, categories, setTaskAdded, is
 						);
 					}}
 				/>
-				{/* Time Estimate (hr/min) */}
-				<FormItem>
-					<FormLabel>Time Estimate</FormLabel>
-					<div>
-						<div className="flex flex-row justify-between gap-2">
-							<div className="flex flex-row gap-2">
-								<Input
-									disabled={!isEditable}
-									type="number"
-									min="0"
-									placeholder="hr"
-									value={timeEstimateHour}
-									onChange={(e) => {
-										const val = e.target.value.replace(/[^0-9]/g, "");
-										setTimeEstimateHour(val);
-									}}
-									className="w-20"
-								/>
-								<span>hr</span>
-								<Input
-									disabled={!isEditable}
-									type="number"
-									min="0"
-									max="59"
-									placeholder="min"
-									value={timeEstimateMinute}
-									onChange={(e) => {
-										let val = e.target.value.replace(/[^0-9]/g, "");
-										if (parseInt(val, 10) > 59) val = "59";
-										setTimeEstimateMinute(val);
-									}}
-									className="w-20"
-								/>
-								<span>min</span>
+				<FormField
+					control={form.control}
+					name="time_estimate"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Time Estimate</FormLabel>
+							<div>
+								<div className="flex flex-row justify-between gap-2">
+									<div className="flex flex-row gap-2">
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											placeholder="hr"
+											value={timeEstimateHour}
+											onChange={(e) => {
+												const val = e.target.value.replace(/[^0-9]/g, "");
+												setTimeEstimateHour(val);
+												const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
+												field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
+											}}
+											className="w-20"
+										/>
+										<span>hr</span>
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											max="59"
+											placeholder="min"
+											value={timeEstimateMinute}
+											onChange={(e) => {
+												let val = e.target.value.replace(/[^0-9]/g, "");
+												if (parseInt(val, 10) > 59) val = "59";
+												setTimeEstimateMinute(val);
+												const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
+												field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
+											}}
+											className="w-20"
+										/>
+										<span>min</span>
+									</div>
+									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
+										Auto Calculate
+									</Button>
+								</div>
+								{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
+								<FormMessage /> {/* ✅ Now linked to time_estimate */}
 							</div>
-							<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
-								Auto Calculate
-							</Button>
-						</div>
-						{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
-					</div>
-					<FormMessage />
-				</FormItem>
+						</FormItem>
+					)}
+				/>
+
 				{/* Time Taken (hr/min) */}
 				<FormItem>
 					<FormLabel>Time Taken</FormLabel>
