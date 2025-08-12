@@ -7,6 +7,7 @@ import TaskForm from "../Tasks/form";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Loader2 } from "lucide-react";
 import History from "@/components/task/History";
+import { flattenTasks } from "@/utils/taskHelpers";
 
 export default function Month({
 	data,
@@ -161,6 +162,7 @@ export default function Month({
 								<History selectedTaskHistory={selectedTaskHistory} />
 							) : (
 								<TaskForm
+									tasks={flattenTasks(data)}
 									projects={projects}
 									users={users}
 									categories={categories}

@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import History from "@/components/task/History";
+import { flattenTasks } from "@/utils/taskHelpers";
 
 export default function Week({
 	data,
@@ -197,6 +198,7 @@ export default function Week({
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : (
 									<TaskForm
+										tasks={flattenTasks(data)}
 										projects={projects}
 										users={users}
 										categories={categories}
