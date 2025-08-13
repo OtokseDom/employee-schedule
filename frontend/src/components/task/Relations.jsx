@@ -10,7 +10,7 @@ export default function Relations({ relations }) {
 				<span className="text-lg">{relations.title}</span>
 				<div>
 					<span className="text-muted-foreground">2/4 subtasks completed</span>
-					<Progress value={50} />
+					<Progress value={50} className="h-3" />
 				</div>
 				{/* <span
 					className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit ${
@@ -20,10 +20,10 @@ export default function Relations({ relations }) {
 					{relations.status.replace("_", " ")}
 				</span> */}
 			</div>
-			<div className="flex flex-col bg-secondary p-4">
+			<div className="flex flex-col bg-sidebar-accent">
 				{/* Children array */}
-				<div className="flex flex-row py-4 gap-2">
-					<div className="flex flex-row justify-between rounded-lg">
+				<div className="flex flex-row px-4 py-6 gap-2 hover:bg-secondary">
+					<div className="flex flex-row w-full justify-between">
 						<div className="flex flex-row h-fit items-center gap-2">
 							<span
 								className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit text-xs ${
@@ -33,14 +33,14 @@ export default function Relations({ relations }) {
 								{relations.status.replace("_", " ")}
 							</span>
 							<span className="">{relations.title}</span>
-							<Button variant="ghost" size="sm">
-								<Inspect />
-							</Button>
 						</div>
+						<Button variant="ghost" size="sm">
+							<Inspect />
+						</Button>
 					</div>
 				</div>
-				<div className="flex flex-row py-4 gap-2">
-					<div className="flex flex-row justify-between rounded-lg">
+				<div className="flex flex-row px-4 py-6 gap-2 hover:bg-secondary">
+					<div className="flex flex-row w-full justify-between">
 						<div className="flex flex-row h-fit items-center gap-2">
 							<span
 								className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit text-xs ${
@@ -50,10 +50,10 @@ export default function Relations({ relations }) {
 								{relations.status.replace("_", " ")}
 							</span>
 							<span className="">{relations.title}</span>
-							<Button variant="ghost" size="sm">
-								<Inspect />
-							</Button>
 						</div>
+						<Button variant="ghost" size="sm">
+							<Inspect />
+						</Button>
 					</div>
 				</div>
 			</div>
