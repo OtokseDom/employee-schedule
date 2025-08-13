@@ -291,7 +291,7 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistor
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdate(task)}>
-									Update Task
+									View and Update Task
 								</DropdownMenuItem>
 								<DropdownMenuItem>
 									<DialogTrigger asChild>

@@ -31,8 +31,8 @@ export function DataTableTasks({
 	setUpdateData,
 	fetchData,
 	showLess = true,
-	showHistory,
-	setShowHistory,
+	activeTab,
+	setActiveTab,
 }) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
@@ -144,15 +144,29 @@ export function DataTableTasks({
 									<SheetTitle>
 										{Object.keys(updateData).length > 0 ? (
 											<div className="flex flex-row items-center">
-												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
-													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
-														<button onClick={() => setShowHistory(false)}>Update Task</button>
+												<div className="flex flex-row w-fit h-fit border-b-2 border-b-bg-secondary bg-card text-sm">
+													<div
+														className={`w-fit py-2 px-5 ${
+															activeTab == "update" ? "bg-secondary" : "text-muted-foreground"
+														} rounded-t`}
+													>
+														<button onClick={() => setActiveTab("update")}>Update Task</button>
 													</div>
-													<div className={`w-fit py-2 px-5 ${showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
-														<button onClick={() => setShowHistory(true)}>History</button>
+													<div
+														className={`w-fit py-2 px-5 ${
+															activeTab == "history" ? "bg-secondary" : "text-muted-foreground"
+														} rounded-t`}
+													>
+														<button onClick={() => setActiveTab("history")}>History</button>
+													</div>
+													<div
+														className={`w-fit py-2 px-5 ${
+															activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"
+														} rounded-t`}
+													>
+														<button onClick={() => setActiveTab("relations")}>Relations</button>
 													</div>
 												</div>
-												{/* {!showHistory ? <span>{updateData?.id ? "Update Task" : "Add Task"}</span> : <span>Task History</span>} */}
 												<span>{loading && <Loader2 className="animate-spin" />}</span>
 											</div>
 										) : (
@@ -161,7 +175,7 @@ export function DataTableTasks({
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
-								{showHistory ? (
+								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : (
 									<TaskForm

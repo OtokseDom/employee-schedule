@@ -19,7 +19,7 @@ export default function Tasks() {
 	const [isOpen, setIsOpen] = useState(false);
 	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
-	const [showHistory, setShowHistory] = useState(false);
+	const [activeTab, setActiveTab] = useState(false);
 
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const tableData = flattenTasks(tasks);
@@ -29,6 +29,7 @@ export default function Tasks() {
 		if (!isOpen) {
 			setUpdateData({});
 			setShowHistory(false);
+			setActiveTab("update");
 		}
 	}, [isOpen]);
 	useEffect(() => {
@@ -99,8 +100,8 @@ export default function Tasks() {
 				isOpen={isOpen}
 				setIsOpen={setIsOpen}
 				fetchData={fetchData}
-				showHistory={showHistory}
-				setShowHistory={setShowHistory}
+				activeTab={activeTab}
+				setActiveTab={setActiveTab}
 			/>
 		</div>
 	);
