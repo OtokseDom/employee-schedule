@@ -310,7 +310,11 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistor
 						<DialogContent>
 							<DialogHeader>
 								<DialogTitle>Are you absolutely sure?</DialogTitle>
-								<DialogDescription>This action cannot be undone.</DialogDescription>
+								<DialogDescription>
+									<span className="text-lg text-destructive">Assigned subtasks will be deleted as well.</span>
+									<br />
+									This action cannot be undone.
+								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>
 								<DialogClose asChild>
