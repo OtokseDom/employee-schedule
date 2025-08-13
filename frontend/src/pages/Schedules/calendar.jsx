@@ -12,17 +12,6 @@ import Week from "./week";
 import Month from "./month";
 import { API } from "@/constants/api";
 
-// Status colors
-const statusColors = {
-	"In Progress": "bg-blue-100 border-blue-300 text-blue-800",
-	"For Review": "bg-orange-100 border-orange-300 text-orange-800",
-	Pending: "bg-yellow-100 border-yellow-300 text-yellow-800",
-	Completed: "bg-green-100 border-green-300 text-green-800",
-	"On Hold": "bg-gray-100 border-gray-300 text-gray-800",
-	Cancelled: "bg-red-100 border-red-300 text-red-800",
-	Delayed: "bg-purple-100 border-purple-300 text-purple-800",
-};
-
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
@@ -254,7 +243,6 @@ export default function ScheduleCalendar() {
 						fetchData={fetchTasks}
 						currentMonth={currentMonth}
 						getTaskForDate={getTaskForDate}
-						statusColors={statusColors}
 						selectedUser={selectedUser}
 						showHistory={showHistory}
 						setShowHistory={setShowHistory}
@@ -272,7 +260,6 @@ export default function ScheduleCalendar() {
 						weekstart_date={weekstart_date}
 						isInTimeSlot={isInTimeSlot}
 						selectedUser={selectedUser}
-						statusColors={statusColors}
 						showHistory={showHistory}
 						setShowHistory={setShowHistory}
 						taskHistory={taskHistory}

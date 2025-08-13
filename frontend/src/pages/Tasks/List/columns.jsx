@@ -5,24 +5,21 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }) => {
+import { statusColors } from "@/utils/taskHelpers";
+export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations }) => {
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
 		const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 		setSelectedTaskHistory(filteredHistory);
+		if (!task.parent_id) {
+			setRelations(task);
+		} else {
+			const filteredRelations = tasks.filter((t) => t.id == task.parent_id);
+			setRelations(...filteredRelations);
+		}
 	};
 
-	// Define color classes based on status value
-	const statusColors = {
-		Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
-		"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
-		"For Review": "bg-orange-100 border border-orange-800 border-2 text-orange-800",
-		Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
-		Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
-		Delayed: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
-		"On Hold": "bg-gray-100 border border-gray-800 border-2 text-gray-800",
-	};
 	return [
 		{
 			id: "status",

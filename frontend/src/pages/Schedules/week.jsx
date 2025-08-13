@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import History from "@/components/task/History";
-import { flattenTasks } from "@/utils/taskHelpers";
+import { flattenTasks, statusColors } from "@/utils/taskHelpers";
 
 export default function Week({
 	data,
@@ -19,7 +19,6 @@ export default function Week({
 	getTimeSlots,
 	weekstart_date: weekStartDate,
 	isInTimeSlot,
-	statusColors,
 	selectedUser,
 	showHistory,
 	setShowHistory,
