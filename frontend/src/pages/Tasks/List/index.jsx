@@ -12,6 +12,7 @@ export default function Tasks() {
 	const [tasks, setTasks] = useState([]);
 	const [taskHistory, setTaskHistory] = useState([]);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
+	const [relations, setRelations] = useState([]);
 	const [projects, setProjects] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [categories, setCategories] = useState([]);
@@ -28,7 +29,7 @@ export default function Tasks() {
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
-			setShowHistory(false);
+			setRelations({});
 			setActiveTab("update");
 		}
 	}, [isOpen]);
@@ -88,9 +89,10 @@ export default function Tasks() {
 				<p>View list of all tasks</p>
 			</div>
 			<DataTableTasks
-				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory })}
+				columns={columnsTask({ tableData, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations })}
 				data={tableData}
 				selectedTaskHistory={selectedTaskHistory}
+				relations={relations}
 				projects={projects}
 				users={users}
 				categories={categories}

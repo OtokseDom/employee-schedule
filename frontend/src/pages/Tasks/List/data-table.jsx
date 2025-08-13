@@ -13,14 +13,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
-import { format } from "date-fns";
 import History from "@/components/task/History";
+import Relations from "@/components/task/Relations";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({
 	columns,
 	data,
 	selectedTaskHistory,
+	relations,
 	projects,
 	users,
 	categories,
@@ -177,6 +178,8 @@ export function DataTableTasks({
 								</SheetHeader>
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
+								) : activeTab == "relations" ? (
+									<Relations relations={relations} />
 								) : (
 									<TaskForm
 										tasks={data}
