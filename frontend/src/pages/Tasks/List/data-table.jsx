@@ -23,6 +23,8 @@ export function DataTableTasks({
 	selectedTaskHistory,
 	relations,
 	setRelations,
+	taskHistory,
+	setSelectedTaskHistory,
 	projects,
 	users,
 	categories,
@@ -201,7 +203,14 @@ export function DataTableTasks({
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations relations={relations} setUpdateData={setUpdateData} setActiveTab={setActiveTab} setParentId={setParentId} />
+									<Relations
+										relations={relations}
+										setUpdateData={setUpdateData}
+										setActiveTab={setActiveTab}
+										setParentId={setParentId}
+										taskHistory={taskHistory}
+										setSelectedTaskHistory={setSelectedTaskHistory}
+									/>
 								) : (
 									<TaskForm
 										tasks={data}

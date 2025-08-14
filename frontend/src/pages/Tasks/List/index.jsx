@@ -96,9 +96,11 @@ export default function Tasks() {
 			<DataTableTasks
 				columns={columnsTask({ tableData, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations })}
 				data={tableData}
+				taskHistory={taskHistory}
 				selectedTaskHistory={selectedTaskHistory}
 				relations={relations}
 				setRelations={setRelations}
+				setSelectedTaskHistory={setSelectedTaskHistory}
 				projects={projects}
 				users={users}
 				categories={categories}

@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 import { useState } from "react";
 
-export default function Relations({ relations, setUpdateData, setActiveTab, setParentId }) {
+export default function Relations({ relations, setUpdateData, setActiveTab, setParentId, taskHistory, setSelectedTaskHistory }) {
 	const subTasksCount = relations?.children?.length ?? 0;
 	const completedCount = relations?.children?.filter((child) => child.status === "Completed").length ?? 0;
 	const getSubtaskProgress = () => {
@@ -33,6 +33,8 @@ export default function Relations({ relations, setUpdateData, setActiveTab, setP
 								onClick={() => {
 									setUpdateData(relations);
 									setActiveTab("update");
+									const filteredHistory = taskHistory.filter((th) => th.task_id === relations.id);
+									setSelectedTaskHistory(filteredHistory);
 								}}
 							>
 								<Inspect />
@@ -63,6 +65,8 @@ export default function Relations({ relations, setUpdateData, setActiveTab, setP
 										onClick={() => {
 											setUpdateData(child);
 											setActiveTab("update");
+											const filteredHistory = taskHistory.filter((th) => th.task_id === child.id);
+											setSelectedTaskHistory(filteredHistory);
 										}}
 									>
 										<Inspect />
