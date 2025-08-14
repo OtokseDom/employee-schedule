@@ -50,7 +50,21 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ tasks, projects, users, categories, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({
+	tasks,
+	projects,
+	users,
+	categories,
+	parentId,
+	setTaskAdded,
+	isOpen,
+	setIsOpen,
+	updateData,
+	setUpdateData,
+	fetchData,
+	setActiveTab,
+	setRelations,
+}) {
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
@@ -123,7 +137,7 @@ export default function TaskForm({ tasks, projects, users, categories, setTaskAd
 				calendar_add: calendar_add || false,
 				title: title || "",
 				description: description || "",
-				parent_id: parent_id || undefined,
+				parent_id: parent_id || parentId || undefined,
 				assignee_id: assignee_id || undefined,
 				project_id: project_id || undefined,
 				category_id: category_id || undefined,
@@ -199,10 +213,18 @@ export default function TaskForm({ tasks, projects, users, categories, setTaskAd
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
 			if (Object.keys(updateData).length === 0) {
-				await axiosClient.post(API().task(), parsedForm);
+				const taskResponse = await axiosClient.post(API().task(), parsedForm);
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
-				setIsOpen(false);
+				if (!parentId) setIsOpen(false);
+				else {
+					setActiveTab("relations");
+					setUpdateData(formData);
+					setRelations((prev) => ({
+						...prev,
+						children: [...prev.children, taskResponse.data.data],
+					}));
+				}
 			} else if (updateData?.calendar_add) {
 				await axiosClient.post(API().task(), parsedForm);
 				fetchData();
@@ -337,6 +359,23 @@ export default function TaskForm({ tasks, projects, users, categories, setTaskAd
 										)}
 									</SelectContent>
 								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="title"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>
+									Title <span className="text-red-500">*</span>
+								</FormLabel>
+								<FormControl>
+									<Input disabled={!isEditable} placeholder="Title" {...field} />
+								</FormControl>
 								<FormMessage />
 							</FormItem>
 						);
@@ -496,23 +535,6 @@ export default function TaskForm({ tasks, projects, users, categories, setTaskAd
 										)}
 									</SelectContent>
 								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="title"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>
-									Title <span className="text-red-500">*</span>
-								</FormLabel>
-								<FormControl>
-									<Input disabled={!isEditable} placeholder="Title" {...field} />
-								</FormControl>
 								<FormMessage />
 							</FormItem>
 						);

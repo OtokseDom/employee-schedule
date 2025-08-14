@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 import { useState } from "react";
 
-export default function Relations({ relations, setUpdateData, setActiveTab }) {
+export default function Relations({ relations, setUpdateData, setActiveTab, setParentId }) {
 	const subTasksCount = relations?.children?.length ?? 0;
 	const completedCount = relations?.children?.filter((child) => child.status === "Completed").length ?? 0;
 	const getSubtaskProgress = () => {
@@ -16,7 +16,7 @@ export default function Relations({ relations, setUpdateData, setActiveTab }) {
 	return (
 		<>
 			{Array.isArray(relations.children) && relations.children.length > 0 ? (
-				<div className="flex flex-col border rounded-xl text-sm gap-4">
+				<div className="flex flex-col border rounded-xl text-sm overflow-hidden">
 					<div className="flex flex-col justify-between rounded-lg p-4 gap-4">
 						<span
 							className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit text-xs ${
@@ -38,14 +38,14 @@ export default function Relations({ relations, setUpdateData, setActiveTab }) {
 								<Inspect />
 							</Button>
 						</div>
-						<div>
+						<div className="mb-4">
 							<span className="text-muted-foreground">{getSubtaskProgress()}</span>
 							<Progress value={getSubtaskProgressPercentage()} className="h-3" />
 						</div>
 					</div>
 					<div className="flex flex-col bg-sidebar-accent">
 						{relations?.children?.map((child) => (
-							<div key={child.id} className="flex flex-row px-4 py-6 gap-2 hover:bg-secondary">
+							<div key={child.id} className="flex flex-row px-4 py-6 gap-2 hover:bg-secondary border-b">
 								<div className="flex flex-row w-full justify-between">
 									<div className="flex flex-row h-fit items-center gap-2">
 										<span
@@ -53,7 +53,7 @@ export default function Relations({ relations, setUpdateData, setActiveTab }) {
 												statusColors[child?.status] || "bg-gray-200 text-gray-800"
 											}`}
 										>
-											{child?.status.replace("_", " ")}
+											{child?.status?.replace("_", " ")}
 										</span>
 										<span className="">{child?.title}</span>
 									</div>
@@ -71,9 +71,20 @@ export default function Relations({ relations, setUpdateData, setActiveTab }) {
 							</div>
 						))}
 					</div>
+					<Button
+						variant="ghost"
+						className="w-full rounded-none"
+						onClick={() => {
+							setParentId(relations?.id);
+							setUpdateData({});
+							setActiveTab("update");
+						}}
+					>
+						Add Subtask
+					</Button>
 				</div>
 			) : (
-				<div className="w-full text-muted-foreground text-lg text-center p-4">No Relations</div>
+				<div className="w-full text-muted-foreground text-lg text-center p-4">No Related Tasks</div>
 			)}
 		</>
 	);

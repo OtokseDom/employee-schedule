@@ -22,10 +22,10 @@ export function DataTableTasks({
 	data,
 	selectedTaskHistory,
 	relations,
+	setRelations,
 	projects,
 	users,
 	categories,
-	setTasks,
 	isOpen,
 	setIsOpen,
 	updateData,
@@ -34,6 +34,8 @@ export function DataTableTasks({
 	showLess = true,
 	activeTab,
 	setActiveTab,
+	parentId,
+	setParentId,
 }) {
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
@@ -170,6 +172,26 @@ export function DataTableTasks({
 												</div>
 												<span>{loading && <Loader2 className="animate-spin" />}</span>
 											</div>
+										) : parentId ? (
+											<div className="flex flex-row items-center">
+												<div className="flex flex-row w-fit h-fit border-b-2 border-b-bg-secondary bg-card text-sm">
+													<div
+														className={`w-fit py-2 px-5 ${
+															activeTab == "update" ? "bg-secondary" : "text-muted-foreground"
+														} rounded-t`}
+													>
+														<button onClick={() => setActiveTab("update")}>Add Subtask</button>
+													</div>
+													<div
+														className={`w-fit py-2 px-5 ${
+															activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"
+														} rounded-t`}
+													>
+														<button onClick={() => setActiveTab("relations")}>Relations</button>
+													</div>
+												</div>
+												<span>{loading && <Loader2 className="animate-spin" />}</span>
+											</div>
 										) : (
 											"Add Task"
 										)}
@@ -179,19 +201,22 @@ export function DataTableTasks({
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations relations={relations} setUpdateData={setUpdateData} setActiveTab={setActiveTab} />
+									<Relations relations={relations} setUpdateData={setUpdateData} setActiveTab={setActiveTab} setParentId={setParentId} />
 								) : (
 									<TaskForm
 										tasks={data}
+										setRelations={setRelations}
 										projects={projects}
 										users={users}
 										categories={categories}
+										parentId={parentId}
 										isOpen={isOpen}
 										setIsOpen={setIsOpen}
 										updateData={updateData}
 										setUpdateData={setUpdateData}
 										fetchData={fetchData}
 										selectedTaskHistory={selectedTaskHistory}
+										setActiveTab={setActiveTab}
 									/>
 								)}
 							</SheetContent>

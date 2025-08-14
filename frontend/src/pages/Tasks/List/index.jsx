@@ -21,9 +21,10 @@ export default function Tasks() {
 	// const [deleted, setDeleted] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [activeTab, setActiveTab] = useState(false);
+	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
 
 	// Flatten tasks for datatable usage (also groups children below parent)
-	const tableData = flattenTasks(tasks);
+	const [tableData, setTableData] = useState([]);
 
 	// Add comments from users
 	useEffect(() => {
@@ -31,6 +32,7 @@ export default function Tasks() {
 			setUpdateData({});
 			setRelations({});
 			setActiveTab("update");
+			setParentId(null);
 		}
 	}, [isOpen]);
 	useEffect(() => {
@@ -38,6 +40,9 @@ export default function Tasks() {
 		fetchData();
 		fetchSelection();
 	}, []);
+	useEffect(() => {
+		setTableData(flattenTasks(tasks));
+	}, [tasks]);
 	const fetchData = async () => {
 		setLoading(true);
 		try {
@@ -93,10 +98,10 @@ export default function Tasks() {
 				data={tableData}
 				selectedTaskHistory={selectedTaskHistory}
 				relations={relations}
+				setRelations={setRelations}
 				projects={projects}
 				users={users}
 				categories={categories}
-				setTasks={setTasks}
 				updateData={updateData}
 				setUpdateData={setUpdateData}
 				isOpen={isOpen}
@@ -104,6 +109,8 @@ export default function Tasks() {
 				fetchData={fetchData}
 				activeTab={activeTab}
 				setActiveTab={setActiveTab}
+				parentId={parentId}
+				setParentId={setParentId}
 			/>
 		</div>
 	);
