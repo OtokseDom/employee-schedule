@@ -8,6 +8,8 @@ import TaskForm from "../Tasks/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import History from "@/components/task/History";
 import { flattenTasks, statusColors } from "@/utils/taskHelpers";
+import Relations from "@/components/task/Relations";
+import Tabs from "@/components/task/Tabs";
 
 export default function Week({
 	data,
@@ -20,8 +22,6 @@ export default function Week({
 	weekstart_date: weekStartDate,
 	isInTimeSlot,
 	selectedUser,
-	showHistory,
-	setShowHistory,
 	taskHistory,
 }) {
 	const { loading, setLoading } = useLoadContext();
@@ -32,6 +32,11 @@ export default function Week({
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
 	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
+	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+	const [relations, setRelations] = useState([]);
+	const [activeTab, setActiveTab] = useState(false);
+	// Flatten tasks for datatable usage (also groups children below parent)
+	const [tableData, setTableData] = useState([]);
 
 	useEffect(() => {
 		if (taskAdded) {
@@ -41,10 +46,18 @@ export default function Week({
 	}, [taskAdded]);
 
 	useEffect(() => {
+		setTableData(flattenTasks(tasks));
+	}, [tasks]);
+
+	useEffect(() => {
 		setTasks(data);
 	}, [data]);
 	useEffect(() => {
-		if (!openDialogIndex) setShowHistory(false);
+		if (!openDialogIndex) {
+			setRelations({});
+			setActiveTab("update");
+			setParentId(null);
+		}
 	}, [openDialogIndex]);
 	return (
 		<div className="overflow-x-auto">
@@ -148,6 +161,12 @@ export default function Week({
 																setOpenDialogIndex(index);
 																const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 																setSelectedTaskHistory(filteredHistory);
+																if (!task.parent_id) {
+																	setRelations(task);
+																} else {
+																	const filteredRelations = tasks.filter((t) => t.id == task.parent_id);
+																	setRelations(...filteredRelations);
+																}
 															}}
 															className={`
 														absolute left-0 right-0 mx-1 p-1 rounded border z-10 overflow-clip
@@ -175,26 +194,21 @@ export default function Week({
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
 									<SheetTitle>
-										{Object.keys(updateData).length > 0 && !updateData?.calendar_add ? (
-											<div className="flex flex-row items-center">
-												<div className="flex flex-row w-fit h-fit bg-card rounded-sm text-base">
-													<div className={`w-fit py-2 px-5 ${!showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
-														<button onClick={() => setShowHistory(false)}>Update Task</button>
-													</div>
-													<div className={`w-fit py-2 px-5 ${showHistory ? "bg-secondary" : "text-muted-foreground"} rounded`}>
-														<button onClick={() => setShowHistory(true)}>History</button>
-													</div>
-												</div>
-												<span>{loading && <Loader2 className="animate-spin" />}</span>
-											</div>
-										) : (
-											"Add Task"
-										)}
+										<Tabs loading={loading} updateData={updateData} activeTab={activeTab} setActiveTab={setActiveTab} parentId={parentId} />
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
-								{showHistory ? (
+								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
+								) : activeTab == "relations" ? (
+									<Relations
+										relations={relations}
+										setUpdateData={setUpdateData}
+										setActiveTab={setActiveTab}
+										setParentId={setParentId}
+										taskHistory={taskHistory}
+										setSelectedTaskHistory={setSelectedTaskHistory}
+									/>
 								) : (
 									<TaskForm
 										tasks={flattenTasks(data)}
@@ -207,6 +221,10 @@ export default function Week({
 										setUpdateData={setUpdateData}
 										fetchData={fetchData}
 										setTaskAdded={setTaskAdded}
+										setRelations={setRelations}
+										parentId={parentId}
+										selectedTaskHistory={selectedTaskHistory}
+										setActiveTab={setActiveTab}
 									/>
 								)}
 							</SheetContent>

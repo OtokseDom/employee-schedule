@@ -15,7 +15,6 @@ import { API } from "@/constants/api";
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
-	const [showHistory, setShowHistory] = useState(false);
 
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -244,8 +243,6 @@ export default function ScheduleCalendar() {
 						currentMonth={currentMonth}
 						getTaskForDate={getTaskForDate}
 						selectedUser={selectedUser}
-						showHistory={showHistory}
-						setShowHistory={setShowHistory}
 						taskHistory={taskHistory}
 					/>
 				) : (
@@ -260,8 +257,6 @@ export default function ScheduleCalendar() {
 						weekstart_date={weekstart_date}
 						isInTimeSlot={isInTimeSlot}
 						selectedUser={selectedUser}
-						showHistory={showHistory}
-						setShowHistory={setShowHistory}
 						taskHistory={taskHistory}
 					/>
 				)}
