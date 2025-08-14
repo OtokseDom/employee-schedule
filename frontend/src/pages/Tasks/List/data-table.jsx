@@ -179,7 +179,7 @@ export function DataTableTasks({
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations relations={relations} />
+									<Relations relations={relations} setUpdateData={setUpdateData} setActiveTab={setActiveTab} />
 								) : (
 									<TaskForm
 										tasks={data}
