@@ -2,8 +2,17 @@ import { statusColors } from "@/utils/taskHelpers";
 import { Inspect } from "lucide-react";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
+import { useState } from "react";
 
 export default function Relations({ relations, setUpdateData, setActiveTab }) {
+	const subTasksCount = relations?.children?.length ?? 0;
+	const completedCount = relations?.children?.filter((child) => child.status === "Completed").length ?? 0;
+	const getSubtaskProgress = () => {
+		return completedCount + "/" + subTasksCount + " subtasks completed";
+	};
+	const getSubtaskProgressPercentage = () => {
+		return Math.round((completedCount / subTasksCount) * 100, 2);
+	};
 	return (
 		<>
 			{Array.isArray(relations.children) && relations.children.length > 0 ? (
@@ -30,8 +39,8 @@ export default function Relations({ relations, setUpdateData, setActiveTab }) {
 							</Button>
 						</div>
 						<div>
-							<span className="text-muted-foreground">2/4 subtasks completed</span>
-							<Progress value={50} className="h-3" />
+							<span className="text-muted-foreground">{getSubtaskProgress()}</span>
+							<Progress value={getSubtaskProgressPercentage()} className="h-3" />
 						</div>
 					</div>
 					<div className="flex flex-col bg-sidebar-accent">
