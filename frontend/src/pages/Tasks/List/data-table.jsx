@@ -61,7 +61,7 @@ export function DataTableTasks({
 		showLess
 			? {
 					// status: false,
-					"start date": true,
+					"start date": false,
 					"end date": true,
 					"start time": false,
 					"end time": false,

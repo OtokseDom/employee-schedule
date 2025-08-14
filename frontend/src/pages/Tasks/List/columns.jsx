@@ -45,50 +45,6 @@ export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpda
 			},
 		},
 		{
-			id: "assignee",
-			accessorKey: "assignee.name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-			cell: ({ row }) => {
-				const assignee = row.original.assignee;
-
-				return (
-					<div>
-						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
-						<br />
-						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
-					</div>
-				);
-			},
-		},
-		{
-			id: "project",
-			accessorKey: "project.title",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Project <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-		},
-		{
-			id: "category",
-			accessorKey: "category.name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Category <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
-		},
-		{
 			id: "title",
 			accessorKey: "title",
 			header: ({ column }) => {
@@ -111,6 +67,50 @@ export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpda
 			},
 		},
 		{
+			id: "project",
+			accessorKey: "project.title",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Project <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+		},
+		{
+			id: "assignee",
+			accessorKey: "assignee.name",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			cell: ({ row }) => {
+				const assignee = row.original.assignee;
+
+				return (
+					<div>
+						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
+						<br />
+						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
+					</div>
+				);
+			},
+		},
+		{
+			id: "category",
+			accessorKey: "category.name",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Category <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+		},
+		{
 			id: "expected output",
 			accessorKey: "expected_output",
 			meta: { hidden: true },
@@ -123,7 +123,7 @@ export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpda
 			},
 		},
 		{
-			id: "start_date",
+			id: "start date",
 			accessorKey: "start_date",
 			header: ({ column }) => (
 				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
