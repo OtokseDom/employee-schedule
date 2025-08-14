@@ -15,6 +15,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import TaskForm from "../form";
 import History from "@/components/task/History";
 import Relations from "@/components/task/Relations";
+import Tabs from "@/components/task/Tabs";
 
 // Convert the DataTable component to JavaScript
 export function DataTableTasks({
@@ -147,56 +148,7 @@ export function DataTableTasks({
 							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
 								<SheetHeader>
 									<SheetTitle>
-										{Object.keys(updateData).length > 0 ? (
-											<div className="flex flex-row items-center">
-												<div className="flex flex-row w-fit h-fit border-b-2 border-b-bg-secondary bg-card text-sm">
-													<div
-														className={`w-fit py-2 px-5 ${
-															activeTab == "update" ? "bg-secondary" : "text-muted-foreground"
-														} rounded-t`}
-													>
-														<button onClick={() => setActiveTab("update")}>Update Task</button>
-													</div>
-													<div
-														className={`w-fit py-2 px-5 ${
-															activeTab == "history" ? "bg-secondary" : "text-muted-foreground"
-														} rounded-t`}
-													>
-														<button onClick={() => setActiveTab("history")}>History</button>
-													</div>
-													<div
-														className={`w-fit py-2 px-5 ${
-															activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"
-														} rounded-t`}
-													>
-														<button onClick={() => setActiveTab("relations")}>Relations</button>
-													</div>
-												</div>
-												<span>{loading && <Loader2 className="animate-spin" />}</span>
-											</div>
-										) : parentId ? (
-											<div className="flex flex-row items-center">
-												<div className="flex flex-row w-fit h-fit border-b-2 border-b-bg-secondary bg-card text-sm">
-													<div
-														className={`w-fit py-2 px-5 ${
-															activeTab == "update" ? "bg-secondary" : "text-muted-foreground"
-														} rounded-t`}
-													>
-														<button onClick={() => setActiveTab("update")}>Add Subtask</button>
-													</div>
-													<div
-														className={`w-fit py-2 px-5 ${
-															activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"
-														} rounded-t`}
-													>
-														<button onClick={() => setActiveTab("relations")}>Relations</button>
-													</div>
-												</div>
-												<span>{loading && <Loader2 className="animate-spin" />}</span>
-											</div>
-										) : (
-											"Add Task"
-										)}
+										<Tabs loading={loading} updateData={updateData} activeTab={activeTab} setActiveTab={setActiveTab} parentId={parentId} />
 									</SheetTitle>
 									<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 								</SheetHeader>
