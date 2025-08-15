@@ -23,6 +23,7 @@ import FilterForm from "@/components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
+import { flattenTasks } from "@/utils/taskHelpers";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
@@ -56,9 +57,26 @@ export default function UserProfile() {
 		},
 	});
 	const [selectedProjects, setSelectedProjects] = useState([]);
+	// Subtasks
+	const [relations, setRelations] = useState([]);
+
+	const [activeTab, setActiveTab] = useState(false);
+	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+
+	// Flatten tasks for datatable usage (also groups children below parent)
+	const [tableData, setTableData] = useState([]);
+	useEffect(() => {
+		if (userReports?.user_tasks?.data) setTableData(flattenTasks(userReports?.user_tasks?.data));
+	}, [userReports?.user_tasks?.data]);
+
 	const navigate = useNavigate();
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
+		if (!isOpen) {
+			setUpdateData({});
+			setRelations({});
+			setActiveTab("update");
+			setParentId(null);
+		}
 		if (!isOpenUser) setUpdateDataUser({});
 	}, [isOpen, isOpenUser]);
 
@@ -331,9 +349,16 @@ export default function UserProfile() {
 						</div>
 
 						<DataTableTasks
-							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }, false)}
-							data={userReports?.user_tasks?.data || []}
+							columns={columnsTask(
+								{ tableData, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations },
+								false
+							)}
+							data={tableData}
+							taskHistory={taskHistory}
 							selectedTaskHistory={selectedTaskHistory}
+							relations={relations}
+							setRelations={setRelations}
+							setSelectedTaskHistory={setSelectedTaskHistory}
 							projects={projects}
 							users={users}
 							categories={categories}
@@ -345,6 +370,10 @@ export default function UserProfile() {
 							showLess={true}
 							showHistory={showHistory}
 							setShowHistory={setShowHistory}
+							activeTab={activeTab}
+							setActiveTab={setActiveTab}
+							parentId={parentId}
+							setParentId={setParentId}
 						/>
 					</div>
 				</div>

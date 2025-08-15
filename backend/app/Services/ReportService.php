@@ -327,8 +327,20 @@ class ReportService
     // User Assigned Tasks
     public function userTasks($id, $filter)
     {
-        $query = $this->task->with(['assignee:id,name,email,role,position', 'category', 'project:id,title'])
-            ->orderBy('id', 'DESC')
+        $query = $this->task->with([
+            'assignee:id,name,email,role,position',
+            'category',
+            'project:id,title',
+            'parent:id,title',
+            'children' => function ($query) {
+                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    ->with([
+                        'assignee:id,name,email,role,position',
+                        'project:id,title',
+                        'category'
+                    ]);
+            },
+        ])->orderBy('id', 'DESC')
             ->where('assignee_id', $id)
             ->where('organization_id', $this->organization_id);
 
