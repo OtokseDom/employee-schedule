@@ -1,8 +1,8 @@
 export const createDashboardSlice = (set) => ({
 	// STATE
 	reports: {},
-	userFilter: {},
-	projectFilter: {},
+	userFilter: [],
+	projectFilter: [],
 	selectedUsers: [],
 	selectedProjects: [],
 	filters: {

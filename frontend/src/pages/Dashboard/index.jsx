@@ -23,7 +23,7 @@ export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
-	const { reports, setReports, setUserFilter, setProjectFilter, filters, setFilters } = useDashboardStore();
+	const { reports, setReports, userFilter, setUserFilter, projectFilter, setProjectFilter, filters, setFilters } = useDashboardStore();
 	const [isOpen, setIsOpen] = useState(false);
 
 	useEffect(() => {
@@ -31,6 +31,8 @@ export default function UserProfile() {
 		if (!reports || Object.keys(reports).length === 0) fetchReports();
 		if (!users || users.length === 0) fetchUsers();
 		if (!projects || projects.length === 0) fetchProjects();
+		if (users.length !== userFilter.length) mapUserFilter(users);
+		if (projects.length !== projectFilter.length) mapProjectFilter(projects);
 	}, []);
 
 	const fetchReports = async () => {
@@ -50,11 +52,7 @@ export default function UserProfile() {
 		try {
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse.data.data);
-			const mappedUsers = userResponse.data.data.map((user) => ({
-				value: user.id,
-				label: user.name,
-			}));
-			setUserFilter(mappedUsers);
+			mapUserFilter(userResponse.data.data);
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -62,22 +60,32 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
+	const mapUserFilter = (users) => {
+		const mappedUsers = users?.map((user) => ({
+			value: user.id,
+			label: user.name,
+		}));
+		setUserFilter(mappedUsers);
+	};
 	const fetchProjects = async () => {
 		setLoading(true);
 		try {
 			const projectResponse = await axiosClient.get(API().project());
 			setProjects(projectResponse.data.data);
-			const mappedProjects = projectResponse.data.data.map((project) => ({
-				value: project.id,
-				label: project.title,
-			}));
-			setProjectFilter(mappedProjects);
+			mapUserFilter(projectResponse.data.data);
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
+	};
+	const mapProjectFilter = (projects) => {
+		const mappedProjects = projects?.map((project) => ({
+			value: project.id,
+			label: project.name,
+		}));
+		setProjectFilter(mappedProjects);
 	};
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly
@@ -127,18 +135,7 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								<FilterForm
-									setIsOpen={setIsOpen}
-									// setReports={setReports}
-									// projects={projectFilter}
-									// users={userFilter}
-									// filters={filters}
-									// setFilters={setFilters}
-									// selectedProjects={selectedProjects}
-									// setSelectedProjects={setSelectedProjects}
-									// selectedUsers={selectedUsers}
-									// setSelectedUsers={setSelectedUsers}
-								/>
+								<FilterForm setIsOpen={setIsOpen} />
 							</DialogContent>
 						</Dialog>
 					</div>
