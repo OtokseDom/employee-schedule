@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 export default function Tabs({ loading, updateData, activeTab, setActiveTab, parentId }) {
 	return (
 		<div className="flex flex-row gap-5">
-			{Object.keys(updateData).length > 0 ? (
+			{Object.keys(updateData).length > 0 && updateData.id ? (
 				<div className="flex flex-row items-center">
 					<div className="flex flex-row w-fit h-fit border-b-2 border-b-bg-secondary bg-card text-sm">
 						<div className={`w-fit py-2 px-5 ${activeTab == "update" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
