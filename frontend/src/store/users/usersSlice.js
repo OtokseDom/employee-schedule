@@ -5,7 +5,7 @@ export const createUsersSlice = (set) => ({
 
 	addUser: (user) =>
 		set((state) => ({
-			users: [...state.users, user],
+			users: [user, ...state.users],
 		})),
 
 	updateUser: (id, updates) =>

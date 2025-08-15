@@ -63,16 +63,7 @@ export default function Users() {
 				const { columns: userColumns, dialog } = columns({ fetchData, handleDelete, setIsOpen, setUpdateData, updateData });
 				return (
 					<>
-						<DataTable
-							columns={userColumns}
-							data={users}
-							setUsers={setUsers}
-							isOpen={isOpen}
-							setIsOpen={setIsOpen}
-							updateData={updateData}
-							setUpdateData={setUpdateData}
-							fetchData={fetchData}
-						/>
+						<DataTable columns={userColumns} isOpen={isOpen} setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
 						{dialog}
 					</>
 				);

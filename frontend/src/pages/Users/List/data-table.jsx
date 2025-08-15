@@ -14,9 +14,11 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import UserForm from "../form";
 import { useNavigate } from "react-router-dom";
+import { useUsersStore } from "@/store/users/usersStore";
 
 // Convert the DataTable component to JavaScript
-export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export function DataTable({ columns, isOpen, setIsOpen, updateData, setUpdateData }) {
+	const { users: data } = useUsersStore();
 	const { loading, setLoading } = useLoadContext();
 	const { user } = useAuthContext();
 	const navigate = useNavigate();
@@ -68,14 +70,7 @@ export function DataTable({ columns, data, setUsers, isOpen, setIsOpen, updateDa
 								<SheetTitle>Add User</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
-							<UserForm
-								data={data}
-								setUsers={setUsers}
-								setIsOpen={setIsOpen}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-							/>
+							<UserForm data={data} setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
 						</SheetContent>
 					</Sheet>
 					<DropdownMenu>
