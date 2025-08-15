@@ -6,18 +6,22 @@ import { columns } from "./columns";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useUsersStore } from "@/store/users/usersStore";
 
 export default function Users() {
 	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
-	const [users, setUsers] = useState([]);
+	const { users, setUsers } = useUsersStore();
+	// const [users, setUsers] = useState([]);
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
 	useEffect(() => {
 		document.title = "Task Management | Users";
-		fetchData();
+		if (!users || users.length === 0) {
+			fetchData();
+		}
 	}, []);
 
 	const fetchData = async () => {
