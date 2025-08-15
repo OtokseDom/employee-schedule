@@ -14,6 +14,9 @@ import { set } from "date-fns";
 import { useEffect, useState } from "react";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { API } from "@/constants/api";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 const formSchema = z
 	.object({
@@ -47,19 +50,30 @@ const formSchema = z
 
 export default function FilterForm({
 	setIsOpen,
-	setReports,
-	filters,
-	setFilters,
 	userId = null,
-	projects,
-	selectedProjects,
-	setSelectedProjects,
-	users,
-	selectedUsers,
-	setSelectedUsers,
+	// setReports,
+	// projects,
+	// users,
+	// filters,
+	// setFilters,
+	// selectedProjects,
+	// setSelectedProjects,
+	// selectedUsers,
+	// setSelectedUsers,
 }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
+	const {
+		setReports,
+		userFilter: users,
+		projectFilter: projects,
+		filters,
+		setFilters,
+		selectedProjects,
+		setSelectedProjects,
+		selectedUsers,
+		setSelectedUsers,
+	} = useDashboardStore();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
