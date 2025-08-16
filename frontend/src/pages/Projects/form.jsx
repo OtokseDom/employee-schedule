@@ -16,6 +16,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { format, parseISO } from "date-fns";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 const formSchema = z.object({
 	title: z.string().refine((data) => data.trim() !== "", {
@@ -33,10 +34,11 @@ const formSchema = z.object({
 	}),
 });
 
-export default function ProjectForm({ data, setProjects, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
+	const { addProject, updateProject } = useProjectsStore([]);
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -76,14 +78,11 @@ export default function ProjectForm({ data, setProjects, setIsOpen, updateData, 
 			};
 			if (Object.keys(updateData).length === 0) {
 				const projectResponse = await axiosClient.post(API().project(), parsedForm);
-				const addedProject = projectResponse.data.data;
-				// Insert added project in projects array
-				const updatedProjects = [addedProject, ...data];
-				setProjects(updatedProjects);
+				addProject(projectResponse.data.data);
 				showToast("Success!", "Project added.", 3000);
 			} else {
-				await axiosClient.put(API().project(updateData?.id), parsedForm);
-				fetchData();
+				const projectResponse = await axiosClient.put(API().project(updateData?.id), parsedForm);
+				updateProject(updateData?.id, projectResponse.data.data);
 				showToast("Success!", "Project updated.", 3000);
 			}
 		} catch (e) {

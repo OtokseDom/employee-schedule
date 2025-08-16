@@ -5,7 +5,7 @@ export const createProjectsSlice = (set) => ({
 
 	addProject: (project) =>
 		set((state) => ({
-			projects: [...state.projects, project],
+			projects: [project, ...state.projects],
 		})),
 
 	updateProject: (id, updates) =>

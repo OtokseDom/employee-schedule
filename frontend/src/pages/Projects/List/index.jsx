@@ -8,7 +8,7 @@ import { API } from "@/constants/api";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 
 export default function Projects() {
-	const { loading, setLoading } = useLoadContext();
+	const { setLoading } = useLoadContext();
 	const { projects, setProjects } = useProjectsStore([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
@@ -25,13 +25,11 @@ export default function Projects() {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			// Make both API calls concurrently using Promise.all
 			const projectResponse = await axiosClient.get(API().project());
 			setProjects(projectResponse.data.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
@@ -46,7 +44,6 @@ export default function Projects() {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setDialogOpen(false);
 			setLoading(false);
 		}
@@ -64,13 +61,10 @@ export default function Projects() {
 					<>
 						<DataTableProjects
 							columns={projectColumns}
-							data={projects}
-							setProjects={setProjects}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
-							fetchData={fetchData}
 						/>
 						{dialog}
 					</>

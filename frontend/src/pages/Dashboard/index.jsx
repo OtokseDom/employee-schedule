@@ -83,7 +83,7 @@ export default function UserProfile() {
 	const mapProjectFilter = (projects) => {
 		const mappedProjects = projects?.map((project) => ({
 			value: project.id,
-			label: project.name,
+			label: project.title,
 		}));
 		setProjectFilter(mappedProjects);
 	};
