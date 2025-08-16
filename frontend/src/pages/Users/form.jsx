@@ -90,6 +90,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
 			} else {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
 				updateUser(updateData.id, userResponse.data.data);
+				// Update auth user data if the updated user is the current logged-in user
 				if (user.id === userResponse.data.data.id) setUser(userResponse.data.data);
 				showToast("Success!", "User updated.", 3000);
 			}

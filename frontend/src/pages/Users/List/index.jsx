@@ -13,7 +13,6 @@ export default function Users() {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { users, setUsers } = useUsersStore();
-	// const [users, setUsers] = useState([]);
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
@@ -27,13 +26,11 @@ export default function Users() {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			// Make both API calls concurrently using Promise.all
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse.data.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
@@ -48,7 +45,6 @@ export default function Users() {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
@@ -15,11 +15,9 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 	const { user } = useAuthContext();
 	const { setLoading } = useLoadContext();
 	const showToast = useToast();
-	const navigate = useNavigate();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
 	const [selectedUser, setSelectedUser] = useState(null);
-	// const [selectedUserData, setSelectedUserData] = useState(null);
 
 	const openDialog = (type, userData = {}) => {
 		setDialogType(type);

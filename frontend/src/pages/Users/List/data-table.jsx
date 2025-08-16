@@ -13,15 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import UserForm from "../form";
-import { useNavigate } from "react-router-dom";
 import { useUsersStore } from "@/store/users/usersStore";
 
 // Convert the DataTable component to JavaScript
 export function DataTable({ columns, isOpen, setIsOpen, updateData, setUpdateData }) {
 	const { users: data } = useUsersStore();
-	const { loading, setLoading } = useLoadContext();
+	const { loading } = useLoadContext();
 	const { user } = useAuthContext();
-	const navigate = useNavigate();
 
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -120,7 +118,6 @@ export function DataTable({ columns, isOpen, setIsOpen, updateData, setUpdateDat
 					</TableHeader>
 					<TableBody>
 						{loading ? (
-							// Show skeleton while loading
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24">
 									<div className="flex items-center justify-center">
@@ -133,20 +130,14 @@ export function DataTable({ columns, isOpen, setIsOpen, updateData, setUpdateDat
 								</TableCell>
 							</TableRow>
 						) : table.getRowModel().rows.length ? (
-							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow
-									// className="cursor-pointer"
-									key={row.id}
-									// onClick={() => navigate(`/users/${row.original.id}`)} // Redirect on row click
-								>
+								<TableRow key={row.id}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
 								</TableRow>
 							))
 						) : (
-							// Show "No Results" only if data has finished loading and is truly empty
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
 									No Results.
