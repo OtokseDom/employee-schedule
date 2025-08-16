@@ -24,41 +24,42 @@ import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
 import { flattenTasks } from "@/utils/taskHelpers";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUserStore } from "@/store/user/userStore";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
-	const [user, setUser] = useState(null); // State for user details
+	const { users, setUsers } = useUsersStore();
+	const {
+		user,
+		setUser,
+		updateUser,
+		userReports,
+		setUserReports,
+		filterProjects,
+		setFilterProjects,
+		filters,
+		setFilters,
+		selectedProjects,
+		setSelectedProjects,
+	} = useUserStore();
+	const { projects, setProjects } = useProjectsStore();
+	const { categories, setCategories } = useCategoriesStore();
+	const { taskHistory, setTaskHistory, selectedTaskHistory, setSelectedTaskHistory, relations, setRelations } = useTasksStore();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
-	const [users, setUsers] = useState([]);
-	const [projects, setProjects] = useState();
-	const [filterProjects, setFilterProjects] = useState();
-	const [taskHistory, setTaskHistory] = useState([]);
-	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
-	const [showHistory, setShowHistory] = useState(false);
-	const [categories, setCategories] = useState([]);
-	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenUser, setIsOpenUser] = useState(false);
 	const [isOpenFilter, setIsOpenFilter] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
-	const [filters, setFilters] = useState({
-		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
-		values: {
-			"Date Range": null,
-			Projects: [],
-		},
-		display: {
-			"Date Range": null,
-			Projects: [],
-		},
-	});
-	const [selectedProjects, setSelectedProjects] = useState([]);
 	// Subtasks
-	const [relations, setRelations] = useState([]);
+	// const [relations, setRelations] = useState([]);
 
 	const [activeTab, setActiveTab] = useState(false);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
@@ -82,9 +83,11 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		fetchDetails();
-		fetchSelection();
-		fetchData();
+		if (Object.keys(user).length === 0 && user.id !== id) fetchDetails();
+		if (!projects || projects.length === 0) fetchProjects();
+		if (!users || users.length === 0) fetchUsers();
+		if (!categories || categories.length === 0) fetchCategories();
+		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
 	}, []);
 
 	const fetchDetails = async () => {
@@ -110,23 +113,41 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
-	const fetchSelection = async () => {
+	const fetchProjects = async () => {
 		setLoading(true);
 		try {
 			// selection items
-			const [projectResponse, userResponse, categoryResponse] = await Promise.all([
-				axiosClient.get(API().project()),
-				axiosClient.get(API().user()),
-				axiosClient.get(API().category()),
-			]);
+			const projectResponse = await axiosClient.get(API().project());
 			const mappedProjects = projectResponse.data.data.map((project) => ({
 				value: project.id,
 				label: project.title,
 			}));
 			setFilterProjects(mappedProjects);
 			setProjects(projectResponse?.data?.data);
-			setCategories(categoryResponse?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchUsers = async () => {
+		setLoading(true);
+		try {
+			// selection items
+			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchCategories = async () => {
+		setLoading(true);
+		try {
+			// selection items
+			const categoryResponse = await axiosClient.get(API().category());
+			setCategories(categoryResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -138,12 +159,14 @@ export default function UserProfile() {
 		setDetailsLoading(true);
 		try {
 			if (action == 0) {
-				const userResponse = await axiosClient.delete(API().user(id));
-				if (userResponse?.data?.success == true) {
+				const form = { ...user, status: "rejected" };
+				try {
+					const userResponse = await axiosClient.put(API().user(id), form);
+					updateUser(id, userResponse?.data?.data);
 					showToast("Success!", userResponse?.data?.message, 3000);
-					navigate("/users");
-				} else {
-					showToast("Failed!", userResponse?.message, 3000);
+				} catch (e) {
+					showToast("Failed!", e.response?.data?.message, 3000, "fail");
+					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 				}
 			} else {
 				const form = {
@@ -152,7 +175,7 @@ export default function UserProfile() {
 				};
 				try {
 					const userResponse = await axiosClient.put(API().user(id), form);
-					setUser(userResponse?.data?.data);
+					updateUser(id, userResponse?.data?.data);
 					showToast("Success!", userResponse?.data?.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -242,7 +265,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchSelection} />
+					{/* <UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchSelection} /> */}
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
@@ -368,8 +391,6 @@ export default function UserProfile() {
 							setIsOpen={setIsOpen}
 							fetchData={fetchData}
 							showLess={true}
-							showHistory={showHistory}
-							setShowHistory={setShowHistory}
 							activeTab={activeTab}
 							setActiveTab={setActiveTab}
 							parentId={parentId}
