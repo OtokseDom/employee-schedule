@@ -68,7 +68,7 @@ export function DataTable({ columns, isOpen, setIsOpen, updateData, setUpdateDat
 								<SheetTitle>Add User</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
-							<UserForm data={data} setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
+							<UserForm setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
 						</SheetContent>
 					</Sheet>
 					<DropdownMenu>

@@ -40,11 +40,10 @@ const formSchema = z.object({
 });
 
 export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
-	const { user: user_auth } = useAuthContext();
+	const { user: user_auth, setUser } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
-	const { user, setUser } = useAuthContext();
 	const showToast = useToast();
-	const { users, addUser, updateUser } = useUsersStore();
+	const { addUser, updateUser } = useUsersStore();
 
 	const [date, setDate] = useState();
 
@@ -77,7 +76,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
 	const handleSubmit = async (form) => {
 		const formattedData = {
 			...form,
-			organization_id: user.data.organization_id,
+			organization_id: user_auth.data.organization_id,
 			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
 			password: "$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW", //password: admin123
 		};
@@ -91,7 +90,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
 				updateUser(updateData.id, userResponse.data.data);
 				// Update auth user data if the updated user is the current logged-in user
-				if (user.id === userResponse.data.data.id) setUser(userResponse.data.data);
+				if (user_auth.id === userResponse.data.data.id) setUser(userResponse.data.data);
 				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {
