@@ -5,10 +5,11 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableProjects } from "./data-table";
 import { API } from "@/constants/api";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 export default function Projects() {
 	const { loading, setLoading } = useLoadContext();
-	const [projects, setProjects] = useState([]);
+	const { projects, setProjects } = useProjectsStore([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
@@ -19,7 +20,7 @@ export default function Projects() {
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Projects";
-		fetchData();
+		if (!projects || projects.length === 0) fetchData();
 	}, []);
 	const fetchData = async () => {
 		setLoading(true);
