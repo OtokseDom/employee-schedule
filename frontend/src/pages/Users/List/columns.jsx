@@ -10,8 +10,10 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
+import { useUsersStore } from "@/store/users/usersStore";
 
-export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) => {
+export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
+	const { updateUser } = useUsersStore();
 	const { user } = useAuthContext();
 	const { setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -39,7 +41,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 				const res = await axiosClient.put(API().user(userRow?.id), form);
 				if (res.data.success) {
 					showToast("Success!", res.data.message, 3000);
-					fetchData();
+					updateUser(userRow.id, res.data.data);
 				} else {
 					showToast("Failed!", res.message, 3000);
 				}
@@ -48,7 +50,7 @@ export const columns = ({ fetchData, handleDelete, setIsOpen, setUpdateData }) =
 				const res = await axiosClient.put(API().user(userRow?.id), form);
 				if (res.data.success) {
 					showToast("Success!", res.data.message, 3000);
-					fetchData();
+					updateUser(userRow.id, res.data.data);
 				} else {
 					showToast("Failed!", res.message, 3000);
 				}
