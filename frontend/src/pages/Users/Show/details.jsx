@@ -3,7 +3,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Edit, User2 } from "lucide-react";
+import { Edit, Loader2, User2 } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
@@ -78,7 +78,10 @@ export default function UserDetails({ handleUpdateUser, setDetailsLoading, detai
 			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Are you absolutely sure?</DialogTitle>
+						<DialogTitle className="flex flex-row items-center gap-2">
+							Are you absolutely sure?
+							{loading && <Loader2 className="animate-spin text-foreground" />}
+						</DialogTitle>
 						<DialogDescription>This action cannot be undone.</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
