@@ -8,7 +8,7 @@ export const useTasksStore = () => {
 		updateTask: useAppStore((state) => state.updateTask),
 		removeTask: useAppStore((state) => state.removeTask),
 		// Task History
-		taskHistories: useAppStore((state) => state.taskHistories),
+		taskHistory: useAppStore((state) => state.taskHistory),
 		selectedTaskHistory: useAppStore((state) => state.selectedTaskHistory),
 		setTaskHistory: useAppStore((state) => state.setTaskHistory),
 		setSelectedTaskHistory: useAppStore((state) => state.setSelectedTaskHistory),
@@ -21,5 +21,8 @@ export const useTasksStore = () => {
 		addRelation: useAppStore((state) => state.addRelation),
 		updateRelation: useAppStore((state) => state.updateRelation),
 		removeRelation: useAppStore((state) => state.removeRelation),
+		// Tab
+		activeTab: useAppStore((state) => state.activeTab),
+		setActiveTab: useAppStore((state) => state.setActiveTab),
 	};
 };

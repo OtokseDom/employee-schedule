@@ -2,7 +2,6 @@ import { statusColors } from "@/utils/taskHelpers";
 import { Inspect } from "lucide-react";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
-import { useState } from "react";
 
 export default function Relations({ relations, setUpdateData, setActiveTab, setParentId, taskHistory, setSelectedTaskHistory }) {
 	const subTasksCount = relations?.children?.length ?? 0;

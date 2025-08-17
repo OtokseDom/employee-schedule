@@ -6,7 +6,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { format } from "date-fns";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { statusColors } from "@/utils/taskHelpers";
-export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations }) => {
+import { useTasksStore } from "@/store/tasks/tasksStore";
+export const columnsTask = ({ tableData: tasks, handleDelete, setIsOpen, setUpdateData }) => {
+	// console.log(tasks);
+	const { taskHistory, setSelectedTaskHistory, setRelations } = useTasksStore();
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);

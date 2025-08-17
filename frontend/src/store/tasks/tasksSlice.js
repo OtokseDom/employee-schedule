@@ -5,7 +5,7 @@ export const createTasksSlice = (set) => ({
 
 	addTask: (task) =>
 		set((state) => ({
-			tasks: [...state.tasks, task],
+			tasks: [task, ...state.tasks],
 		})),
 
 	updateTask: (id, updates) =>
@@ -19,7 +19,7 @@ export const createTasksSlice = (set) => ({
 		})),
 
 	// Task History
-	taskHistories: [],
+	taskHistory: [],
 	selectedTaskHistory: {},
 
 	setTaskHistory: (taskHistory) => set({ taskHistory }),
@@ -27,27 +27,30 @@ export const createTasksSlice = (set) => ({
 
 	addTaskHistory: (taskHistory) =>
 		set((state) => ({
-			taskHistories: [...state.taskHistories, taskHistory],
+			taskHistory: [...state.taskHistory, taskHistory],
 		})),
 
 	updateTaskHistory: (id, updates) =>
 		set((state) => ({
-			taskHistories: state.taskHistories.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+			taskHistory: state.taskHistory.map((t) => (t.id === id ? { ...t, ...updates } : t)),
 		})),
 
 	removeTaskHistory: (id) =>
 		set((state) => ({
-			taskHistories: state.taskHistories.filter((t) => t.id !== id),
+			taskHistory: state.taskHistory.filter((t) => t.id !== id),
 		})),
 
 	// Relations
-	relations: [],
+	relations: {},
 
 	setRelations: (relations) => set({ relations }),
 
 	addRelation: (relation) =>
 		set((state) => ({
-			relations: [...state.relations, relation],
+			relations: {
+				...state.relations,
+				children: [...state.relations.children, relation],
+			},
 		})),
 
 	updateRelation: (id, updates) =>
@@ -59,4 +62,8 @@ export const createTasksSlice = (set) => ({
 		set((state) => ({
 			relations: state.relations.filter((t) => t.id !== id),
 		})),
+
+	// Tab
+	activeTab: "update",
+	setActiveTab: (activeTab) => set({ activeTab }),
 });

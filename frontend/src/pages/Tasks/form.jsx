@@ -16,6 +16,10 @@ import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -50,21 +54,11 @@ const formSchema = z.object({
 	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({
-	tasks,
-	projects,
-	users,
-	categories,
-	parentId,
-	setTaskAdded,
-	isOpen,
-	setIsOpen,
-	updateData,
-	setUpdateData,
-	fetchData,
-	setActiveTab,
-	setRelations,
-}) {
+export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { tasks, addRelation, setActiveTab } = useTasksStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
@@ -214,25 +208,27 @@ export default function TaskForm({
 			};
 			if (Object.keys(updateData).length === 0) {
 				const taskResponse = await axiosClient.post(API().task(), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
+				// if add subtask, don't close sheet
 				if (!parentId) setIsOpen(false);
 				else {
 					setActiveTab("relations");
+					// to show 3 tabs again
 					setUpdateData(formData);
-					setRelations((prev) => ({
-						...prev,
-						children: [...prev.children, taskResponse.data.data],
-					}));
+					addRelation(taskResponse.data.data.task);
 				}
 			} else if (updateData?.calendar_add) {
 				await axiosClient.post(API().task(), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
 				setTaskAdded(true);
 			} else {
 				await axiosClient.put(API().task(updateData?.id), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task updated.", 3000);
 				setIsOpen(false);
