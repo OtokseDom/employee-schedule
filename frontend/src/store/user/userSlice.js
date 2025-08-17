@@ -1,9 +1,9 @@
 export const createUserSlice = (set) => ({
 	user: {},
 	userReports: {},
-	filterProjects: [],
-	selectedProjects: [],
-	filters: {
+	profileProjectFilter: [],
+	profileSelectedProjects: [],
+	profileFilters: {
 		values: {
 			"Date Range": null,
 			Projects: [],
@@ -15,38 +15,19 @@ export const createUserSlice = (set) => ({
 	},
 
 	setUser: (user) => set({ user }),
-	addUser: (user) =>
-		set((state) => ({
-			users: [user, ...state.users],
-		})),
-	updateUser: (id, updates) =>
+	profileUpdateUser: (id, updates) =>
 		set((state) => ({
 			users: state.users.map((u) => (u.id === id ? { ...u, ...updates } : u)),
 		})),
-	removeUser: (id) =>
-		set((state) => ({
-			users: state.users.filter((u) => u.id !== id),
-		})),
 	setUserReports: (userReports) => set({ userReports }),
-	setFilterProjects: (filterProjects) => set({ filterProjects }),
-	setSelectedProjects: (selectedProjects) => set({ selectedProjects }),
-	setFilters: (filters) => set({ filters }),
+	setProfileProjectFilter: (profileProjectFilter) => set({ profileProjectFilter }),
+	setProfileSelectedProjects: (profileSelectedProjects) => set({ profileSelectedProjects }),
 
-	updateFilterValues: (key, value) =>
+	setProfileFilters: (newDisplay) =>
 		set((state) => ({
-			filters: {
-				...state.filters,
-				values: { ...state.filters.values, [key]: value },
-				display: { ...state.filters.display },
-			},
-		})),
-
-	updateFilterDisplay: (key, value) =>
-		set((state) => ({
-			filters: {
-				...state.filters,
-				values: { ...state.filters.values },
-				display: { ...state.filters.display, [key]: value },
+			profileFilters: {
+				values: { ...state.profileFilters.values, ...newDisplay.values },
+				display: { ...state.profileFilters.display, ...newDisplay.display },
 			},
 		})),
 });
