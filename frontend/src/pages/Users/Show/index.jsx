@@ -82,12 +82,19 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		if (Object.keys(user).length === 0 && user.id !== id) fetchDetails();
+		console.log(Object.keys(user).length === 0 || user.id !== id);
+		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
 		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
 	}, []);
+
+	useEffect(() => {
+		// Because 'view account' when on profile page already does not trigger rerender
+		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
+		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
+	}, [user.id, id]);
 
 	const fetchDetails = async () => {
 		setDetailsLoading(true);
