@@ -31,7 +31,6 @@ import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
 
 export default function UserProfile() {
-	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
 	const { users, setUsers, removeUser } = useUsersStore();
 	const {
@@ -69,7 +68,6 @@ export default function UserProfile() {
 		if (userReports?.user_tasks?.data) setTableData(flattenTasks(userReports?.user_tasks?.data));
 	}, [userReports?.user_tasks?.data]);
 
-	const navigate = useNavigate();
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
@@ -160,17 +158,6 @@ export default function UserProfile() {
 		}
 	};
 
-	const handleUpdateUser = async (user) => {
-		setIsOpenUser(true);
-		setUpdateDataUser(user);
-		// Update sidebar user if current user is updated
-		if (user.id == user_auth.id) {
-			axiosClient.get(API().user_auth).then(({ data }) => {
-				setUserAuth(data);
-			});
-		}
-	};
-
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
@@ -225,7 +212,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails handleUpdateUser={handleUpdateUser} setDetailsLoading={setDetailsLoading} detailsLoading={detailsLoading} />
+				<UserDetails setIsOpenUser={setIsOpenUser} setDetailsLoading={setDetailsLoading} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
@@ -234,7 +221,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} userProfileId={id} />
+					<UserForm setIsOpen={setIsOpenUser} updateData={user} setUpdateData={setUpdateDataUser} userProfileId={id} />
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">

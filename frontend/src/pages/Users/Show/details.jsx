@@ -14,8 +14,8 @@ import { API } from "@/constants/api";
 import { useUserStore } from "@/store/user/userStore";
 import { useUsersStore } from "@/store/users/usersStore";
 
-export default function UserDetails({ handleUpdateUser, setDetailsLoading, detailsLoading }) {
-	const { user: user_auth } = useAuthContext();
+export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsLoading }) {
+	const { user: user_auth, setUser } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,7 +28,6 @@ export default function UserDetails({ handleUpdateUser, setDetailsLoading, detai
 		setDialogType(type);
 		setDialogOpen(true);
 	};
-
 	const handleApproval = async (id) => {
 		setDetailsLoading(true);
 		try {
@@ -146,7 +145,7 @@ export default function UserDetails({ handleUpdateUser, setDetailsLoading, detai
 											className="w-full text-left px-2 py-1.5 text-sm cursor-pointer hover:bg-accent"
 											onClick={(e) => {
 												e.stopPropagation();
-												handleUpdateUser(user);
+												setIsOpenUser(true);
 											}}
 										>
 											Update Account

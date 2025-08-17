@@ -93,7 +93,8 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 				updateUser(updateData.id, userResponse.data.data);
 				if (userProfileId) setProfileUser(userResponse.data.data);
 				// Update auth user data if the updated user is the current logged-in user
-				if (user_auth.id === userResponse.data.data.id) setUser(userResponse.data.data);
+				const formattedAuthData = { data: userResponse.data.data };
+				if (user_auth.data.id === updateData?.id) setUser(formattedAuthData);
 				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {
