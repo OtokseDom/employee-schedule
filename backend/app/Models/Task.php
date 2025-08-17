@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -115,7 +116,7 @@ class Task extends Model
         ]);
 
         // Record Addition in Task History
-        $task->taskHistories()->create([
+        $taskHistory = $task->taskHistories()->create([
             'organization_id' => $userData->organization_id,
             'task_id' => $task->id,
             'status' => $task->status,
@@ -123,7 +124,11 @@ class Task extends Model
             'changed_at' => now(),
             'remarks' => "Task Added",
         ]);
-        return new TaskResource($task);
+        $data = [
+            "task" => new TaskResource($task),
+            "task_history" => new TaskHistoryResource($taskHistory)
+        ];
+        return $data;
     }
 
     public function showTask($id, $organization_id)
@@ -239,10 +244,11 @@ class Task extends Model
                 }
             }
         }
+        $history = null;
         // Record changes in Task History if there are any
         if (!empty($changes)) {
             // Record Update in Task History
-            $task->taskHistories()->create([
+            $history = $task->taskHistories()->create([
                 'organization_id' => $userData->organization_id,
                 'task_id' => $task->id,
                 'status' => $task->status,
@@ -251,6 +257,10 @@ class Task extends Model
                 'remarks' => $changes ? json_encode($changes) : null,
             ]);
         }
-        return new TaskResource($task);
+        $data = [
+            "task" => new TaskResource($task),
+            "task_history" => new TaskHistoryResource($history)
+        ];
+        return $data;
     }
 }
