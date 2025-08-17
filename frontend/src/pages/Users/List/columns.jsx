@@ -12,8 +12,8 @@ import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
 
-export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
-	const { updateUser } = useUsersStore();
+export const columns = ({ setIsOpen, setUpdateData }) => {
+	const { updateUser, removeUser } = useUsersStore();
 	const { user } = useAuthContext();
 	const { setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -33,30 +33,32 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 		setUpdateData(user);
 	};
 
-	const handleApproval = async (action, userRow = {}) => {
+	const handleApproval = async (userRow = {}) => {
 		setLoading(true);
 		try {
-			if (action === 0) {
-				const form = { ...userRow, status: "rejected" };
-				const res = await axiosClient.put(API().user(userRow?.id), form);
-				if (res.data.success) {
-					showToast("Success!", res.data.message, 3000);
-					updateUser(userRow.id, res.data.data);
-				} else {
-					showToast("Failed!", res.message, 3000);
-				}
+			const form = { ...userRow, status: "active" };
+			const res = await axiosClient.put(API().user(userRow?.id), form);
+			if (res.data.success) {
+				showToast("Success!", res.data.message, 3000);
+				updateUser(userRow.id, res.data.data);
 			} else {
-				const form = { ...userRow, status: "active" };
-				const res = await axiosClient.put(API().user(userRow?.id), form);
-				if (res.data.success) {
-					showToast("Success!", res.data.message, 3000);
-					updateUser(userRow.id, res.data.data);
-				} else {
-					showToast("Failed!", res.message, 3000);
-				}
+				showToast("Failed!", res.message, 3000);
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+		} finally {
+			setLoading(false);
+		}
+	};
+	const handleDelete = async (id) => {
+		setLoading(true);
+		try {
+			const userResponse = await axiosClient.delete(API().user(id));
+			removeUser(id);
+			showToast("Success!", userResponse?.data?.message, 3000);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -128,7 +130,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 										className="text-green-500 cursor-pointer"
 										onClick={(e) => {
 											e.stopPropagation();
-											handleApproval(1, userRow);
+											handleApproval(userRow);
 										}}
 									>
 										Approve User
@@ -173,7 +175,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			<DialogContent onClick={(e) => e.stopPropagation()}>
 				<DialogHeader>
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>{dialogType === "delete" ? "This action cannot be undone." : "You can update user status anytime."}</DialogDescription>
+					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
 					<DialogClose asChild>
@@ -183,7 +185,7 @@ export const columns = ({ handleDelete, setIsOpen, setUpdateData }) => {
 					</DialogClose>
 					<Button
 						onClick={() => {
-							if (dialogType === "reject") handleApproval(0, selectedUser);
+							if (dialogType === "reject") handleDelete(selectedUser.id);
 							else if (dialogType === "delete") handleDelete(selectedUser.id);
 							setDialogOpen(false);
 						}}
