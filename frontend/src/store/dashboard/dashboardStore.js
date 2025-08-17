@@ -14,7 +14,5 @@ export const useDashboardStore = () => {
 		setSelectedUsers: useAppStore((state) => state.setSelectedUsers),
 		setSelectedProjects: useAppStore((state) => state.setSelectedProjects),
 		setFilters: useAppStore((state) => state.setFilters),
-		updateFilterValues: useAppStore((state) => state.updateFilterValues),
-		updateFilterDisplays: useAppStore((state) => state.updateFilterDisplays),
 	};
 };
