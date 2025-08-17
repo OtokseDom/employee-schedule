@@ -8,8 +8,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import UserForm from "../form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
 import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
@@ -37,15 +36,15 @@ export default function UserProfile() {
 	const {
 		user,
 		setUser,
-		updateUser,
+		profileUpdateUser,
 		userReports,
 		setUserReports,
-		filterProjects,
-		setFilterProjects,
-		filters,
-		setFilters,
-		selectedProjects,
-		setSelectedProjects,
+		profileProjectFilter,
+		setProfileProjectFilter,
+		profileFilters,
+		setProfileFilters,
+		profileSelectedProjects,
+		setProfileSelectedProjects,
 	} = useUserStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
@@ -122,7 +121,7 @@ export default function UserProfile() {
 				value: project.id,
 				label: project.title,
 			}));
-			setFilterProjects(mappedProjects);
+			setProfileProjectFilter(mappedProjects);
 			setProjects(projectResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -162,7 +161,7 @@ export default function UserProfile() {
 				const form = { ...user, status: "rejected" };
 				try {
 					const userResponse = await axiosClient.put(API().user(id), form);
-					updateUser(id, userResponse?.data?.data);
+					profileUpdateUser(id, userResponse?.data?.data);
 					showToast("Success!", userResponse?.data?.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -175,7 +174,7 @@ export default function UserProfile() {
 				};
 				try {
 					const userResponse = await axiosClient.put(API().user(id), form);
-					updateUser(id, userResponse?.data?.data);
+					profileUpdateUser(id, userResponse?.data?.data);
 					showToast("Success!", userResponse?.data?.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -216,14 +215,13 @@ export default function UserProfile() {
 		}
 	};
 	const handleRemoveFilter = async (key) => {
-		// const updated = { ...filters };
 		const updated = {
-			values: { ...filters.values },
-			display: { ...filters.display },
+			values: { ...profileFilters.values },
+			display: { ...profileFilters.display },
 		};
-		delete updated.values[key];
-		delete updated.display[key];
-		setFilters(updated);
+		updated.values[key] = "";
+		updated.display[key] = "";
+		setProfileFilters(updated);
 		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
 		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
 		const projects = updated.values["Projects"] ?? "";
@@ -280,16 +278,16 @@ export default function UserProfile() {
 							<FilterForm
 								setIsOpen={setIsOpenFilter}
 								setReports={setUserReports}
-								filters={filters}
-								setFilters={setFilters}
-								projects={filterProjects}
-								selectedProjects={selectedProjects}
-								setSelectedProjects={setSelectedProjects}
+								filters={profileFilters}
+								setFilters={setProfileFilters}
+								projects={profileProjectFilter}
+								selectedProjects={profileSelectedProjects}
+								setSelectedProjects={setProfileSelectedProjects}
 								userId={id}
 							/>
 						</DialogContent>
 					</Dialog>
-					<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
+					<FilterTags filters={profileFilters.display} onRemove={handleRemoveFilter} />
 				</div>
 				{/* Overall Progress */}
 				<div className="md:col-span-12 w-full">
