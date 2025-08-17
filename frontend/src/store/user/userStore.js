@@ -4,7 +4,6 @@ export const useUserStore = () => {
 	return {
 		user: useAppStore((state) => state.user),
 		setUser: useAppStore((state) => state.setUser),
-		profileUpdateUser: useAppStore((state) => state.profileUpdateUser),
 		userReports: useAppStore((state) => state.userReports),
 		setUserReports: useAppStore((state) => state.setUserReports),
 		profileProjectFilter: useAppStore((state) => state.profileProjectFilter),

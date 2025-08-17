@@ -17,6 +17,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import DateInput from "@/components/form/DateInput";
 import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
+import { useUserStore } from "@/store/user/userStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -39,11 +40,12 @@ const formSchema = z.object({
 	}),
 });
 
-export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
+export default function UserForm({ setIsOpen, updateData, setUpdateData, userProfileId }) {
 	const { user: user_auth, setUser } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { addUser, updateUser } = useUsersStore();
+	const { setUser: setProfileUser } = useUserStore();
 
 	const [date, setDate] = useState();
 
@@ -89,6 +91,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData }) {
 			} else {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
 				updateUser(updateData.id, userResponse.data.data);
+				if (userProfileId) setProfileUser(userResponse.data.data);
 				// Update auth user data if the updated user is the current logged-in user
 				if (user_auth.id === userResponse.data.data.id) setUser(userResponse.data.data);
 				showToast("Success!", "User updated.", 3000);

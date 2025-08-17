@@ -15,10 +15,6 @@ export const createUserSlice = (set) => ({
 	},
 
 	setUser: (user) => set({ user }),
-	profileUpdateUser: (id, updates) =>
-		set((state) => ({
-			users: state.users.map((u) => (u.id === id ? { ...u, ...updates } : u)),
-		})),
 	setUserReports: (userReports) => set({ userReports }),
 	setProfileProjectFilter: (profileProjectFilter) => set({ profileProjectFilter }),
 	setProfileSelectedProjects: (profileSelectedProjects) => set({ profileSelectedProjects }),

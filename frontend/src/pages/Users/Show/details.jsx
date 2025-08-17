@@ -11,13 +11,17 @@ import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useNavigate } from "react-router-dom";
 import { API } from "@/constants/api";
+import { useUserStore } from "@/store/user/userStore";
+import { useUsersStore } from "@/store/users/usersStore";
 
-export default function UserDetails({ user, handleUpdateUser, handleApproval, detailsLoading }) {
+export default function UserDetails({ handleUpdateUser, handleApproval, detailsLoading }) {
 	const { user: user_auth } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
+	const { user } = useUserStore();
+	const { removeUser } = useUsersStore();
 	const navigate = useNavigate();
 
 	const openDialog = (type) => {
@@ -29,6 +33,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval, de
 		setLoading(true);
 		try {
 			await axiosClient.delete(API().user(id));
+			removeUser(id);
 			showToast("Success!", "User deleted.", 3000);
 			navigate("/users");
 		} catch (e) {
