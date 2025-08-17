@@ -28,15 +28,15 @@ import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
+import UserForm from "../form";
 
 export default function UserProfile() {
 	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
-	const { users, setUsers } = useUsersStore();
+	const { users, setUsers, removeUser } = useUsersStore();
 	const {
 		user,
 		setUser,
-		profileUpdateUser,
 		userReports,
 		setUserReports,
 		profileProjectFilter,
@@ -82,7 +82,6 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		console.log(Object.keys(user).length === 0 || user.id !== id);
 		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
@@ -165,11 +164,11 @@ export default function UserProfile() {
 		setDetailsLoading(true);
 		try {
 			if (action == 0) {
-				const form = { ...user, status: "rejected" };
 				try {
-					const userResponse = await axiosClient.put(API().user(id), form);
-					profileUpdateUser(id, userResponse?.data?.data);
-					showToast("Success!", userResponse?.data?.message, 3000);
+					await axiosClient.delete(API().user(id));
+					removeUser(id);
+					navigate("/users");
+					showToast("Success!", "User deleted successfully", 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
 					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -181,7 +180,7 @@ export default function UserProfile() {
 				};
 				try {
 					const userResponse = await axiosClient.put(API().user(id), form);
-					profileUpdateUser(id, userResponse?.data?.data);
+					setUser(userResponse?.data?.data);
 					showToast("Success!", userResponse?.data?.message, 3000);
 				} catch (e) {
 					showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -261,7 +260,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} detailsLoading={detailsLoading} />
+				<UserDetails handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
@@ -270,7 +269,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					{/* <UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchSelection} /> */}
+					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} userProfileId={id} />
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
