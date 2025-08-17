@@ -160,41 +160,6 @@ export default function UserProfile() {
 		}
 	};
 
-	const handleApproval = async (action, id) => {
-		setDetailsLoading(true);
-		try {
-			if (action == 0) {
-				try {
-					await axiosClient.delete(API().user(id));
-					removeUser(id);
-					navigate("/users");
-					showToast("Success!", "User deleted successfully", 3000);
-				} catch (e) {
-					showToast("Failed!", e.response?.data?.message, 3000, "fail");
-					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-				}
-			} else {
-				const form = {
-					...user,
-					status: "active",
-				};
-				try {
-					const userResponse = await axiosClient.put(API().user(id), form);
-					setUser(userResponse?.data?.data);
-					showToast("Success!", userResponse?.data?.message, 3000);
-				} catch (e) {
-					showToast("Failed!", e.response?.data?.message, 3000, "fail");
-					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-				}
-			}
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setDetailsLoading(false);
-		}
-	};
 	const handleUpdateUser = async (user) => {
 		setIsOpenUser(true);
 		setUpdateDataUser(user);
@@ -260,7 +225,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} detailsLoading={detailsLoading} />
+				<UserDetails handleUpdateUser={handleUpdateUser} setDetailsLoading={setDetailsLoading} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>

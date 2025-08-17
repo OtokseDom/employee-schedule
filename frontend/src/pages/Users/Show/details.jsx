@@ -14,7 +14,7 @@ import { API } from "@/constants/api";
 import { useUserStore } from "@/store/user/userStore";
 import { useUsersStore } from "@/store/users/usersStore";
 
-export default function UserDetails({ handleUpdateUser, handleApproval, detailsLoading }) {
+export default function UserDetails({ handleUpdateUser, setDetailsLoading, detailsLoading }) {
 	const { user: user_auth } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -29,12 +29,36 @@ export default function UserDetails({ handleUpdateUser, handleApproval, detailsL
 		setDialogOpen(true);
 	};
 
+	const handleApproval = async (id) => {
+		setDetailsLoading(true);
+		try {
+			const form = {
+				...user,
+				status: "active",
+			};
+			try {
+				const userResponse = await axiosClient.put(API().user(id), form);
+				setUser(userResponse?.data?.data);
+				showToast("Success!", userResponse?.data?.message, 3000);
+			} catch (e) {
+				showToast("Failed!", e.response?.data?.message, 3000, "fail");
+				if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+			}
+			// }
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			// Always stop loading when done
+			setDetailsLoading(false);
+		}
+	};
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(API().user(id));
+			const userResponse = await axiosClient.delete(API().user(id));
 			removeUser(id);
-			showToast("Success!", "User deleted.", 3000);
+			showToast("Success!", userResponse?.data?.message, 3000);
 			navigate("/users");
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -65,11 +89,11 @@ export default function UserDetails({ handleUpdateUser, handleApproval, detailsL
 						</DialogClose>
 						<Button
 							onClick={() => {
-								if (dialogType === "reject") handleApproval(0, user.id);
+								if (dialogType === "reject") handleDelete(user.id);
 								else if (dialogType === "delete") handleDelete(user.id);
 							}}
 						>
-							Yes, delete
+							{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -106,7 +130,7 @@ export default function UserDetails({ handleUpdateUser, handleApproval, detailsL
 									<DropdownMenuContent align="end">
 										{user?.status == "pending" && (
 											<>
-												<DropdownMenuItem className="cursor-pointer text-green-500" onClick={() => handleApproval(1, user.id)}>
+												<DropdownMenuItem className="cursor-pointer text-green-500" onClick={() => handleApproval(user.id)}>
 													Approve User
 												</DropdownMenuItem>
 												<DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => openDialog("reject")}>
