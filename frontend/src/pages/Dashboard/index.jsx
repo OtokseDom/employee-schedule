@@ -23,7 +23,21 @@ export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
-	const { reports, setReports, userFilter, setUserFilter, projectFilter, setProjectFilter, filters, setFilters } = useDashboardStore();
+	const {
+		reports,
+		setReports,
+		userFilter,
+		setUserFilter,
+		projectFilter,
+		setProjectFilter,
+		filters,
+		setFilters,
+		selectedProjects,
+		setSelectedProjects,
+		selectedUsers,
+		setSelectedUsers,
+	} = useDashboardStore();
+
 	const [isOpen, setIsOpen] = useState(false);
 
 	useEffect(() => {
@@ -34,7 +48,6 @@ export default function UserProfile() {
 		if (users.length !== userFilter.length) mapUserFilter(users);
 		if (projects.length !== projectFilter.length) mapProjectFilter(projects);
 	}, []);
-
 	const fetchReports = async () => {
 		setLoading(true);
 		try {
@@ -72,7 +85,7 @@ export default function UserProfile() {
 		try {
 			const projectResponse = await axiosClient.get(API().project());
 			setProjects(projectResponse.data.data);
-			mapUserFilter(projectResponse.data.data);
+			mapProjectFilter(projectResponse.data.data);
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -93,8 +106,8 @@ export default function UserProfile() {
 			values: { ...filters.values },
 			display: { ...filters.display },
 		};
-		delete updated.values[key];
-		delete updated.display[key];
+		updated.values[key] = "";
+		updated.display[key] = "";
 		setFilters(updated);
 		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
 		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
@@ -102,7 +115,7 @@ export default function UserProfile() {
 		const members = updated.values["Members"] ?? "";
 		setLoading(true);
 		try {
-			// Fetch all user reports in one call
+			// Fetch all reports in one call
 			const reportsRes = await axiosClient.get(API().dashboard(from, to, members, projects));
 			setReports(reportsRes.data.data);
 			setLoading(false);
@@ -135,7 +148,19 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								<FilterForm setIsOpen={setIsOpen} />
+								{/* <FilterForm setIsOpen={setIsOpen} /> */}
+								<FilterForm
+									setIsOpen={setIsOpen}
+									setReports={setReports}
+									filters={filters}
+									setFilters={setFilters}
+									projects={projectFilter}
+									users={userFilter}
+									selectedProjects={selectedProjects}
+									setSelectedProjects={setSelectedProjects}
+									selectedUsers={selectedUsers}
+									setSelectedUsers={setSelectedUsers}
+								/>
 							</DialogContent>
 						</Dialog>
 					</div>
