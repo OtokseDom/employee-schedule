@@ -3,7 +3,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { Edit, Loader2, User2 } from "lucide-react";
+import { Edit, User2 } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
@@ -16,7 +16,7 @@ import { useUsersStore } from "@/store/users/usersStore";
 
 export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsLoading }) {
 	const { user: user_auth, setUser } = useAuthContext();
-	const { loading, setLoading } = useLoadContext();
+	const { setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
@@ -56,9 +56,9 @@ export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsL
 		setLoading(true);
 		try {
 			const userResponse = await axiosClient.delete(API().user(id));
+			navigate("/users");
 			removeUser(id);
 			showToast("Success!", userResponse?.data?.message, 3000);
-			navigate("/users");
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
@@ -77,10 +77,7 @@ export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsL
 			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle className="flex flex-row items-center gap-2">
-							Are you absolutely sure?
-							{loading && <Loader2 className="animate-spin text-foreground" />}
-						</DialogTitle>
+						<DialogTitle className="flex flex-row items-center gap-2">Are you absolutely sure?</DialogTitle>
 						<DialogDescription>This action cannot be undone.</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -89,14 +86,9 @@ export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsL
 								Close
 							</Button>
 						</DialogClose>
-						<Button
-							onClick={() => {
-								if (dialogType === "reject") handleDelete(user.id);
-								else if (dialogType === "delete") handleDelete(user.id);
-							}}
-						>
-							{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}
-						</Button>
+						<DialogClose asChild>
+							<Button onClick={() => handleDelete(user.id)}>{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}</Button>
+						</DialogClose>
 					</DialogFooter>
 				</DialogContent>
 
