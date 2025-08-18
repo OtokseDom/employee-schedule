@@ -10,34 +10,18 @@ import History from "@/components/task/History";
 import { flattenTasks, statusColors } from "@/utils/taskHelpers";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 
-export default function Month({ data, projects, users, categories, fetchData, days, currentMonth, getTaskForDate, selectedUser, taskHistory }) {
-	const { loading, setLoading } = useLoadContext();
-	const [tasks, setTasks] = useState(data);
+export default function Month({ days, currentMonth, getTaskForDate, fetchData }) {
+	const { loading } = useLoadContext();
+	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab, selectedUser } = useTasksStore();
+
+	// const [tasks, setTasks] = useState(tasks);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
-	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
-	const [relations, setRelations] = useState([]);
-	const [activeTab, setActiveTab] = useState(false);
-	// Flatten tasks for datatable usage (also groups children below parent)
-	const [tableData, setTableData] = useState([]);
 
-	useEffect(() => {
-		if (taskAdded) {
-			fetchData();
-			setTaskAdded(false);
-		}
-	}, [taskAdded]);
-
-	useEffect(() => {
-		setTableData(flattenTasks(tasks));
-	}, [tasks]);
-
-	useEffect(() => {
-		setTasks(data);
-	}, [data]);
 	useEffect(() => {
 		if (!openDialogIndex) {
 			setRelations({});
@@ -113,7 +97,7 @@ export default function Month({ data, projects, users, categories, fetchData, da
 												<div
 													key={task.id}
 													onClick={(e) => {
-														//set update data when a task is clicked
+														//set update tasks when a task is clicked
 														e.stopPropagation();
 														setUpdateData({});
 														setTimeout(() => setUpdateData(task), 0);
@@ -153,30 +137,23 @@ export default function Month({ data, projects, users, categories, fetchData, da
 							{activeTab == "history" ? (
 								<History selectedTaskHistory={selectedTaskHistory} />
 							) : activeTab == "relations" ? (
-								<Relations
-									relations={relations}
-									setUpdateData={setUpdateData}
-									setActiveTab={setActiveTab}
-									setParentId={setParentId}
-									taskHistory={taskHistory}
-									setSelectedTaskHistory={setSelectedTaskHistory}
-								/>
+								<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
 							) : (
 								<TaskForm
-									tasks={flattenTasks(data)}
-									projects={projects}
-									users={users}
-									categories={categories}
+									// tasks={flattenTasks(tasks)}
+									// projects={projects}
+									// users={users}
+									// categories={categories}
 									isOpen={isDialogOpen}
 									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
 									setUpdateData={setUpdateData}
 									fetchData={fetchData}
 									setTaskAdded={setTaskAdded}
-									setRelations={setRelations}
+									// setRelations={setRelations}
 									parentId={parentId}
-									selectedTaskHistory={selectedTaskHistory}
-									setActiveTab={setActiveTab}
+									// selectedTaskHistory={selectedTaskHistory}
+									// setActiveTab={setActiveTab}
 								/>
 							)}
 						</SheetContent>

@@ -11,6 +11,10 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import Week from "./week";
 import Month from "./month";
 import { API } from "@/constants/api";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
@@ -22,29 +26,37 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const [tasks, setTasks] = useState([]);
-	const [taskHistory, setTaskHistory] = useState([]);
-	const [projects, setProjects] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [selectedUser, setSelectedUser] = useState(users || null);
-	const [categories, setCategories] = useState(users || null);
+	const { tasks, setTasks, taskHistory, setTaskHistory, selectedUser, setSelectedUser } = useTasksStore();
+	const { users, setUsers } = useUsersStore();
+	const { projects, setProjects } = useProjectsStore();
+	const { categories, setCategories } = useCategoriesStore();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
-		fetchSelection();
-		fetchTasks();
+
+		if (!projects || projects.length === 0) fetchProjects();
+		if (!users || users.length === 0) fetchUsers();
+		else if (!selectedUser) setSelectedUser(users[0]);
+		if (!categories || categories.length === 0) fetchCategories();
+		if (!tasks || tasks.length === 0) fetchData();
 	}, []);
 
-	const fetchSelection = async () => {
-		// setLocalLoading(true);
+	const fetchProjects = async () => {
+		setLoading(true);
 		try {
-			setLoading(true);
 			const projectResponse = await axiosClient.get(API().project());
+			setProjects(projectResponse?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchUsers = async () => {
+		setLoading(true);
+		try {
 			const userResponse = await axiosClient.get(API().user());
-			const categoryResponse = await axiosClient.get(API().category());
-			setProjects(projectResponse.data.data);
-			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.data);
+			setUsers(userResponse?.data?.data);
 			setSelectedUser(userResponse.data.data[0]);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -52,7 +64,18 @@ export default function ScheduleCalendar() {
 			setLoading(false);
 		}
 	};
-	const fetchTasks = async () => {
+	const fetchCategories = async () => {
+		setLoading(true);
+		try {
+			const categoryResponse = await axiosClient.get(API().category());
+			setCategories(categoryResponse?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchData = async () => {
 		setLoading(true);
 		try {
 			const taskResponse = await axiosClient.get(API().task());
@@ -235,29 +258,29 @@ export default function ScheduleCalendar() {
 				{selectedView === "month" ? (
 					<Month
 						days={days}
-						data={tasks}
-						projects={projects}
-						users={users}
-						categories={categories}
-						fetchData={fetchTasks}
+						// data={tasks}
+						// projects={projects}
+						// users={users}
+						// categories={categories}
+						fetchData={fetchData}
 						currentMonth={currentMonth}
 						getTaskForDate={getTaskForDate}
-						selectedUser={selectedUser}
-						taskHistory={taskHistory}
+						// selectedUser={selectedUser}
+						// taskHistory={taskHistory}
 					/>
 				) : (
 					<Week
-						data={tasks}
-						projects={projects}
-						users={users}
-						categories={categories}
-						fetchData={fetchTasks}
+						// data={tasks}
+						// projects={projects}
+						// users={users}
+						// categories={categories}
+						fetchData={fetchData}
 						getWeekDays={getWeekDays}
 						getTimeSlots={getTimeSlots}
 						weekstart_date={weekstart_date}
 						isInTimeSlot={isInTimeSlot}
-						selectedUser={selectedUser}
-						taskHistory={taskHistory}
+						// selectedUser={selectedUser}
+						// taskHistory={taskHistory}
 					/>
 				)}
 			</div>
