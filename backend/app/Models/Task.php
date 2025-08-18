@@ -259,7 +259,7 @@ class Task extends Model
         }
         $data = [
             "task" => new TaskResource($task),
-            "task_history" => new TaskHistoryResource($history)
+            "task_history" => $history ? new TaskHistoryResource($history) : null
         ];
         return $data;
     }
