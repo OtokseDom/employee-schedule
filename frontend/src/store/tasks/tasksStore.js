@@ -24,5 +24,8 @@ export const useTasksStore = () => {
 		// Tab
 		activeTab: useAppStore((state) => state.activeTab),
 		setActiveTab: useAppStore((state) => state.setActiveTab),
+		// Calendar
+		selectedUser: useAppStore((state) => state.selectedUser),
+		setSelectedUser: useAppStore((state) => state.setSelectedUser),
 	};
 };

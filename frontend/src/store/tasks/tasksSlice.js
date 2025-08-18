@@ -66,4 +66,7 @@ export const createTasksSlice = (set) => ({
 	// Tab
 	activeTab: "update",
 	setActiveTab: (activeTab) => set({ activeTab }),
+	// Calendar
+	selectedUser: null,
+	setSelectedUser: (selectedUser) => set({ selectedUser }),
 });
