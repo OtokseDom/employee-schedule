@@ -29,14 +29,13 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
-
+// TODO: multi assignee, only title is and status required, hide unnecessary fields
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	const { users, setUsers, removeUser } = useUsersStore();
+	const { users, setUsers } = useUsersStore();
 	const {
 		user,
 		setUser,
-		setUserTaskHistory,
 		userReports,
 		setUserReports,
 		profileProjectFilter,
@@ -340,7 +339,6 @@ export default function UserProfile() {
 									: ""}
 							</p>
 						</div>
-						{/* TODO: Relations coming undefined */}
 						<DataTableTasks
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 							data={tableData}
