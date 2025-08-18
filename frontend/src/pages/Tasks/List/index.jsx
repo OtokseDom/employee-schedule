@@ -96,7 +96,8 @@ export default function Tasks() {
 		setLoading(true);
 		try {
 			await axiosClient.delete(API().task(id));
-			removeTask(id);
+			// needs to remove all children tasks as well
+			fetchData();
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
