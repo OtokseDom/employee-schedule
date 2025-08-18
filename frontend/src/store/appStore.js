@@ -5,6 +5,7 @@ import { createDashboardSlice } from "./dashboard/dashboardSlice";
 import { createProjectsSlice } from "./projects/projectsSlice";
 import { createUserSlice } from "./user/userSlice";
 import { createCategoriesSlice } from "./categories/categoriesSlice";
+import { createOrganizationSlice } from "./organization/organizationSlice";
 
 export const useAppStore = create((set) => ({
 	...createDashboardSlice(set),
@@ -13,4 +14,5 @@ export const useAppStore = create((set) => ({
 	...createUsersSlice(set),
 	...createUserSlice(set),
 	...createCategoriesSlice(set),
+	...createOrganizationSlice(set),
 }));
