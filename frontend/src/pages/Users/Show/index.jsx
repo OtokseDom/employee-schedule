@@ -69,7 +69,7 @@ export default function UserProfile() {
 			const filteredUserTasks = tasks.filter((task) => task.assignee_id === parseInt(id));
 			setTableData(flattenTasks(filteredUserTasks));
 		}
-	}, [tasks]);
+	}, [tasks, id]);
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
@@ -344,22 +344,12 @@ export default function UserProfile() {
 						<DataTableTasks
 							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 							data={tableData}
-							// taskHistory={taskHistory}
-							// selectedTaskHistory={selectedTaskHistory}
-							// relations={relations}
-							// setRelations={setRelations}
-							// setSelectedTaskHistory={setSelectedTaskHistory}
-							// projects={projects}
-							// users={users}
-							// categories={categories}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
 							fetchData={fetchTasks}
 							showLess={true}
-							// activeTab={activeTab}
-							// setActiveTab={setActiveTab}
 							parentId={parentId}
 							setParentId={setParentId}
 						/>

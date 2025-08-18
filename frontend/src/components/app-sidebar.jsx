@@ -1,19 +1,4 @@
-import {
-	ChevronUp,
-	MoonStar,
-	Sun,
-	User2,
-	Calendar,
-	ClipboardList,
-	Users2,
-	CalendarClock,
-	Settings,
-	Tag,
-	ChevronDown,
-	Gauge,
-	Building,
-	FolderKanban,
-} from "lucide-react";
+import { ChevronUp, MoonStar, Sun, User2, ClipboardList, Users2, CalendarClock, Settings, Tag, ChevronDown, Gauge, Building, FolderKanban } from "lucide-react";
 import logo from "../assets/logo.png";
 
 import {
@@ -29,7 +14,6 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 	SidebarTrigger,
-	SidebarMenuSubButton,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
 	useSidebar, // for auto closing sidebar on mobile location change
@@ -105,7 +89,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-	const { user, token, setToken, setUser } = useAuthContext();
+	const { user, setToken, setUser } = useAuthContext();
 	const { isMobile, openMobile, setOpenMobile } = useSidebar(); // Add this line
 
 	// Darkmode set session
@@ -260,14 +244,9 @@ export function AppSidebar() {
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-								<DropdownMenuItem
-									onClick={() => {
-										setCurrentPath(`/users/${user?.data?.id}`);
-										navigate(`/users/${user?.data?.id}`);
-									}}
-								>
-									<span>Account</span>
-								</DropdownMenuItem>
+								<Link to={`/users/${user?.data?.id}`}>
+									<DropdownMenuItem>Account</DropdownMenuItem>
+								</Link>
 								<DropdownMenuItem onClick={onLogout}>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
