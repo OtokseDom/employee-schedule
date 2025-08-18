@@ -36,6 +36,7 @@ export default function UserProfile() {
 	const {
 		user,
 		setUser,
+		setUserTaskHistory,
 		userReports,
 		setUserReports,
 		profileProjectFilter,
@@ -47,7 +48,7 @@ export default function UserProfile() {
 	} = useUserStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
-	const { taskHistory, setTaskHistory, selectedTaskHistory, setSelectedTaskHistory, relations, setRelations } = useTasksStore();
+	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab } = useTasksStore();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const showToast = useToast();
@@ -59,15 +60,16 @@ export default function UserProfile() {
 	// Subtasks
 	// const [relations, setRelations] = useState([]);
 
-	const [activeTab, setActiveTab] = useState(false);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
 
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const [tableData, setTableData] = useState([]);
 	useEffect(() => {
-		if (userReports?.user_tasks?.data) setTableData(flattenTasks(userReports?.user_tasks?.data));
-	}, [userReports?.user_tasks?.data]);
-
+		if (tasks || tasks?.length > 0) {
+			const filteredUserTasks = tasks.filter((task) => task.assignee_id === parseInt(id));
+			setTableData(flattenTasks(filteredUserTasks));
+		}
+	}, [tasks]);
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
@@ -81,6 +83,7 @@ export default function UserProfile() {
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
 		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
+		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
@@ -109,7 +112,18 @@ export default function UserProfile() {
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes?.data?.data);
-			setTaskHistory(reportsRes?.data?.data?.user_tasks?.task_history);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchTasks = async () => {
+		setLoading(true);
+		try {
+			const taskResponse = await axiosClient.get(API().task());
+			setTasks(taskResponse?.data?.data?.tasks);
+			setTaskHistory(taskResponse?.data?.data?.task_history);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -326,29 +340,26 @@ export default function UserProfile() {
 									: ""}
 							</p>
 						</div>
-
+						{/* TODO: Relations coming undefined */}
 						<DataTableTasks
-							columns={columnsTask(
-								{ tableData, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations },
-								false
-							)}
+							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
 							data={tableData}
-							taskHistory={taskHistory}
-							selectedTaskHistory={selectedTaskHistory}
-							relations={relations}
-							setRelations={setRelations}
-							setSelectedTaskHistory={setSelectedTaskHistory}
-							projects={projects}
-							users={users}
-							categories={categories}
+							// taskHistory={taskHistory}
+							// selectedTaskHistory={selectedTaskHistory}
+							// relations={relations}
+							// setRelations={setRelations}
+							// setSelectedTaskHistory={setSelectedTaskHistory}
+							// projects={projects}
+							// users={users}
+							// categories={categories}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
-							fetchData={fetchData}
+							fetchData={fetchTasks}
 							showLess={true}
-							activeTab={activeTab}
-							setActiveTab={setActiveTab}
+							// activeTab={activeTab}
+							// setActiveTab={setActiveTab}
 							parentId={parentId}
 							setParentId={setParentId}
 						/>
