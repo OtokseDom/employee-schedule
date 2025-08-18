@@ -18,7 +18,7 @@ import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 
 export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true, parentId, setParentId }) {
-	const { taskHistory, selectedTaskHistory, setSelectedTaskHistory, relations, activeTab, setActiveTab } = useTasksStore();
+	const { selectedTaskHistory, activeTab, setActiveTab } = useTasksStore();
 	const { loading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -134,14 +134,7 @@ export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, s
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations
-										relations={relations}
-										setUpdateData={setUpdateData}
-										setActiveTab={setActiveTab}
-										setParentId={setParentId}
-										taskHistory={taskHistory}
-										setSelectedTaskHistory={setSelectedTaskHistory}
-									/>
+									<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
 								) : (
 									<TaskForm
 										parentId={parentId}
@@ -218,7 +211,10 @@ export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, s
 						) : table.getRowModel().rows.length ? (
 							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} onClick={() => handleUpdate(row.original)} className="cursor-pointer">
+								<TableRow
+									key={row.id}
+									//  onClick={() => handleUpdate(row.original)} className="cursor-pointer"
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}

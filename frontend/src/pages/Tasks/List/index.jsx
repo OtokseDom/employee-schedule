@@ -113,7 +113,7 @@ export default function Tasks() {
 				<p>View list of all tasks</p>
 			</div>
 			<DataTableTasks
-				columns={columnsTask({ tableData, handleDelete, setIsOpen, setUpdateData })}
+				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
 				data={tableData}
 				updateData={updateData}
 				setUpdateData={setUpdateData}
