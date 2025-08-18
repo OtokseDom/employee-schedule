@@ -3,10 +3,18 @@ import { ArrowUpDown } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-export const columnsCategory = ({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
+import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
+	const { setLoading } = useLoadContext();
+	const { setCategories } = useCategoriesStore();
+	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
@@ -17,6 +25,21 @@ export const columnsCategory = ({ handleDelete, setIsOpen, setUpdateData, dialog
 	const handleUpdateCategory = (category) => {
 		setIsOpen(true);
 		setUpdateData(category);
+	};
+	const handleDelete = async (id) => {
+		setLoading(true);
+		try {
+			const categoryResponse = await axiosClient.delete(API().category(id));
+			setCategories(categoryResponse.data.data);
+			showToast("Success!", "Category deleted.", 3000);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			// Always stop loading when done
+			setDialogOpen(false);
+			setLoading(false);
+		}
 	};
 	const baseColumns = useMemo(
 		() => [
@@ -80,7 +103,7 @@ export const columnsCategory = ({ handleDelete, setIsOpen, setUpdateData, dialog
 	}
 
 	const dialog = (
-		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={true}>
+		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={false}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
@@ -92,7 +115,14 @@ export const columnsCategory = ({ handleDelete, setIsOpen, setUpdateData, dialog
 							Close
 						</Button>
 					</DialogClose>
-					<Button onClick={() => handleDelete(selectedCategoryId)}>Yes, delete</Button>
+					<Button
+						onClick={() => {
+							handleDelete(selectedCategoryId);
+							setDialogOpen(false);
+						}}
+					>
+						Yes, delete
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

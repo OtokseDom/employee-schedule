@@ -5,11 +5,11 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableCategories } from "./data-table";
 import { API } from "@/constants/api";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 
 export default function Categories() {
-	const { loading, setLoading } = useLoadContext();
-	const [categories, setCategories] = useState([]);
-	const showToast = useToast();
+	const { setLoading } = useLoadContext();
+	const { categories, setCategories } = useCategoriesStore();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,7 +19,7 @@ export default function Categories() {
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Categories";
-		fetchData();
+		if (!categories || categories.length === 0) fetchData();
 	}, []);
 	const fetchData = async () => {
 		setLoading(true);
@@ -35,41 +35,29 @@ export default function Categories() {
 		}
 	};
 
-	const handleDelete = async (id) => {
-		setLoading(true);
-		try {
-			const categoryResponse = await axiosClient.delete(API().category(id));
-			setCategories(categoryResponse.data.data);
-			showToast("Success!", "Category deleted.", 3000);
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setDialogOpen(false);
-			setLoading(false);
-		}
-	};
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
+					dialogOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div>
 				<h1 className=" font-extrabold text-3xl">Categories</h1>
 				<p>View list of all categories</p>
 			</div>
 			{/* Updated table to fix dialog per column issue */}
 			{(() => {
-				const { columnsCategory: categoryColumns, dialog } = columnsCategory({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen });
+				const { columnsCategory: categoryColumns, dialog } = columnsCategory({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen });
 				return (
 					<>
 						<DataTableCategories
 							columns={categoryColumns}
-							data={categories}
-							setCategories={setCategories}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
-							fetchData={fetchData}
 						/>
 						{dialog}
 					</>

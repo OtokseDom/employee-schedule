@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -23,8 +24,9 @@ const formSchema = z.object({
 	}),
 });
 
-export default function CategoryForm({ data, setCategories, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function CategoryForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
+	const { categories: data, setCategories, updateCategory, addCategory } = useCategoriesStore();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -51,14 +53,11 @@ export default function CategoryForm({ data, setCategories, setIsOpen, updateDat
 		try {
 			if (Object.keys(updateData).length === 0) {
 				const categoryResponse = await axiosClient.post(API().category(), form);
-				const addedCategory = categoryResponse.data.data;
-				// Insert added category in categories array
-				const updatedCategories = [addedCategory, ...data];
-				setCategories(updatedCategories);
+				addCategory(categoryResponse.data.data);
 				showToast("Success!", "Category added.", 3000);
 			} else {
 				await axiosClient.put(API().category(updateData?.id), form);
-				fetchData();
+				updateCategory(updateData.id, form);
 				showToast("Success!", "Category updated.", 3000);
 			}
 		} catch (e) {
