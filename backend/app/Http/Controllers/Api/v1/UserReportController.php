@@ -22,7 +22,6 @@ class UserReportController extends Controller
         }
 
         $reports = [
-            'user_tasks' => $this->report_service->userTasks($id, $filter),
             'tasks_by_status' => $this->report_service->tasksByStatus($id, "", $filter),
             'task_activity_timeline' => $this->report_service->taskActivityTimeline($id, $filter),
             'rating_per_category' => $this->report_service->ratingPerCategory($id, $filter),

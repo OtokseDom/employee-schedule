@@ -324,53 +324,6 @@ class ReportService
     }
 
     /* ------------------------------ USER REPORTS ------------------------------ */
-    // User Assigned Tasks
-    public function userTasks($id, $filter)
-    {
-        $query = $this->task->with([
-            'assignee:id,name,email,role,position',
-            'category',
-            'project:id,title',
-            'parent:id,title',
-            'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
-                    ->with([
-                        'assignee:id,name,email,role,position',
-                        'project:id,title',
-                        'category'
-                    ]);
-            },
-        ])->orderBy('id', 'DESC')
-            ->where('assignee_id', $id)
-            ->where('organization_id', $this->organization_id);
-
-        if ($filter && $filter['from'] && $filter['to']) {
-            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $query->whereIn('project_id', $projectIds);
-        }
-
-        $userTasks = $query->get();
-        $taskIds = $userTasks->pluck('id');
-
-        $task_history = $this->task_history->with(['task:id,title', 'changedBy:id,name,email'])
-            ->where('organization_id', $this->organization_id)
-            ->whereIn('task_id', $taskIds)
-            ->orderBy('id', 'ASC')->get();
-
-        $data = [
-            'data' => $userTasks,
-            'task_history' => TaskHistoryResource::collection($task_history),
-            'filters' => $filter
-        ];
-        if (empty($data)) {
-            return apiResponse(null, 'No tasks assigned to this user', false, 404);
-        }
-
-        return apiResponse($data, 'User assigned tasks fetched successfully');
-    }
     // User Taskload. Area chart
     public function taskActivityTimeline($id, $filter)
     {
