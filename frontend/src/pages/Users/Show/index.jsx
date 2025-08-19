@@ -81,21 +81,20 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
 		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
 	}, []);
 
 	useEffect(() => {
 		// Because 'view account' when on profile page already does not trigger rerender
 		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
 		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
-	}, [user.id, id]);
+	}, [id]);
 
 	const fetchDetails = async () => {
+		console.log("fetched details");
 		setDetailsLoading(true);
 		try {
 			const response = await axiosClient.get(API().user(id));
@@ -107,6 +106,7 @@ export default function UserProfile() {
 		}
 	};
 	const fetchData = async () => {
+		console.log("fetched data");
 		setLoading(true);
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
