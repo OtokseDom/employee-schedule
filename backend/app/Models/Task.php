@@ -13,6 +13,7 @@ class Task extends Model
 
     protected $fillable = [
         'organization_id',
+        'status_id',
         'project_id',
         'category_id',
         'parent_id',
@@ -20,7 +21,6 @@ class Task extends Model
         'description',
         'expected_output',
         'assignee_id',
-        'status',
         'start_date',
         'end_date',
         'start_time',
@@ -74,19 +74,27 @@ class Task extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // Relationship with Status
+    public function status()
+    {
+        return $this->belongsTo(TaskStatus::class);
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                          Contrller Logic Functions                         */
     /* -------------------------------------------------------------------------- */
     public function getTasks($organization_id)
     {
         return TaskResource::collection($this->with([
+            'status:id,name',
             'assignee:id,name,email,role,position',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
+                        'status:id,name',
                         'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
@@ -101,13 +109,15 @@ class Task extends Model
     {
         $task = $this->create($request->validated());
         $task->load([
+            'status:id,name',
             'assignee:id,name,email',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
+                        'status:id,name',
                         'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
@@ -119,7 +129,7 @@ class Task extends Model
         $taskHistory = $task->taskHistories()->create([
             'organization_id' => $userData->organization_id,
             'task_id' => $task->id,
-            'status' => $task->status,
+            'status_id' => $task->status_id,
             'changed_by' => $userData->id,
             'changed_at' => now(),
             'remarks' => "Task Added",
@@ -135,12 +145,14 @@ class Task extends Model
     {
         $task = $this->with([
             'assignee:id,name,email,role,position',
+            'status:id,name',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
+                        'status:id,name',
                         'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
@@ -162,12 +174,14 @@ class Task extends Model
         $task->update($validated);
         $task->load([
             'assignee:id,name,email,role,position',
+            'status:id,name',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
+                        'status:id,name',
                         'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
@@ -251,7 +265,7 @@ class Task extends Model
             $history = $task->taskHistories()->create([
                 'organization_id' => $userData->organization_id,
                 'task_id' => $task->id,
-                'status' => $task->status,
+                'status_id' => $task->status_id,
                 'changed_by' => $userData->id,
                 'changed_at' => now(),
                 'remarks' => $changes ? json_encode($changes) : null,

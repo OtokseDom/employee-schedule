@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('status_id')->constrained('task_statuses')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('status_id')->nullable()->constrained('task_statuses')->onDelete('set null')->onUpdate('cascade');
             $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('set null')->onUpdate('cascade');
             $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null')->onUpdate('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('set null')->onUpdate('cascade');

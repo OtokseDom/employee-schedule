@@ -34,6 +34,7 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
+            'status_id' => 'nullable|exists:task_statuses,id',
             'project_id' => 'nullable|exists:projects,id',
             'category_id' => 'nullable|exists:categories,id',
             'parent_id' => [
@@ -51,7 +52,6 @@ class StoreTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
             'assignee_id' => 'nullable|exists:users,id',
-            'status' => 'required|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i:s',
@@ -77,7 +77,6 @@ class StoreTaskRequest extends FormRequest
             'parent_id.exists' => 'The selected parent task does not exist.',
             'parent_id.no_grandchildren' => 'Tasks can only be a parent or a child, but not both (no grandchildren allowed).',
             'title.required' => 'Title is required.',
-            'status.required' => 'Status is required.',
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
             'end_time.after' => 'The end time must be after the start time.',
             'performance_rating.min' => 'Performance rating must be at least 0.',

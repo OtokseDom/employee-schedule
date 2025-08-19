@@ -17,6 +17,7 @@ class TaskResource extends JsonResource
         return [
             'id' => $this->id,
             'organization_id' => $this->organization_id,
+            'status_id' => $this->status_id,
             'project_id' => $this->project_id,
             'category_id' => $this->category_id,
             'parent_id' => $this->parent_id,
@@ -24,7 +25,6 @@ class TaskResource extends JsonResource
             'description' => $this->description,
             'expected_output' => $this->expected_output,
             'assignee_id' => $this->assignee_id,
-            'status' => $this->status,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'start_time' => $this->start_time,
@@ -37,6 +37,11 @@ class TaskResource extends JsonResource
             'remarks' => $this->remarks,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
+            'status' => $this->whenLoaded('status', function () {
+                return [
+                    'name' => $this->status->name
+                ];
+            }),
             'assignee' => $this->whenLoaded('assignee', function () {
                 return [
                     'name' => $this->assignee->name,
@@ -47,15 +52,7 @@ class TaskResource extends JsonResource
             }),
             'project' => $this->whenLoaded('project', function () {
                 return [
-                    'title' => $this->project->title,
-                    // 'organization_id',
-                    // 'title',
-                    // 'description',
-                    // 'target_date',
-                    // 'estimated_date',
-                    // 'priority',
-                    // 'status',
-                    // 'remarks'
+                    'title' => $this->project->title
                 ];
             }),
             'category' => new CategoryResource($this->whenLoaded('category')),
@@ -64,14 +61,6 @@ class TaskResource extends JsonResource
                     'title' => $this->parent->title,
                 ];
             }),
-            // 'children' => $this->whenLoaded('children', function () {
-            //     return $this->children->map(function ($child) {
-            //         if ($child instanceof \Illuminate\Http\Resources\MissingValue) {
-            //             return null; // or skip this child
-            //         }
-            //         return (new self($child))->toArray(request());
-            //     })->filter(); // remove nulls
-            // }),
             'children' => $this->whenLoaded('children', function () {
                 return $this->children->map(function ($child) {
                     // Use the same resource recursively to include full fields

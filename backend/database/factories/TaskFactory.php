@@ -7,6 +7,7 @@ use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
 use App\Models\Task;
+use App\Models\TaskStatus;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
@@ -24,13 +25,13 @@ class TaskFactory extends Factory
     {
         return [
             'organization_id' => 1,
+            'status_id' => TaskStatus::inRandomOrder()->value('id'),
             'project_id' => 1,
             'category_id' => Category::inRandomOrder()->value('id'),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,
             'assignee_id' => User::inRandomOrder()->value('id'),
-            'status' => $this->faker->randomElement(['Pending', 'In Progress', 'For Review', 'Completed', 'Delayed', 'Cancelled', 'On Hold']),
             'start_date' => $startDate = fake()->dateTimeBetween('-1 month', '+1 month'),
             'end_date' => $startDate,
             'start_time' => $this->faker->randomElement(['07:30:00', '08:00:00', '08:20:00', '09:45:00', '10:00:00']),
