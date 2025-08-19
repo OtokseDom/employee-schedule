@@ -10,6 +10,7 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+// TODO: Task status refactoring
 // TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
