@@ -6,6 +6,7 @@ use App\Http\Resources\TaskHistoryResource;
 use App\Models\Category;
 use App\Models\Task;
 use App\Models\TaskHistory;
+use App\Models\TaskStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,15 @@ class ReportService
 
     protected Task $task;
     protected TaskHistory $task_history;
+    protected TaskStatus $task_status;
     protected Category $category;
     protected User $user;
     protected $organization_id;
-    public function __construct(Task $task, TaskHistory $task_history, Category $category, User $user)
+    public function __construct(Task $task, TaskHistory $task_history, TaskStatus $task_status, Category $category, User $user)
     {
         $this->task = $task;
         $this->task_history = $task_history;
+        $this->task_status = $task_status;
         $this->category = $category;
         $this->user = $user;
         $this->organization_id = Auth::user()->organization_id;
@@ -49,10 +52,13 @@ class ReportService
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
             $progress_query->whereIn('assignee_id', $userIds);
         }
+        // TODO: Add function to set which status will consider in reports
+        $cancelled = $this->task_status->where('name', 'cancelled')->value('id');
+        $completed = $this->task_status->where('name', 'completed')->value('id');
         // Total tasks excluding cancelled
-        $totalTasks = (clone $progress_query)->where('status', '!=', 'cancelled')->count();
+        $totalTasks = (clone $progress_query)->where('status_id', '!=', $cancelled)->where('status_id', '!=', null)->count();
         // Completed tasks count
-        $completedTasks = (clone $progress_query)->where('status', 'completed')->count();
+        $completedTasks = (clone $progress_query)->where('status_id', $completed)->count();
 
         $progress = $totalTasks > 0
             ? round(($completedTasks / $totalTasks) * 100, 2)
@@ -93,8 +99,9 @@ class ReportService
         }
         $avg_performance = $avg_performance_query->avg('performance_rating');
         /* ----------------------------- // Task at Risk ---------------------------- */
+        $completed = $this->task_status->where('name', 'completed')->value('id');
         $task_at_risk_query = $this->task
-            ->where('status', '!=', 'completed')
+            ->where('status_id', '!=', $completed)
             ->where('organization_id', $this->organization_id)
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
@@ -115,12 +122,12 @@ class ReportService
         $task_at_risk = $task_at_risk_query->count();
         /* ----------------------- // Average Completion Time ----------------------- */
         $avg_completion_time = $this->task
-            ->where('status', 'completed')
+            ->where('status_id', $completed)
             ->where('organization_id', $this->organization_id)
             ->avg('time_taken');
         /* --------------------------- // Time Efficiency --------------------------- */
         $time_efficiency_query = $this->task
-            ->where('status', 'completed')
+            ->where('status_id', $completed)
             ->where('organization_id', $this->organization_id);
         if ($id) {
             $time_efficiency_query->where('assignee_id', $id);
@@ -156,7 +163,7 @@ class ReportService
         }
         $total_tasks = (clone $task_completion_query)->count();
         $completed_tasks = (clone $task_completion_query)
-            ->where('status', 'Completed')
+            ->where('status_id', $completed)
             ->count();
         $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
 
@@ -180,71 +187,52 @@ class ReportService
     {
         if (!is_numeric($id) && $variant == "") {
             return apiResponse(null, 'Invalid user ID', false, 400);
-            // return response()->json(['error' => 'Invalid user ID'], 400);
         }
 
-        $statuses = [
-            [
-                'name' => 'Pending',
-                'field' => 'pending',
-            ],
-            [
-                'name' => 'In Progress',
-                'field' => 'in_progress',
-            ],
-            [
-                'name' => 'For Review',
-                'field' => 'for_review',
-            ],
-            [
-                'name' => 'Completed',
-                'field' => 'completed',
-            ],
-            [
-                'name' => 'Delayed',
-                'field' => 'delayed',
-            ],
-            [
-                'name' => 'Cancelled',
-                'field' => 'cancelled',
-            ],
-            [
-                'name' => 'On Hold',
-                'field' => 'on_hold',
-            ],
-        ];
+        // Fetch statuses from DB (only id & name)
+        $statuses = $this->task_status->select('id', 'name')->get();
+
         $chart_data = [];
         foreach ($statuses as $index => $status) {
-            $chart_data[$index]['status'] = $status['field'];
+            $chart_data[$index]['status_id'] = $status->id;
+            $chart_data[$index]['status'] = $status->name;
+
             $query = $this->task
                 ->where('organization_id', $this->organization_id)
-                ->where('status', $status['name']);
+                ->where('status_id', $status->id);
+
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
+
             if ($filter && isset($filter['projects'])) {
-                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
+                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10,9]
                 $query->whereIn('project_id', $projectIds);
             }
+
             if ($filter && isset($filter['users']) && $variant === 'dashboard') {
-                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+                $userIds = explode(',', $filter['users']);
                 $query->whereIn('assignee_id', $userIds);
             }
+
             if ($id && $variant !== 'dashboard') {
                 $query->where('assignee_id', $id);
             }
+
             $chart_data[$index]['tasks'] = $query->count();
-            $chart_data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+            $chart_data[$index]['fill'] = 'var(--color-' . str($status->name)->slug('_') . ')';
+            // turns "In Progress" → "in_progress"
         }
-        // return response($data);
+
         $data = [
             'chart_data' => $chart_data,
             'filters' => $filter
         ];
 
-        if (empty($data)) {
+        if (empty($data['chart_data'])) {
             return apiResponse(null, 'Failed to fetch task by status report', false, 404);
         }
+
         return apiResponse($data, "Task by status report fetched successfully");
     }
 
