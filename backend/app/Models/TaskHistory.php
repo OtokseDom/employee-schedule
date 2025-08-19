@@ -13,7 +13,7 @@ class TaskHistory extends Model
     protected $fillable = [
         'organization_id',
         'task_id',
-        'status',
+        'status_id',
         'changed_by',
         'changed_at',
         'remarks',
@@ -29,6 +29,12 @@ class TaskHistory extends Model
         return $this->belongsTo(Task::class);
     }
 
+    // Relationship with Status
+    public function status()
+    {
+        return $this->belongsTo(TaskStatus::class);
+    }
+
     // Relationship with User (Who made the change)
     public function changedBy()
     {
@@ -40,7 +46,7 @@ class TaskHistory extends Model
     /* -------------------------------------------------------------------------- */
     public function getTaskHistories($organization_id)
     {
-        return TaskHistoryResource::collection($this->with(['task:id,title', 'changedBy:id,name,email'])
+        return TaskHistoryResource::collection($this->with(['task:id,title', 'status:id,name', 'changedBy:id,name,email'])
             ->where('organization_id', $organization_id)
             ->orderBy('id', 'ASC')->get());
     }
@@ -48,13 +54,13 @@ class TaskHistory extends Model
     public function storeTaskHistory($request)
     {
         $taskHistory = $this->create($request->validated());
-        $taskHistory->load(['task:id,title', 'changedBy:id,name,email']);
+        $taskHistory->load(['task:id,title', 'status:id,name', 'changedBy:id,name,email']);
         return new TaskHistoryResource($taskHistory);
     }
 
     public function showTaskHistory($id, $organization_id)
     {
-        $task_history = $this->with(['task:id,title', 'changedBy:id,name'])
+        $task_history = $this->with(['task:id,title', 'status:id,name', 'changedBy:id,name'])
             ->where('id', $id)
             ->where('organization_id', $organization_id)
             ->first();
@@ -66,7 +72,7 @@ class TaskHistory extends Model
     public function updateTaskHistory($request, $task_history)
     {
         $task_history->update($request->validated());
-        $task_history->load(['task:id,title', 'changedBy:id,name,email']);
+        $task_history->load(['task:id,title', 'status:id,name', 'changedBy:id,name,email']);
         return new TaskHistoryResource($task_history);
     }
 }
