@@ -34,8 +34,8 @@ class UpdateTaskRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
-            'project_id' => 'required|exists:projects,id',
-            'category_id' => 'required|exists:categories,id',
+            'project_id' => 'nullable|exists:projects,id',
+            'category_id' => 'nullable|exists:categories,id',
             'parent_id' => [
                 'nullable',
                 'integer',
@@ -74,9 +74,6 @@ class UpdateTaskRequest extends FormRequest
     {
         return [
             'organization_id.required' => 'Organization is required.',
-            'project_id.required' => 'Project is required.',
-            'category_id.required' => 'Category is required.',
-            'parent_id.exists' => 'The selected parent task does not exist.',
             'parent_id.no_grandchildren' => 'Tasks can only be a parent or a child, but not both (no grandchildren allowed).',
             'title.required' => 'Title is required.',
             'status.required' => 'Status is required.',

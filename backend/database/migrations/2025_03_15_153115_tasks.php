@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('status_id')->constrained('task_statuses')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('expected_output')->nullable();
-            $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->enum('status', ['Pending', 'In Progress', 'For Review', 'Completed', 'Delayed', 'Cancelled', 'On Hold'])->default('pending');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->time('start_time')->nullable();
