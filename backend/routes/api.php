@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\v1\CategoryController;
 use App\Http\Controllers\Api\v1\DashboardReportController;
 use App\Http\Controllers\Api\v1\OrganizationController;
 use App\Http\Controllers\Api\v1\ProjectController;
+use App\Http\Controllers\Api\v1\RelationCheckerController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
 use App\Http\Controllers\Api\v1\UserController;
@@ -41,6 +42,7 @@ Route::prefix('v1')->group(function () {
 
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
+        Route::post('/relation-check', [RelationCheckerController::class, 'check']);
     });
     Route::post('/signup', [AuthController::class, 'signup']);
     Route::post('/login', [AuthController::class, 'login']);
