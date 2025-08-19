@@ -8,9 +8,11 @@ use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\RelationCheckerController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
+use App\Http\Controllers\Api\v1\TaskStatusController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\UserReportController;
 use App\Http\Resources\UserResource;
+use App\Models\TaskStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +33,7 @@ Route::prefix('v1')->group(function () {
         // User CRUD
         Route::apiResource('/organization', OrganizationController::class);
         Route::apiResource('/user', UserController::class);
+        Route::apiResource('/task-status', TaskStatusController::class);
         Route::apiResource('/project', ProjectController::class);
         Route::apiResource('/category', CategoryController::class);
         Route::apiResource('/task', TaskController::class);
