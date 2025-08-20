@@ -202,6 +202,18 @@ class Task extends Model
                         'to' => $value,
                     ];
                 }
+            } else if (in_array($key, ['status_id'])) {
+                // save project name instead of id in task history
+                $status = new TaskStatus();
+                $orig = isset($original[$key]) ? optional($status->find($original[$key]))->name : null;
+                $val = $value ? optional($status->find($value))->name : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
+                    ];
+                }
             } else if (in_array($key, ['project_id'])) {
                 // save project name instead of id in task history
                 $project = new Project();
