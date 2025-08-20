@@ -27,11 +27,11 @@ export function flattenTasks(tasks) {
 }
 
 export const statusColors = {
-	Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
-	"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
-	"For Review": "bg-orange-100 border border-orange-800 border-2 text-orange-800",
-	Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
-	Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
-	Delayed: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
-	"On Hold": "bg-gray-100 border border-gray-800 border-2 text-gray-800",
+	yellow: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
+	blue: "bg-blue-100 border border-blue-800 border-2 text-blue-800",
+	orange: "bg-orange-100 border border-orange-800 border-2 text-orange-800",
+	green: "bg-green-100 border border-green-800 border-2 text-green-800",
+	red: "bg-red-100 border border-red-800 border-2 text-red-800",
+	purple: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
+	gray: "bg-gray-100 border border-gray-800 border-2 text-gray-800",
 };

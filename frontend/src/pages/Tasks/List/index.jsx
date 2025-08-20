@@ -14,7 +14,7 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
-	const { tasks, setTasks, removeTask, setTaskHistory, setRelations, setActiveTab } = useTasksStore();
+	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab } = useTasksStore();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
