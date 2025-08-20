@@ -4,6 +4,7 @@ export const API = (version = "v1") => ({
 	signup: `/${version}/signup`,
 	logout: `/${version}/logout`,
 	user_auth: `/${version}/user-auth`,
+	task_status: (id = "") => `/${version}/task-status${id ? `/${id}` : ""}`,
 	project: (id = "") => `/${version}/project${id ? `/${id}` : ""}`,
 	category: (id = "") => `/${version}/category${id ? `/${id}` : ""}`,
 	user: (id = "") => `/${version}/user${id ? `/${id}` : ""}`,
