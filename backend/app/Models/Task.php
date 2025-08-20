@@ -190,8 +190,13 @@ class Task extends Model
 
     public function updateTask($request, $task, $userData)
     {
+
         $original = $task->getOriginal();
         $validated = $request->validated();
+
+        // Get original assigned user IDs before update
+        $origUserIds = $task->assignees()->pluck('users.id')->toArray();
+
         $task->update($validated);
 
         // sync new assignees (if provided)
@@ -267,31 +272,20 @@ class Task extends Model
                         'to' => $val,
                     ];
                 }
-                // } else if (in_array($key, ['assignee_id'])) {
-                //     // save assignee name instead of id in task history
-                //     $user = new User();
-                //     $orig = isset($original[$key]) ? optional($user->find($original[$key]))->name : null;
-                //     $val = $value ? optional($user->find($value))->name : null;
-
-                //     if ($orig !== $val) {
-                //         $changes[$key] = [
-                //             'from' => $orig,
-                //             'to' => $val,
-                //         ];
-                //     }
             } else if ($key === 'assignees') {
-                // current assigned users
-                $origUsers = $task->assignees()->pluck('name')->toArray(); // before update
-                $valUsers = User::whereIn('id', $value)->pluck('name')->toArray(); // new assignment from request
-
-                // compare
-                if (array_diff($origUsers, $valUsers) || array_diff($valUsers, $origUsers)) {
-                    $changes['assignees'] = [
+                // Get new assigned user IDs from request
+                $valUserIds = is_array($value) ? $value : [];
+                // Compare arrays
+                if (array_diff($origUserIds, $valUserIds) || array_diff($valUserIds, $origUserIds)) {
+                    // Get user names for display
+                    $origUsers = User::whereIn('id', $origUserIds)->pluck('name')->toArray();
+                    $valUsers = User::whereIn('id', $valUserIds)->pluck('name')->toArray();
+                    $changes[$key] = [
                         'from' => implode(', ', $origUsers),
                         'to'   => implode(', ', $valUsers),
                     ];
                 }
-            } else if (in_array($key, ['parent_id'])) {
+            } else if ($key === 'parent_id') {
                 // save parent title instead of id in task history
                 $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
                 $val = $value ? optional($this->find($value))->title : null;
