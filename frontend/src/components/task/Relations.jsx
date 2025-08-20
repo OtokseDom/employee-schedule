@@ -3,11 +3,18 @@ import { Inspect } from "lucide-react";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 export default function Relations({ setUpdateData, setParentId }) {
 	const { relations, setActiveTab, taskHistory, setSelectedTaskHistory } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
 	const subTasksCount = relations?.children?.length ?? 0;
 	const completedCount = relations?.children?.filter((child) => child.status === "Completed").length ?? 0;
+	const findStatus = (status_id) => {
+		const name = taskStatuses.find((status) => status.id === status_id)?.name || "Unknown";
+		const color = taskStatuses.find((status) => status.id === status_id)?.color || "gray";
+		return { name, color };
+	};
 	const getSubtaskProgress = () => {
 		return completedCount + "/" + subTasksCount + " subtasks completed";
 	};
@@ -21,10 +28,10 @@ export default function Relations({ setUpdateData, setParentId }) {
 					<div className="flex flex-col justify-between rounded-lg p-4 gap-4">
 						<span
 							className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit text-xs ${
-								statusColors[relations?.status] || "bg-gray-200 text-gray-800"
+								statusColors[findStatus(relations.status_id).color] || "bg-gray-200 text-gray-800"
 							}`}
 						>
-							{relations?.status.replace("_", " ")}
+							{findStatus(relations.status_id).name}
 						</span>
 						<div className="flex flex-row w-full justify-between items-start">
 							<span className="text-lg">{relations.title}</span>
@@ -53,10 +60,10 @@ export default function Relations({ setUpdateData, setParentId }) {
 									<div className="flex flex-row h-fit items-center gap-2">
 										<span
 											className={`px-2 py-1 text-center whitespace-nowrap rounded-full h-fit w-fit text-xs ${
-												statusColors[child?.status] || "bg-gray-200 text-gray-800"
+												statusColors[findStatus(child.status_id).color] || "bg-gray-200 text-gray-800"
 											}`}
 										>
-											{child?.status?.replace("_", " ")}
+											{findStatus(child.status_id).name}
 										</span>
 										<span className="">{child?.title}</span>
 									</div>
