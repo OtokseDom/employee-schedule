@@ -35,6 +35,7 @@ class StoreTaskRequest extends FormRequest
         return [
             'organization_id' => 'required|exists:organizations,id',
             'status_id' => 'nullable|exists:task_statuses,id',
+            'title' => 'required|string|max:255',
             'project_id' => 'nullable|exists:projects,id',
             'category_id' => 'nullable|exists:categories,id',
             'parent_id' => [
@@ -48,10 +49,11 @@ class StoreTaskRequest extends FormRequest
                     }
                 },
             ],
-            'title' => 'required|string|max:255',
+            'assignees' => 'nullable|array',
+            'assignees.*' => 'exists:users,id|distinct',
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
-            'assignee_id' => 'nullable|exists:users,id',
+            // 'assignee_id' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i:s',
@@ -74,6 +76,8 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id.required' => 'Organization is required.',
+            'assignees.*.distinct' => 'Each assignee must be unique for this task.',
+            'assignees.*.exists' => 'Selected assignee does not exist.',
             'parent_id.exists' => 'The selected parent task does not exist.',
             'parent_id.no_grandchildren' => 'Tasks can only be a parent or a child, but not both (no grandchildren allowed).',
             'title.required' => 'Title is required.',

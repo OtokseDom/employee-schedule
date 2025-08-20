@@ -18,13 +18,13 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'organization_id' => $this->organization_id,
             'status_id' => $this->status_id,
+            'title' => $this->title,
             'project_id' => $this->project_id,
             'category_id' => $this->category_id,
+            // 'assignee_id' => $this->assignee_id,
             'parent_id' => $this->parent_id,
-            'title' => $this->title,
             'description' => $this->description,
             'expected_output' => $this->expected_output,
-            'assignee_id' => $this->assignee_id,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'start_time' => $this->start_time,
@@ -37,20 +37,30 @@ class TaskResource extends JsonResource
             'remarks' => $this->remarks,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
+            // 'assignees' => UserResource::collection($this->assignees),
+            'assignees' => $this->assignees->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'position' => $user->position,
+                ];
+            }),
             'status' => $this->whenLoaded('status', function () {
                 return [
                     'name' => $this->status->name,
                     'color' => $this->status->color
                 ];
             }),
-            'assignee' => $this->whenLoaded('assignee', function () {
-                return [
-                    'name' => $this->assignee->name,
-                    'email' => $this->assignee->email,
-                    'role' => $this->assignee->role,
-                    'position' => $this->assignee->position,
-                ];
-            }),
+            // 'assignee' => $this->whenLoaded('assignee', function () {
+            //     return [
+            //         'name' => $this->assignee->name,
+            //         'email' => $this->assignee->email,
+            //         'role' => $this->assignee->role,
+            //         'position' => $this->assignee->position,
+            //     ];
+            // }),
             'project' => $this->whenLoaded('project', function () {
                 return [
                     'title' => $this->project->title
