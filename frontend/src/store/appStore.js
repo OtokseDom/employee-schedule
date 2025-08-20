@@ -6,9 +6,11 @@ import { createProjectsSlice } from "./projects/projectsSlice";
 import { createUserSlice } from "./user/userSlice";
 import { createCategoriesSlice } from "./categories/categoriesSlice";
 import { createOrganizationSlice } from "./organization/organizationSlice";
+import { createTaskStatusesSlice } from "./taskStatuses/taskStatusesSlice";
 
 export const useAppStore = create((set) => ({
 	...createDashboardSlice(set),
+	...createTaskStatusesSlice(set),
 	...createProjectsSlice(set),
 	...createTasksSlice(set),
 	...createUsersSlice(set),
