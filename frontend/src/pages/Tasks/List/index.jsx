@@ -14,7 +14,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
 	const { loading, setLoading } = useLoadContext();
-	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab } = useTasksStore();
+	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab, setOptions } = useTasksStore();
 	const { users, setUsers } = useUsersStore();
 	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
 	const { projects, setProjects } = useProjectsStore();
@@ -87,6 +87,7 @@ export default function Tasks() {
 		setLoading(true);
 		try {
 			const userResponse = await axiosClient.get(API().user());
+			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
 			setUsers(userResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);

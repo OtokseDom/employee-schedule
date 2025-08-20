@@ -27,5 +27,8 @@ export const useTasksStore = () => {
 		// Calendar
 		selectedUser: useAppStore((state) => state.selectedUser),
 		setSelectedUser: useAppStore((state) => state.setSelectedUser),
+		// Multi-select users
+		options: useAppStore((state) => state.options),
+		setOptions: useAppStore((state) => state.setOptions),
 	};
 };

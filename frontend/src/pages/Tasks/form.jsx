@@ -21,6 +21,7 @@ import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -46,7 +47,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { tasks, addRelation, setActiveTab, selectedUser = undefined } = useTasksStore();
+	const { tasks, addRelation, setActiveTab, selectedUser = undefined, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
@@ -68,6 +69,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
+	const [selectedUsers, setSelectedUsers] = useState([]);
 	const bottomRef = useRef(null);
 	const scrollToBottom = () => {
 		setTimeout(() => {
@@ -147,6 +149,16 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
 			});
+			// Multi-User field
+			// const userIds = Array.isArray(options.values)
+			// 	? options.values.map((id) => parseInt(id))
+			// 	: typeof options.values === "string"
+			// 	? options.values
+			// 			?.split(",")
+			// 			.map((id) => parseInt(id.trim()))
+			// 			.filter((id) => !isNaN(id)) // to avoid [NaN] when membersRaw is empty or non numeric
+			// 	: [];
+			// setSelectedUsers(userIds); // crucial
 			// Set hour/minute fields for time_estimate and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
 				const te = parseFloat(time_estimate);
@@ -312,7 +324,14 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 		(updateData?.assignee_id === user_auth?.data?.id && user_auth?.data?.role === "Employee");
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
+			<form
+				onSubmit={form.handleSubmit((formData) => {
+					// Include selectedUsers in the formData object
+					handleSubmit({ ...formData, selected_users: selectedUsers });
+				})}
+				// onSubmit={form.handleSubmit(handleSubmit)}
+				className="flex flex-col gap-4 max-w-md w-full"
+			>
 				<FormField
 					control={form.control}
 					name="status_id"
@@ -406,6 +425,29 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 									</SelectContent>
 								</Select>
 								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="selected_users"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Assignees</FormLabel>
+								<FormControl>
+									<MultiSelect
+										field={field}
+										options={options || []}
+										onValueChange={setSelectedUsers}
+										defaultValue={selectedUsers}
+										placeholder="Select users"
+										variant="inverted"
+										animation={2}
+										// maxCount={3}
+									/>
+								</FormControl>
 							</FormItem>
 						);
 					}}

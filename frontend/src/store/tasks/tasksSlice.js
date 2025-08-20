@@ -69,4 +69,7 @@ export const createTasksSlice = (set) => ({
 	// Calendar
 	selectedUser: null,
 	setSelectedUser: (selectedUser) => set({ selectedUser }),
+	// Multi-select users
+	options: [],
+	setOptions: (options) => set({ options }),
 });

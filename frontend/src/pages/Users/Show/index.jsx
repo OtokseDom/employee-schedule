@@ -29,7 +29,7 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
-// TODO: multi assignee, only title is and status required, hide unnecessary fields
+// TODO: multi assignee
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const { users, setUsers } = useUsersStore();

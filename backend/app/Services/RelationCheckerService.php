@@ -15,7 +15,6 @@ class RelationCheckerService
         $this->task = $task;
         $this->organization_id = Auth::user()->organization_id;
     }
-    // TODO: Add other checks
     public function checkTaskStatus($value)
     {
         return $this->task->where('status_id', $value)->where('organization_id', $this->organization_id)->exists();
