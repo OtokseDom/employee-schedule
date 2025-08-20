@@ -39,7 +39,8 @@ class TaskResource extends JsonResource
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'status' => $this->whenLoaded('status', function () {
                 return [
-                    'name' => $this->status->name
+                    'name' => $this->status->name,
+                    'color' => $this->status->color
                 ];
             }),
             'assignee' => $this->whenLoaded('assignee', function () {
