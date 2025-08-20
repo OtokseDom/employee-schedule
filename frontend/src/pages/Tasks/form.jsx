@@ -20,24 +20,18 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
-	assignee_id: z.number({
-		required_error: "Assignee is required.",
-	}),
-	project_id: z.number({
-		required_error: "Project is required.",
-	}),
-	category_id: z.number({
-		required_error: "Category is required.",
-	}),
+	status_id: z.number().optional(),
+	assignee_id: z.number().optional(),
+	project_id: z.number().optional(),
+	category_id: z.number().optional(),
 	title: z.string().refine((data) => data.trim() !== "", {
 		message: "Title is required.",
 	}),
-	description: z.string().refine((data) => data.trim() !== "", {
-		message: "Description is required.",
-	}),
+	description: z.string().optional(),
 	expected_output: z.string().optional(),
 	start_date: z.date().optional(),
 	end_date: z.date().optional(),
@@ -49,13 +43,11 @@ const formSchema = z.object({
 	delay_reason: z.string().optional(),
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
 	remarks: z.string().optional(),
-	status: z.string({
-		required_error: "Status is required.",
-	}),
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { tasks, addRelation, setActiveTab, selectedUser = undefined } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
@@ -79,6 +71,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			calendar_add: false,
+			status_id: undefined,
 			title: "",
 			description: "",
 			parent_id: undefined,
@@ -96,7 +89,6 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 			delay_reason: "",
 			performance_rating: "",
 			remarks: "",
-			status: undefined,
 		},
 	});
 
@@ -108,6 +100,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 		if (updateData && projects && users && categories) {
 			const {
 				calendar_add,
+				status_id,
 				title,
 				description,
 				parent_id,
@@ -125,10 +118,10 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				delay_reason,
 				performance_rating,
 				remarks,
-				status,
 			} = updateData;
 			form.reset({
 				calendar_add: calendar_add || false,
+				status_id: status_id || undefined,
 				title: title || "",
 				description: description || "",
 				parent_id: parent_id || parentId || undefined,
@@ -146,7 +139,6 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				delay_reason: delay_reason || "",
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
-				status: status || undefined,
 			});
 			// Set hour/minute fields for time_estimate and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
@@ -316,42 +308,32 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
 				<FormField
 					control={form.control}
-					name="status"
+					name="status_id"
 					render={({ field }) => {
-						const statuses = [
-							{ id: 1, name: "Pending" },
-							{ id: 2, name: "In Progress" },
-							{ id: 3, name: "For Review" },
-							{ id: 4, name: "Completed" },
-							{ id: 5, name: "Delayed" },
-							{ id: 6, name: "On Hold" },
-							{ id: 7, name: "Cancelled" },
-						];
 						return (
 							<FormItem>
-								<FormLabel>
-									Status <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Status</FormLabel>
 								<Select
 									disabled={!isEditable}
-									onValueChange={field.onChange}
-									value={field.value || ""}
-									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : ""}
 								>
 									<FormControl>
 										<SelectTrigger>
-											<SelectValue placeholder="Select a status"></SelectValue>
+											<SelectValue placeholder="Select a status">
+												{field.value ? taskStatuses?.find((taskStatus) => taskStatus.id == field.value).name : "Select a status"}
+											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{Array.isArray(statuses) && statuses.length > 0 ? (
-											statuses?.map((status) => (
-												<SelectItem key={status?.id} value={status?.name}>
-													{status?.name}
+										{Array.isArray(taskStatuses) && taskStatuses.length > 0 ? (
+											taskStatuses.map((taskStatus) => (
+												<SelectItem key={taskStatus.id} value={taskStatus.id.toString()}>
+													{taskStatus.name}
 												</SelectItem>
 											))
 										) : (
-											<SelectItem disabled>No status available</SelectItem>
+											<></>
 										)}
 									</SelectContent>
 								</Select>
@@ -406,7 +388,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 													<div className="flex flex-col">
 														<span> {task.title}</span>
 														<span className="text-muted-foreground opacity-50">
-															{task.project.title} | {task.status}
+															{task.project.title} | {task.status.name}
 														</span>
 													</div>
 												</SelectItem>
@@ -427,9 +409,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Assignee <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Assignee</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -466,9 +446,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Project <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Project</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -504,9 +482,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Category <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Category</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -542,9 +518,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Description <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Description</FormLabel>
 								<FormControl>
 									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>
