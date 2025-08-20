@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, parseISO } from "date-fns";
@@ -54,6 +54,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
+	const [showMore, setShowMore] = useState(false);
 	const parentTasks = () => {
 		return tasks.filter((task) => task.parent_id == null && task.id !== updateData?.id) || [];
 	};
@@ -67,6 +68,12 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
+	const bottomRef = useRef(null);
+	const scrollToBottom = () => {
+		setTimeout(() => {
+			bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+		}, 1);
+	};
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -527,182 +534,147 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="expected_output"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Expected output</FormLabel>
-								<FormControl>
-									<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="start_date"
-					render={({ field }) => {
-						return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="end_date"
-					render={({ field }) => {
-						return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="start_time"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Start Time</FormLabel>
-								<FormControl>
-									<Input
-										disabled={!isEditable}
-										type="time"
-										step="60"
-										inputMode="numeric"
-										pattern="[0-9]{2}:[0-9]{2}"
-										className="bg-background appearance-none"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="end_time"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>End Time</FormLabel>
-								<FormControl>
-									<Input
-										disabled={!isEditable}
-										type="time"
-										step="any"
-										// placeholder="Rating &#40;1-10&#41;"
-										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="time_estimate"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Time Estimate</FormLabel>
-							<div>
-								<div className="flex flex-row justify-between gap-2">
-									<div className="flex flex-row gap-2">
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											placeholder="hr"
-											value={timeEstimateHour}
-											onChange={(e) => {
-												const val = e.target.value.replace(/[^0-9]/g, "");
-												setTimeEstimateHour(val);
-												const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
-												field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
-											}}
-											className="w-20"
-										/>
-										<span>hr</span>
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											max="59"
-											placeholder="min"
-											value={timeEstimateMinute}
-											onChange={(e) => {
-												let val = e.target.value.replace(/[^0-9]/g, "");
-												if (parseInt(val, 10) > 59) val = "59";
-												setTimeEstimateMinute(val);
-												const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
-												field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
-											}}
-											className="w-20"
-										/>
-										<span>min</span>
+				{showMore && (
+					<>
+						<FormField
+							control={form.control}
+							name="expected_output"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Expected output</FormLabel>
+										<FormControl>
+											<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Start Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="60"
+												inputMode="numeric"
+												pattern="[0-9]{2}:[0-9]{2}"
+												className="bg-background appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>End Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="any"
+												// placeholder="Rating &#40;1-10&#41;"
+												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="time_estimate"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Time Estimate</FormLabel>
+									<div>
+										<div className="flex flex-row justify-between gap-2">
+											<div className="flex flex-row gap-2">
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													placeholder="hr"
+													value={timeEstimateHour}
+													onChange={(e) => {
+														const val = e.target.value.replace(/[^0-9]/g, "");
+														setTimeEstimateHour(val);
+														const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
+														field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
+													}}
+													className="w-20"
+												/>
+												<span>hr</span>
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													max="59"
+													placeholder="min"
+													value={timeEstimateMinute}
+													onChange={(e) => {
+														let val = e.target.value.replace(/[^0-9]/g, "");
+														if (parseInt(val, 10) > 59) val = "59";
+														setTimeEstimateMinute(val);
+														const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
+														field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
+													}}
+													className="w-20"
+												/>
+												<span>min</span>
+											</div>
+											<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
+												Auto Calculate
+											</Button>
+										</div>
+										{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
+										<FormMessage /> {/* ✅ Now linked to time_estimate */}
 									</div>
-									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
-										Auto Calculate
-									</Button>
-								</div>
-								{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
-								<FormMessage /> {/* ✅ Now linked to time_estimate */}
-							</div>
-						</FormItem>
-					)}
-				/>
-
-				{/* Time Taken (hr/min) */}
-				<FormItem>
-					<FormLabel>Time Taken</FormLabel>
-					<div className="flex gap-2">
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							placeholder="hr"
-							value={timeTakenHour}
-							onChange={(e) => {
-								const val = e.target.value.replace(/[^0-9]/g, "");
-								setTimeTakenHour(val);
-							}}
-							className="w-20"
+								</FormItem>
+							)}
 						/>
-						<span>hr</span>
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							max="59"
-							placeholder="min"
-							value={timeTakenMinute}
-							onChange={(e) => {
-								let val = e.target.value.replace(/[^0-9]/g, "");
-								if (parseInt(val, 10) > 59) val = "59";
-								setTimeTakenMinute(val);
-							}}
-							className="w-20"
-						/>
-						<span>min</span>
-					</div>
-					<FormMessage />
-				</FormItem>
-				<FormItem>
-					<FormLabel>Delay</FormLabel>
-					<div>
-						<div className="flex flex-row justify-between gap-2">
+						{/* Time Taken (hr/min) */}
+						<FormItem>
+							<FormLabel>Time Taken</FormLabel>
 							<div className="flex gap-2">
 								<Input
 									disabled={!isEditable}
 									type="number"
 									min="0"
 									placeholder="hr"
-									value={delayHour}
+									value={timeTakenHour}
 									onChange={(e) => {
 										const val = e.target.value.replace(/[^0-9]/g, "");
-										setDelayHour(val);
+										setTimeTakenHour(val);
 									}}
 									className="w-20"
 								/>
@@ -713,73 +685,124 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 									min="0"
 									max="59"
 									placeholder="min"
-									value={delayMinute}
+									value={timeTakenMinute}
 									onChange={(e) => {
 										let val = e.target.value.replace(/[^0-9]/g, "");
 										if (parseInt(val, 10) > 59) val = "59";
-										setDelayMinute(val);
+										setTimeTakenMinute(val);
 									}}
 									className="w-20"
 								/>
 								<span>min</span>
 							</div>
+							<FormMessage />
+						</FormItem>
+						<FormItem>
+							<FormLabel>Delay</FormLabel>
+							<div>
+								<div className="flex flex-row justify-between gap-2">
+									<div className="flex gap-2">
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											placeholder="hr"
+											value={delayHour}
+											onChange={(e) => {
+												const val = e.target.value.replace(/[^0-9]/g, "");
+												setDelayHour(val);
+											}}
+											className="w-20"
+										/>
+										<span>hr</span>
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											max="59"
+											placeholder="min"
+											value={delayMinute}
+											onChange={(e) => {
+												let val = e.target.value.replace(/[^0-9]/g, "");
+												if (parseInt(val, 10) > 59) val = "59";
+												setDelayMinute(val);
+											}}
+											className="w-20"
+										/>
+										<span>min</span>
+									</div>
 
-							<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
-								Auto Calculate
-							</Button>
-						</div>
-						{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
-					</div>
-				</FormItem>
-				<FormField
-					control={form.control}
-					name="delay_reason"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Delay reason</FormLabel>
-								<FormControl>
-									<Textarea disabled={!isEditable} placeholder="Delay reason" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				{user_auth?.data?.role !== "Employee" && (
-					<>
+									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
+										Auto Calculate
+									</Button>
+								</div>
+								{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
+							</div>
+						</FormItem>
 						<FormField
 							control={form.control}
-							name="performance_rating"
+							name="delay_reason"
 							render={({ field }) => {
 								return (
 									<FormItem>
-										<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+										<FormLabel>Delay reason</FormLabel>
 										<FormControl>
-											<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+											<Textarea disabled={!isEditable} placeholder="Delay reason" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								);
 							}}
 						/>
-						<FormField
-							control={form.control}
-							name="remarks"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>Remarks</FormLabel>
-										<FormControl>
-											<Textarea disabled={!isEditable} placeholder="Remarks" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
+						{user_auth?.data?.role !== "Employee" && (
+							<>
+								<FormField
+									control={form.control}
+									name="performance_rating"
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+												<FormControl>
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="remarks"
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>Remarks</FormLabel>
+												<FormControl>
+													<Textarea disabled={!isEditable} placeholder="Remarks" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+							</>
+						)}
 					</>
 				)}
+				<div className="w-full" ref={bottomRef}>
+					<Button
+						type="button"
+						variant="secondary"
+						className="w-full"
+						onClick={() => {
+							setShowMore(!showMore);
+							scrollToBottom();
+						}}
+					>
+						{!showMore ? "Show other details" : " Hide other details"}
+					</Button>
+				</div>
 				{isEditable ? (
 					<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150 p-4 mt-auto">
 						<Button type="submit" disabled={loading} className="w-full">
