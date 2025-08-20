@@ -395,7 +395,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 													<div className="flex flex-col">
 														<span> {task.title}</span>
 														<span className="text-muted-foreground opacity-50">
-															{task.project.title} | {task.status.name}
+															{task.project?.title} | {task.status?.name}
 														</span>
 													</div>
 												</SelectItem>
