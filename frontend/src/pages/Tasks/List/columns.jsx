@@ -81,23 +81,22 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 			},
 		},
 		{
-			id: "assignee",
-			accessorKey: "assignee.name",
-			header: ({ column }) => {
-				return (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				);
-			},
+			id: "assignees",
+			header: ({ column }) => (
+				<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+					Assignees <ArrowUpDown className="ml-2 h-4 w-4" />
+				</button>
+			),
 			cell: ({ row }) => {
-				const assignee = row.original.assignee;
+				const assignees = row.original.assignees; // array of users
 
+				if (!assignees || assignees.length === 0) {
+					return <span className="text-gray-500">Unassigned</span>;
+				}
+				const names = assignees.map((user) => user.name).join(", ");
 				return (
 					<div>
-						<span className=" font-extrabold">{assignee ? assignee.name : "Unassigned"}</span>
-						<br />
-						<span className="text-sm text-gray-500">{assignee && assignee.position}</span>
+						<span>{names}</span>
 					</div>
 				);
 			},
