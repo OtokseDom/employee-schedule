@@ -26,7 +26,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 const formSchema = z.object({
 	parent_id: z.number().optional(),
 	status_id: z.number().optional(),
-	assignee_id: z.number().optional(),
+	// assignee_id: z.number().optional(),
 	project_id: z.number().optional(),
 	category_id: z.number().optional(),
 	title: z.string().refine((data) => data.trim() !== "", {
@@ -47,7 +47,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { tasks, addRelation, setActiveTab, selectedUser = undefined, options } = useTasksStore();
+	const { tasks, addRelation, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
@@ -69,7 +69,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
-	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [selectedUsers, setSelectedUsers] = useState(updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || []);
 	const bottomRef = useRef(null);
 	const scrollToBottom = () => {
 		setTimeout(() => {
@@ -84,7 +84,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 			title: "",
 			description: "",
 			parent_id: undefined,
-			assignee_id: undefined,
+			// assignee_id: undefined,
 			project_id: undefined,
 			category: undefined,
 			expected_output: "",
@@ -113,7 +113,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				title,
 				description,
 				parent_id,
-				assignee_id,
+				// assignee_id,
 				project_id,
 				category_id,
 				expected_output,
@@ -134,7 +134,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				title: title || "",
 				description: description || "",
 				parent_id: parent_id || parentId || undefined,
-				assignee_id: assignee_id || selectedUser || undefined,
+				// assignee_id: assignee_id || selectedUser || undefined,
 				project_id: project_id || undefined,
 				category_id: category_id || undefined,
 				expected_output: expected_output || "",
@@ -149,16 +149,6 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
 			});
-			// Multi-User field
-			// const userIds = Array.isArray(options.values)
-			// 	? options.values.map((id) => parseInt(id))
-			// 	: typeof options.values === "string"
-			// 	? options.values
-			// 			?.split(",")
-			// 			.map((id) => parseInt(id.trim()))
-			// 			.filter((id) => !isNaN(id)) // to avoid [NaN] when membersRaw is empty or non numeric
-			// 	: [];
-			// setSelectedUsers(userIds); // crucial
 			// Set hour/minute fields for time_estimate and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
 				const te = parseFloat(time_estimate);
@@ -321,13 +311,13 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 		user_auth?.data?.role === "Manager" ||
 		Object.keys(updateData).length === 0 ||
 		updateData?.calendar_add ||
-		(updateData?.assignee_id === user_auth?.data?.id && user_auth?.data?.role === "Employee");
+		updateData?.assignees?.includes(user_auth?.data?.id);
 	return (
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit((formData) => {
 					// Include selectedUsers in the formData object
-					handleSubmit({ ...formData, selected_users: selectedUsers });
+					handleSubmit({ ...formData, assignees: selectedUsers });
 				})}
 				// onSubmit={form.handleSubmit(handleSubmit)}
 				className="flex flex-col gap-4 max-w-md w-full"
@@ -431,7 +421,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				/>
 				<FormField
 					control={form.control}
-					name="selected_users"
+					name="assignees"
 					render={({ field }) => {
 						return (
 							<FormItem>
@@ -442,7 +432,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 										options={options || []}
 										onValueChange={setSelectedUsers}
 										defaultValue={selectedUsers}
-										placeholder="Select users"
+										placeholder="Select assignees"
 										variant="inverted"
 										animation={2}
 										// maxCount={3}
@@ -452,7 +442,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 						);
 					}}
 				/>
-				<FormField
+				{/* <FormField
 					control={form.control}
 					name="assignee_id"
 					render={({ field }) => {
@@ -488,7 +478,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 							</FormItem>
 						);
 					}}
-				/>
+				/> */}
 				<FormField
 					control={form.control}
 					name="project_id"
