@@ -25,7 +25,7 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 	return [
 		{
 			id: "status",
-			accessorKey: "status",
+			accessorKey: "status.name",
 			header: ({ column }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -39,8 +39,13 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 				return (
 					<div className="flex flex-row min-w-24" style={{ paddingLeft: depth * 40 }}>
 						{depth == 1 ? <CornerDownRight size={18} /> : ""}
-						<span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
-							{status.replace("_", " ")}
+						{/* <span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}> */}
+						<span
+							className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${
+								statusColors[status.color] || "bg-gray-200 text-gray-800"
+							}`}
+						>
+							{status.name}
 						</span>
 					</div>
 				);
