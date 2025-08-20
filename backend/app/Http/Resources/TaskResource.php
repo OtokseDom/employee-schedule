@@ -37,49 +37,43 @@ class TaskResource extends JsonResource
             'remarks' => $this->remarks,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
-            // 'assignees' => UserResource::collection($this->assignees),
-            'assignees' => $this->assignees->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'position' => $user->position,
-                ];
-            }),
+            'assignees' => $this->assignees && $this->assignees->count() > 0
+                ? $this->assignees->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'position' => $user->position,
+                    ];
+                })
+                : null,
             'status' => $this->whenLoaded('status', function () {
-                return [
+                return $this->status ? [
                     'name' => $this->status->name,
                     'color' => $this->status->color
-                ];
+                ] : null;
             }),
-            // 'assignee' => $this->whenLoaded('assignee', function () {
-            //     return [
-            //         'name' => $this->assignee->name,
-            //         'email' => $this->assignee->email,
-            //         'role' => $this->assignee->role,
-            //         'position' => $this->assignee->position,
-            //     ];
-            // }),
             'project' => $this->whenLoaded('project', function () {
-                return [
+                return $this->project ? [
                     'title' => $this->project->title
-                ];
+                ] : null;
             }),
-            'category' => new CategoryResource($this->whenLoaded('category')),
+            'category' => $this->category ? new CategoryResource($this->category) : null,
             'parent' => $this->whenLoaded('parent', function () {
-                return [
+                return $this->parent ? [
+                    'id' => $this->parent->id,
                     'title' => $this->parent->title,
-                ];
+                ] : null;
             }),
             'children' => $this->whenLoaded('children', function () {
-                return $this->children->map(function ($child) {
-                    // Use the same resource recursively to include full fields
-                    return (new self($child))->toArray(request());
-                });
+                return $this->children && $this->children->count() > 0
+                    ? $this->children->map(function ($child) {
+                        // Use the same resource recursively to include full fields
+                        return (new self($child))->toArray(request());
+                    })
+                    : null;
             }),
-
-
         ];
     }
 }
