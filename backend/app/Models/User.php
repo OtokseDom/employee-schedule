@@ -92,9 +92,6 @@ class User extends Authenticatable
 
     public function deleteUser($user, $organization_id)
     {
-        if (Task::where('assignee_id', $user->id)->exists()) {
-            return false;
-        }
         $user->delete();
         return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
     }
