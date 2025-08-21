@@ -4,7 +4,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
@@ -12,16 +12,34 @@ import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const { setCategories } = useCategoriesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+	const [hasRelation, setHasRelation] = useState(false);
 
-	const openDialog = (category = {}) => {
+	const openDialog = async (category = {}) => {
+		setLoading(true);
+		const relationCheckParams = {
+			type: "category",
+			value: category.id,
+		};
 		setDialogOpen(true);
 		setSelectedCategoryId(category.id);
+		try {
+			const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
+			setHasRelation(hasRelationResponse?.data?.data?.exists);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
 	};
+	useEffect(() => {
+		if (!dialogOpen) setHasRelation(false);
+	}, [dialogOpen]);
 	const handleUpdateCategory = (category) => {
 		setIsOpen(true);
 		setUpdateData(category);
@@ -109,6 +127,15 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
 					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
+				<div className="ml-4 text-base">
+					{hasRelation && (
+						<>
+							<span className="text-yellow-800">Warning: Category is assigned to tasks.</span>
+							<br />
+							<span> Deleting this will set task category to null</span>
+						</>
+					)}
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
@@ -116,6 +143,7 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 						</Button>
 					</DialogClose>
 					<Button
+						disabled={loading}
 						onClick={() => {
 							handleDelete(selectedCategoryId);
 							setDialogOpen(false);
