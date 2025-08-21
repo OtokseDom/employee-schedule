@@ -4,7 +4,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
@@ -13,7 +13,7 @@ import { API } from "@/constants/api";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { statusColors } from "@/utils/taskHelpers";
 export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const { setTaskStatuses } = useTaskStatusesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
@@ -25,12 +25,21 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 			type: "status",
 			value: taskStatus.id,
 		};
-		const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
-		setHasRelation(hasRelationResponse?.data?.exists);
 		setDialogOpen(true);
 		setSelectedTaskStatusId(taskStatus.id);
-		setLoading(false);
+		try {
+			const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
+			setHasRelation(hasRelationResponse?.data?.data?.exists);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
 	};
+	useEffect(() => {
+		if (!dialogOpen) setHasRelation(false);
+	}, [dialogOpen]);
 	const handleUpdateTaskStatus = (taskStatus) => {
 		setIsOpen(true);
 		setUpdateData(taskStatus);
@@ -133,7 +142,7 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
 				<div className="ml-4 text-base">
-					{hasRelation ?? (
+					{hasRelation && (
 						<>
 							<span className="text-yellow-800">Warning: Status is assigned to tasks.</span>
 							<br />
@@ -148,6 +157,7 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 						</Button>
 					</DialogClose>
 					<Button
+						disabled={loading}
 						onClick={() => {
 							handleDelete(selectedTaskStatusId);
 							setDialogOpen(false);
