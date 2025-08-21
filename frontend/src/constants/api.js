@@ -4,7 +4,7 @@ export const API = (version = "v1") => ({
 	signup: `/${version}/signup`,
 	logout: `/${version}/logout`,
 	user_auth: `/${version}/user-auth`,
-	relation_check: `/${version}/relation-check`,
+	relation_check: (type = "", value = "") => `/${version}/relation-check?type=${type}&value=${value}`,
 	task_status: (id = "") => `/${version}/task-status${id ? `/${id}` : ""}`,
 	project: (id = "") => `/${version}/project${id ? `/${id}` : ""}`,
 	category: (id = "") => `/${version}/category${id ? `/${id}` : ""}`,

@@ -21,14 +21,10 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 
 	const openDialog = async (category = {}) => {
 		setLoading(true);
-		const relationCheckParams = {
-			type: "category",
-			value: category.id,
-		};
 		setDialogOpen(true);
 		setSelectedCategoryId(category.id);
 		try {
-			const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
+			const hasRelationResponse = await axiosClient.post(API().relation_check("category", category.id));
 			setHasRelation(hasRelationResponse?.data?.data?.exists);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");

@@ -21,14 +21,10 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 	const [hasRelation, setHasRelation] = useState(false);
 	const openDialog = async (taskStatus = {}) => {
 		setLoading(true);
-		const relationCheckParams = {
-			type: "status",
-			value: taskStatus.id,
-		};
 		setDialogOpen(true);
 		setSelectedTaskStatusId(taskStatus.id);
 		try {
-			const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
+			const hasRelationResponse = await axiosClient.post(API().relation_check("status", taskStatus.id));
 			setHasRelation(hasRelationResponse?.data?.data?.exists);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
