@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
@@ -15,17 +15,31 @@ import { useUsersStore } from "@/store/users/usersStore";
 export const columns = ({ setIsOpen, setUpdateData }) => {
 	const { updateUser, removeUser } = useUsersStore();
 	const { user } = useAuthContext();
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [hasRelation, setHasRelation] = useState(false);
 
-	const openDialog = (type, userData = {}) => {
+	const openDialog = async (type, userData = {}) => {
+		setLoading(true);
 		setDialogType(type);
 		setDialogOpen(true);
-		setSelectedUser(userData);
+		setSelectedUser(userData.id);
+		try {
+			const hasRelationResponse = await axiosClient.post(API().relation_check("assignee", userData.id));
+			setHasRelation(hasRelationResponse?.data?.data?.exists);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
 	};
+	useEffect(() => {
+		if (!dialogOpen) setHasRelation(false);
+	}, [dialogOpen]);
 
 	const handleUpdateUser = (user, event) => {
 		event.stopPropagation();
@@ -53,6 +67,7 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
+			console.log(id);
 			const userResponse = await axiosClient.delete(API().user(id));
 			removeUser(id);
 			showToast("Success!", userResponse?.data?.message, 3000);
@@ -177,6 +192,15 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
 					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
+				<div className="ml-4 text-base">
+					{hasRelation && (
+						<>
+							<span className="text-yellow-800">Warning: User has assigned tasks.</span>
+							<br />
+							<span>Deleting this will remove this user as assignee</span>
+						</>
+					)}
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
@@ -184,9 +208,10 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 						</Button>
 					</DialogClose>
 					<Button
+						disabled={loading}
 						onClick={() => {
-							if (dialogType === "reject") handleDelete(selectedUser.id);
-							else if (dialogType === "delete") handleDelete(selectedUser.id);
+							if (dialogType === "reject") handleDelete(selectedUser);
+							else if (dialogType === "delete") handleDelete(selectedUser);
 							setDialogOpen(false);
 						}}
 					>
