@@ -20,6 +20,7 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 	const [hasRelation, setHasRelation] = useState(false);
 
 	const openDialog = async (category = {}) => {
+		// TODO: Remove old relation checker in model
 		setLoading(true);
 		setDialogOpen(true);
 		setSelectedCategoryId(category.id);
