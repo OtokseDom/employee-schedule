@@ -14,6 +14,7 @@ import Categories from "./pages/Categories/List";
 import Organization from "./pages/Organization";
 import ErrorFallback from "./pages/ErrorFallback";
 import Projects from "./pages/Projects/List";
+import TaskStatuses from "./pages/TaskStatuses/List";
 
 const router = createBrowserRouter(
 	[
@@ -75,6 +76,14 @@ const router = createBrowserRouter(
 					path: "/settings",
 					children: [
 						{
+							path: "organization",
+							element: (
+								<ErrorFallback>
+									<Organization />
+								</ErrorFallback>
+							),
+						},
+						{
 							path: "categories",
 							element: (
 								<ErrorFallback>
@@ -83,10 +92,10 @@ const router = createBrowserRouter(
 							),
 						},
 						{
-							path: "organization",
+							path: "task-statuses",
 							element: (
 								<ErrorFallback>
-									<Organization />
+									<TaskStatuses />
 								</ErrorFallback>
 							),
 						},
