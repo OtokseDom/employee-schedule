@@ -5,7 +5,7 @@ export const createTaskStatusesSlice = (set) => ({
 
 	addTaskStatus: (taskStatus) =>
 		set((state) => ({
-			taskStatuses: [taskStatus, ...state.taskStatus],
+			taskStatuses: [taskStatus, ...state.taskStatuses],
 		})),
 
 	updateTaskStatus: (id, updates) =>
