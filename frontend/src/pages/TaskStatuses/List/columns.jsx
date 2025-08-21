@@ -18,9 +18,18 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedTaskStatusId, setSelectedTaskStatusId] = useState(null);
-	const openDialog = (taskStatus = {}) => {
+	const [hasRelation, setHasRelation] = useState(false);
+	const openDialog = async (taskStatus = {}) => {
+		setLoading(true);
+		const relationCheckParams = {
+			type: "status",
+			value: taskStatus.id,
+		};
+		const hasRelationResponse = await axiosClient.post(API().relation_check, relationCheckParams);
+		setHasRelation(hasRelationResponse?.data?.exists);
 		setDialogOpen(true);
 		setSelectedTaskStatusId(taskStatus.id);
+		setLoading(false);
 	};
 	const handleUpdateTaskStatus = (taskStatus) => {
 		setIsOpen(true);
@@ -123,6 +132,15 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 					<DialogTitle>Are you absolutely sure?</DialogTitle>
 					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
+				<div className="ml-4 text-base">
+					{hasRelation ?? (
+						<>
+							<span className="text-yellow-800">Warning: Status is assigned to tasks.</span>
+							<br />
+							<span> Deleting this will set task status to null</span>
+						</>
+					)}
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
