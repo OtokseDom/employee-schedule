@@ -35,6 +35,7 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 		Urgent: "bg-red-100 border border-red-800 border-2 text-red-800",
 		Critical: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
 	};
+	// TODO: Use status master
 	const baseColumns = useMemo(
 		() => [
 			{
