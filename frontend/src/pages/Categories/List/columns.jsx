@@ -13,14 +13,13 @@ import { API } from "@/constants/api";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
-	const { setCategories } = useCategoriesStore();
+	const { setCategories, removeCategory } = useCategoriesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 	const [hasRelation, setHasRelation] = useState(false);
 
 	const openDialog = async (category = {}) => {
-		// TODO: Remove old relation checker in model
 		setLoading(true);
 		setDialogOpen(true);
 		setSelectedCategoryId(category.id);
@@ -45,7 +44,8 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 		setLoading(true);
 		try {
 			const categoryResponse = await axiosClient.delete(API().category(id));
-			setCategories(categoryResponse.data.data);
+			removeCategory(id);
+			// setCategories(categoryResponse.data.data);
 			showToast("Success!", "Category deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -92,7 +92,7 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 				return (
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0">
+							<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
 								<span className="sr-only">Open menu</span>
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
