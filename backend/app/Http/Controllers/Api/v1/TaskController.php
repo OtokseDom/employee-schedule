@@ -67,7 +67,9 @@ class TaskController extends Controller
 
     public function destroy(Task $task)
     {
-        $task->delete();
+        if (!$task->delete()) {
+            return apiResponse(null, 'Failed to delete task.', false, 500);
+        }
         return apiResponse('', 'Task deleted successfully');
     }
 }
