@@ -89,10 +89,4 @@ class User extends Authenticatable
         $user->update($request->validated());
         return new UserResource($user);
     }
-
-    public function deleteUser($user, $organization_id)
-    {
-        $user->delete();
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
-    }
 }
