@@ -54,13 +54,9 @@ class TaskStatusController extends Controller
 
     public function destroy(TaskStatus $task_status)
     {
-        $result = $this->task_status->deleteTaskStatus($task_status, $this->userData->organization_id);
-        if ($result === false) {
-            return apiResponse(null, 'Task status cannot be deleted because they have assigned tasks.', false, 400);
-        }
-        if ($result === null) {
+        if (!$task_status->delete()) {
             return apiResponse(null, 'Failed to delete task_status.', false, 500);
         }
-        return apiResponse(TaskStatusResource::collection($result), 'Task status deleted successfully');
+        return apiResponse('', 'Task status deleted successfully');
     }
 }

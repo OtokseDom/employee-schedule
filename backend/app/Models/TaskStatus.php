@@ -47,13 +47,4 @@ class TaskStatus extends Model
         $status->update($request->validated());
         return $status;
     }
-
-    public function deleteTaskStatus($status, $organization_id)
-    {
-        if (!$status->delete()) {
-            return null;
-        }
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
-    }
-    // TODO: Status master page with status check
 }
