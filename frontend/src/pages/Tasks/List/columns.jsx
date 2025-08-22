@@ -24,27 +24,18 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 
 	return [
 		{
-			id: "status",
-			accessorKey: "status.name",
+			id: "id",
+			accessorKey: "id",
 			header: ({ column }) => {
 				return (
 					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Status <ArrowUpDown className="ml-2 h-4 w-4" />
+						ID <ArrowUpDown className="ml-2 h-4 w-4" />
 					</button>
 				);
 			},
 			cell: ({ row }) => {
-				const { status, depth } = row.original;
-
-				return (
-					<div className="flex flex-row min-w-24" style={{ paddingLeft: depth * 40 }}>
-						{depth == 1 ? <CornerDownRight size={18} /> : ""}
-						{/* <span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}> */}
-						<span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
-							{status?.name || "-"}
-						</span>
-					</div>
-				);
+				const { id } = row.original;
+				return <span className="text-xs text-gray-500">{id}</span>;
 			},
 		},
 		{
@@ -58,13 +49,39 @@ export const columnsTask = ({ handleDelete, setIsOpen, setUpdateData }) => {
 				);
 			},
 			cell: ({ row }) => {
-				const title = row.original.title;
+				const { title, depth } = row.original;
 				const description = row.original.description;
 				return (
-					<div className="min-w-52">
-						{title}
-						<br />
-						<span className="text-sm text-gray-500">{description}</span>
+					<div className="flex flex-row min-w-52 gap-2" style={{ paddingLeft: depth * 20 }}>
+						<span>{depth == 1 ? <CornerDownRight size={18} /> : ""}</span>
+						<div>
+							{title}
+							<br />
+							<span className="text-sm text-gray-500">{description}</span>
+						</div>
+					</div>
+				);
+			},
+		},
+		{
+			id: "status",
+			accessorKey: "status.name",
+			header: ({ column }) => {
+				return (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Status <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				);
+			},
+			cell: ({ row }) => {
+				const { status, depth } = row.original;
+
+				return (
+					<div className="flex flex-row min-w-24">
+						{/* <span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}> */}
+						<span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
+							{status?.name || "-"}
+						</span>
 					</div>
 				);
 			},
