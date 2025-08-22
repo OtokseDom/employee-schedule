@@ -180,6 +180,11 @@ export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, s
 					</div>
 				</div>
 			</div>
+			<div className="w-full m-0 text-right">
+				<Button variant="link" className="text-muted-foreground" onClick={() => setSorting([])}>
+					Reset sort
+				</Button>
+			</div>
 			<div className="rounded-md">
 				<Table>
 					<TableHeader>
