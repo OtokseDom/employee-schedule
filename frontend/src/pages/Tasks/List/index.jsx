@@ -1,7 +1,6 @@
 import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
 import { columnsTask } from "./columns";
-import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
@@ -13,16 +12,18 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
-	const { loading, setLoading } = useLoadContext();
+	const { setLoading } = useLoadContext();
 	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab, setOptions } = useTasksStore();
 	const { users, setUsers } = useUsersStore();
 	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
-	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
+
 	const [updateData, setUpdateData] = useState({});
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+	const [hasRelation, setHasRelation] = useState(false);
 
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const [tableData, setTableData] = useState([]);
@@ -34,6 +35,10 @@ export default function Tasks() {
 			setActiveTab("update");
 			setParentId(null);
 		}
+	}, [isOpen]);
+
+	useEffect(() => {
+		if (!isOpen) setHasRelation(false);
 	}, [isOpen]);
 
 	useEffect(() => {
@@ -106,39 +111,47 @@ export default function Tasks() {
 			setLoading(false);
 		}
 	};
-
-	const handleDelete = async (id) => {
-		setLoading(true);
-		try {
-			await axiosClient.delete(API().task(id));
-			// needs to remove all children tasks as well
-			fetchData();
-			showToast("Success!", "Task deleted.", 3000);
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
+					dialogOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div>
 				<h1 className=" font-extrabold text-3xl">Tasks</h1>
 				<p>View list of all tasks</p>
 			</div>
-			<DataTableTasks
-				columns={columnsTask({ handleDelete, setIsOpen, setUpdateData })}
-				data={tableData}
-				updateData={updateData}
-				setUpdateData={setUpdateData}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				parentId={parentId}
-				setParentId={setParentId}
-				fetchData={fetchData}
-			/>
+
+			{/* Updated table to fix dialog per column issue */}
+			{(() => {
+				const { columnsTask: taskColumns, dialog } = columnsTask({
+					dialogOpen,
+					setDialogOpen,
+					hasRelation,
+					setHasRelation,
+					setIsOpen,
+					setUpdateData,
+					fetchData,
+				});
+				return (
+					<>
+						<DataTableTasks
+							columns={taskColumns}
+							data={tableData}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
+							isOpen={isOpen}
+							setIsOpen={setIsOpen}
+							parentId={parentId}
+							setParentId={setParentId}
+							fetchData={fetchData}
+						/>
+						{dialog}
+					</>
+				);
+			})()}
 		</div>
 	);
 }
