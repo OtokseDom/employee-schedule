@@ -47,15 +47,4 @@ class Category extends Model
         $category->update($request->validated());
         return $category;
     }
-
-    public function deleteCategory($category, $organization_id)
-    {
-        if (Task::where('category_id', $category->id)->exists()) {
-            return false;
-        }
-        if (!$category->delete()) {
-            return null;
-        }
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
-    }
 }
