@@ -324,4 +324,12 @@ class Task extends Model
         ];
         return $data;
     }
+
+    public function deleteSubtasks($task)
+    {
+        // Get all child task IDs
+        $childIds = $this->where('parent_id', $task->id)->pluck('id')->toArray();
+        // Delete all child tasks
+        return $this->whereIn('id', $childIds)->delete();
+    }
 }
