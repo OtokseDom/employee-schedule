@@ -170,7 +170,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 						return (
 							<FormItem>
 								<FormLabel>Priority *</FormLabel>
-								<Select onValueChange={field.onChange} value={field.value || undefined}>
+								<Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select priority"></SelectValue>
@@ -209,7 +209,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 						return (
 							<FormItem>
 								<FormLabel>Status *</FormLabel>
-								<Select onValueChange={field.onChange} value={field.value || undefined}>
+								<Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a status"></SelectValue>
