@@ -134,15 +134,13 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={false}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogTitle>{hasRelation ? <span className="text-yellow-800">Warning</span> : "Are you absolutely sure?"}</DialogTitle>
+					<DialogDescription>{!hasRelation && "This action cannot be undone."}</DialogDescription>
 				</DialogHeader>
 				<div className="ml-4 text-base">
 					{hasRelation && (
 						<>
-							<span className="text-yellow-800">Warning: Status is assigned to tasks.</span>
-							<br />
-							<span> Deleting this will set task status to null</span>
+							<span className="text-yellow-800">Status cannot be deleted because it has assigned tasks.</span>
 						</>
 					)}
 				</div>
@@ -152,15 +150,17 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 							Close
 						</Button>
 					</DialogClose>
-					<Button
-						disabled={loading}
-						onClick={() => {
-							handleDelete(selectedTaskStatusId);
-							setDialogOpen(false);
-						}}
-					>
-						Yes, delete
-					</Button>
+					{!hasRelation && (
+						<Button
+							disabled={loading}
+							onClick={() => {
+								handleDelete(selectedTaskStatusId);
+								setDialogOpen(false);
+							}}
+						>
+							Yes, delete
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
