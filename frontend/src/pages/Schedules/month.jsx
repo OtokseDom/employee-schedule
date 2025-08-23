@@ -113,7 +113,7 @@ export default function Month({ days, currentMonth, getTaskForDate, fetchData })
 													}}
 													className={`
 											text-xxs md:text-xs py-1 md:p-1 rounded border truncate
-											${statusColors[task.status] || "bg-gray-100 border-gray-300"}
+											${statusColors[task.status.color] || "bg-gray-100 border-gray-300"}
 										`}
 												>
 													<div className="flex items-center">
