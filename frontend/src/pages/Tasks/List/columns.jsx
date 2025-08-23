@@ -38,8 +38,12 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 	}, [dialogOpen]);
 
 	const handleUpdate = (task) => {
-		setIsOpen(true);
-		setUpdateData(task);
+		setTimeout(() => {
+			setIsOpen(true);
+			setUpdateData(task);
+		}, 0);
+		// setIsOpen(true);
+		// setUpdateData(task);
 		const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 		setSelectedTaskHistory(filteredHistory);
 		if (!task.parent_id) {
