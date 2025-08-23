@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('status_id')->nullable()->constrained('task_statuses')->onDelete('set null')->onUpdate('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('target_date')->nullable();
             $table->date('estimated_date')->nullable();
             $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent', 'Critical']);
-            $table->enum('status', ['Pending', 'In Progress', 'For Review', 'Completed', 'Delayed', 'Cancelled', 'On Hold']);
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

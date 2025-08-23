@@ -23,12 +23,12 @@ class UpdateProjectRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
+            'status_id' => 'nullable|exists:task_statuses,id',
             'title'           => 'required|string|max:255',
             'description'     => 'nullable|string',
             'target_date'     => 'nullable|date',
             'estimated_date'  => 'nullable|date',
             'priority'        => 'required|in:Low,Medium,High,Urgent,Critical',
-            'status'          => 'required|in:Pending,In Progress,For Review,Completed,Delayed,Cancelled,On Hold',
             'remarks'         => 'nullable|string',
         ];
     }

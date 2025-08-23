@@ -11,12 +11,12 @@ class Project extends Model
 
     protected $fillable = [
         'organization_id',
+        'status_id',
         'title',
         'description',
         'target_date',
         'estimated_date',
         'priority',
-        'status',
         'remarks'
     ];
 
@@ -37,12 +37,21 @@ class Project extends Model
         return $this->hasMany(Task::class, 'project_id');
     }
 
+    // Relationship with Status
+    public function status()
+    {
+        return $this->belongsTo(TaskStatus::class);
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                          Controller Logic Function                         */
     /* -------------------------------------------------------------------------- */
     public function getProjects($organization_id)
     {
-        return $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
+        return $this->with('status:id,name,color')
+            ->orderBy("id", "DESC")
+            ->where('organization_id', $organization_id)
+            ->get();
     }
 
     public function storeProject($request)
@@ -52,7 +61,7 @@ class Project extends Model
 
     public function showProject($organization_id, $project_id)
     {
-        return $this->where('id', $project_id)
+        return $this->with('status:id,name,color')->where('id', $project_id)
             ->where('organization_id', $organization_id)
             ->first();
     }
