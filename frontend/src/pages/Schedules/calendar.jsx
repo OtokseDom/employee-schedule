@@ -124,7 +124,12 @@ export default function ScheduleCalendar() {
 		return tasks.filter((task) => {
 			const start = format(new Date(task.start_date), "yyyy-MM-dd");
 			const end = format(new Date(task.end_date), "yyyy-MM-dd");
-			return task.assignee_id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
+			return (
+				Array.isArray(task.assignees) &&
+				task.assignees.some((assignee) => assignee.id === selectedUser?.id) &&
+				start <= formattedDate &&
+				end >= formattedDate
+			);
 		});
 	};
 
@@ -147,7 +152,8 @@ export default function ScheduleCalendar() {
 		const taskEndDate = format(new Date(task?.end_date), "yyyy-MM-dd");
 
 		return (
-			task?.assignee_id === selectedUser?.id &&
+			Array.isArray(task.assignees) &&
+			task.assignees.some((assignee) => assignee.id === selectedUser?.id) &&
 			formattedDate >= taskStartDate &&
 			formattedDate <= taskEndDate &&
 			startHour <= slotHour &&
@@ -211,7 +217,6 @@ export default function ScheduleCalendar() {
 				<div className="flex flex-row w-full items-center gap-4">
 					{/* Navigation */}
 					<div className="flex flex-col justify-center gap-2 w-full">
-						{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
 						<div className="flex items-center justify-center">
 							<span className="block md:hidden text-lg font-bold">
 								{selectedView === "month"
@@ -256,31 +261,14 @@ export default function ScheduleCalendar() {
 			{/* Calendar/Week View */}
 			<div className="bg-background overflow-x-auto">
 				{selectedView === "month" ? (
-					<Month
-						days={days}
-						// data={tasks}
-						// projects={projects}
-						// users={users}
-						// categories={categories}
-						fetchData={fetchData}
-						currentMonth={currentMonth}
-						getTaskForDate={getTaskForDate}
-						// selectedUser={selectedUser}
-						// taskHistory={taskHistory}
-					/>
+					<Month days={days} fetchData={fetchData} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
 				) : (
 					<Week
-						// data={tasks}
-						// projects={projects}
-						// users={users}
-						// categories={categories}
 						fetchData={fetchData}
 						getWeekDays={getWeekDays}
 						getTimeSlots={getTimeSlots}
 						weekstart_date={weekstart_date}
 						isInTimeSlot={isInTimeSlot}
-						// selectedUser={selectedUser}
-						// taskHistory={taskHistory}
 					/>
 				)}
 			</div>
