@@ -4,17 +4,37 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { format } from "date-fns";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
+import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
 export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
+	const { loading, setLoading } = useLoadContext();
+	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedProjectId, setSelectedProjectId] = useState(null);
+	const [hasRelation, setHasRelation] = useState(false);
 
-	const openDialog = (project = {}) => {
+	const openDialog = async (project = {}) => {
+		setLoading(true);
 		setDialogOpen(true);
 		setSelectedProjectId(project.id);
+		try {
+			const hasRelationResponse = await axiosClient.post(API().relation_check("project", project.id));
+			setHasRelation(hasRelationResponse?.data?.data?.exists);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
 	};
+	useEffect(() => {
+		if (!dialogOpen) setHasRelation(false);
+	}, [dialogOpen]);
 	const handleUpdateProject = (project) => {
 		setIsOpen(true);
 		setUpdateData(project);
@@ -188,16 +208,33 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={true}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogTitle>{hasRelation ? <span className="text-yellow-800">Warning</span> : "Are you absolutely sure?"}</DialogTitle>
+					<DialogDescription>{!hasRelation && "This action cannot be undone."}</DialogDescription>
 				</DialogHeader>
+				<div className="ml-4 text-base">
+					{hasRelation && (
+						<>
+							<span className="text-yellow-800">Project cannot be deleted because it has assigned tasks.</span>
+						</>
+					)}
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
 							Close
 						</Button>
 					</DialogClose>
-					<Button onClick={() => handleDelete(selectedProjectId)}>Yes, delete</Button>
+					{!hasRelation && (
+						<Button
+							disabled={loading}
+							onClick={() => {
+								handleDelete(selectedProjectId);
+								setDialogOpen(false);
+							}}
+						>
+							Yes, delete
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
