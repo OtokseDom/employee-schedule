@@ -56,8 +56,9 @@ export default function UserProfile() {
 	const [isOpenFilter, setIsOpenFilter] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
-	// Subtasks
-	// const [relations, setRelations] = useState([]);
+	// datatable props
+	const [hasRelation, setHasRelation] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
 
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
 
@@ -65,16 +66,19 @@ export default function UserProfile() {
 	const [tableData, setTableData] = useState([]);
 	useEffect(() => {
 		if (tasks || tasks?.length > 0) {
-			const filteredUserTasks = tasks.filter((task) => task.assignee_id === parseInt(id));
+			const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
+			console.log(filteredUserTasks);
 			setTableData(flattenTasks(filteredUserTasks));
 		}
 	}, [tasks, id]);
+
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
 			setRelations({});
 			setActiveTab("update");
 			setParentId(null);
+			setHasRelation(false);
 		}
 		if (!isOpenUser) setUpdateDataUser({});
 	}, [isOpen, isOpenUser]);
@@ -339,18 +343,36 @@ export default function UserProfile() {
 									: ""}
 							</p>
 						</div>
-						<DataTableTasks
-							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData }, false)}
-							data={tableData}
-							updateData={updateData}
-							setUpdateData={setUpdateData}
-							isOpen={isOpen}
-							setIsOpen={setIsOpen}
-							fetchData={fetchTasks}
-							showLess={true}
-							parentId={parentId}
-							setParentId={setParentId}
-						/>
+
+						{/* Updated table to fix dialog per column issue */}
+						{(() => {
+							const { columnsTask: taskColumns, dialog } = columnsTask({
+								dialogOpen,
+								setDialogOpen,
+								hasRelation,
+								setHasRelation,
+								setIsOpen,
+								setUpdateData,
+								fetchData,
+							});
+							return (
+								<>
+									<DataTableTasks
+										columns={taskColumns}
+										data={tableData}
+										updateData={updateData}
+										setUpdateData={setUpdateData}
+										isOpen={isOpen}
+										setIsOpen={setIsOpen}
+										parentId={parentId}
+										setParentId={setParentId}
+										fetchData={fetchData}
+										showLess={true}
+									/>
+									{dialog}
+								</>
+							);
+						})()}
 					</div>
 				</div>
 			</div>
