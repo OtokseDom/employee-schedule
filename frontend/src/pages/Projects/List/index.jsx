@@ -33,7 +33,6 @@ export default function Projects() {
 			setLoading(false);
 		}
 	};
-	// TODO: relation check
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
