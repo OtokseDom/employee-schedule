@@ -54,8 +54,12 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        if (!$category->delete()) {
-            return apiResponse(null, 'Failed to delete task.', false, 500);
+        $result = $this->category->deleteCategory($category);
+        if ($result === false) {
+            return apiResponse(null, 'Category cannot be deleted because they have assigned tasks.', false, 400);
+        }
+        if ($result === null) {
+            return apiResponse(null, 'Failed to delete category.', false, 500);
         }
         return apiResponse('', 'Category deleted successfully');
     }

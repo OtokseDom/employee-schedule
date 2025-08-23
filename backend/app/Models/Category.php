@@ -44,7 +44,17 @@ class Category extends Model
 
     public function updateCategory($request, $category)
     {
-        $category->update($request->validated());
-        return $category;
+        return $category->update($request->validated());
+    }
+
+    public function deleteCategory($category)
+    {
+        if (Task::where('category_id', $category->id)->exists()) {
+            return false;
+        }
+        if (!$category->delete()) {
+            return null;
+        }
+        return true;
     }
 }

@@ -54,13 +54,13 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        $result = $this->project->deleteProject($project, $this->userData->organization_id);
+        $result = $this->project->deleteProject($project);
         if ($result === false) {
             return apiResponse(null, 'Project cannot be deleted because they have assigned tasks.', false, 400);
         }
         if ($result === null) {
             return apiResponse(null, 'Failed to delete project.', false, 500);
         }
-        return apiResponse(ProjectResource::collection($result), 'Project deleted successfully');
+        return apiResponse('', 'Project deleted successfully');
     }
 }

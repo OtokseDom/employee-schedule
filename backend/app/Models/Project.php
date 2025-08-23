@@ -63,7 +63,7 @@ class Project extends Model
         return $project;
     }
 
-    public function deleteProject($project, $organization_id)
+    public function deleteProject($project)
     {
         if (Task::where('project_id', $project->id)->exists()) {
             return false;
@@ -71,6 +71,6 @@ class Project extends Model
         if (!$project->delete()) {
             return null;
         }
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
+        return true;
     }
 }

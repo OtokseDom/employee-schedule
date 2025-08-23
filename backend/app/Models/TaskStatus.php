@@ -47,4 +47,15 @@ class TaskStatus extends Model
         $status->update($request->validated());
         return $status;
     }
+
+    public function deleteTaskStatus($taskStatus)
+    {
+        if (Task::where('status_id', $taskStatus->id)->exists()) {
+            return false;
+        }
+        if (!$taskStatus->delete()) {
+            return null;
+        }
+        return true;
+    }
 }

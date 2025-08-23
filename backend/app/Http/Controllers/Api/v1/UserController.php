@@ -46,8 +46,12 @@ class UserController extends Controller
 
    public function destroy(User $user)
    {
-      if (!$user->delete()) {
-         return apiResponse(null, 'Failed to delete task.', false, 500);
+      $result = $this->user->deleteUser($user);
+      if ($result === false) {
+         return apiResponse(null, 'User cannot be deleted because they have assigned tasks.', false, 400);
+      }
+      if ($result === null) {
+         return apiResponse(null, 'Failed to delete user.', false, 500);
       }
       return apiResponse('', 'User deleted successfully');
    }
