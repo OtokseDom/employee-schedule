@@ -43,7 +43,7 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const categoryResponse = await axiosClient.delete(API().category(id));
+			await axiosClient.delete(API().category(id));
 			removeCategory(id);
 			// setCategories(categoryResponse.data.data);
 			showToast("Success!", "Category deleted.", 3000);
@@ -121,15 +121,13 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={false}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogTitle>{hasRelation ? <span className="text-yellow-800">Warning</span> : "Are you absolutely sure?"}</DialogTitle>
+					<DialogDescription>{!hasRelation && "This action cannot be undone."}</DialogDescription>
 				</DialogHeader>
 				<div className="ml-4 text-base">
 					{hasRelation && (
 						<>
-							<span className="text-yellow-800">Warning: Category is assigned to tasks.</span>
-							<br />
-							<span> Deleting this will set task category to null</span>
+							<span className="text-yellow-800">Category cannot be deleted because it has assigned tasks.</span>
 						</>
 					)}
 				</div>
@@ -139,15 +137,17 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 							Close
 						</Button>
 					</DialogClose>
-					<Button
-						disabled={loading}
-						onClick={() => {
-							handleDelete(selectedCategoryId);
-							setDialogOpen(false);
-						}}
-					>
-						Yes, delete
-					</Button>
+					{!hasRelation && (
+						<Button
+							disabled={loading}
+							onClick={() => {
+								handleDelete(selectedCategoryId);
+								setDialogOpen(false);
+							}}
+						>
+							Yes, delete
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
