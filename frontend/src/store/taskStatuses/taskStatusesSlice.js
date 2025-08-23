@@ -15,6 +15,6 @@ export const createTaskStatusesSlice = (set) => ({
 
 	removeTaskStatus: (id) =>
 		set((state) => ({
-			taskStatuses: state.taskStatus.filter((t) => t.id !== id),
+			taskStatuses: state.taskStatuses.filter((t) => t.id !== id),
 		})),
 });
