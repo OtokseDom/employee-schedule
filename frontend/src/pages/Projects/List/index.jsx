@@ -9,7 +9,7 @@ import { useProjectsStore } from "@/store/projects/projectsStore";
 
 export default function Projects() {
 	const { setLoading } = useLoadContext();
-	const { projects, setProjects } = useProjectsStore([]);
+	const { projects, setProjects, removeProject } = useProjectsStore([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
@@ -38,7 +38,7 @@ export default function Projects() {
 		setLoading(true);
 		try {
 			const projectResponse = await axiosClient.delete(API().project(id));
-			setProjects(projectResponse.data.data);
+			removeProject(id);
 			showToast("Success!", "Project deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
