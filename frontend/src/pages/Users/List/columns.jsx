@@ -189,15 +189,13 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={true}>
 			<DialogContent onClick={(e) => e.stopPropagation()}>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogTitle>{hasRelation ? <span className="text-yellow-800">Warning</span> : "Are you absolutely sure?"}</DialogTitle>
+					<DialogDescription>{!hasRelation && "This action cannot be undone."}</DialogDescription>
 				</DialogHeader>
 				<div className="ml-4 text-base">
 					{hasRelation && (
 						<>
-							<span className="text-yellow-800">Warning: User has assigned tasks.</span>
-							<br />
-							<span>Deleting this will remove this user as assignee</span>
+							<span className="text-yellow-800">Status cannot be deleted because it has assigned tasks.</span>
 						</>
 					)}
 				</div>
@@ -207,16 +205,18 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 							Close
 						</Button>
 					</DialogClose>
-					<Button
-						disabled={loading}
-						onClick={() => {
-							if (dialogType === "reject") handleDelete(selectedUser);
-							else if (dialogType === "delete") handleDelete(selectedUser);
-							setDialogOpen(false);
-						}}
-					>
-						{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}
-					</Button>
+					{!hasRelation && (
+						<Button
+							disabled={loading}
+							onClick={() => {
+								if (dialogType === "reject") handleDelete(selectedUser);
+								else if (dialogType === "delete") handleDelete(selectedUser);
+								setDialogOpen(false);
+							}}
+						>
+							{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
