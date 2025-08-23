@@ -27,7 +27,6 @@ const formSchema = z.object({
 		message: "Color is required.",
 	}),
 });
-// TODO: Realtion check before delete
 export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { taskStatuses: data, setTaskStatuses, updateTaskStatus, addTaskStatus } = useTaskStatusesStore();

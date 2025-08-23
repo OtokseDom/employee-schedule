@@ -14,7 +14,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { statusColors } from "@/utils/taskHelpers";
 export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
-	const { setTaskStatuses } = useTaskStatusesStore();
+	const { removeTaskStatus } = useTaskStatusesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedTaskStatusId, setSelectedTaskStatusId] = useState(null);
@@ -43,8 +43,8 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const taskStatusResponse = await axiosClient.delete(API().task_status(id));
-			setTaskStatuses(taskStatusResponse.data.data);
+			await axiosClient.delete(API().task_status(id));
+			removeTaskStatus(id);
 			showToast("Success!", "Task Status deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
