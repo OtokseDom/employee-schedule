@@ -69,7 +69,9 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
-	const [selectedUsers, setSelectedUsers] = useState(updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || [selectedUser.id] || []);
+	const [selectedUsers, setSelectedUsers] = useState(
+		updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || (updateData.calendar_add ? [selectedUser?.id] : []) || []
+	);
 	const bottomRef = useRef(null);
 	const scrollToBottom = () => {
 		setTimeout(() => {
@@ -102,7 +104,9 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	});
 
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
+		if (!isOpen) {
+			setUpdateData({});
+		}
 	}, [isOpen]);
 
 	useEffect(() => {
