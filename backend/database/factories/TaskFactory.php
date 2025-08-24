@@ -31,7 +31,7 @@ class TaskFactory extends Factory
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'expected_output' => $this->faker->sentence,
-            'start_date' => $startDate = fake()->dateTimeBetween('-1 month', '+1 month'),
+            'start_date' => $startDate = fake()->dateTimeBetween('now', '+1 month'),
             'end_date' => $startDate,
             'start_time' => $this->faker->randomElement(['07:30:00', '08:00:00', '08:20:00', '09:45:00', '10:00:00']),
             'end_time' => $this->faker->randomElement(['13:30:00', '14:00:00', '15:45:00', '15:20:00', '16:00:00']),

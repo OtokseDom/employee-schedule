@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             TaskSeeder::class,
             TaskHistorySeeder::class,
+            TaskAssigneeSeeder::class,
         ]);
     }
 }
