@@ -19,10 +19,12 @@ import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
+	const { setOptions } = useTasksStore();
 	const {
 		reports,
 		setReports,
@@ -66,6 +68,8 @@ export default function UserProfile() {
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse.data.data);
 			mapUserFilter(userResponse.data.data);
+			// To load task assignees option when users are fetched
+			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);

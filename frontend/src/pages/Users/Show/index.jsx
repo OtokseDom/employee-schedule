@@ -29,6 +29,7 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: multi assignee task fetch
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
@@ -47,7 +48,9 @@ export default function UserProfile() {
 	} = useUserStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
-	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab } = useTasksStore();
+	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab, setOptions } = useTasksStore();
+	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
+
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const showToast = useToast();
@@ -84,6 +87,7 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
@@ -153,6 +157,8 @@ export default function UserProfile() {
 			// selection items
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse?.data?.data);
+			// To load task assignees option when users are fetched
+			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -165,6 +171,17 @@ export default function UserProfile() {
 			// selection items
 			const categoryResponse = await axiosClient.get(API().category());
 			setCategories(categoryResponse?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+	const fetchTaskStatuses = async () => {
+		setLoading(true);
+		try {
+			const taskStatusResponse = await axiosClient.get(API().task_status());
+			setTaskStatuses(taskStatusResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -214,7 +231,7 @@ export default function UserProfile() {
 		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					isOpenUser || isOpenFilter ? "opacity-100" : "opacity-0"
+					isOpenUser || isOpenFilter || dialogOpen ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
@@ -363,7 +380,7 @@ export default function UserProfile() {
 										setIsOpen={setIsOpen}
 										parentId={parentId}
 										setParentId={setParentId}
-										fetchData={fetchData}
+										fetchData={fetchTasks}
 										showLess={true}
 									/>
 									{dialog}

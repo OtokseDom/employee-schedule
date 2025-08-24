@@ -15,6 +15,7 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 export default function ScheduleCalendar() {
 	const { loading, setLoading } = useLoadContext();
@@ -26,14 +27,15 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const { tasks, setTasks, taskHistory, setTaskHistory, selectedUser, setSelectedUser } = useTasksStore();
+	const { tasks, setTasks, taskHistory, setTaskHistory, selectedUser, setSelectedUser, setOptions } = useTasksStore();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
+	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
-
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		else if (!selectedUser) setSelectedUser(users[0]);
@@ -41,6 +43,18 @@ export default function ScheduleCalendar() {
 		if (!tasks || tasks.length === 0) fetchData();
 	}, []);
 
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const taskResponse = await axiosClient.get(API().task());
+			setTasks(taskResponse.data.data.tasks);
+			setTaskHistory(taskResponse.data.data.task_history);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
 	const fetchProjects = async () => {
 		setLoading(true);
 		try {
@@ -58,6 +72,8 @@ export default function ScheduleCalendar() {
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse?.data?.data);
 			setSelectedUser(userResponse.data.data[0]);
+			// To load task assignees option when users are fetched
+			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -75,12 +91,11 @@ export default function ScheduleCalendar() {
 			setLoading(false);
 		}
 	};
-	const fetchData = async () => {
+	const fetchTaskStatuses = async () => {
 		setLoading(true);
 		try {
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse.data.data.tasks);
-			setTaskHistory(taskResponse.data.data.task_history);
+			const taskStatusResponse = await axiosClient.get(API().task_status());
+			setTaskStatuses(taskStatusResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {

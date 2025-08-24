@@ -6,11 +6,13 @@ import { columns } from "./columns";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 
 export default function Users() {
 	const { user } = useAuthContext();
 	const { setLoading } = useLoadContext();
 	const { users, setUsers } = useUsersStore();
+	const { setOptions } = useTasksStore();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 
@@ -26,6 +28,8 @@ export default function Users() {
 		try {
 			const userResponse = await axiosClient.get(API().user());
 			setUsers(userResponse.data.data);
+			// To load task assignees option when users are fetched
+			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
