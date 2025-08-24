@@ -13,7 +13,7 @@ import { API } from "@/constants/api";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
-	const { setCategories, removeCategory } = useCategoriesStore();
+	const { categories, removeCategory } = useCategoriesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -81,7 +81,7 @@ export const columnsCategory = ({ setIsOpen, setUpdateData, dialogOpen, setDialo
 				},
 			},
 		],
-		[user]
+		[categories]
 	);
 	// Add actions column for Superadmin
 	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin" || user?.data?.role === "Manager") {

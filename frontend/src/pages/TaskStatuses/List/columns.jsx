@@ -14,7 +14,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { statusColors } from "@/utils/taskHelpers";
 export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
-	const { removeTaskStatus } = useTaskStatusesStore();
+	const { taskStatuses, removeTaskStatus } = useTaskStatusesStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedTaskStatusId, setSelectedTaskStatusId] = useState(null);
@@ -94,7 +94,7 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 				},
 			},
 		],
-		[user]
+		[taskStatuses]
 	);
 	// Add actions column for Superadmin
 	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin" || user?.data?.role === "Manager") {

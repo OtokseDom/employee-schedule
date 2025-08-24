@@ -13,7 +13,7 @@ import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
 
 export const columns = ({ setIsOpen, setUpdateData }) => {
-	const { updateUser, removeUser } = useUsersStore();
+	const { users, updateUser, removeUser } = useUsersStore();
 	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -122,7 +122,7 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 			{ id: "position", accessorKey: "position", header: createHeader("Position") },
 			// ...existing code...
 		],
-		[user]
+		[users]
 	);
 
 	// Add actions column for Superadmin

@@ -12,8 +12,10 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { statusColors } from "@/utils/taskHelpers";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
+	const { projects } = useProjectsStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -161,7 +163,7 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 				},
 			},
 		],
-		[user]
+		[projects]
 	);
 	// Add actions column for Superadmin
 	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin" || user?.data?.role === "Manager") {
