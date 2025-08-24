@@ -11,7 +11,7 @@ import { useUsersStore } from "@/store/users/usersStore";
 
 export const useTaskHelpers = () => {
 	const { setLoading } = useLoadContext();
-	const { setTasks, setTaskHistory, setOptions } = useTasksStore();
+	const { setTasks, setTaskHistory, setOptions, setSelectedUser } = useTasksStore();
 	const { setProjects } = useProjectsStore();
 	const { setUsers } = useUsersStore();
 	const { setCategories } = useCategoriesStore();
@@ -37,6 +37,7 @@ export const useTaskHelpers = () => {
 			const res = await axiosClient.get(API().project());
 			setProjects(res?.data?.data);
 			const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
+			// Used in user profile
 			setProfileProjectFilter(mappedProjects);
 			setOptions(res?.data?.data.map((p) => ({ value: p.id, label: p.title })));
 		} catch (e) {
@@ -51,6 +52,8 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().user());
 			setUsers(res?.data?.data);
+			// Used in calendar
+			setSelectedUser(res?.data?.data[0]);
 			setOptions(res?.data?.data.map((u) => ({ value: u.id, label: u.name })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);

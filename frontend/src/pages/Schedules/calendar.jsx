@@ -1,24 +1,21 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/axios.client";
-import { Calendar, ChevronLeft, ChevronRight, Clock, Edit3, Users, Plus, X, Check, Trash } from "lucide-react";
 import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths } from "date-fns";
 // Shadcn UI
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Contexts
-import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import Week from "./week";
 import Month from "./month";
-import { API } from "@/constants/api";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 export default function ScheduleCalendar() {
-	const { loading, setLoading } = useLoadContext();
+	const { loading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
 
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -27,11 +24,13 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const { tasks, setTasks, setTaskHistory, selectedUser, setSelectedUser, setOptions } = useTasksStore();
-	const { users, setUsers } = useUsersStore();
-	const { projects, setProjects } = useProjectsStore();
-	const { categories, setCategories } = useCategoriesStore();
-	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
+	const { tasks, selectedUser, setSelectedUser } = useTasksStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
@@ -40,68 +39,8 @@ export default function ScheduleCalendar() {
 		if (!users || users.length === 0) fetchUsers();
 		else if (!selectedUser) setSelectedUser(users[0]);
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!tasks || tasks.length === 0) fetchData();
+		if (!tasks || tasks.length === 0) fetchTasks();
 	}, []);
-
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse.data.data.tasks);
-			setTaskHistory(taskResponse.data.data.task_history);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchProjects = async () => {
-		setLoading(true);
-		try {
-			const projectResponse = await axiosClient.get(API().project());
-			setProjects(projectResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchUsers = async () => {
-		setLoading(true);
-		try {
-			const userResponse = await axiosClient.get(API().user());
-			setUsers(userResponse?.data?.data);
-			setSelectedUser(userResponse.data.data[0]);
-			// To load task assignees option when users are fetched
-			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchCategories = async () => {
-		setLoading(true);
-		try {
-			const categoryResponse = await axiosClient.get(API().category());
-			setCategories(categoryResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchTaskStatuses = async () => {
-		setLoading(true);
-		try {
-			const taskStatusResponse = await axiosClient.get(API().task_status());
-			setTaskStatuses(taskStatusResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	// For week view - get the start of the week (Sunday)
 	const getWeekstart_date = (date) => {
@@ -276,10 +215,10 @@ export default function ScheduleCalendar() {
 			{/* Calendar/Week View */}
 			<div className="bg-background overflow-x-auto">
 				{selectedView === "month" ? (
-					<Month days={days} fetchData={fetchData} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
+					<Month days={days} fetchData={fetchTasks} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
 				) : (
 					<Week
-						fetchData={fetchData}
+						fetchData={fetchTasks}
 						getWeekDays={getWeekDays}
 						getTimeSlots={getTimeSlots}
 						weekstart_date={weekstart_date}

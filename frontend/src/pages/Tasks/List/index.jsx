@@ -1,9 +1,6 @@
-import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
 import { columnsTask } from "./columns";
 import { DataTableTasks } from "./data-table";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
-import { API } from "@/constants/api";
 import { flattenTasks, useTaskHelpers } from "@/utils/taskHelpers";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
@@ -12,12 +9,11 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
-	const { setLoading } = useLoadContext();
-	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab, setOptions } = useTasksStore();
-	const { users, setUsers } = useUsersStore();
-	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
-	const { projects, setProjects } = useProjectsStore();
-	const { categories, setCategories } = useCategoriesStore();
+	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { users } = useUsersStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
 	// Fetch Hooks
 	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 	const [isOpen, setIsOpen] = useState(false);
