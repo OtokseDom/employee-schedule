@@ -316,7 +316,8 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 		user_auth?.data?.role === "Manager" ||
 		Object.keys(updateData).length === 0 ||
 		updateData?.calendar_add ||
-		updateData?.assignees?.includes(user_auth?.data?.id);
+		updateData?.assignees?.some((assignee) => assignee.id === user_auth?.data?.id) ||
+		!updateData?.assignees;
 	return (
 		<Form {...form}>
 			<form
@@ -389,6 +390,7 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 								<FormLabel>Assignees</FormLabel>
 								<FormControl>
 									<MultiSelect
+										disabled={!isEditable}
 										field={field}
 										options={options || []}
 										onValueChange={setSelectedUsers}
