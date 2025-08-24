@@ -24,6 +24,8 @@ export const useTaskHelpers = () => {
 			const res = await axiosClient.get(API().task());
 			setTasks(res?.data?.data?.tasks);
 			setTaskHistory(res?.data?.data?.task_history);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -37,6 +39,8 @@ export const useTaskHelpers = () => {
 			const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
 			setProfileProjectFilter(mappedProjects);
 			setOptions(res?.data?.data.map((p) => ({ value: p.id, label: p.title })));
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -48,6 +52,8 @@ export const useTaskHelpers = () => {
 			const res = await axiosClient.get(API().user());
 			setUsers(res?.data?.data);
 			setOptions(res?.data?.data.map((u) => ({ value: u.id, label: u.name })));
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -58,6 +64,8 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().category());
 			setCategories(res?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
@@ -68,6 +76,8 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().task_status());
 			setTaskStatuses(res?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
 		}
