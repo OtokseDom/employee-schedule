@@ -13,7 +13,7 @@ import { API } from "@/constants/api";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRelation, setIsOpen, setUpdateData, fetchData }) => {
+export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRelation, setIsOpen, setUpdateData, fetchTasks }) => {
 	const { user } = useAuthContext(); // Get authenticated user details
 	const { tasks, taskHistory, setSelectedTaskHistory, setRelations } = useTasksStore();
 	const [selectedTaskId, setSelectedTaskId] = useState(null);
@@ -69,7 +69,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 				});
 			}
 			// needs to remove all children tasks as well
-			fetchData();
+			fetchTasks();
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");

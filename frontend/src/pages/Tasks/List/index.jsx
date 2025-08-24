@@ -4,7 +4,7 @@ import { columnsTask } from "./columns";
 import { DataTableTasks } from "./data-table";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { API } from "@/constants/api";
-import { flattenTasks } from "@/utils/taskHelpers";
+import { flattenTasks, useTaskHelpers } from "@/utils/taskHelpers";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
@@ -18,6 +18,8 @@ export default function Tasks() {
 	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 	const [isOpen, setIsOpen] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -47,70 +49,13 @@ export default function Tasks() {
 		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!tasks || tasks.length === 0) fetchData();
+		if (!tasks || tasks.length === 0) fetchTasks();
 	}, []);
 
 	useEffect(() => {
 		setTableData(flattenTasks(tasks));
 	}, [tasks]);
 
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse.data.data.tasks);
-			setTaskHistory(taskResponse.data.data.task_history);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchTaskStatuses = async () => {
-		setLoading(true);
-		try {
-			const taskStatusResponse = await axiosClient.get(API().task_status());
-			setTaskStatuses(taskStatusResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchProjects = async () => {
-		setLoading(true);
-		try {
-			const projectResponse = await axiosClient.get(API().project());
-			setProjects(projectResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchUsers = async () => {
-		setLoading(true);
-		try {
-			const userResponse = await axiosClient.get(API().user());
-			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
-			setUsers(userResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchCategories = async () => {
-		setLoading(true);
-		try {
-			const categoryResponse = await axiosClient.get(API().category());
-			setCategories(categoryResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 			<div
@@ -133,7 +78,7 @@ export default function Tasks() {
 					setHasRelation,
 					setIsOpen,
 					setUpdateData,
-					fetchData,
+					fetchTasks,
 				});
 				return (
 					<>
@@ -146,7 +91,7 @@ export default function Tasks() {
 							setIsOpen={setIsOpen}
 							parentId={parentId}
 							setParentId={setParentId}
-							fetchData={fetchData}
+							fetchData={fetchTasks}
 						/>
 						{dialog}
 					</>
