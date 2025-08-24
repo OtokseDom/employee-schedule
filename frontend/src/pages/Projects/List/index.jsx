@@ -14,7 +14,7 @@ export default function Projects() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [dialogOpen, setDialogOpen] = useState(false);
-
+	// TODO: Fix update not seting status
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);

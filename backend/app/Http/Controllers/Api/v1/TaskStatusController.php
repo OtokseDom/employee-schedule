@@ -45,11 +45,11 @@ class TaskStatusController extends Controller
 
     public function update(UpdateTaskStatusRequest $request, TaskStatus $task_status)
     {
-        $updated = $this->task_status->updateTaskStatus($request, $task_status);
+        $updated = $task_status->update($request->validated());
         if (!$updated) {
             return apiResponse(null, 'Failed to update task status.', false, 500);
         }
-        return apiResponse(new TaskStatusResource($updated), 'Task status updated successfully');
+        return apiResponse(new TaskStatusResource($task_status), 'Task status updated successfully');
     }
 
     public function destroy(TaskStatus $task_status)

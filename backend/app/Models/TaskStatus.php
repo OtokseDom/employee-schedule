@@ -42,12 +42,6 @@ class TaskStatus extends Model
             ->first();
     }
 
-    public function updateTaskStatus($request, $status)
-    {
-        $status->update($request->validated());
-        return $status;
-    }
-
     public function deleteTaskStatus($taskStatus)
     {
         if (Task::where('status_id', $taskStatus->id)->exists()) {

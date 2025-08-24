@@ -66,12 +66,6 @@ class Project extends Model
             ->first();
     }
 
-    public function updateProject($request, $project)
-    {
-        $project->update($request->validated());
-        return $project;
-    }
-
     public function deleteProject($project)
     {
         if (Task::where('project_id', $project->id)->exists()) {

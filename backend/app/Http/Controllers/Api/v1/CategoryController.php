@@ -43,15 +43,6 @@ class CategoryController extends Controller
         return apiResponse(new CategoryResource($details), 'Category details fetched successfully');
     }
 
-    public function update(UpdateCategoryRequest $request, Category $category)
-    {
-        $updated = $this->category->updateCategory($request, $category);
-        if (!$updated) {
-            return apiResponse(null, 'Failed to update category.', false, 500);
-        }
-        return apiResponse(new CategoryResource($updated), 'Category updated successfully');
-    }
-
     public function destroy(Category $category)
     {
         $result = $this->category->deleteCategory($category);

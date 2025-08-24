@@ -40,8 +40,11 @@ class UserController extends Controller
 
    public function update(UpdateUserRequest $request, User $user)
    {
-      $details = $this->user->updateUser($request, $user);
-      return apiResponse($details, 'User updated successfully');
+      $updated = $user->update($request->validated());
+      if (!$updated) {
+         return apiResponse(null, 'Failed to update user.', false, 500);
+      }
+      return apiResponse($user, 'User updated successfully');
    }
 
    public function destroy(User $user)

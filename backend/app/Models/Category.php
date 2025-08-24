@@ -42,11 +42,6 @@ class Category extends Model
             ->first();
     }
 
-    public function updateCategory($request, $category)
-    {
-        return $category->update($request->validated());
-    }
-
     public function deleteCategory($category)
     {
         if (Task::where('category_id', $category->id)->exists()) {

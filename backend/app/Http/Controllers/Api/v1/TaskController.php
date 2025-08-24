@@ -60,10 +60,11 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        return apiResponse(
-            $this->task->updateTask($request, $task, $this->userData),
-            'Task updated successfully'
-        );
+        $updated = $this->task->updateTask($request, $task, $this->userData);
+        if (!$updated) {
+            return apiResponse(null, 'Failed to update task.', false, 500);
+        }
+        return apiResponse($updated, 'Task updated successfully');
     }
 
     public function destroy(Request $request, Task $task)
