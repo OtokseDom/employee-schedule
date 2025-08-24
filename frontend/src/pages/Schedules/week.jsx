@@ -147,7 +147,6 @@ export default function Week({
 																//set update data when a task is clicked
 																e.stopPropagation();
 																setUpdateData(task);
-																setTimeout(() => setUpdateData(task), 0);
 																setOpenDialogIndex(index);
 																const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 																setSelectedTaskHistory(filteredHistory);

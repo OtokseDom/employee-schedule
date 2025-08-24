@@ -47,7 +47,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { tasks, addRelation, setActiveTab, options } = useTasksStore();
+	const { tasks, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
@@ -69,7 +69,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
-	const [selectedUsers, setSelectedUsers] = useState(updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || []);
+	const [selectedUsers, setSelectedUsers] = useState(updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || [selectedUser.id] || []);
 	const bottomRef = useRef(null);
 	const scrollToBottom = () => {
 		setTimeout(() => {
@@ -377,6 +377,29 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				/>
 				<FormField
 					control={form.control}
+					name="assignees"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Assignees</FormLabel>
+								<FormControl>
+									<MultiSelect
+										field={field}
+										options={options || []}
+										onValueChange={setSelectedUsers}
+										defaultValue={selectedUsers}
+										placeholder="Select assignees"
+										variant="inverted"
+										animation={2}
+										// maxCount={3}
+									/>
+								</FormControl>
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
 					name="parent_id"
 					render={({ field }) => {
 						return (
@@ -419,66 +442,6 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="assignees"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Assignees</FormLabel>
-								<FormControl>
-									<MultiSelect
-										field={field}
-										options={options || []}
-										onValueChange={setSelectedUsers}
-										defaultValue={selectedUsers}
-										placeholder="Select assignees"
-										variant="inverted"
-										animation={2}
-										// maxCount={3}
-									/>
-								</FormControl>
-							</FormItem>
-						);
-					}}
-				/>
-				{/* <FormField
-					control={form.control}
-					name="assignee_id"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Assignee</FormLabel>
-								<Select
-									disabled={!isEditable}
-									onValueChange={(value) => field.onChange(Number(value))}
-									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
-									value={field.value ? field.value.toString() : ""}
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select an assignee">
-												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
-											</SelectValue>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{Array.isArray(users) && users.length > 0 ? (
-											users.map((user) => (
-												<SelectItem key={user.id} value={user.id.toString()}>
-													{user.name}
-												</SelectItem>
-											))
-										) : (
-											<></>
-										)}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/> */}
 				<FormField
 					control={form.control}
 					name="project_id"
@@ -566,7 +529,7 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 						);
 					}}
 				/>
-				{showMore && (
+				{showMore & !updateData.calendar_add ? (
 					<>
 						<FormField
 							control={form.control}
@@ -821,6 +784,70 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 							</>
 						)}
 					</>
+				) : updateData.calendar_add ? (
+					<>
+						<FormField
+							control={form.control}
+							name="start_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Start Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="60"
+												inputMode="numeric"
+												pattern="[0-9]{2}:[0-9]{2}"
+												className="bg-background appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>End Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="any"
+												// placeholder="Rating &#40;1-10&#41;"
+												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+					</>
+				) : (
+					""
 				)}
 				<div className="w-full" ref={bottomRef}>
 					<Button

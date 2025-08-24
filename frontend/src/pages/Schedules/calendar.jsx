@@ -27,7 +27,7 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const { tasks, setTasks, taskHistory, setTaskHistory, selectedUser, setSelectedUser, setOptions } = useTasksStore();
+	const { tasks, setTasks, setTaskHistory, selectedUser, setSelectedUser, setOptions } = useTasksStore();
 	const { users, setUsers } = useUsersStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { categories, setCategories } = useCategoriesStore();
