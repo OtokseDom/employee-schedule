@@ -99,7 +99,7 @@ export default function Month({ days, currentMonth, getTaskForDate, fetchData })
 													onClick={(e) => {
 														//set update tasks when a task is clicked
 														e.stopPropagation();
-														setUpdateData({});
+														setUpdateData(task);
 														setTimeout(() => setUpdateData(task), 0);
 														setOpenDialogIndex(index);
 														const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
