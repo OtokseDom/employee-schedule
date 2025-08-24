@@ -103,13 +103,29 @@ export default function Signup() {
 					)}
 
 					<form onSubmit={onSubmit} className="space-y-4">
-						<div>
+						<div className="border-b-2">
+							<div className="flex flex-col gap-2 mb-6">
+								<label className="flex flex-row w-full gap-4 cursor-pointer">
+									<input className="w-fit my-auto" type="radio" name="orgOption" checked={hasOrgCode} onChange={() => setHasOrgCode(true)} />
+									<span className={`${theme === "dark" ? "text-purple-200" : "text-gray-700"} w-full`}>Join Organization</span>
+								</label>
+								<label className="flex  flex-row w-full gap-4 cursor-pointer">
+									<input
+										className="w-fit my-auto"
+										type="radio"
+										name="orgOption"
+										checked={!hasOrgCode}
+										onChange={() => setHasOrgCode(false)}
+									/>
+									<span className={`${theme === "dark" ? "text-purple-200" : "text-gray-700"} w-full`}>Create Organization</span>
+								</label>
+							</div>
 							<label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-purple-200" : "text-gray-700"}`}>Organization</label>
 							{hasOrgCode ? (
 								<input
 									ref={orgCodeRef}
 									type="text"
-									placeholder="Enter Organization Code"
+									placeholder="Enter code to join existing organization"
 									className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
 										theme === "dark"
 											? "bg-black/20 border-white/10 text-white placeholder-purple-300"
@@ -121,7 +137,7 @@ export default function Signup() {
 								<input
 									ref={orgNameRef}
 									type="text"
-									placeholder="Enter New Organization Name"
+									placeholder="Enter new organization name"
 									className={`w-full px-4 py-3 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 ${
 										theme === "dark"
 											? "bg-black/20 border-white/10 text-white placeholder-purple-300"
@@ -130,15 +146,6 @@ export default function Signup() {
 									required
 								/>
 							)}
-							<button
-								type="button"
-								className={`mt-2 text-sm underline transition-colors duration-300 ${
-									theme === "dark" ? "text-purple-300 hover:text-purple-100" : "text-purple-600 hover:text-purple-800"
-								}`}
-								onClick={() => setHasOrgCode((prev) => !prev)}
-							>
-								{hasOrgCode ? "Create a new organization" : "Join existing organization"}
-							</button>
 						</div>
 
 						<div className="grid grid-cols-1 gap-4">
