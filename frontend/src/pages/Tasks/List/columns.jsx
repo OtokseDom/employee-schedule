@@ -38,19 +38,18 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 	}, [dialogOpen]);
 
 	const handleUpdate = (task) => {
+		// wait for dialog menu to close
 		setTimeout(() => {
 			setIsOpen(true);
 			setUpdateData(task);
 		}, 100);
-		// setIsOpen(true);
-		// setUpdateData(task);
 		const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 		setSelectedTaskHistory(filteredHistory);
 		if (!task.parent_id) {
 			setRelations(task);
 		} else {
-			const filteredRelations = tasks.filter((t) => t.id == task.parent_id);
-			setRelations(...filteredRelations);
+			const parentTask = tasks.find((t) => t.id == task.parent_id);
+			setRelations(parentTask);
 		}
 	};
 
@@ -394,7 +393,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 				},
 			},
 		],
-		[user]
+		[tasks]
 	);
 	const dialog = (
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={false}>

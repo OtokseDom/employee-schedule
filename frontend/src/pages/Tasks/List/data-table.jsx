@@ -138,6 +138,7 @@ export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, s
 								) : (
 									<TaskForm
 										parentId={parentId}
+										setParentId={setParentId}
 										isOpen={isOpen}
 										setIsOpen={setIsOpen}
 										updateData={updateData}

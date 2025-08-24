@@ -46,7 +46,7 @@ const formSchema = z.object({
 	remarks: z.string().optional(),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { tasks, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
@@ -221,7 +221,8 @@ export default function TaskForm({ parentId, setTaskAdded, isOpen, setIsOpen, up
 				else {
 					setActiveTab("relations");
 					// to show 3 tabs again
-					setUpdateData(formData);
+					setUpdateData(taskResponse?.data?.data?.task);
+					// setParentId(null);
 					addRelation(taskResponse.data.data.task);
 				}
 			} else if (updateData?.calendar_add) {
