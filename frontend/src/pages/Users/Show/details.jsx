@@ -11,26 +11,54 @@ import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useNavigate } from "react-router-dom";
 import { API } from "@/constants/api";
+import { useUserStore } from "@/store/user/userStore";
+import { useUsersStore } from "@/store/users/usersStore";
 
-export default function UserDetails({ user, handleUpdateUser, handleApproval, detailsLoading }) {
-	const { user: user_auth } = useAuthContext();
-	const { loading, setLoading } = useLoadContext();
+export default function UserDetails({ setIsOpenUser, setDetailsLoading, detailsLoading }) {
+	const { user: user_auth, setUser } = useAuthContext();
+	const { setLoading } = useLoadContext();
 	const showToast = useToast();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogType, setDialogType] = useState(null);
+	const { user } = useUserStore();
+	const { removeUser } = useUsersStore();
 	const navigate = useNavigate();
 
 	const openDialog = (type) => {
 		setDialogType(type);
 		setDialogOpen(true);
 	};
-
+	const handleApproval = async (id) => {
+		setDetailsLoading(true);
+		try {
+			const form = {
+				...user,
+				status: "active",
+			};
+			try {
+				const userResponse = await axiosClient.put(API().user(id), form);
+				setUser(userResponse?.data?.data);
+				showToast("Success!", userResponse?.data?.message, 3000);
+			} catch (e) {
+				showToast("Failed!", e.response?.data?.message, 3000, "fail");
+				if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+			}
+			// }
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			// Always stop loading when done
+			setDetailsLoading(false);
+		}
+	};
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			await axiosClient.delete(API().user(id));
-			showToast("Success!", "User deleted.", 3000);
+			const userResponse = await axiosClient.delete(API().user(id));
 			navigate("/users");
+			removeUser(id);
+			showToast("Success!", userResponse?.data?.message, 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			console.error("Error fetching data:", e);
@@ -49,7 +77,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval, de
 			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Are you absolutely sure?</DialogTitle>
+						<DialogTitle className="flex flex-row items-center gap-2">Are you absolutely sure?</DialogTitle>
 						<DialogDescription>This action cannot be undone.</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -58,14 +86,9 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval, de
 								Close
 							</Button>
 						</DialogClose>
-						<Button
-							onClick={() => {
-								if (dialogType === "reject") handleApproval(0, user.id);
-								else if (dialogType === "delete") handleDelete(user.id);
-							}}
-						>
-							Yes, delete
-						</Button>
+						<DialogClose asChild>
+							<Button onClick={() => handleDelete(user.id)}>{dialogType === "delete" ? "Yes, delete" : "Yes, reject"}</Button>
+						</DialogClose>
 					</DialogFooter>
 				</DialogContent>
 
@@ -101,7 +124,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval, de
 									<DropdownMenuContent align="end">
 										{user?.status == "pending" && (
 											<>
-												<DropdownMenuItem className="cursor-pointer text-green-500" onClick={() => handleApproval(1, user.id)}>
+												<DropdownMenuItem className="cursor-pointer text-green-500" onClick={() => handleApproval(user.id)}>
 													Approve User
 												</DropdownMenuItem>
 												<DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => openDialog("reject")}>
@@ -114,7 +137,7 @@ export default function UserDetails({ user, handleUpdateUser, handleApproval, de
 											className="w-full text-left px-2 py-1.5 text-sm cursor-pointer hover:bg-accent"
 											onClick={(e) => {
 												e.stopPropagation();
-												handleUpdateUser(user);
+												setIsOpenUser(true);
 											}}
 										>
 											Update Account

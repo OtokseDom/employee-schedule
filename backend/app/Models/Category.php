@@ -42,13 +42,7 @@ class Category extends Model
             ->first();
     }
 
-    public function updateCategory($request, $category)
-    {
-        $category->update($request->validated());
-        return $category;
-    }
-
-    public function deleteCategory($category, $organization_id)
+    public function deleteCategory($category)
     {
         if (Task::where('category_id', $category->id)->exists()) {
             return false;
@@ -56,6 +50,6 @@ class Category extends Model
         if (!$category->delete()) {
             return null;
         }
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
+        return true;
     }
 }

@@ -34,8 +34,10 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
-            'project_id' => 'required|exists:projects,id',
-            'category_id' => 'required|exists:categories,id',
+            'status_id' => 'nullable|exists:task_statuses,id',
+            'title' => 'required|string|max:255',
+            'project_id' => 'nullable|exists:projects,id',
+            'category_id' => 'nullable|exists:categories,id',
             'parent_id' => [
                 'nullable',
                 'integer',
@@ -47,11 +49,11 @@ class StoreTaskRequest extends FormRequest
                     }
                 },
             ],
-            'title' => 'required|string|max:255',
+            'assignees' => 'nullable|array',
+            'assignees.*' => 'exists:users,id|distinct',
             'description' => 'nullable|string',
             'expected_output' => 'nullable|string',
-            'assignee_id' => 'nullable|exists:users,id',
-            'status' => 'required|in:Pending,In Progress,For Review,Completed,Delayed,Cancelled,On Hold',
+            // 'assignee_id' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i:s',
@@ -74,12 +76,11 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'organization_id.required' => 'Organization is required.',
-            'project_id.required' => 'Project is required.',
-            'category_id.required' => 'Category is required.',
+            'assignees.*.distinct' => 'Each assignee must be unique for this task.',
+            'assignees.*.exists' => 'Selected assignee does not exist.',
             'parent_id.exists' => 'The selected parent task does not exist.',
             'parent_id.no_grandchildren' => 'Tasks can only be a parent or a child, but not both (no grandchildren allowed).',
             'title.required' => 'Title is required.',
-            'status.required' => 'Status is required.',
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
             'end_time.after' => 'The end time must be after the start time.',
             'performance_rating.min' => 'Performance rating must be at least 0.',

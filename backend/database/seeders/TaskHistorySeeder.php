@@ -22,7 +22,7 @@ class TaskHistorySeeder extends Seeder
             TaskHistory::create([
                 'organization_id' => $task->organization_id,
                 'task_id' => $task->id,
-                'status' => 'Pending',
+                'status_id' => 1,
                 'changed_by' => $userId,
                 'changed_at' => now(),
                 'remarks' => 'Task Added',

@@ -25,10 +25,8 @@ axiosClient.interceptors.response.use(
 		if (response?.status === 401) {
 			// if user is unauthorize, token invalid, token expired
 			localStorage.removeItem("ACCESS_TOKEN");
+			window.location.href = "/login"; // force redirect to login page
 		}
-		// else {
-		//     // other handle
-		// }
 		return Promise.reject(error);
 
 		// throw error;

@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-// import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
@@ -16,31 +15,11 @@ import TaskForm from "../form";
 import History from "@/components/task/History";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 
-// Convert the DataTable component to JavaScript
-export function DataTableTasks({
-	columns,
-	data,
-	selectedTaskHistory,
-	relations,
-	setRelations,
-	taskHistory,
-	setSelectedTaskHistory,
-	projects,
-	users,
-	categories,
-	isOpen,
-	setIsOpen,
-	updateData,
-	setUpdateData,
-	fetchData,
-	showLess = true,
-	activeTab,
-	setActiveTab,
-	parentId,
-	setParentId,
-}) {
-	const { loading, setLoading } = useLoadContext();
+export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true, parentId, setParentId }) {
+	const { selectedTaskHistory, activeTab, setActiveTab } = useTasksStore();
+	const { loading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
@@ -155,29 +134,16 @@ export function DataTableTasks({
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations
-										relations={relations}
-										setUpdateData={setUpdateData}
-										setActiveTab={setActiveTab}
-										setParentId={setParentId}
-										taskHistory={taskHistory}
-										setSelectedTaskHistory={setSelectedTaskHistory}
-									/>
+									<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
 								) : (
 									<TaskForm
-										tasks={data}
-										setRelations={setRelations}
-										projects={projects}
-										users={users}
-										categories={categories}
 										parentId={parentId}
+										setParentId={setParentId}
 										isOpen={isOpen}
 										setIsOpen={setIsOpen}
 										updateData={updateData}
 										setUpdateData={setUpdateData}
 										fetchData={fetchData}
-										selectedTaskHistory={selectedTaskHistory}
-										setActiveTab={setActiveTab}
 									/>
 								)}
 							</SheetContent>
@@ -215,6 +181,11 @@ export function DataTableTasks({
 					</div>
 				</div>
 			</div>
+			<div className="w-full m-0 text-right">
+				<Button variant="link" className="text-muted-foreground" onClick={() => setSorting([])}>
+					Reset sort
+				</Button>
+			</div>
 			<div className="rounded-md">
 				<Table>
 					<TableHeader>
@@ -232,7 +203,6 @@ export function DataTableTasks({
 					</TableHeader>
 					<TableBody>
 						{loading ? (
-							// Show skeleton while loading
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24">
 									<div className="flex items-center justify-center">
@@ -249,7 +219,7 @@ export function DataTableTasks({
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
-									// onClick={() => handleUpdate(row.original)}
+									//  onClick={() => handleUpdate(row.original)} className="cursor-pointer"
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -257,7 +227,6 @@ export function DataTableTasks({
 								</TableRow>
 							))
 						) : (
-							// Show "No Results" only if data has finished loading and is truly empty
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
 									No Results.

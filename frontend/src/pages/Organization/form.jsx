@@ -9,10 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import axiosClient from "@/axios.client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { useEffect, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useOrganizationStore } from "@/store/organization/organizationStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -21,10 +21,11 @@ const formSchema = z.object({
 	description: z.string().optional(),
 });
 
-export default function OrganizationForm({ setIsOpen, fetchData }) {
+export default function OrganizationForm({ setIsOpen }) {
 	const { user, setUser } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
+	const { setOrganization } = useOrganizationStore();
 	const orgId = user?.data?.organization_id;
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -52,7 +53,7 @@ export default function OrganizationForm({ setIsOpen, fetchData }) {
 						},
 					},
 				}));
-				fetchData();
+				setOrganization(updatedOrg);
 				showToast("Success!", "Organization updated.", 3000);
 			}
 		} catch (e) {

@@ -6,22 +6,24 @@ use App\Http\Resources\TaskHistoryResource;
 use App\Models\Category;
 use App\Models\Task;
 use App\Models\TaskHistory;
+use App\Models\TaskStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
-
     protected Task $task;
     protected TaskHistory $task_history;
+    protected TaskStatus $task_status;
     protected Category $category;
     protected User $user;
     protected $organization_id;
-    public function __construct(Task $task, TaskHistory $task_history, Category $category, User $user)
+    public function __construct(Task $task, TaskHistory $task_history, TaskStatus $task_status, Category $category, User $user)
     {
         $this->task = $task;
         $this->task_history = $task_history;
+        $this->task_status = $task_status;
         $this->category = $category;
         $this->user = $user;
         $this->organization_id = Auth::user()->organization_id;
@@ -36,7 +38,15 @@ class ReportService
         $progress_query = $this->task->where('organization_id', $this->organization_id);
 
         if ($id) {
-            $progress_query->where('assignee_id', $id);
+            $progress_query->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $progress_query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $progress_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -45,14 +55,13 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $progress_query->whereIn('project_id', $projectIds);
         }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $progress_query->whereIn('assignee_id', $userIds);
-        }
+        // TODO: Add function to set which status will consider in reports
+        $cancelled = $this->task_status->where('name', 'cancelled')->value('id');
+        $completed = $this->task_status->where('name', 'completed')->value('id');
         // Total tasks excluding cancelled
-        $totalTasks = (clone $progress_query)->where('status', '!=', 'cancelled')->count();
+        $totalTasks = (clone $progress_query)->where('status_id', '!=', $cancelled)->where('status_id', '!=', null)->count();
         // Completed tasks count
-        $completedTasks = (clone $progress_query)->where('status', 'completed')->count();
+        $completedTasks = (clone $progress_query)->where('status_id', $completed)->count();
 
         $progress = $totalTasks > 0
             ? round(($completedTasks / $totalTasks) * 100, 2)
@@ -78,7 +87,15 @@ class ReportService
         $avg_performance_query = $this->task->where('organization_id', $this->organization_id);
 
         if ($id) {
-            $avg_performance_query->where('assignee_id', $id);
+            $avg_performance_query->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $avg_performance_query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $avg_performance_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -87,19 +104,24 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $avg_performance_query->whereIn('project_id', $projectIds);
         }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $avg_performance_query->whereIn('assignee_id', $userIds);
-        }
         $avg_performance = $avg_performance_query->avg('performance_rating');
         /* ----------------------------- // Task at Risk ---------------------------- */
+        $completed = $this->task_status->where('name', 'completed')->value('id');
         $task_at_risk_query = $this->task
-            ->where('status', '!=', 'completed')
+            ->where('status_id', '!=', $completed)
             ->where('organization_id', $this->organization_id)
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
         if ($id) {
-            $task_at_risk_query->where('assignee_id', $id);
+            $task_at_risk_query->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $task_at_risk_query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $task_at_risk_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -108,22 +130,26 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $task_at_risk_query->whereIn('project_id', $projectIds);
         }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $task_at_risk_query->whereIn('assignee_id', $userIds);
-        }
         $task_at_risk = $task_at_risk_query->count();
         /* ----------------------- // Average Completion Time ----------------------- */
         $avg_completion_time = $this->task
-            ->where('status', 'completed')
+            ->where('status_id', $completed)
             ->where('organization_id', $this->organization_id)
             ->avg('time_taken');
         /* --------------------------- // Time Efficiency --------------------------- */
         $time_efficiency_query = $this->task
-            ->where('status', 'completed')
+            ->where('status_id', $completed)
             ->where('organization_id', $this->organization_id);
         if ($id) {
-            $time_efficiency_query->where('assignee_id', $id);
+            $time_efficiency_query->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $time_efficiency_query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $time_efficiency_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -132,16 +158,20 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $time_efficiency_query->whereIn('project_id', $projectIds);
         }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $time_efficiency_query->whereIn('assignee_id', $userIds);
-        }
         $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
         /* ------------------------- // Task Completion Rate ------------------------ */
         $task_completion_query = $this->task
             ->where('organization_id', $this->organization_id);
         if ($id) {
-            $task_completion_query->where('assignee_id', $id);
+            $task_completion_query->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $task_completion_query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         if ($filter && $filter['from'] && $filter['to']) {
             $task_completion_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -150,13 +180,9 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $task_completion_query->whereIn('project_id', $projectIds);
         }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $task_completion_query->whereIn('assignee_id', $userIds);
-        }
         $total_tasks = (clone $task_completion_query)->count();
         $completed_tasks = (clone $task_completion_query)
-            ->where('status', 'Completed')
+            ->where('status_id', $completed)
             ->count();
         $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
 
@@ -180,71 +206,55 @@ class ReportService
     {
         if (!is_numeric($id) && $variant == "") {
             return apiResponse(null, 'Invalid user ID', false, 400);
-            // return response()->json(['error' => 'Invalid user ID'], 400);
         }
 
-        $statuses = [
-            [
-                'name' => 'Pending',
-                'field' => 'pending',
-            ],
-            [
-                'name' => 'In Progress',
-                'field' => 'in_progress',
-            ],
-            [
-                'name' => 'For Review',
-                'field' => 'for_review',
-            ],
-            [
-                'name' => 'Completed',
-                'field' => 'completed',
-            ],
-            [
-                'name' => 'Delayed',
-                'field' => 'delayed',
-            ],
-            [
-                'name' => 'Cancelled',
-                'field' => 'cancelled',
-            ],
-            [
-                'name' => 'On Hold',
-                'field' => 'on_hold',
-            ],
-        ];
+        // Fetch statuses from DB (only id & name)
+        $statuses = $this->task_status->select('id', 'name')->get();
+
         $chart_data = [];
         foreach ($statuses as $index => $status) {
-            $chart_data[$index]['status'] = $status['field'];
+            $chart_data[$index]['status_id'] = $status->id;
+            $chart_data[$index]['status'] = $status->name;
+
             $query = $this->task
                 ->where('organization_id', $this->organization_id)
-                ->where('status', $status['name']);
-            if ($filter && $filter['from'] && $filter['to']) {
-                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-            }
-            if ($filter && isset($filter['projects'])) {
-                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-                $query->whereIn('project_id', $projectIds);
+                ->where('status_id', $status->id);
+
+            if ($id && $variant !== 'dashboard') {
+                $query->whereHas('assignees', function ($q) use ($id) {
+                    $q->where('users.id', $id);
+                });
             }
             if ($filter && isset($filter['users']) && $variant === 'dashboard') {
                 $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-                $query->whereIn('assignee_id', $userIds);
+                $query->whereHas('assignees', function ($query) use ($userIds) {
+                    $query->whereIn('users.id', $userIds);
+                });
             }
-            if ($id && $variant !== 'dashboard') {
-                $query->where('assignee_id', $id);
+            if ($filter && $filter['from'] && $filter['to']) {
+                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
+
+            if ($filter && isset($filter['projects'])) {
+                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10,9]
+                $query->whereIn('project_id', $projectIds);
+            }
+
+
             $chart_data[$index]['tasks'] = $query->count();
-            $chart_data[$index]['fill'] = 'var(--color-' . $status['field'] . ')';
+            $chart_data[$index]['fill'] = 'var(--color-' . str($status->name)->slug('_') . ')';
+            // turns "In Progress" → "in_progress"
         }
-        // return response($data);
+
         $data = [
             'chart_data' => $chart_data,
             'filters' => $filter
         ];
 
-        if (empty($data)) {
+        if (empty($data['chart_data'])) {
             return apiResponse(null, 'Failed to fetch task by status report', false, 404);
         }
+
         return apiResponse($data, "Task by status report fetched successfully");
     }
 
@@ -272,19 +282,23 @@ class ReportService
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
                 ->where('organization_id', $this->organization_id);
+            if ($id && $variant !== 'dashboard') {
+                $query->whereHas('assignees', function ($q) use ($id) {
+                    $q->where('users.id', $id);
+                });
+            }
+            if ($filter && isset($filter['users']) && $variant === 'dashboard') {
+                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+                $query->whereHas('assignees', function ($query) use ($userIds) {
+                    $query->whereIn('users.id', $userIds);
+                });
+            }
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
             }
             if ($filter && isset($filter['projects'])) {
                 $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
                 $query->whereIn('project_id', $projectIds);
-            }
-            if ($filter && isset($filter['users']) && $variant === 'dashboard') {
-                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-                $query->whereIn('assignee_id', $userIds);
-            }
-            if ($variant !== 'dashboard') {
-                $query->where('assignee_id', $id);
             }
             $rating = $query->select(
                 DB::raw('AVG(performance_rating) as average_rating'),
@@ -324,41 +338,6 @@ class ReportService
     }
 
     /* ------------------------------ USER REPORTS ------------------------------ */
-    // User Assigned Tasks
-    public function userTasks($id, $filter)
-    {
-        $query = $this->task->with(['assignee:id,name,email,role,position', 'category', 'project:id,title'])
-            ->orderBy('id', 'DESC')
-            ->where('assignee_id', $id)
-            ->where('organization_id', $this->organization_id);
-
-        if ($filter && $filter['from'] && $filter['to']) {
-            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $query->whereIn('project_id', $projectIds);
-        }
-
-        $userTasks = $query->get();
-        $taskIds = $userTasks->pluck('id');
-
-        $task_history = $this->task_history->with(['task:id,title', 'changedBy:id,name,email'])
-            ->where('organization_id', $this->organization_id)
-            ->whereIn('task_id', $taskIds)
-            ->orderBy('id', 'ASC')->get();
-
-        $data = [
-            'data' => $userTasks,
-            'task_history' => TaskHistoryResource::collection($task_history),
-            'filters' => $filter
-        ];
-        if (empty($data)) {
-            return apiResponse(null, 'No tasks assigned to this user', false, 404);
-        }
-
-        return apiResponse($data, 'User assigned tasks fetched successfully');
-    }
     // User Taskload. Area chart
     public function taskActivityTimeline($id, $filter)
     {
@@ -379,7 +358,9 @@ class ReportService
         $task_count = 0;
         foreach ($months as $m) {
             $query = $this->task
-                ->where('assignee_id', $id)
+                ->whereHas('assignees', function ($query) use ($id) {
+                    $query->where('users.id', $id);
+                })
                 ->where('organization_id', $this->organization_id)
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num']);
@@ -429,9 +410,13 @@ class ReportService
     {
         $query = $this->category
             ->leftJoin('tasks', function ($join) use ($id, $filter) {
-                $join->on('tasks.category_id', '=', 'categories.id')
-                    ->where('tasks.assignee_id', '=', $id);
+                $join->on('tasks.category_id', '=', 'categories.id');
 
+                // Filter by assignee
+                if ($id) {
+                    $join->leftJoin('task_assignees', 'tasks.id', '=', 'task_assignees.task_id')
+                        ->where('task_assignees.assignee_id', $id);
+                }
                 if ($filter && $filter['from'] && $filter['to']) {
                     $join->whereBetween('tasks.start_date', [$filter['from'], $filter['to']]);
                 }
@@ -482,7 +467,9 @@ class ReportService
     {
         // Fetch the 10 most recent tasks for the user
         $query = $this->task
-            ->where('assignee_id', $id)
+            ->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            })
             ->where('organization_id', $this->organization_id);
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -551,22 +538,27 @@ class ReportService
      */
     public function usersTaskLoad($filter)
     {
+        // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
+            ->leftJoin('task_assignees', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id');
+            })
             ->leftJoin('tasks', function ($join) {
-                $join->on('users.id', '=', 'tasks.assignee_id')
+                $join->on('tasks.id', '=', 'task_assignees.task_id')
                     ->where('tasks.organization_id', $this->organization_id);
             })
             ->where('users.organization_id', $this->organization_id);
+
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $query->whereIn('users.id', $userIds);
+        }
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
         if ($filter && isset($filter['projects'])) {
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $query->whereIn('project_id', $projectIds);
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $query->whereIn('assignee_id', $userIds);
         }
         $chart_data = $query->select(
             'users.name as user',
@@ -603,21 +595,27 @@ class ReportService
      */
     public function performanceLeaderboard($filter)
     {
-        $query = $this->user->join('tasks', function ($join) {
-            $join->on('users.id', '=', 'tasks.assignee_id')
-                ->where('tasks.organization_id', $this->organization_id);
-        })
+        // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
+        $query = $this->user
+            ->leftJoin('task_assignees', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id');
+            })
+            ->leftJoin('tasks', function ($join) {
+                $join->on('tasks.id', '=', 'task_assignees.task_id')
+                    ->where('tasks.organization_id', $this->organization_id);
+            })
             ->where('users.organization_id', $this->organization_id);
+
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $query->whereIn('users.id', $userIds);
+        }
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
         if ($filter && isset($filter['projects'])) {
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $query->whereIn('project_id', $projectIds);
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $query->whereIn('assignee_id', $userIds);
         }
         $chart_data = $query->select(
             'users.id',
@@ -664,7 +662,9 @@ class ReportService
         }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $query->whereIn('assignee_id', $userIds);
+            $query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
         }
         $chart_data = $query->groupBy('categories.name')
             ->get();

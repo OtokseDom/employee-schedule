@@ -43,24 +43,15 @@ class CategoryController extends Controller
         return apiResponse(new CategoryResource($details), 'Category details fetched successfully');
     }
 
-    public function update(UpdateCategoryRequest $request, Category $category)
-    {
-        $updated = $this->category->updateCategory($request, $category);
-        if (!$updated) {
-            return apiResponse(null, 'Failed to update category.', false, 500);
-        }
-        return apiResponse(new CategoryResource($updated), 'Category updated successfully');
-    }
-
     public function destroy(Category $category)
     {
-        $result = $this->category->deleteCategory($category, $this->userData->organization_id);
+        $result = $this->category->deleteCategory($category);
         if ($result === false) {
             return apiResponse(null, 'Category cannot be deleted because they have assigned tasks.', false, 400);
         }
         if ($result === null) {
             return apiResponse(null, 'Failed to delete category.', false, 500);
         }
-        return apiResponse(CategoryResource::collection($result), 'Category deleted successfully');
+        return apiResponse('', 'Category deleted successfully');
     }
 }

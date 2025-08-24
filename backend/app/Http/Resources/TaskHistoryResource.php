@@ -18,7 +18,7 @@ class TaskHistoryResource extends JsonResource
             'id' => $this->id,
             'organization_id' => $this->organization_id,
             'task_id' => $this->task_id,
-            'status' => $this->status,
+            'status_id' => $this->status_id,
             'changed_by' => $this->changed_by,
             'changed_at' => $this->changed_at->format('Y-m-d H:i:s'),
             'remarks' => $this->parseRemarks($this->remarks),
@@ -27,6 +27,11 @@ class TaskHistoryResource extends JsonResource
             'task' => $this->whenLoaded('task', function () {
                 return [
                     'title' => $this->task->title,
+                ];
+            }),
+            'status' => $this->whenLoaded('status', function () {
+                return [
+                    'name' => $this->status->name,
                 ];
             }),
             'changedBy' => $this->whenLoaded('changedBy', function () {

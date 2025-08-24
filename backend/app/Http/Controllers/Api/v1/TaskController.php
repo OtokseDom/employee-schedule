@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -59,15 +60,25 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        return apiResponse(
-            $this->task->updateTask($request, $task, $this->userData),
-            'Task updated successfully'
-        );
+        $updated = $this->task->updateTask($request, $task, $this->userData);
+        if (!$updated) {
+            return apiResponse(null, 'Failed to update task.', false, 500);
+        }
+        return apiResponse($updated, 'Task updated successfully');
     }
 
-    public function destroy(Task $task)
+    public function destroy(Request $request, Task $task)
     {
-        $task->delete();
+        // Delete subtasks or not
+        if ($request->boolean('delete_subtasks')) {
+            if (!$this->task->deleteSubtasks($task)) {
+                return apiResponse(null, 'Failed to delete subtasks', false, 500);
+            }
+        }
+
+        if (!$task->delete()) {
+            return apiResponse(null, 'Failed to delete task.', false, 500);
+        }
         return apiResponse('', 'Task deleted successfully');
     }
 }

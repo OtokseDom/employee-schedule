@@ -1,19 +1,21 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/axios.client";
-import { Calendar, ChevronLeft, ChevronRight, Clock, Edit3, Users, Plus, X, Check, Trash } from "lucide-react";
 import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths } from "date-fns";
 // Shadcn UI
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Contexts
-import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import Week from "./week";
 import Month from "./month";
-import { API } from "@/constants/api";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 export default function ScheduleCalendar() {
-	const { loading, setLoading } = useLoadContext();
+	const { loading } = useLoadContext();
 	const [selectedView, setSelectedView] = useState("month"); // 'month' or 'week'
 
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -22,48 +24,23 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const [tasks, setTasks] = useState([]);
-	const [taskHistory, setTaskHistory] = useState([]);
-	const [projects, setProjects] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [selectedUser, setSelectedUser] = useState(users || null);
-	const [categories, setCategories] = useState(users || null);
+	const { tasks, selectedUser, setSelectedUser } = useTasksStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
-		fetchSelection();
-		fetchTasks();
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!projects || projects.length === 0) fetchProjects();
+		if (!users || users.length === 0) fetchUsers();
+		else if (!selectedUser) setSelectedUser(users[0]);
+		if (!categories || categories.length === 0) fetchCategories();
+		if (!tasks || tasks.length === 0) fetchTasks();
 	}, []);
-
-	const fetchSelection = async () => {
-		// setLocalLoading(true);
-		try {
-			setLoading(true);
-			const projectResponse = await axiosClient.get(API().project());
-			const userResponse = await axiosClient.get(API().user());
-			const categoryResponse = await axiosClient.get(API().category());
-			setProjects(projectResponse.data.data);
-			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.data);
-			setSelectedUser(userResponse.data.data[0]);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchTasks = async () => {
-		setLoading(true);
-		try {
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse.data.data.tasks);
-			setTaskHistory(taskResponse.data.data.task_history);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	// For week view - get the start of the week (Sunday)
 	const getWeekstart_date = (date) => {
@@ -101,7 +78,12 @@ export default function ScheduleCalendar() {
 		return tasks.filter((task) => {
 			const start = format(new Date(task.start_date), "yyyy-MM-dd");
 			const end = format(new Date(task.end_date), "yyyy-MM-dd");
-			return task.assignee_id === selectedUser?.id && start <= formattedDate && end >= formattedDate;
+			return (
+				Array.isArray(task.assignees) &&
+				task.assignees.some((assignee) => assignee.id === selectedUser?.id) &&
+				start <= formattedDate &&
+				end >= formattedDate
+			);
 		});
 	};
 
@@ -124,7 +106,8 @@ export default function ScheduleCalendar() {
 		const taskEndDate = format(new Date(task?.end_date), "yyyy-MM-dd");
 
 		return (
-			task?.assignee_id === selectedUser?.id &&
+			Array.isArray(task.assignees) &&
+			task.assignees.some((assignee) => assignee.id === selectedUser?.id) &&
 			formattedDate >= taskStartDate &&
 			formattedDate <= taskEndDate &&
 			startHour <= slotHour &&
@@ -188,7 +171,6 @@ export default function ScheduleCalendar() {
 				<div className="flex flex-row w-full items-center gap-4">
 					{/* Navigation */}
 					<div className="flex flex-col justify-center gap-2 w-full">
-						{/* <h2 className="block md:hidden text-xl font-bold text-center">{format(currentMonth, "MMMM yyyy")}</h2> */}
 						<div className="flex items-center justify-center">
 							<span className="block md:hidden text-lg font-bold">
 								{selectedView === "month"
@@ -233,31 +215,14 @@ export default function ScheduleCalendar() {
 			{/* Calendar/Week View */}
 			<div className="bg-background overflow-x-auto">
 				{selectedView === "month" ? (
-					<Month
-						days={days}
-						data={tasks}
-						projects={projects}
-						users={users}
-						categories={categories}
-						fetchData={fetchTasks}
-						currentMonth={currentMonth}
-						getTaskForDate={getTaskForDate}
-						selectedUser={selectedUser}
-						taskHistory={taskHistory}
-					/>
+					<Month days={days} fetchData={fetchTasks} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
 				) : (
 					<Week
-						data={tasks}
-						projects={projects}
-						users={users}
-						categories={categories}
 						fetchData={fetchTasks}
 						getWeekDays={getWeekDays}
 						getTimeSlots={getTimeSlots}
 						weekstart_date={weekstart_date}
 						isInTimeSlot={isInTimeSlot}
-						selectedUser={selectedUser}
-						taskHistory={taskHistory}
 					/>
 				)}
 			</div>

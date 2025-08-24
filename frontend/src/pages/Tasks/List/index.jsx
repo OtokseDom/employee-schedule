@@ -1,32 +1,31 @@
-import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
 import { columnsTask } from "./columns";
-import { useToast } from "@/contexts/ToastContextProvider";
 import { DataTableTasks } from "./data-table";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
-import { API } from "@/constants/api";
-import { flattenTasks } from "@/utils/taskHelpers";
+import { flattenTasks, useTaskHelpers } from "@/utils/taskHelpers";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
-	const { loading, setLoading } = useLoadContext();
-	const [tasks, setTasks] = useState([]);
-	const [taskHistory, setTaskHistory] = useState([]);
-	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
-	const [relations, setRelations] = useState([]);
-	const [projects, setProjects] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [categories, setCategories] = useState([]);
-	const showToast = useToast();
+	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { users } = useUsersStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 	const [isOpen, setIsOpen] = useState(false);
-	// const [deleted, setDeleted] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
+
 	const [updateData, setUpdateData] = useState({});
-	const [activeTab, setActiveTab] = useState(false);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+	const [hasRelation, setHasRelation] = useState(false);
 
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const [tableData, setTableData] = useState([]);
 
-	// Add comments from users
 	useEffect(() => {
 		if (!isOpen) {
 			setUpdateData({});
@@ -35,85 +34,65 @@ export default function Tasks() {
 			setParentId(null);
 		}
 	}, [isOpen]);
+
+	useEffect(() => {
+		if (!isOpen) setHasRelation(false);
+	}, [isOpen]);
+
 	useEffect(() => {
 		document.title = "Task Management | Tasks";
-		fetchData();
-		fetchSelection();
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!projects || projects.length === 0) fetchProjects();
+		if (!users || users.length === 0) fetchUsers();
+		if (!categories || categories.length === 0) fetchCategories();
+		if (!tasks || tasks.length === 0) fetchTasks();
 	}, []);
+
 	useEffect(() => {
 		setTableData(flattenTasks(tasks));
 	}, [tasks]);
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Make both API calls concurrently using Promise.all
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse.data.data.tasks);
-			setTaskHistory(taskResponse.data.data.task_history);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
-	const fetchSelection = async () => {
-		try {
-			setLoading(true);
-			const projectResponse = await axiosClient.get(API().project());
-			const userResponse = await axiosClient.get(API().user());
-			const categoryResponse = await axiosClient.get(API().category());
-			setProjects(projectResponse.data.data);
-			setCategories(categoryResponse.data.data);
-			setUsers(userResponse.data.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 
-	const handleDelete = async (id) => {
-		setLoading(true);
-		try {
-			await axiosClient.delete(API().task(id));
-			fetchData();
-			showToast("Success!", "Task deleted.", 3000);
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
+					dialogOpen ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			<div>
 				<h1 className=" font-extrabold text-3xl">Tasks</h1>
 				<p>View list of all tasks</p>
 			</div>
-			<DataTableTasks
-				columns={columnsTask({ tableData, handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory, setRelations })}
-				data={tableData}
-				taskHistory={taskHistory}
-				selectedTaskHistory={selectedTaskHistory}
-				relations={relations}
-				setRelations={setRelations}
-				setSelectedTaskHistory={setSelectedTaskHistory}
-				projects={projects}
-				users={users}
-				categories={categories}
-				updateData={updateData}
-				setUpdateData={setUpdateData}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				fetchData={fetchData}
-				activeTab={activeTab}
-				setActiveTab={setActiveTab}
-				parentId={parentId}
-				setParentId={setParentId}
-			/>
+
+			{/* Updated table to fix dialog per column issue */}
+			{(() => {
+				const { columnsTask: taskColumns, dialog } = columnsTask({
+					dialogOpen,
+					setDialogOpen,
+					hasRelation,
+					setHasRelation,
+					setIsOpen,
+					setUpdateData,
+					fetchTasks,
+				});
+				return (
+					<>
+						<DataTableTasks
+							columns={taskColumns}
+							data={tableData}
+							updateData={updateData}
+							setUpdateData={setUpdateData}
+							isOpen={isOpen}
+							setIsOpen={setIsOpen}
+							parentId={parentId}
+							setParentId={setParentId}
+							fetchData={fetchTasks}
+						/>
+						{dialog}
+					</>
+				);
+			})()}
 		</div>
 	);
 }

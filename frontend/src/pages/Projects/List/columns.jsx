@@ -4,31 +4,47 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { format } from "date-fns";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
+import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
+import { statusColors } from "@/utils/taskHelpers";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
+	const { loading, setLoading } = useLoadContext();
+	const { projects } = useProjectsStore();
+	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedProjectId, setSelectedProjectId] = useState(null);
+	const [hasRelation, setHasRelation] = useState(false);
 
-	const openDialog = (project = {}) => {
+	const openDialog = async (project = {}) => {
+		setLoading(true);
 		setDialogOpen(true);
 		setSelectedProjectId(project.id);
+		try {
+			const hasRelationResponse = await axiosClient.post(API().relation_check("project", project.id));
+			setHasRelation(hasRelationResponse?.data?.data?.exists);
+		} catch (e) {
+			showToast("Failed!", e.response?.data?.message, 3000, "fail");
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
 	};
+	useEffect(() => {
+		if (!dialogOpen) setHasRelation(false);
+	}, [dialogOpen]);
 	const handleUpdateProject = (project) => {
 		setIsOpen(true);
 		setUpdateData(project);
 	};
 
 	// Define color classes based on status value
-	const statusColors = {
-		Pending: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
-		"In Progress": "bg-blue-100 border border-blue-800 border-2 text-blue-800",
-		"For Review": "bg-orange-100 border border-orange-800 border-2 text-orange-800",
-		Completed: "bg-green-100 border border-green-800 border-2 text-green-800",
-		Cancelled: "bg-red-100 border border-red-800 border-2 text-red-800",
-		Delayed: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
-		"On Hold": "bg-gray-100 border border-gray-800 border-2 text-gray-800",
+	const priorityColors = {
 		Low: "bg-gray-100 border border-gray-800 border-2 text-gray-800",
 		Medium: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
 		High: "bg-orange-100 border border-orange-800 border-2 text-orange-800",
@@ -39,7 +55,7 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 		() => [
 			{
 				id: "status",
-				accessorKey: "status",
+				accessorKey: "status.name",
 				header: ({ column }) => {
 					return (
 						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -52,8 +68,8 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 					return (
 						<div className=" min-w-24">
-							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status] || "bg-gray-200 text-gray-800"}`}>
-								{status.replace("_", " ")}
+							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status.color] || "bg-gray-200 text-gray-800"}`}>
+								{status.name}
 							</span>
 						</div>
 					);
@@ -128,7 +144,7 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 					return (
 						<div className=" min-w-24">
-							<span className={`px-2 py-1 w-full text-center rounded text-xs ${statusColors[priority] || "bg-gray-200 text-gray-800"}`}>
+							<span className={`px-2 py-1 w-full text-center rounded text-xs ${priorityColors[priority] || "bg-gray-200 text-gray-800"}`}>
 								{priority.replace("_", " ")}
 							</span>
 						</div>
@@ -147,7 +163,7 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 				},
 			},
 		],
-		[user]
+		[projects]
 	);
 	// Add actions column for Superadmin
 	if (user?.data?.role === "Superadmin" || user?.data?.role === "Admin" || user?.data?.role === "Manager") {
@@ -187,16 +203,33 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 		<Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal={true}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
-					<DialogDescription>This action cannot be undone.</DialogDescription>
+					<DialogTitle>{hasRelation ? <span className="text-yellow-800">Warning</span> : "Are you absolutely sure?"}</DialogTitle>
+					<DialogDescription>{!hasRelation && "This action cannot be undone."}</DialogDescription>
 				</DialogHeader>
+				<div className="ml-4 text-base">
+					{hasRelation && (
+						<>
+							<span className="text-yellow-800">Project cannot be deleted because it has assigned tasks.</span>
+						</>
+					)}
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
 							Close
 						</Button>
 					</DialogClose>
-					<Button onClick={() => handleDelete(selectedProjectId)}>Yes, delete</Button>
+					{!hasRelation && (
+						<Button
+							disabled={loading}
+							onClick={() => {
+								handleDelete(selectedProjectId);
+								setDialogOpen(false);
+							}}
+						>
+							Yes, delete
+						</Button>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

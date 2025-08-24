@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,14 +13,14 @@ class Task extends Model
 
     protected $fillable = [
         'organization_id',
+        'status_id',
         'project_id',
         'category_id',
         'parent_id',
         'title',
         'description',
         'expected_output',
-        'assignee_id',
-        'status',
+        // 'assignee_id',
         'start_date',
         'end_date',
         'start_time',
@@ -41,6 +42,13 @@ class Task extends Model
     public function assignee()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relationship with Multiple Users (Assignees)
+    public function assignees()
+    {
+        return $this->belongsToMany(User::class, 'task_assignees', 'task_id', 'assignee_id')
+            ->withTimestamps();
     }
 
     // Relationship with Project
@@ -73,20 +81,32 @@ class Task extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // Relationship with Status
+    public function status()
+    {
+        return $this->belongsTo(TaskStatus::class);
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                          Contrller Logic Functions                         */
     /* -------------------------------------------------------------------------- */
     public function getTasks($organization_id)
     {
+        // $tasks = $this->with('assignees:id,name,email,role,position')->find([54]);
+        // dd($tasks->first()->assignees);
         return TaskResource::collection($this->with([
-            'assignee:id,name,email,role,position',
+            'status:id,name,color',
+            // 'assignee:id,name,email,role,position',
+            'assignees:id,name,email,role,position',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
-                        'assignee:id,name,email,role,position',
+                        'status:id,name,color',
+                        // 'assignee:id,name,email,role,position',
+                        'assignees:id,name,email,role,position',
                         'project:id,title',
                         'category'
                     ]);
@@ -99,15 +119,25 @@ class Task extends Model
     public function storeTask($request, $userData)
     {
         $task = $this->create($request->validated());
+
+        // attach multiple assignees if provided
+        if ($request->has('assignees')) {
+            $task->assignees()->attach($request->input('assignees'));
+        }
+
         $task->load([
-            'assignee:id,name,email',
+            'status:id,name,color',
+            'assignees:id,name,email,role,position',
+            // 'assignee:id,name,email',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
-                        'assignee:id,name,email,role,position',
+                        'status:id,name,color',
+                        'assignees:id,name,email,role,position',
+                        // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
                     ]);
@@ -115,28 +145,36 @@ class Task extends Model
         ]);
 
         // Record Addition in Task History
-        $task->taskHistories()->create([
+        $taskHistory = $task->taskHistories()->create([
             'organization_id' => $userData->organization_id,
             'task_id' => $task->id,
-            'status' => $task->status,
+            'status_id' => $task->status_id,
             'changed_by' => $userData->id,
             'changed_at' => now(),
             'remarks' => "Task Added",
         ]);
-        return new TaskResource($task);
+        $data = [
+            "task" => new TaskResource($task),
+            "task_history" => new TaskHistoryResource($taskHistory)
+        ];
+        return $data;
     }
 
     public function showTask($id, $organization_id)
     {
         $task = $this->with([
-            'assignee:id,name,email,role,position',
+            // 'assignee:id,name,email,role,position',
+            'assignees:id,name,email,role,position',
+            'status:id,name,color',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
-                        'assignee:id,name,email,role,position',
+                        'status:id,name,color',
+                        'assignees:id,name,email,role,position',
+                        // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
                     ]);
@@ -152,18 +190,33 @@ class Task extends Model
 
     public function updateTask($request, $task, $userData)
     {
+
         $original = $task->getOriginal();
         $validated = $request->validated();
+
+        // Get original assigned user IDs before update
+        $origUserIds = $task->assignees()->pluck('users.id')->toArray();
+
         $task->update($validated);
+
+        // sync new assignees (if provided)
+        if ($request->has('assignees')) {
+            $task->assignees()->sync($request->input('assignees'));
+        }
+
         $task->load([
-            'assignee:id,name,email,role,position',
+            // 'assignee:id,name,email,role,position',
+            'assignees:id,name,email,role,position',
+            'status:id,name,color',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'parent_id', 'title', 'description', 'status', 'assignee_id', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
                     ->with([
-                        'assignee:id,name,email,role,position',
+                        'status:id,name,color',
+                        'assignees:id,name,email,role,position',
+                        // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category'
                     ]);
@@ -181,6 +234,18 @@ class Task extends Model
                     $changes[$key] = [
                         'from' => $orig,
                         'to' => $value,
+                    ];
+                }
+            } else if (in_array($key, ['status_id'])) {
+                // save project name instead of id in task history
+                $status = new TaskStatus();
+                $orig = isset($original[$key]) ? optional($status->find($original[$key]))->name : null;
+                $val = $value ? optional($status->find($value))->name : null;
+
+                if ($orig !== $val) {
+                    $changes[$key] = [
+                        'from' => $orig,
+                        'to' => $val,
                     ];
                 }
             } else if (in_array($key, ['project_id'])) {
@@ -207,19 +272,20 @@ class Task extends Model
                         'to' => $val,
                     ];
                 }
-            } else if (in_array($key, ['assignee_id'])) {
-                // save assignee name instead of id in task history
-                $user = new User();
-                $orig = isset($original[$key]) ? optional($user->find($original[$key]))->name : null;
-                $val = $value ? optional($user->find($value))->name : null;
-
-                if ($orig !== $val) {
+            } else if ($key === 'assignees') {
+                // Get new assigned user IDs from request
+                $valUserIds = is_array($value) ? $value : [];
+                // Compare arrays
+                if (array_diff($origUserIds, $valUserIds) || array_diff($valUserIds, $origUserIds)) {
+                    // Get user names for display
+                    $origUsers = User::whereIn('id', $origUserIds)->pluck('name')->toArray();
+                    $valUsers = User::whereIn('id', $valUserIds)->pluck('name')->toArray();
                     $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $val,
+                        'from' => implode(', ', $origUsers),
+                        'to'   => implode(', ', $valUsers),
                     ];
                 }
-            } else if (in_array($key, ['parent_id'])) {
+            } else if ($key === 'parent_id') {
                 // save parent title instead of id in task history
                 $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
                 $val = $value ? optional($this->find($value))->title : null;
@@ -239,18 +305,31 @@ class Task extends Model
                 }
             }
         }
+        $history = null;
         // Record changes in Task History if there are any
         if (!empty($changes)) {
             // Record Update in Task History
-            $task->taskHistories()->create([
+            $history = $task->taskHistories()->create([
                 'organization_id' => $userData->organization_id,
                 'task_id' => $task->id,
-                'status' => $task->status,
+                'status_id' => $task->status_id,
                 'changed_by' => $userData->id,
                 'changed_at' => now(),
                 'remarks' => $changes ? json_encode($changes) : null,
             ]);
         }
-        return new TaskResource($task);
+        $data = [
+            "task" => new TaskResource($task),
+            "task_history" => $history ? new TaskHistoryResource($history) : null
+        ];
+        return $data;
+    }
+
+    public function deleteSubtasks($task)
+    {
+        // Get all child task IDs
+        $childIds = $this->where('parent_id', $task->id)->pluck('id')->toArray();
+        // Delete all child tasks
+        return $this->whereIn('id', $childIds)->delete();
     }
 }

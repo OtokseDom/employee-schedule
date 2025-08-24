@@ -8,8 +8,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { columnsTask } from "@/pages/Tasks/List/columns";
 import { DataTableTasks } from "@/pages/Tasks/List/data-table";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import UserForm from "../form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
 import GalaxyProfileBanner from "@/components/design/galaxy";
 import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
@@ -23,51 +22,83 @@ import FilterForm from "@/components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
-
+import { flattenTasks, useTaskHelpers } from "@/utils/taskHelpers";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUserStore } from "@/store/user/userStore";
+import UserForm from "../form";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+// TODO: multi assignee task fetch
 export default function UserProfile() {
-	const { user: user_auth, setUser: setUserAuth } = useAuthContext();
 	const { id } = useParams(); // Get user ID from URL
-	const [user, setUser] = useState(null); // State for user details
+	const {
+		user,
+		setUser,
+		userReports,
+		setUserReports,
+		profileProjectFilter,
+		profileFilters,
+		setProfileFilters,
+		profileSelectedProjects,
+		setProfileSelectedProjects,
+	} = useUserStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
-	const [users, setUsers] = useState([]);
-	const [projects, setProjects] = useState();
-	const [filterProjects, setFilterProjects] = useState();
-	const [taskHistory, setTaskHistory] = useState([]);
-	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
-	const [showHistory, setShowHistory] = useState(false);
-	const [categories, setCategories] = useState([]);
-	const [userReports, setUserReports] = useState(null); // State for all user reports
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isOpenUser, setIsOpenUser] = useState(false);
 	const [isOpenFilter, setIsOpenFilter] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
-	const [filters, setFilters] = useState({
-		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
-		values: {
-			"Date Range": null,
-			Projects: [],
-		},
-		display: {
-			"Date Range": null,
-			Projects: [],
-		},
-	});
-	const [selectedProjects, setSelectedProjects] = useState([]);
-	const navigate = useNavigate();
+	// datatable props
+	const [hasRelation, setHasRelation] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
+
+	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+
+	// Flatten tasks for datatable usage (also groups children below parent)
+	const [tableData, setTableData] = useState([]);
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
+		if (tasks || tasks?.length > 0) {
+			const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
+			setTableData(flattenTasks(filteredUserTasks));
+		}
+	}, [tasks, id]);
+
+	useEffect(() => {
+		if (!isOpen) {
+			setUpdateData({});
+			setRelations({});
+			setActiveTab("update");
+			setParentId(null);
+			setHasRelation(false);
+		}
 		if (!isOpenUser) setUpdateDataUser({});
 	}, [isOpen, isOpenUser]);
 
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
-		fetchDetails();
-		fetchSelection();
-		fetchData();
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!tasks || tasks.length === 0) fetchTasks();
+		if (!projects || projects.length === 0) fetchProjects();
+		if (!users || users.length === 0) fetchUsers();
+		if (!categories || categories.length === 0) fetchCategories();
 	}, []);
+
+	useEffect(() => {
+		// Because 'view account' when on profile page already does not trigger rerender
+		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
+		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
+	}, [id]);
 
 	const fetchDetails = async () => {
 		setDetailsLoading(true);
@@ -85,78 +116,10 @@ export default function UserProfile() {
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes?.data?.data);
-			setTaskHistory(reportsRes?.data?.data?.user_tasks?.task_history);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
 			setLoading(false);
-		}
-	};
-	const fetchSelection = async () => {
-		setLoading(true);
-		try {
-			// selection items
-			const [projectResponse, userResponse, categoryResponse] = await Promise.all([
-				axiosClient.get(API().project()),
-				axiosClient.get(API().user()),
-				axiosClient.get(API().category()),
-			]);
-			const mappedProjects = projectResponse.data.data.map((project) => ({
-				value: project.id,
-				label: project.title,
-			}));
-			setFilterProjects(mappedProjects);
-			setProjects(projectResponse?.data?.data);
-			setCategories(categoryResponse?.data?.data);
-			setUsers(userResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const handleApproval = async (action, id) => {
-		setDetailsLoading(true);
-		try {
-			if (action == 0) {
-				const userResponse = await axiosClient.delete(API().user(id));
-				if (userResponse?.data?.success == true) {
-					showToast("Success!", userResponse?.data?.message, 3000);
-					navigate("/users");
-				} else {
-					showToast("Failed!", userResponse?.message, 3000);
-				}
-			} else {
-				const form = {
-					...user,
-					status: "active",
-				};
-				try {
-					const userResponse = await axiosClient.put(API().user(id), form);
-					setUser(userResponse?.data?.data);
-					showToast("Success!", userResponse?.data?.message, 3000);
-				} catch (e) {
-					showToast("Failed!", e.response?.data?.message, 3000, "fail");
-					if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-				}
-			}
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setDetailsLoading(false);
-		}
-	};
-	const handleUpdateUser = async (user) => {
-		setIsOpenUser(true);
-		setUpdateDataUser(user);
-		// Update sidebar user if current user is updated
-		if (user.id == user_auth.id) {
-			axiosClient.get(API().user_auth).then(({ data }) => {
-				setUserAuth(data);
-			});
 		}
 	};
 
@@ -175,14 +138,13 @@ export default function UserProfile() {
 		}
 	};
 	const handleRemoveFilter = async (key) => {
-		// const updated = { ...filters };
 		const updated = {
-			values: { ...filters.values },
-			display: { ...filters.display },
+			values: { ...profileFilters.values },
+			display: { ...profileFilters.display },
 		};
-		delete updated.values[key];
-		delete updated.display[key];
-		setFilters(updated);
+		updated.values[key] = "";
+		updated.display[key] = "";
+		setProfileFilters(updated);
 		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
 		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
 		const projects = updated.values["Projects"] ?? "";
@@ -203,7 +165,7 @@ export default function UserProfile() {
 		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					isOpenUser || isOpenFilter ? "opacity-100" : "opacity-0"
+					isOpenUser || isOpenFilter || dialogOpen ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
@@ -215,7 +177,7 @@ export default function UserProfile() {
 			</Link>
 			{/* ------------------------------ User Details ------------------------------ */}
 			<GalaxyProfileBanner>
-				<UserDetails user={user} handleUpdateUser={handleUpdateUser} handleApproval={handleApproval} detailsLoading={detailsLoading} />
+				<UserDetails setIsOpenUser={setIsOpenUser} setDetailsLoading={setDetailsLoading} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
@@ -224,7 +186,7 @@ export default function UserProfile() {
 						<SheetTitle>Update User</SheetTitle>
 						<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 					</SheetHeader>
-					<UserForm setIsOpen={setIsOpenUser} updateData={updateDataUser} setUpdateData={setUpdateDataUser} fetchData={fetchSelection} />
+					<UserForm setIsOpen={setIsOpenUser} updateData={user} setUpdateData={setUpdateDataUser} userProfileId={id} />
 				</SheetContent>
 			</Sheet>
 			<div className="flex flex-col gap-4 w-full">
@@ -239,16 +201,16 @@ export default function UserProfile() {
 							<FilterForm
 								setIsOpen={setIsOpenFilter}
 								setReports={setUserReports}
-								filters={filters}
-								setFilters={setFilters}
-								projects={filterProjects}
-								selectedProjects={selectedProjects}
-								setSelectedProjects={setSelectedProjects}
+								filters={profileFilters}
+								setFilters={setProfileFilters}
+								projects={profileProjectFilter}
+								selectedProjects={profileSelectedProjects}
+								setSelectedProjects={setProfileSelectedProjects}
 								userId={id}
 							/>
 						</DialogContent>
 					</Dialog>
-					<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
+					<FilterTags filters={profileFilters.display} onRemove={handleRemoveFilter} />
 				</div>
 				{/* Overall Progress */}
 				<div className="md:col-span-12 w-full">
@@ -330,22 +292,35 @@ export default function UserProfile() {
 							</p>
 						</div>
 
-						<DataTableTasks
-							columns={columnsTask({ handleDelete, setIsOpen, setUpdateData, taskHistory, setSelectedTaskHistory }, false)}
-							data={userReports?.user_tasks?.data || []}
-							selectedTaskHistory={selectedTaskHistory}
-							projects={projects}
-							users={users}
-							categories={categories}
-							updateData={updateData}
-							setUpdateData={setUpdateData}
-							isOpen={isOpen}
-							setIsOpen={setIsOpen}
-							fetchData={fetchData}
-							showLess={true}
-							showHistory={showHistory}
-							setShowHistory={setShowHistory}
-						/>
+						{/* Updated table to fix dialog per column issue */}
+						{(() => {
+							const { columnsTask: taskColumns, dialog } = columnsTask({
+								dialogOpen,
+								setDialogOpen,
+								hasRelation,
+								setHasRelation,
+								setIsOpen,
+								setUpdateData,
+								fetchData,
+							});
+							return (
+								<>
+									<DataTableTasks
+										columns={taskColumns}
+										data={tableData}
+										updateData={updateData}
+										setUpdateData={setUpdateData}
+										isOpen={isOpen}
+										setIsOpen={setIsOpen}
+										parentId={parentId}
+										setParentId={setParentId}
+										fetchData={fetchTasks}
+										showLess={true}
+									/>
+									{dialog}
+								</>
+							);
+						})()}
 					</div>
 				</div>
 			</div>

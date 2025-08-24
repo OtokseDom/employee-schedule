@@ -17,14 +17,14 @@ class TaskResource extends JsonResource
         return [
             'id' => $this->id,
             'organization_id' => $this->organization_id,
+            'status_id' => $this->status_id,
+            'title' => $this->title,
             'project_id' => $this->project_id,
             'category_id' => $this->category_id,
+            // 'assignee_id' => $this->assignee_id,
             'parent_id' => $this->parent_id,
-            'title' => $this->title,
             'description' => $this->description,
             'expected_output' => $this->expected_output,
-            'assignee_id' => $this->assignee_id,
-            'status' => $this->status,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'start_time' => $this->start_time,
@@ -37,49 +37,43 @@ class TaskResource extends JsonResource
             'remarks' => $this->remarks,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
-            'assignee' => $this->whenLoaded('assignee', function () {
-                return [
-                    'name' => $this->assignee->name,
-                    'email' => $this->assignee->email,
-                    'role' => $this->assignee->role,
-                    'position' => $this->assignee->position,
-                ];
+            'assignees' => $this->assignees && $this->assignees->count() > 0
+                ? $this->assignees->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'position' => $user->position,
+                    ];
+                })
+                : null,
+            'status' => $this->whenLoaded('status', function () {
+                return $this->status ? [
+                    'name' => $this->status->name,
+                    'color' => $this->status->color
+                ] : null;
             }),
             'project' => $this->whenLoaded('project', function () {
-                return [
-                    'title' => $this->project->title,
-                    // 'organization_id',
-                    // 'title',
-                    // 'description',
-                    // 'target_date',
-                    // 'estimated_date',
-                    // 'priority',
-                    // 'status',
-                    // 'remarks'
-                ];
+                return $this->project ? [
+                    'title' => $this->project->title
+                ] : null;
             }),
-            'category' => new CategoryResource($this->whenLoaded('category')),
+            'category' => $this->category ? new CategoryResource($this->category) : null,
             'parent' => $this->whenLoaded('parent', function () {
-                return [
+                return $this->parent ? [
+                    'id' => $this->parent->id,
                     'title' => $this->parent->title,
-                ];
+                ] : null;
             }),
-            // 'children' => $this->whenLoaded('children', function () {
-            //     return $this->children->map(function ($child) {
-            //         if ($child instanceof \Illuminate\Http\Resources\MissingValue) {
-            //             return null; // or skip this child
-            //         }
-            //         return (new self($child))->toArray(request());
-            //     })->filter(); // remove nulls
-            // }),
             'children' => $this->whenLoaded('children', function () {
-                return $this->children->map(function ($child) {
-                    // Use the same resource recursively to include full fields
-                    return (new self($child))->toArray(request());
-                });
+                return $this->children && $this->children->count() > 0
+                    ? $this->children->map(function ($child) {
+                        // Use the same resource recursively to include full fields
+                        return (new self($child))->toArray(request());
+                    })
+                    : null;
             }),
-
-
         ];
     }
 }

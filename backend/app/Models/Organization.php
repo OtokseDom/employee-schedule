@@ -54,14 +54,6 @@ class Organization extends Model
         return $this->find($organization->id);
     }
 
-    public function updateOrganization($request, $organization)
-    {
-        if ($organization->update($request->validated())) {
-            return $organization;
-        }
-        return null;
-    }
-
     public function deleteOrganization($organization)
     {
         $hasTasks = Task::where('organization_id', $organization->id)->exists();

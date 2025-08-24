@@ -13,14 +13,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ProjectForm from "../form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 // Convert the DataTable component to JavaScript
-export function DataTableProjects({ columns, data, setProjects, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export function DataTableProjects({ columns, isOpen, setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
+	const { projects: data } = useProjectsStore([]);
 	const table = useReactTable({
 		data,
 		columns,
@@ -65,14 +67,7 @@ export function DataTableProjects({ columns, data, setProjects, isOpen, setIsOpe
 								<SheetTitle>{updateData?.id ? "Update Project" : "Add Project"}</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
-							<ProjectForm
-								data={data}
-								setProjects={setProjects}
-								setIsOpen={setIsOpen}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-							/>
+							<ProjectForm setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
 						</SheetContent>
 					</Sheet>
 					<DropdownMenu>

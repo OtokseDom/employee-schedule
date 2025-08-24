@@ -40,15 +40,22 @@ class UserController extends Controller
 
    public function update(UpdateUserRequest $request, User $user)
    {
-      $details = $this->user->updateUser($request, $user);
-      return apiResponse($details, 'User updated successfully');
+      $updated = $user->update($request->validated());
+      if (!$updated) {
+         return apiResponse(null, 'Failed to update user.', false, 500);
+      }
+      return apiResponse($user, 'User updated successfully');
    }
 
    public function destroy(User $user)
    {
-      $users = $this->user->deleteUser($user, $this->userData->organization_id);
-      if (!$users)
-         return apiResponse('', 'User cannot be deleted because they have assigned tasks.', false, 400);
-      return apiResponse(UserResource::collection($users), 'User deleted successfully');
+      $result = $this->user->deleteUser($user);
+      if ($result === false) {
+         return apiResponse(null, 'User cannot be deleted because they have assigned tasks.', false, 400);
+      }
+      if ($result === null) {
+         return apiResponse(null, 'Failed to delete user.', false, 500);
+      }
+      return apiResponse('', 'User deleted successfully');
    }
 }

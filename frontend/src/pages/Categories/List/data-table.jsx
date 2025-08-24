@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-// import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,11 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CategoryForm from "../form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 
-// Convert the DataTable component to JavaScript
-export function DataTableCategories({ columns, data, setCategories, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export function DataTableCategories({ columns, isOpen, setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
-	const { loading, setLoading } = useLoadContext();
+	const { categories: data } = useCategoriesStore();
+	const { loading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
@@ -66,19 +66,9 @@ export function DataTableCategories({ columns, data, setCategories, isOpen, setI
 								<SheetTitle>{updateData?.id ? "Update Category" : "Add Category"}</SheetTitle>
 								<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 							</SheetHeader>
-							<CategoryForm
-								data={data}
-								setCategories={setCategories}
-								setIsOpen={setIsOpen}
-								updateData={updateData}
-								setUpdateData={setUpdateData}
-								fetchData={fetchData}
-							/>
+							<CategoryForm setIsOpen={setIsOpen} updateData={updateData} setUpdateData={setUpdateData} />
 						</SheetContent>
 					</Sheet>
-					{/* <Link to="/products/add">
-						<Button variant="">Add Product</Button>
-					</Link> */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline">Columns</Button>
@@ -126,7 +116,6 @@ export function DataTableCategories({ columns, data, setCategories, isOpen, setI
 					</TableHeader>
 					<TableBody>
 						{loading ? (
-							// Show skeleton while loading
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24">
 									<div className="flex items-center justify-center">
@@ -139,26 +128,14 @@ export function DataTableCategories({ columns, data, setCategories, isOpen, setI
 								</TableCell>
 							</TableRow>
 						) : table.getRowModel().rows.length ? (
-							// Show table data if available
 							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && "selected"}
-									// to select only 1 row at a time
-									onClick={() => {
-										// if (!row.getIsSelected(true)) {
-										// 	table.toggleAllRowsSelected(false);
-										// 	row.toggleSelected();
-										// }
-									}}
-								>
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
 									))}
 								</TableRow>
 							))
 						) : (
-							// Show "No Results" only if data has finished loading and is truly empty
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
 									No Results.

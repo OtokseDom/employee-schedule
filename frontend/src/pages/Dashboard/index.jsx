@@ -15,57 +15,33 @@ import FilterForm from "../../components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
+// Zustand centralized store
+import { useUsersStore } from "@/store/users/usersStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
-	const [reports, setReports] = useState();
-	const [users, setUsers] = useState();
-	const [projects, setProjects] = useState();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { reports, setReports, userFilter, projectFilter, filters, setFilters, selectedProjects, setSelectedProjects, selectedUsers, setSelectedUsers } =
+		useDashboardStore();
+	// Fetch Hooks
+	const { fetchProjects, fetchUsers } = useTaskHelpers();
+
 	const [isOpen, setIsOpen] = useState(false);
-	const [filters, setFilters] = useState({
-		// Need to separate values and display becase values are used for API calls and display is used for Filter Tags UI
-		values: {
-			"Date Range": null,
-			Members: [],
-			Projects: [],
-		},
-		display: {
-			"Date Range": null,
-			Members: [],
-			Projects: [],
-		},
-	});
-	const [selectedUsers, setSelectedUsers] = useState([]);
-	const [selectedProjects, setSelectedProjects] = useState([]);
 
 	useEffect(() => {
 		document.title = "Task Management";
-		fetchData();
+		if (!reports || Object.keys(reports).length === 0) fetchReports();
+		if (!users || users.length === 0) fetchUsers();
+		if (!projects || projects.length === 0) fetchProjects();
 	}, []);
-
-	const fetchData = async () => {
+	const fetchReports = async () => {
 		setLoading(true);
 		try {
-			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(API().dashboard());
 			setReports(reportsRes.data.data);
-			// fetch users only if not already fetched
-			if (!users) {
-				const userResponse = await axiosClient.get(API().user());
-				const mappedUsers = userResponse.data.data.map((user) => ({
-					value: user.id,
-					label: user.name,
-				}));
-				setUsers(mappedUsers);
-			}
-			// fetch projects only if not already fetched
-			if (!projects) {
-				const projectResponse = await axiosClient.get(API().project());
-				const mappedProjects = projectResponse.data.data.map((project) => ({
-					value: project.id,
-					label: project.title,
-				}));
-				setProjects(mappedProjects);
-			}
 			setLoading(false);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -79,8 +55,8 @@ export default function UserProfile() {
 			values: { ...filters.values },
 			display: { ...filters.display },
 		};
-		delete updated.values[key];
-		delete updated.display[key];
+		updated.values[key] = "";
+		updated.display[key] = "";
 		setFilters(updated);
 		const from = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[0] : "";
 		const to = updated.values["Date Range"] ? updated.values["Date Range"]?.split(" to ")[1] : "";
@@ -88,7 +64,7 @@ export default function UserProfile() {
 		const members = updated.values["Members"] ?? "";
 		setLoading(true);
 		try {
-			// Fetch all user reports in one call
+			// Fetch all reports in one call
 			const reportsRes = await axiosClient.get(API().dashboard(from, to, members, projects));
 			setReports(reportsRes.data.data);
 			setLoading(false);
@@ -121,15 +97,16 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
+								{/* <FilterForm setIsOpen={setIsOpen} /> */}
 								<FilterForm
 									setIsOpen={setIsOpen}
 									setReports={setReports}
 									filters={filters}
 									setFilters={setFilters}
-									projects={projects}
+									projects={projectFilter}
+									users={userFilter}
 									selectedProjects={selectedProjects}
 									setSelectedProjects={setSelectedProjects}
-									users={users}
 									selectedUsers={selectedUsers}
 									setSelectedUsers={setSelectedUsers}
 								/>

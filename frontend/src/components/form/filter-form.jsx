@@ -19,7 +19,6 @@ const formSchema = z
 	.object({
 		from: z.date().optional(),
 		to: z.date().optional(),
-		// project_id: z.number().optional(),
 	})
 	.refine(
 		(data) => {
@@ -47,14 +46,14 @@ const formSchema = z
 
 export default function FilterForm({
 	setIsOpen,
+	userId = null,
 	setReports,
+	projects,
+	users,
 	filters,
 	setFilters,
-	userId = null,
-	projects,
 	selectedProjects,
 	setSelectedProjects,
-	users,
 	selectedUsers,
 	setSelectedUsers,
 }) {
@@ -65,7 +64,6 @@ export default function FilterForm({
 		defaultValues: {
 			from: undefined,
 			to: undefined,
-			// project_id: undefined,
 		},
 	});
 

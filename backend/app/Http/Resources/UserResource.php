@@ -24,8 +24,8 @@ class UserResource extends JsonResource
             'role' => $this->role,
             'email' => $this->email,
             'status' => $this->status,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
             'organization' => new OrganizationResource($this->whenLoaded('organization')),
             // 'organization' => $this->whenLoaded('organization', function () {
             //     return [

@@ -42,11 +42,11 @@ class OrganizationController extends Controller
 
     public function update(UpdateOrganizationRequest $request, Organization $organization)
     {
-        $updated = $this->organization->updateOrganization($request, $organization);
+        $updated = $organization->update($request->validated());
         if (!$updated) {
             return apiResponse(null, 'Failed to update organization.', false, 500);
         }
-        return apiResponse(new OrganizationResource($updated), 'Organization updated successfully');
+        return apiResponse(new OrganizationResource($organization), 'Organization updated successfully');
     }
 
     public function destroy(Organization $organization)

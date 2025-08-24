@@ -13,17 +13,32 @@ class ProjectSeeder extends Seeder
      */
     public function run(): void
     {
+        $projects =
+            [
+                [
+                    'organization_id' => 1,
+                    'status_id' => 1,
+                    'title' => 'Project Alpha',
+                    'description' => 'Pioneer Project',
+                    'target_date' => Carbon::parse('2025-08-12'),
+                    'estimated_date' => Carbon::parse('2025-07-12'),
+                    'priority' => 'Critical',
+                    'remarks' => 'breaking changes'
+                ],
+                [
+                    'organization_id' => 1,
+                    'status_id' => 2,
+                    'title' => 'Project Beta',
+                    'description' => 'Pioneer Project',
+                    'target_date' => Carbon::parse('2025-08-12'),
+                    'estimated_date' => Carbon::parse('2025-07-12'),
+                    'priority' => 'Medium',
+                    'remarks' => 'Module adjustments'
+                ]
+            ];
 
-        Project::create([
-            'organization_id' => 1,
-            'title' => 'Porject Alpha',
-            'description' => 'Pioneer Project',
-            'target_date' => Carbon::parse('2025-08-12'),
-            'estimated_date' => Carbon::parse('2025-07-12'),
-            'priority' => 'Critical',
-            'status' => 'In Progress',
-            'remarks' => 'breaking changes'
-
-        ]);
+        foreach ($projects as $project) {
+            Project::create($project);
+        }
     }
 }

@@ -16,6 +16,8 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import DateInput from "@/components/form/DateInput";
 import { API } from "@/constants/api";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useUserStore } from "@/store/user/userStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -38,11 +40,13 @@ const formSchema = z.object({
 	}),
 });
 
-export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { user: user_auth } = useAuthContext();
+export default function UserForm({ setIsOpen, updateData, setUpdateData, userProfileId }) {
+	const { user: user_auth, setUser } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
-	const { user, setUser } = useAuthContext();
 	const showToast = useToast();
+	const { addUser, updateUser } = useUsersStore();
+	const { setUser: setProfileUser } = useUserStore();
+
 	const [date, setDate] = useState();
 
 	const form = useForm({
@@ -74,21 +78,23 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, fetchDa
 	const handleSubmit = async (form) => {
 		const formattedData = {
 			...form,
-			organization_id: user.data.organization_id,
+			organization_id: user_auth.data.organization_id,
 			dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null, // Format to Y-m-d
 			password: "$2y$12$tXliF33idwwMmvk1tiF.ZOotEsqQnuWinaX90NLaw.rEchjbEAXCW", //password: admin123
 		};
 		setLoading(true);
 		try {
 			if (Object.keys(updateData).length === 0) {
-				await axiosClient.post(API().user(), formattedData);
-				fetchData();
+				const userResponse = await axiosClient.post(API().user(), formattedData);
+				addUser(userResponse.data.data);
 				showToast("Success!", "User added.", 3000);
 			} else {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
-				// fetch data to load user table and calendar
-				fetchData();
-				if (user.id === userResponse.data.data.id) setUser(userResponse.data.data);
+				updateUser(updateData.id, userResponse.data.data);
+				if (userProfileId) setProfileUser(userResponse.data.data);
+				// Update auth user data if the updated user is the current logged-in user
+				const formattedAuthData = { data: userResponse.data.data };
+				if (user_auth.data.id === updateData?.id) setUser(formattedAuthData);
 				showToast("Success!", "User updated.", 3000);
 			}
 		} catch (e) {

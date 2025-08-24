@@ -6,35 +6,35 @@ import axiosClient from "@/axios.client";
 
 import GalaxyProfileBanner from "../../components/design/galaxy";
 // Shadcn UI
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
-import { Building, Edit, EllipsisVertical, Eye, EyeOff } from "lucide-react";
+import { Building, EllipsisVertical, Eye, EyeOff } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import OrganizationForm from "./form";
 import { API } from "@/constants/api";
+import { useOrganizationStore } from "@/store/organization/organizationStore";
 
 export default function Organization() {
 	const { user } = useAuthContext(); // Get authenticated user details
 	const { loading, setLoading } = useLoadContext();
-	const [organization, setOrganization] = useState(null);
+	const { organization, setOrganization } = useOrganizationStore();
 	const [isOpen, setIsOpen] = useState(false);
-	const { name = "Guardians of the Galaxy", description = "The ones who protect all celestial beings", code = "WEARETHEGUARDIANS" } = organization || {};
 	const [showCode, setShowCode] = useState(false);
 	const orgId = user?.data?.organization_id;
 
 	useEffect(() => {
 		document.title = "Task Management | Organization";
-		if (user?.data?.organization_id) fetchData();
+		if (!organization.id) fetchData();
 	}, [user?.data?.organization_id]);
 
 	const fetchData = async () => {
 		setLoading(true);
 		try {
 			if (orgId) {
-				const { data } = await axiosClient.get(API().organization(orgId));
-				setOrganization(data.data); // assuming it's using Laravel's Resource response
+				const organizationResponse = await axiosClient.get(API().organization(orgId));
+				setOrganization(organizationResponse?.data?.data);
 			}
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -83,8 +83,8 @@ export default function Organization() {
 										<Building size={64} />
 									</div>
 									<div className="w-full">
-										<span className="flex gap-3 text-2xl md:text-3xl  font-bold text-white mb-0 md:mb-2">{name}</span>
-										<span className="text-xs md:text-lg text-purple-200">{description}</span>
+										<span className="flex gap-3 text-2xl md:text-3xl  font-bold text-white mb-0 md:mb-2">{organization?.name}</span>
+										<span className="text-xs md:text-lg text-purple-200">{organization?.description}</span>
 									</div>
 								</div>
 								{user?.data?.role === "Superadmin" || user?.data?.role === "Admin" ? (
@@ -117,7 +117,7 @@ export default function Organization() {
 							</div>
 						) : user?.data?.role !== "Employee" ? (
 							<div className="flex items-center flex-wrap mt-4 gap-2 md:gap-4 text-lg">
-								<span>Code: {showCode ? code : "•".repeat(code?.length || 10)}</span>
+								<span>Code: {showCode ? organization?.code : "•".repeat(organization?.code?.length || 10)}</span>
 								<button
 									type="button"
 									onClick={() => setShowCode((prev) => !prev)}
@@ -141,7 +141,7 @@ export default function Organization() {
 							<SheetTitle>Update Organization</SheetTitle>
 							<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
 						</SheetHeader>
-						<OrganizationForm setIsOpen={setIsOpen} fetchData={fetchData} />
+						<OrganizationForm setIsOpen={setIsOpen} />
 					</SheetContent>
 				</Sheet>
 			</GalaxyProfileBanner>

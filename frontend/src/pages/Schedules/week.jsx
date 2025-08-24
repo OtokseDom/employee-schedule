@@ -10,33 +10,30 @@ import History from "@/components/task/History";
 import { flattenTasks, statusColors } from "@/utils/taskHelpers";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 
 export default function Week({
-	data,
-	projects,
-	users,
-	categories,
+	// data,
+	// projects,
+	// users,
+	// categories,
 	fetchData,
 	getWeekDays,
 	getTimeSlots,
 	weekstart_date: weekStartDate,
 	isInTimeSlot,
-	selectedUser,
-	taskHistory,
+	// selectedUser,
+	// taskHistory,
 }) {
+	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab, selectedUser } = useTasksStore();
+
 	const { loading, setLoading } = useLoadContext();
-	const [tasks, setTasks] = useState(data);
 	const weekDays = getWeekDays(weekStartDate);
 	const timeSlots = getTimeSlots();
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
 	const [taskAdded, setTaskAdded] = useState(false);
-	const [selectedTaskHistory, setSelectedTaskHistory] = useState([]);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
-	const [relations, setRelations] = useState([]);
-	const [activeTab, setActiveTab] = useState(false);
-	// Flatten tasks for datatable usage (also groups children below parent)
-	const [tableData, setTableData] = useState([]);
 
 	useEffect(() => {
 		if (taskAdded) {
@@ -45,13 +42,6 @@ export default function Week({
 		}
 	}, [taskAdded]);
 
-	useEffect(() => {
-		setTableData(flattenTasks(tasks));
-	}, [tasks]);
-
-	useEffect(() => {
-		setTasks(data);
-	}, [data]);
 	useEffect(() => {
 		if (!openDialogIndex) {
 			setRelations({});
@@ -156,8 +146,7 @@ export default function Week({
 															onClick={(e) => {
 																//set update data when a task is clicked
 																e.stopPropagation();
-																setUpdateData({});
-																setTimeout(() => setUpdateData(task), 0);
+																setUpdateData(task);
 																setOpenDialogIndex(index);
 																const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
 																setSelectedTaskHistory(filteredHistory);
@@ -170,7 +159,7 @@ export default function Week({
 															}}
 															className={`
 														absolute left-0 right-0 mx-1 p-1 rounded border z-10 overflow-clip
-														${statusColors[task.status] || "bg-gray-100 border-gray-300 text-black"}
+														${statusColors[task.status.color] || "bg-gray-100 border-gray-300 text-black"}
 														`}
 															style={{ height: `${duration * 4}rem`, top: `${(startMin / 60) * 4}rem` }}
 														>
@@ -201,30 +190,16 @@ export default function Week({
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations
-										relations={relations}
-										setUpdateData={setUpdateData}
-										setActiveTab={setActiveTab}
-										setParentId={setParentId}
-										taskHistory={taskHistory}
-										setSelectedTaskHistory={setSelectedTaskHistory}
-									/>
+									<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
 								) : (
 									<TaskForm
-										tasks={flattenTasks(data)}
-										projects={projects}
-										users={users}
-										categories={categories}
 										isOpen={isDialogOpen}
 										setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 										updateData={updateData}
 										setUpdateData={setUpdateData}
 										fetchData={fetchData}
 										setTaskAdded={setTaskAdded}
-										setRelations={setRelations}
 										parentId={parentId}
-										selectedTaskHistory={selectedTaskHistory}
-										setActiveTab={setActiveTab}
 									/>
 								)}
 							</SheetContent>

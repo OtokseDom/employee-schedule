@@ -3,7 +3,6 @@ import {
 	MoonStar,
 	Sun,
 	User2,
-	Calendar,
 	ClipboardList,
 	Users2,
 	CalendarClock,
@@ -13,6 +12,7 @@ import {
 	Gauge,
 	Building,
 	FolderKanban,
+	ListCheck,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -29,7 +29,6 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 	SidebarTrigger,
-	SidebarMenuSubButton,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
 	useSidebar, // for auto closing sidebar on mobile location change
@@ -87,6 +86,13 @@ const items = [
 		collapsible: true,
 		subItems: [
 			{
+				title: "Organization",
+				url: "/organization",
+				icon: Building,
+				collapsible: false,
+				subItems: [],
+			},
+			{
 				title: "Categories",
 				url: "/categories",
 				icon: Tag,
@@ -94,9 +100,9 @@ const items = [
 				subItems: [],
 			},
 			{
-				title: "Organization",
-				url: "/organization",
-				icon: Building,
+				title: "Task Statuses",
+				url: "/task-statuses",
+				icon: ListCheck,
 				collapsible: false,
 				subItems: [],
 			},
@@ -105,7 +111,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-	const { user, token, setToken, setUser } = useAuthContext();
+	const { user, setToken, setUser } = useAuthContext();
 	const { isMobile, openMobile, setOpenMobile } = useSidebar(); // Add this line
 
 	// Darkmode set session
@@ -260,14 +266,9 @@ export function AppSidebar() {
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-								<DropdownMenuItem
-									onClick={() => {
-										setCurrentPath(`/users/${user?.data?.id}`);
-										navigate(`/users/${user?.data?.id}`);
-									}}
-								>
-									<span>Account</span>
-								</DropdownMenuItem>
+								<Link to={`/users/${user?.data?.id}`}>
+									<DropdownMenuItem>Account</DropdownMenuItem>
+								</Link>
 								<DropdownMenuItem onClick={onLogout}>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>

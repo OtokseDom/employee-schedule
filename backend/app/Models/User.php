@@ -84,18 +84,14 @@ class User extends Authenticatable
         return $user;
     }
 
-    public function updateUser($request, $user)
-    {
-        $user->update($request->validated());
-        return new UserResource($user);
-    }
-
-    public function deleteUser($user, $organization_id)
+    public function deleteUser($user)
     {
         if (Task::where('assignee_id', $user->id)->exists()) {
             return false;
         }
-        $user->delete();
-        return $this->where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
+        if (!$user->delete()) {
+            return null;
+        }
+        return true;
     }
 }

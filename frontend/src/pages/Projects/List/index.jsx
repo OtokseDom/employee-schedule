@@ -5,47 +5,44 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableProjects } from "./data-table";
 import { API } from "@/constants/api";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 export default function Projects() {
-	const { loading, setLoading } = useLoadContext();
-	const [projects, setProjects] = useState([]);
+	const { setLoading } = useLoadContext();
+	const { projects, setProjects, removeProject } = useProjectsStore([]);
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [dialogOpen, setDialogOpen] = useState(false);
-
+	// TODO: Fix update not seting status
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Projects";
-		fetchData();
+		if (!projects || projects.length === 0) fetchData();
 	}, []);
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			// Make both API calls concurrently using Promise.all
 			const projectResponse = await axiosClient.get(API().project());
 			setProjects(projectResponse.data.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
-
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
 			const projectResponse = await axiosClient.delete(API().project(id));
-			setProjects(projectResponse.data.data);
+			removeProject(id);
 			showToast("Success!", "Project deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setDialogOpen(false);
 			setLoading(false);
 		}
@@ -63,13 +60,10 @@ export default function Projects() {
 					<>
 						<DataTableProjects
 							columns={projectColumns}
-							data={projects}
-							setProjects={setProjects}
 							updateData={updateData}
 							setUpdateData={setUpdateData}
 							isOpen={isOpen}
 							setIsOpen={setIsOpen}
-							fetchData={fetchData}
 						/>
 						{dialog}
 					</>

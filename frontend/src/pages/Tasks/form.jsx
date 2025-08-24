@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axiosClient from "@/axios.client";
 import { useToast } from "@/contexts/ToastContextProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, parseISO } from "date-fns";
@@ -16,24 +16,23 @@ import { Loader2 } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
-	assignee_id: z.number({
-		required_error: "Assignee is required.",
-	}),
-	project_id: z.number({
-		required_error: "Project is required.",
-	}),
-	category_id: z.number({
-		required_error: "Category is required.",
-	}),
+	status_id: z.number().optional(),
+	// assignee_id: z.number().optional(),
+	project_id: z.number().optional(),
+	category_id: z.number().optional(),
 	title: z.string().refine((data) => data.trim() !== "", {
 		message: "Title is required.",
 	}),
-	description: z.string().refine((data) => data.trim() !== "", {
-		message: "Description is required.",
-	}),
+	description: z.string().optional(),
 	expected_output: z.string().optional(),
 	start_date: z.date().optional(),
 	end_date: z.date().optional(),
@@ -45,29 +44,18 @@ const formSchema = z.object({
 	delay_reason: z.string().optional(),
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
 	remarks: z.string().optional(),
-	status: z.string({
-		required_error: "Status is required.",
-	}),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({
-	tasks,
-	projects,
-	users,
-	categories,
-	parentId,
-	setTaskAdded,
-	isOpen,
-	setIsOpen,
-	updateData,
-	setUpdateData,
-	fetchData,
-	setActiveTab,
-	setRelations,
-}) {
+export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
 	const { loading, setLoading } = useLoadContext();
 	const { user: user_auth } = useAuthContext();
 	const showToast = useToast();
+	const [showMore, setShowMore] = useState(false);
 	const parentTasks = () => {
 		return tasks.filter((task) => task.parent_id == null && task.id !== updateData?.id) || [];
 	};
@@ -81,14 +69,24 @@ export default function TaskForm({
 	const [delayMinute, setDelayMinute] = useState("");
 	const [estimateError, setEstimateError] = useState("");
 	const [delayError, setDelayError] = useState("");
+	const [selectedUsers, setSelectedUsers] = useState(
+		updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || (updateData.calendar_add ? [selectedUser?.id] : []) || []
+	);
+	const bottomRef = useRef(null);
+	const scrollToBottom = () => {
+		setTimeout(() => {
+			bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+		}, 1);
+	};
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			calendar_add: false,
+			status_id: undefined,
 			title: "",
 			description: "",
 			parent_id: undefined,
-			assignee_id: undefined,
+			// assignee_id: undefined,
 			project_id: undefined,
 			category: undefined,
 			expected_output: "",
@@ -102,22 +100,24 @@ export default function TaskForm({
 			delay_reason: "",
 			performance_rating: "",
 			remarks: "",
-			status: undefined,
 		},
 	});
 
 	useEffect(() => {
-		if (!isOpen) setUpdateData({});
+		if (!isOpen) {
+			setUpdateData({});
+		}
 	}, [isOpen]);
 
 	useEffect(() => {
 		if (updateData && projects && users && categories) {
 			const {
 				calendar_add,
+				status_id,
 				title,
 				description,
 				parent_id,
-				assignee_id,
+				// assignee_id,
 				project_id,
 				category_id,
 				expected_output,
@@ -131,19 +131,19 @@ export default function TaskForm({
 				delay_reason,
 				performance_rating,
 				remarks,
-				status,
 			} = updateData;
 			form.reset({
 				calendar_add: calendar_add || false,
+				status_id: status_id || undefined,
 				title: title || "",
 				description: description || "",
 				parent_id: parent_id || parentId || undefined,
-				assignee_id: assignee_id || undefined,
+				// assignee_id: assignee_id || selectedUser || undefined,
 				project_id: project_id || undefined,
 				category_id: category_id || undefined,
 				expected_output: expected_output || "",
-				start_date: start_date ? parseISO(start_date) : undefined,
-				end_date: end_date ? parseISO(end_date) : undefined,
+				start_date: typeof start_date === "string" ? parseISO(start_date) : start_date || undefined,
+				end_date: typeof end_date === "string" ? parseISO(end_date) : end_date || undefined,
 				start_time: start_time || "",
 				end_time: end_time || "",
 				time_estimate: time_estimate || "",
@@ -152,7 +152,6 @@ export default function TaskForm({
 				delay_reason: delay_reason || "",
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
-				status: status || undefined,
 			});
 			// Set hour/minute fields for time_estimate and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
@@ -214,25 +213,37 @@ export default function TaskForm({
 			};
 			if (Object.keys(updateData).length === 0) {
 				const taskResponse = await axiosClient.post(API().task(), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
+				// if add subtask, don't close sheet
 				if (!parentId) setIsOpen(false);
 				else {
 					setActiveTab("relations");
-					setUpdateData(formData);
-					setRelations((prev) => ({
-						...prev,
-						children: [...prev.children, taskResponse.data.data],
-					}));
+					// to show 3 tabs again
+					setUpdateData(taskResponse?.data?.data?.task);
+					if (relations.children && relations?.children?.length !== 0) {
+						// Setting new relations when added subtask
+						addRelation(taskResponse.data.data.task);
+					} else {
+						// Setting new relations if adding subtask from task without relation
+						const parentTask = tasks.find((task) => task.id === taskResponse.data.data.task.parent_id);
+						setRelations({
+							...parentTask,
+							children: [...(parentTask.children || []), taskResponse.data.data.task],
+						});
+					}
 				}
 			} else if (updateData?.calendar_add) {
 				await axiosClient.post(API().task(), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
 				setTaskAdded(true);
 			} else {
 				await axiosClient.put(API().task(updateData?.id), parsedForm);
+				// cannot update stores, need to update parent task
 				fetchData();
 				showToast("Success!", "Task updated.", 3000);
 				setIsOpen(false);
@@ -240,7 +251,7 @@ export default function TaskForm({
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e.response?.data?.message);
+			console.error("Error fetching data:", e);
 			if (e.response?.data?.errors) {
 				const backendErrors = e.response.data.errors;
 				Object.keys(backendErrors).forEach((field) => {
@@ -314,48 +325,46 @@ export default function TaskForm({
 		user_auth?.data?.role === "Manager" ||
 		Object.keys(updateData).length === 0 ||
 		updateData?.calendar_add ||
-		(updateData?.assignee_id === user_auth?.data?.id && user_auth?.data?.role === "Employee");
+		updateData?.assignees?.some((assignee) => assignee.id === user_auth?.data?.id) ||
+		!updateData?.assignees;
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 max-w-md w-full">
+			<form
+				onSubmit={form.handleSubmit((formData) => {
+					// Include selectedUsers in the formData object
+					handleSubmit({ ...formData, assignees: selectedUsers });
+				})}
+				// onSubmit={form.handleSubmit(handleSubmit)}
+				className="flex flex-col gap-4 max-w-md w-full"
+			>
 				<FormField
 					control={form.control}
-					name="status"
+					name="status_id"
 					render={({ field }) => {
-						const statuses = [
-							{ id: 1, name: "Pending" },
-							{ id: 2, name: "In Progress" },
-							{ id: 3, name: "For Review" },
-							{ id: 4, name: "Completed" },
-							{ id: 5, name: "Delayed" },
-							{ id: 6, name: "On Hold" },
-							{ id: 7, name: "Cancelled" },
-						];
 						return (
 							<FormItem>
-								<FormLabel>
-									Status <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Status</FormLabel>
 								<Select
 									disabled={!isEditable}
-									onValueChange={field.onChange}
-									value={field.value || ""}
-									//  defaultValue={updateData?.status || field.value} //this does not work on calendar modal form
+									onValueChange={(value) => field.onChange(Number(value))}
+									value={field.value ? field.value.toString() : ""}
 								>
 									<FormControl>
 										<SelectTrigger>
-											<SelectValue placeholder="Select a status"></SelectValue>
+											<SelectValue placeholder="Select a status">
+												{field.value ? taskStatuses?.find((taskStatus) => taskStatus.id == field.value).name : "Select a status"}
+											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{Array.isArray(statuses) && statuses.length > 0 ? (
-											statuses?.map((status) => (
-												<SelectItem key={status?.id} value={status?.name}>
-													{status?.name}
+										{Array.isArray(taskStatuses) && taskStatuses.length > 0 ? (
+											taskStatuses.map((taskStatus) => (
+												<SelectItem key={taskStatus.id} value={taskStatus.id.toString()}>
+													{taskStatus.name}
 												</SelectItem>
 											))
 										) : (
-											<SelectItem disabled>No status available</SelectItem>
+											<></>
 										)}
 									</SelectContent>
 								</Select>
@@ -377,6 +386,30 @@ export default function TaskForm({
 									<Input disabled={!isEditable} placeholder="Title" {...field} />
 								</FormControl>
 								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="assignees"
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<FormLabel>Assignees</FormLabel>
+								<FormControl>
+									<MultiSelect
+										disabled={!isEditable}
+										field={field}
+										options={options || []}
+										onValueChange={setSelectedUsers}
+										defaultValue={selectedUsers}
+										placeholder="Select assignees"
+										variant="inverted"
+										animation={2}
+										// maxCount={3}
+									/>
+								</FormControl>
 							</FormItem>
 						);
 					}}
@@ -410,48 +443,9 @@ export default function TaskForm({
 													<div className="flex flex-col">
 														<span> {task.title}</span>
 														<span className="text-muted-foreground opacity-50">
-															{task.project.title} | {task.status}
+															{task.project?.title} | {task.status?.name}
 														</span>
 													</div>
-												</SelectItem>
-											))
-										) : (
-											<></>
-										)}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="assignee_id"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>
-									Assignee <span className="text-red-500">*</span>
-								</FormLabel>
-								<Select
-									disabled={!isEditable}
-									onValueChange={(value) => field.onChange(Number(value))}
-									// defaultValue={updateData?.assignee_id || field.value} //this does not work on calendar modal form
-									value={field.value ? field.value.toString() : ""}
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select an assignee">
-												{field.value ? users?.find((user) => user.id == field.value)?.name : "Select an assignee"}
-											</SelectValue>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{Array.isArray(users) && users.length > 0 ? (
-											users.map((user) => (
-												<SelectItem key={user.id} value={user.id.toString()}>
-													{user.name}
 												</SelectItem>
 											))
 										) : (
@@ -470,9 +464,7 @@ export default function TaskForm({
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Project <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Project</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -508,9 +500,7 @@ export default function TaskForm({
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Category <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Category</FormLabel>
 								<Select
 									disabled={!isEditable}
 									onValueChange={(value) => field.onChange(Number(value))}
@@ -546,9 +536,7 @@ export default function TaskForm({
 					render={({ field }) => {
 						return (
 							<FormItem>
-								<FormLabel>
-									Description <span className="text-red-500">*</span>
-								</FormLabel>
+								<FormLabel>Description</FormLabel>
 								<FormControl>
 									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
 								</FormControl>
@@ -557,182 +545,147 @@ export default function TaskForm({
 						);
 					}}
 				/>
-				<FormField
-					control={form.control}
-					name="expected_output"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Expected output</FormLabel>
-								<FormControl>
-									<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="start_date"
-					render={({ field }) => {
-						return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="end_date"
-					render={({ field }) => {
-						return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="start_time"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Start Time</FormLabel>
-								<FormControl>
-									<Input
-										disabled={!isEditable}
-										type="time"
-										step="60"
-										inputMode="numeric"
-										pattern="[0-9]{2}:[0-9]{2}"
-										className="bg-background appearance-none"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="end_time"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>End Time</FormLabel>
-								<FormControl>
-									<Input
-										disabled={!isEditable}
-										type="time"
-										step="any"
-										// placeholder="Rating &#40;1-10&#41;"
-										className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				<FormField
-					control={form.control}
-					name="time_estimate"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Time Estimate</FormLabel>
-							<div>
-								<div className="flex flex-row justify-between gap-2">
-									<div className="flex flex-row gap-2">
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											placeholder="hr"
-											value={timeEstimateHour}
-											onChange={(e) => {
-												const val = e.target.value.replace(/[^0-9]/g, "");
-												setTimeEstimateHour(val);
-												const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
-												field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
-											}}
-											className="w-20"
-										/>
-										<span>hr</span>
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											max="59"
-											placeholder="min"
-											value={timeEstimateMinute}
-											onChange={(e) => {
-												let val = e.target.value.replace(/[^0-9]/g, "");
-												if (parseInt(val, 10) > 59) val = "59";
-												setTimeEstimateMinute(val);
-												const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
-												field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
-											}}
-											className="w-20"
-										/>
-										<span>min</span>
+				{showMore & !updateData.calendar_add ? (
+					<>
+						<FormField
+							control={form.control}
+							name="expected_output"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Expected output</FormLabel>
+										<FormControl>
+											<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Start Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="60"
+												inputMode="numeric"
+												pattern="[0-9]{2}:[0-9]{2}"
+												className="bg-background appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>End Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="any"
+												// placeholder="Rating &#40;1-10&#41;"
+												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="time_estimate"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Time Estimate</FormLabel>
+									<div>
+										<div className="flex flex-row justify-between gap-2">
+											<div className="flex flex-row gap-2">
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													placeholder="hr"
+													value={timeEstimateHour}
+													onChange={(e) => {
+														const val = e.target.value.replace(/[^0-9]/g, "");
+														setTimeEstimateHour(val);
+														const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
+														field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
+													}}
+													className="w-20"
+												/>
+												<span>hr</span>
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													max="59"
+													placeholder="min"
+													value={timeEstimateMinute}
+													onChange={(e) => {
+														let val = e.target.value.replace(/[^0-9]/g, "");
+														if (parseInt(val, 10) > 59) val = "59";
+														setTimeEstimateMinute(val);
+														const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
+														field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
+													}}
+													className="w-20"
+												/>
+												<span>min</span>
+											</div>
+											<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
+												Auto Calculate
+											</Button>
+										</div>
+										{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
+										<FormMessage /> {/* ✅ Now linked to time_estimate */}
 									</div>
-									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
-										Auto Calculate
-									</Button>
-								</div>
-								{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
-								<FormMessage /> {/* ✅ Now linked to time_estimate */}
-							</div>
-						</FormItem>
-					)}
-				/>
-
-				{/* Time Taken (hr/min) */}
-				<FormItem>
-					<FormLabel>Time Taken</FormLabel>
-					<div className="flex gap-2">
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							placeholder="hr"
-							value={timeTakenHour}
-							onChange={(e) => {
-								const val = e.target.value.replace(/[^0-9]/g, "");
-								setTimeTakenHour(val);
-							}}
-							className="w-20"
+								</FormItem>
+							)}
 						/>
-						<span>hr</span>
-						<Input
-							disabled={!isEditable}
-							type="number"
-							min="0"
-							max="59"
-							placeholder="min"
-							value={timeTakenMinute}
-							onChange={(e) => {
-								let val = e.target.value.replace(/[^0-9]/g, "");
-								if (parseInt(val, 10) > 59) val = "59";
-								setTimeTakenMinute(val);
-							}}
-							className="w-20"
-						/>
-						<span>min</span>
-					</div>
-					<FormMessage />
-				</FormItem>
-				<FormItem>
-					<FormLabel>Delay</FormLabel>
-					<div>
-						<div className="flex flex-row justify-between gap-2">
+						{/* Time Taken (hr/min) */}
+						<FormItem>
+							<FormLabel>Time Taken</FormLabel>
 							<div className="flex gap-2">
 								<Input
 									disabled={!isEditable}
 									type="number"
 									min="0"
 									placeholder="hr"
-									value={delayHour}
+									value={timeTakenHour}
 									onChange={(e) => {
 										const val = e.target.value.replace(/[^0-9]/g, "");
-										setDelayHour(val);
+										setTimeTakenHour(val);
 									}}
 									className="w-20"
 								/>
@@ -743,50 +696,143 @@ export default function TaskForm({
 									min="0"
 									max="59"
 									placeholder="min"
-									value={delayMinute}
+									value={timeTakenMinute}
 									onChange={(e) => {
 										let val = e.target.value.replace(/[^0-9]/g, "");
 										if (parseInt(val, 10) > 59) val = "59";
-										setDelayMinute(val);
+										setTimeTakenMinute(val);
 									}}
 									className="w-20"
 								/>
 								<span>min</span>
 							</div>
+							<FormMessage />
+						</FormItem>
+						<FormItem>
+							<FormLabel>Delay</FormLabel>
+							<div>
+								<div className="flex flex-row justify-between gap-2">
+									<div className="flex gap-2">
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											placeholder="hr"
+											value={delayHour}
+											onChange={(e) => {
+												const val = e.target.value.replace(/[^0-9]/g, "");
+												setDelayHour(val);
+											}}
+											className="w-20"
+										/>
+										<span>hr</span>
+										<Input
+											disabled={!isEditable}
+											type="number"
+											min="0"
+											max="59"
+											placeholder="min"
+											value={delayMinute}
+											onChange={(e) => {
+												let val = e.target.value.replace(/[^0-9]/g, "");
+												if (parseInt(val, 10) > 59) val = "59";
+												setDelayMinute(val);
+											}}
+											className="w-20"
+										/>
+										<span>min</span>
+									</div>
 
-							<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
-								Auto Calculate
-							</Button>
-						</div>
-						{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
-					</div>
-				</FormItem>
-				<FormField
-					control={form.control}
-					name="delay_reason"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Delay reason</FormLabel>
-								<FormControl>
-									<Textarea disabled={!isEditable} placeholder="Delay reason" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/>
-				{user_auth?.data?.role !== "Employee" && (
-					<>
+									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
+										Auto Calculate
+									</Button>
+								</div>
+								{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
+							</div>
+						</FormItem>
 						<FormField
 							control={form.control}
-							name="performance_rating"
+							name="delay_reason"
 							render={({ field }) => {
 								return (
 									<FormItem>
-										<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+										<FormLabel>Delay reason</FormLabel>
 										<FormControl>
-											<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+											<Textarea disabled={!isEditable} placeholder="Delay reason" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+						{user_auth?.data?.role !== "Employee" && (
+							<>
+								<FormField
+									control={form.control}
+									name="performance_rating"
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+												<FormControl>
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="remarks"
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>Remarks</FormLabel>
+												<FormControl>
+													<Textarea disabled={!isEditable} placeholder="Remarks" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+							</>
+						)}
+					</>
+				) : updateData.calendar_add ? (
+					<>
+						<FormField
+							control={form.control}
+							name="start_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="end_date"
+							render={({ field }) => {
+								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
+							}}
+						/>
+						<FormField
+							control={form.control}
+							name="start_time"
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>Start Time</FormLabel>
+										<FormControl>
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="60"
+												inputMode="numeric"
+												pattern="[0-9]{2}:[0-9]{2}"
+												className="bg-background appearance-none"
+												{...field}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -795,13 +841,20 @@ export default function TaskForm({
 						/>
 						<FormField
 							control={form.control}
-							name="remarks"
+							name="end_time"
 							render={({ field }) => {
 								return (
 									<FormItem>
-										<FormLabel>Remarks</FormLabel>
+										<FormLabel>End Time</FormLabel>
 										<FormControl>
-											<Textarea disabled={!isEditable} placeholder="Remarks" {...field} />
+											<Input
+												disabled={!isEditable}
+												type="time"
+												step="any"
+												// placeholder="Rating &#40;1-10&#41;"
+												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+												{...field}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -809,7 +862,22 @@ export default function TaskForm({
 							}}
 						/>
 					</>
+				) : (
+					""
 				)}
+				<div className="w-full" ref={bottomRef}>
+					<Button
+						type="button"
+						variant="secondary"
+						className="w-full"
+						onClick={() => {
+							setShowMore(!showMore);
+							scrollToBottom();
+						}}
+					>
+						{!showMore ? "Show other details" : " Hide other details"}
+					</Button>
+				</div>
 				{isEditable ? (
 					<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150 p-4 mt-auto">
 						<Button type="submit" disabled={loading} className="w-full">
