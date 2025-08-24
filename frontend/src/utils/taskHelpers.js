@@ -38,14 +38,13 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().project());
 			setProjects(res?.data?.data);
-			if (projects.length !== projectFilter.length || projects.length !== profileProjectFilter.length) {
+			if (res.data.data.length !== projectFilter.length || res.data.data.length !== profileProjectFilter.length) {
 				const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
 				// Used in user profile
 				setProfileProjectFilter(mappedProjects);
 				// Used in dashboard
 				setProjectFilter(mappedProjects);
 			}
-			setOptions(res?.data?.data.map((p) => ({ value: p.id, label: p.title })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -59,7 +58,7 @@ export const useTaskHelpers = () => {
 			const res = await axiosClient.get(API().user());
 			setUsers(res?.data?.data);
 			// Used in dashboard
-			if (users.length !== userFilter.length) {
+			if (res.data.data.length !== userFilter.length) {
 				const mappedUsers = res.data.data.map((user) => ({ value: user.id, label: user.name }));
 				setUserFilter(mappedUsers);
 			}
