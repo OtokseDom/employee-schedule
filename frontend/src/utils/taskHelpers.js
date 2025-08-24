@@ -1,4 +1,86 @@
 // src/utils/taskHelpers.js
+import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useUserStore } from "@/store/user/userStore";
+import { useUsersStore } from "@/store/users/usersStore";
+
+export const useTaskHelpers = () => {
+	const { setLoading } = useLoadContext();
+	const { setTasks, setTaskHistory, setOptions } = useTasksStore();
+	const { setProjects } = useProjectsStore();
+	const { setUsers } = useUsersStore();
+	const { setCategories } = useCategoriesStore();
+	const { setTaskStatuses } = useTaskStatusesStore();
+	const { setProfileProjectFilter } = useUserStore();
+
+	const fetchTasks = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().task());
+			setTasks(res?.data?.data?.tasks);
+			setTaskHistory(res?.data?.data?.task_history);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchProjects = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().project());
+			setProjects(res?.data?.data);
+			const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
+			setProfileProjectFilter(mappedProjects);
+			setOptions(res?.data?.data.map((p) => ({ value: p.id, label: p.title })));
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchUsers = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().user());
+			setUsers(res?.data?.data);
+			setOptions(res?.data?.data.map((u) => ({ value: u.id, label: u.name })));
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchCategories = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().category());
+			setCategories(res?.data?.data);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchTaskStatuses = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().task_status());
+			setTaskStatuses(res?.data?.data);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	return {
+		fetchTasks,
+		fetchProjects,
+		fetchUsers,
+		fetchCategories,
+		fetchTaskStatuses,
+	};
+};
 
 export function flattenTasks(tasks) {
 	// Get IDs of all children
