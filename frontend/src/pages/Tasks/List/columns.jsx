@@ -57,12 +57,10 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 		setLoading(true);
 		try {
 			if (deleteSubtasks) {
-				console.log("delete subtasks");
 				await axiosClient.delete(API().task(id), {
 					data: { delete_subtasks: true }, // send in request body
 				});
 			} else {
-				console.log("delete this task only");
 				await axiosClient.delete(API().task(id), {
 					data: { delete_subtasks: false }, // send in request body
 				});

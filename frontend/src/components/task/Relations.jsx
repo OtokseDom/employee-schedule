@@ -96,7 +96,19 @@ export default function Relations({ setUpdateData, setParentId }) {
 					</Button>
 				</div>
 			) : (
-				<div className="w-full text-muted-foreground text-lg text-center p-4">No Related Tasks</div>
+				<>
+					<div className="w-full text-muted-foreground text-lg text-center p-4">No Related Tasks</div>
+					<Button
+						className="w-full rounded"
+						onClick={() => {
+							setParentId(relations?.id);
+							setUpdateData({});
+							setActiveTab("update");
+						}}
+					>
+						Add Subtask
+					</Button>
+				</>
 			)}
 		</>
 	);

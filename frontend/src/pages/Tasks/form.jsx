@@ -47,7 +47,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { tasks, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
+	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
@@ -222,8 +222,17 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 					setActiveTab("relations");
 					// to show 3 tabs again
 					setUpdateData(taskResponse?.data?.data?.task);
-					// setParentId(null);
-					addRelation(taskResponse.data.data.task);
+					if (relations.children && relations?.children?.length !== 0) {
+						// Setting new relations when added subtask
+						addRelation(taskResponse.data.data.task);
+					} else {
+						// Setting new relations if adding subtask from task without relation
+						const parentTask = tasks.find((task) => task.id === taskResponse.data.data.task.parent_id);
+						setRelations({
+							...parentTask,
+							children: [...(parentTask.children || []), taskResponse.data.data.task],
+						});
+					}
 				}
 			} else if (updateData?.calendar_add) {
 				await axiosClient.post(API().task(), parsedForm);
@@ -242,7 +251,7 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 			}
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			console.error("Error fetching data:", e.response?.data?.message);
+			console.error("Error fetching data:", e);
 			if (e.response?.data?.errors) {
 				const backendErrors = e.response.data.errors;
 				Object.keys(backendErrors).forEach((field) => {
