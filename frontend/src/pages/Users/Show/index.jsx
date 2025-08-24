@@ -67,7 +67,6 @@ export default function UserProfile() {
 	useEffect(() => {
 		if (tasks || tasks?.length > 0) {
 			const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
-			console.log(filteredUserTasks);
 			setTableData(flattenTasks(filteredUserTasks));
 		}
 	}, [tasks, id]);
@@ -98,7 +97,6 @@ export default function UserProfile() {
 	}, [id]);
 
 	const fetchDetails = async () => {
-		console.log("fetched details");
 		setDetailsLoading(true);
 		try {
 			const response = await axiosClient.get(API().user(id));
@@ -110,7 +108,6 @@ export default function UserProfile() {
 		}
 	};
 	const fetchData = async () => {
-		console.log("fetched data");
 		setLoading(true);
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
