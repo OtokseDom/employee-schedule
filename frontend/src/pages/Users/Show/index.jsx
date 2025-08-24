@@ -22,7 +22,7 @@ import FilterForm from "@/components/form/filter-form";
 import FilterTags from "@/components/form/FilterTags";
 import { API } from "@/constants/api";
 import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
-import { flattenTasks } from "@/utils/taskHelpers";
+import { flattenTasks, useTaskHelpers } from "@/utils/taskHelpers";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
@@ -33,24 +33,24 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: multi assignee task fetch
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	const { users, setUsers } = useUsersStore();
 	const {
 		user,
 		setUser,
 		userReports,
 		setUserReports,
 		profileProjectFilter,
-		setProfileProjectFilter,
 		profileFilters,
 		setProfileFilters,
 		profileSelectedProjects,
 		setProfileSelectedProjects,
 	} = useUserStore();
-	const { projects, setProjects } = useProjectsStore();
-	const { categories, setCategories } = useCategoriesStore();
-	const { tasks, setTasks, setTaskHistory, setRelations, setActiveTab, setOptions } = useTasksStore();
-	const { taskStatuses, setTaskStatuses } = useTaskStatusesStore();
-
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	// Fetch Hooks
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const showToast = useToast();
@@ -116,72 +116,6 @@ export default function UserProfile() {
 		try {
 			const reportsRes = await axiosClient.get(API().user_reports(id));
 			setUserReports(reportsRes?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchTasks = async () => {
-		setLoading(true);
-		try {
-			const taskResponse = await axiosClient.get(API().task());
-			setTasks(taskResponse?.data?.data?.tasks);
-			setTaskHistory(taskResponse?.data?.data?.task_history);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchProjects = async () => {
-		setLoading(true);
-		try {
-			// selection items
-			const projectResponse = await axiosClient.get(API().project());
-			const mappedProjects = projectResponse.data.data.map((project) => ({
-				value: project.id,
-				label: project.title,
-			}));
-			setProfileProjectFilter(mappedProjects);
-			setProjects(projectResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchUsers = async () => {
-		setLoading(true);
-		try {
-			// selection items
-			const userResponse = await axiosClient.get(API().user());
-			setUsers(userResponse?.data?.data);
-			// To load task assignees option when users are fetched
-			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchCategories = async () => {
-		setLoading(true);
-		try {
-			// selection items
-			const categoryResponse = await axiosClient.get(API().category());
-			setCategories(categoryResponse?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const fetchTaskStatuses = async () => {
-		setLoading(true);
-		try {
-			const taskStatusResponse = await axiosClient.get(API().task_status());
-			setTaskStatuses(taskStatusResponse?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
