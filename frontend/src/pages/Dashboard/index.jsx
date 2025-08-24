@@ -19,26 +19,15 @@ import GalaxyProgressBar from "@/components/design/GalaxyProgressBar";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
-import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
-	const { users, setUsers } = useUsersStore();
-	const { projects, setProjects } = useProjectsStore();
-	const { setOptions } = useTasksStore();
-	const {
-		reports,
-		setReports,
-		userFilter,
-		setUserFilter,
-		projectFilter,
-		setProjectFilter,
-		filters,
-		setFilters,
-		selectedProjects,
-		setSelectedProjects,
-		selectedUsers,
-		setSelectedUsers,
-	} = useDashboardStore();
+	const { users } = useUsersStore();
+	const { projects } = useProjectsStore();
+	const { reports, setReports, userFilter, projectFilter, filters, setFilters, selectedProjects, setSelectedProjects, selectedUsers, setSelectedUsers } =
+		useDashboardStore();
+	// Fetch Hooks
+	const { fetchProjects, fetchUsers } = useTaskHelpers();
 
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -47,8 +36,6 @@ export default function UserProfile() {
 		if (!reports || Object.keys(reports).length === 0) fetchReports();
 		if (!users || users.length === 0) fetchUsers();
 		if (!projects || projects.length === 0) fetchProjects();
-		if (users.length !== userFilter.length) mapUserFilter(users);
-		if (projects.length !== projectFilter.length) mapProjectFilter(projects);
 	}, []);
 	const fetchReports = async () => {
 		setLoading(true);
@@ -61,48 +48,6 @@ export default function UserProfile() {
 		} finally {
 			setLoading(false);
 		}
-	};
-	const fetchUsers = async () => {
-		setLoading(true);
-		try {
-			const userResponse = await axiosClient.get(API().user());
-			setUsers(userResponse.data.data);
-			mapUserFilter(userResponse.data.data);
-			// To load task assignees option when users are fetched
-			setOptions(userResponse?.data?.data?.map((user) => ({ value: user.id, label: user.name })));
-			setLoading(false);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const mapUserFilter = (users) => {
-		const mappedUsers = users?.map((user) => ({
-			value: user.id,
-			label: user.name,
-		}));
-		setUserFilter(mappedUsers);
-	};
-	const fetchProjects = async () => {
-		setLoading(true);
-		try {
-			const projectResponse = await axiosClient.get(API().project());
-			setProjects(projectResponse.data.data);
-			mapProjectFilter(projectResponse.data.data);
-			setLoading(false);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-	const mapProjectFilter = (projects) => {
-		const mappedProjects = projects?.map((project) => ({
-			value: project.id,
-			label: project.title,
-		}));
-		setProjectFilter(mappedProjects);
 	};
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly

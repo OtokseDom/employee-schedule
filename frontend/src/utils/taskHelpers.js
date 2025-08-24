@@ -3,6 +3,7 @@ import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
@@ -11,12 +12,13 @@ import { useUsersStore } from "@/store/users/usersStore";
 
 export const useTaskHelpers = () => {
 	const { setLoading } = useLoadContext();
+	const { projectFilter, setProjectFilter, userFilter, setUserFilter } = useDashboardStore();
 	const { setTasks, setTaskHistory, setOptions, setSelectedUser } = useTasksStore();
-	const { setProjects } = useProjectsStore();
-	const { setUsers } = useUsersStore();
+	const { projects, setProjects } = useProjectsStore();
+	const { users, setUsers } = useUsersStore();
 	const { setCategories } = useCategoriesStore();
 	const { setTaskStatuses } = useTaskStatusesStore();
-	const { setProfileProjectFilter } = useUserStore();
+	const { profileProjectFilter, setProfileProjectFilter } = useUserStore();
 
 	const fetchTasks = async () => {
 		setLoading(true);
@@ -36,9 +38,13 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().project());
 			setProjects(res?.data?.data);
-			const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
-			// Used in user profile
-			setProfileProjectFilter(mappedProjects);
+			if (projects.length !== projectFilter.length || projects.length !== profileProjectFilter.length) {
+				const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
+				// Used in user profile
+				setProfileProjectFilter(mappedProjects);
+				// Used in dashboard
+				setProjectFilter(mappedProjects);
+			}
 			setOptions(res?.data?.data.map((p) => ({ value: p.id, label: p.title })));
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -52,6 +58,11 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().user());
 			setUsers(res?.data?.data);
+			// Used in dashboard
+			if (users.length !== userFilter.length) {
+				const mappedUsers = res.data.data.map((user) => ({ value: user.id, label: user.name }));
+				setUserFilter(mappedUsers);
+			}
 			// Used in calendar
 			setSelectedUser(res?.data?.data[0]);
 			setOptions(res?.data?.data.map((u) => ({ value: u.id, label: u.name })));
