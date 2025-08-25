@@ -72,10 +72,13 @@ class User extends Authenticatable
             ->get();
     }
 
-    public function storeUser($request)
+    public function storeUser($request, $userData)
     {
-        $users = User::create($request->validated());
-        return new UserResource($users);
+        if ($request->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
+        // $users = User::create($request->validated());
+        return $this->create($request->validated());
     }
 
     public function showUser($id)
@@ -84,8 +87,24 @@ class User extends Authenticatable
         return $user;
     }
 
-    public function deleteUser($user)
+    public function updateUser($request, $user, $userData)
     {
+        // Validate org_id param AND payload
+        if ($user->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
+        $updated = $user->update($request->validated());
+        if (!$updated) {
+            return null;
+        }
+        return $updated;
+    }
+
+    public function deleteUser($user, $userData)
+    {
+        if ($user->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
         if (Task::where('assignee_id', $user->id)->exists()) {
             return false;
         }
