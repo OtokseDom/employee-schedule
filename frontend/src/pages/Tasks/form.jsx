@@ -46,7 +46,7 @@ const formSchema = z.object({
 	remarks: z.string().optional(),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
@@ -86,7 +86,6 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 			title: "",
 			description: "",
 			parent_id: undefined,
-			// assignee_id: undefined,
 			project_id: undefined,
 			category: undefined,
 			expected_output: "",
@@ -139,7 +138,7 @@ export default function TaskForm({ parentId, setParentId, setTaskAdded, isOpen, 
 				description: description || "",
 				parent_id: parent_id || parentId || undefined,
 				// assignee_id: assignee_id || selectedUser || undefined,
-				project_id: project_id || undefined,
+				project_id: project_id || projectId || undefined,
 				category_id: category_id || undefined,
 				expected_output: expected_output || "",
 				start_date: typeof start_date === "string" ? parseISO(start_date) : start_date || undefined,

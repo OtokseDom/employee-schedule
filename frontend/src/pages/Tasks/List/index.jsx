@@ -21,6 +21,7 @@ export default function Tasks() {
 
 	const [updateData, setUpdateData] = useState({});
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+	const [projectId, setProjectId] = useState(null); //for adding subtasks from relations tab
 	const [hasRelation, setHasRelation] = useState(false);
 
 	// Flatten tasks for datatable usage (also groups children below parent)
@@ -32,6 +33,7 @@ export default function Tasks() {
 			setRelations({});
 			setActiveTab("update");
 			setParentId(null);
+			setProjectId(null);
 		}
 	}, [isOpen]);
 
@@ -87,6 +89,8 @@ export default function Tasks() {
 							setIsOpen={setIsOpen}
 							parentId={parentId}
 							setParentId={setParentId}
+							projectId={projectId}
+							setProjectId={setProjectId}
 							fetchData={fetchTasks}
 						/>
 						{dialog}
