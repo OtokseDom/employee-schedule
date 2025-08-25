@@ -45,8 +45,12 @@ class TaskStatusController extends Controller
 
     public function update(UpdateTaskStatusRequest $request, TaskStatus $task_status)
     {
-        $updated = $task_status->update($request->validated());
-        if (!$updated) {
+        $result = $this->task_status->updateTaskStatus($request, $task_status);
+
+        if ($result === false) {
+            return apiResponse(null, 'System status cannot be updated.', false, 400);
+        }
+        if ($result === null) {
             return apiResponse(null, 'Failed to update task status.', false, 500);
         }
         return apiResponse(new TaskStatusResource($task_status), 'Task status updated successfully');
@@ -55,6 +59,9 @@ class TaskStatusController extends Controller
     public function destroy(TaskStatus $task_status)
     {
         $result = $this->task_status->deleteTaskStatus($task_status);
+        if ($result === "system") {
+            return apiResponse(null, 'System status cannot be deleted.', false, 400);
+        }
         if ($result === false) {
             return apiResponse(null, 'Task Status cannot be deleted because they have assigned tasks.', false, 400);
         }

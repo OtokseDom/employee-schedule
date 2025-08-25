@@ -42,8 +42,34 @@ class TaskStatus extends Model
             ->first();
     }
 
+    public function updateTaskStatus($request, $task_status)
+    {
+        // Validate if updating system status
+        $taskStatus = $this->find($task_status->id);
+        $systemStatuses = [
+            "Pending",
+            "In Progress",
+            "Completed",
+            "For Review",
+            "On Hold",
+            "Delayed",
+            "Cancelled",
+        ];
+        if ($taskStatus && in_array($taskStatus->name, $systemStatuses)) {
+            return false;
+        }
+        $updated = $task_status->update($request->validated());
+        if (!$updated) {
+            return null;
+        }
+        return $updated;
+    }
+
     public function deleteTaskStatus($taskStatus)
     {
+        if (in_array($taskStatus->name, ["Pending", "In Progress", "Completed", "For Review", "On Hold", "Delayed", "Cancelled"])) {
+            return "system";
+        }
         if (Task::where('status_id', $taskStatus->id)->exists()) {
             return false;
         }
