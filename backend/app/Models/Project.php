@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Resources\ProjectResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -56,7 +57,9 @@ class Project extends Model
 
     public function storeProject($request)
     {
-        return $this->create($request->validated());
+        $project = $this->create($request->validated());
+        $project->load(['status:id,name,color']);
+        return new ProjectResource($project);
     }
 
     public function showProject($organization_id, $project_id)

@@ -17,7 +17,20 @@ import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 
-export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, setUpdateData, fetchData, showLess = true, parentId, setParentId }) {
+export function DataTableTasks({
+	columns,
+	data,
+	isOpen,
+	setIsOpen,
+	updateData,
+	setUpdateData,
+	fetchData,
+	showLess = true,
+	parentId,
+	setParentId,
+	projectId,
+	setProjectId,
+}) {
 	const { selectedTaskHistory, activeTab, setActiveTab } = useTasksStore();
 	const { loading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
@@ -134,11 +147,11 @@ export function DataTableTasks({ columns, data, isOpen, setIsOpen, updateData, s
 								{activeTab == "history" ? (
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
-									<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
+									<Relations setUpdateData={setUpdateData} setParentId={setParentId} setProjectId={setProjectId} />
 								) : (
 									<TaskForm
 										parentId={parentId}
-										setParentId={setParentId}
+										projectId={projectId}
 										isOpen={isOpen}
 										setIsOpen={setIsOpen}
 										updateData={updateData}

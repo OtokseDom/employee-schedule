@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('target_date')->nullable();
             $table->date('estimated_date')->nullable();
-            $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent', 'Critical']);
+            $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent', 'Critical'])->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

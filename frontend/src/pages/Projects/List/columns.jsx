@@ -68,8 +68,8 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 					return (
 						<div className=" min-w-24">
-							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status.color] || "bg-gray-200 text-gray-800"}`}>
-								{status.name}
+							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
+								{status?.name}
 							</span>
 						</div>
 					);
@@ -144,9 +144,13 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 					return (
 						<div className=" min-w-24">
-							<span className={`px-2 py-1 w-full text-center rounded text-xs ${priorityColors[priority] || "bg-gray-200 text-gray-800"}`}>
-								{priority.replace("_", " ")}
-							</span>
+							{priority ? (
+								<span className={`px-2 py-1 w-full text-center rounded text-xs ${priorityColors[priority] || "bg-gray-200 text-gray-800"}`}>
+									{priority?.replace("_", " ")}
+								</span>
+							) : (
+								"-"
+							)}
 						</div>
 					);
 				},

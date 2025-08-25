@@ -105,10 +105,14 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 				return (
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0">
-								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
-							</Button>
+							{!["Pending", "In Progress", "Completed", "For Review", "On Hold", "Delayed", "Cancelled"].includes(taskStatus?.name) ? (
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">Open menu</span>
+									<MoreHorizontal className="h-4 w-4" />
+								</Button>
+							) : (
+								<span className="text-muted-foreground text-xs">system status</span>
+							)}
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem className="cursor-pointer" onClick={() => handleUpdateTaskStatus(taskStatus)}>

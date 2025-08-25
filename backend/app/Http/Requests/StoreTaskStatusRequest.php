@@ -23,7 +23,7 @@ class StoreTaskStatusRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:task_statuses,name',
             'description' => 'nullable|string',
             'color' => 'nullable|string'
         ];
