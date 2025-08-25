@@ -26,8 +26,14 @@ class UserController extends Controller
 
    public function store(StoreUserRequest $request)
    {
-      $user = $this->user->storeUser($request);
-      return apiResponse($user, 'User created successfully', true, 201);
+      $user = $this->user->storeUser($request, $this->userData);
+      if ($user === "not found") {
+         return apiResponse(null, 'Organization not found.', false, 404);
+      }
+      if (!$user) {
+         return apiResponse(null, 'User creation failed', false, 404);
+      }
+      return apiResponse(new UserResource($user), 'User created successfully', true, 201);
    }
 
    public function show($id) //changed User $user to $id to prevent laravel from throwing 404 when no user found instantly after the query
@@ -40,16 +46,22 @@ class UserController extends Controller
 
    public function update(UpdateUserRequest $request, User $user)
    {
-      $updated = $user->update($request->validated());
+      $updated = $this->user->updateUser($request, $user, $this->userData);
+      if ($updated === "not found") {
+         return apiResponse(null, 'User not found.', false, 404);
+      }
       if (!$updated) {
          return apiResponse(null, 'Failed to update user.', false, 500);
       }
-      return apiResponse($user, 'User updated successfully');
+      return apiResponse(new UserResource($user), 'User updated successfully');
    }
 
    public function destroy(User $user)
    {
-      $result = $this->user->deleteUser($user);
+      $result = $this->user->deleteUser($user, $this->userData);
+      if ($result === "not found") {
+         return apiResponse(null, 'User not found.', false, 404);
+      }
       if ($result === false) {
          return apiResponse(null, 'User cannot be deleted because they have assigned tasks.', false, 400);
       }
