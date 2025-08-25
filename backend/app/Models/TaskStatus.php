@@ -30,8 +30,11 @@ class TaskStatus extends Model
         return $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
     }
 
-    public function storeTaskStatus($request)
+    public function storeTaskStatus($request, $userData)
     {
+        if ($request->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
         return $this->create($request->validated());
     }
 
@@ -42,8 +45,11 @@ class TaskStatus extends Model
             ->first();
     }
 
-    public function updateTaskStatus($request, $task_status)
+    public function updateTaskStatus($request, $task_status, $userData)
     {
+        if ($task_status->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
         // Validate if updating system status
         $taskStatus = $this->find($task_status->id);
         $systemStatuses = [
@@ -65,8 +71,11 @@ class TaskStatus extends Model
         return $updated;
     }
 
-    public function deleteTaskStatus($taskStatus)
+    public function deleteTaskStatus($taskStatus, $userData)
     {
+        if ($taskStatus->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
         if (in_array($taskStatus->name, ["Pending", "In Progress", "Completed", "For Review", "On Hold", "Delayed", "Cancelled"])) {
             return "system";
         }

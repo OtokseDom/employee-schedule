@@ -55,7 +55,6 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $progress_query->whereIn('project_id', $projectIds);
         }
-        // TODO: Add function to set which status will consider in reports
         $cancelled = $this->task_status->where('name', 'cancelled')->value('id');
         $completed = $this->task_status->where('name', 'completed')->value('id');
         // Total tasks excluding cancelled

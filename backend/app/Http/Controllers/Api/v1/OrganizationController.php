@@ -7,13 +7,16 @@ use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
 use App\Http\Resources\OrganizationResource;
 use App\Models\Organization;
+use Illuminate\Support\Facades\Auth;
 
 class OrganizationController extends Controller
 {
     protected Organization $organization;
+    protected $userData;
     public function __construct(Organization $organization)
     {
         $this->organization = $organization;
+        $this->userData = Auth::user();
     }
 
     public function index()
@@ -42,6 +45,9 @@ class OrganizationController extends Controller
 
     public function update(UpdateOrganizationRequest $request, Organization $organization)
     {
+        if ($organization->id !== $this->userData->organization_id) {
+            return apiResponse(null, 'Organization not found.', false, 404);
+        }
         $updated = $organization->update($request->validated());
         if (!$updated) {
             return apiResponse(null, 'Failed to update organization.', false, 500);
@@ -63,7 +69,10 @@ class OrganizationController extends Controller
 
     public function generateCode(Organization $organization)
     {
-        $updated = $this->organization->generateCode($organization);
+        $updated = $this->organization->generateCode($organization, $this->userData);
+        if ($updated === "not found") {
+            return apiResponse(null, 'Organization not found', false, 404);
+        }
         if (!$updated) {
             return apiResponse(null, 'Failed to update organization code.', false, 500);
         }

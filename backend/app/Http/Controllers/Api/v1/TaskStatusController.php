@@ -27,7 +27,10 @@ class TaskStatusController extends Controller
 
     public function store(StoreTaskStatusRequest $request)
     {
-        $task_status = $this->task_status->storeTaskStatus($request);
+        $task_status = $this->task_status->storeTaskStatus($request, $this->userData);
+        if ($task_status === "not found") {
+            return apiResponse(null, 'Organization not found.', false, 404);
+        }
         if (!$task_status) {
             return apiResponse(null, 'Task status creation failed', false, 404);
         }
@@ -45,8 +48,11 @@ class TaskStatusController extends Controller
 
     public function update(UpdateTaskStatusRequest $request, TaskStatus $task_status)
     {
-        $result = $this->task_status->updateTaskStatus($request, $task_status);
+        $result = $this->task_status->updateTaskStatus($request, $task_status, $this->userData);
 
+        if ($result === "not found") {
+            return apiResponse(null, 'Task status not found.', false, 404);
+        }
         if ($result === false) {
             return apiResponse(null, 'System status cannot be updated.', false, 400);
         }
@@ -58,7 +64,10 @@ class TaskStatusController extends Controller
 
     public function destroy(TaskStatus $task_status)
     {
-        $result = $this->task_status->deleteTaskStatus($task_status);
+        $result = $this->task_status->deleteTaskStatus($task_status, $this->userData);
+        if ($result === "not found") {
+            return apiResponse(null, 'Task status not found.', false, 404);
+        }
         if ($result === "system") {
             return apiResponse(null, 'System status cannot be deleted.', false, 400);
         }

@@ -65,8 +65,11 @@ class Organization extends Model
         return null;
     }
 
-    public function generateCode($organization)
+    public function generateCode($organization, $userData)
     {
+        if ($organization->id !== $userData->organization_id) {
+            return "not found";
+        }
         $organization->code = strtoupper(uniqid('DOM'));
         return $organization->save() ? $organization : null;
     }

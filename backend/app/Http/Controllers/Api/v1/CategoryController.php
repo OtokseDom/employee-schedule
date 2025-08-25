@@ -27,7 +27,10 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $category = $this->category->storeCategory($request);
+        $category = $this->category->storeCategory($request, $this->userData);
+        if ($category === "not found") {
+            return apiResponse(null, 'Organization not found.', false, 404);
+        }
         if (!$category) {
             return apiResponse(null, 'Category creation failed', false, 404);
         }
@@ -43,9 +46,24 @@ class CategoryController extends Controller
         return apiResponse(new CategoryResource($details), 'Category details fetched successfully');
     }
 
+    public function update(UpdateCategoryRequest $request, Category $category)
+    {
+        $updated = $this->category->updateCategory($request, $category, $this->userData);
+        if ($updated === "not found") {
+            return apiResponse(null, 'Category not found.', false, 404);
+        }
+        if (!$updated) {
+            return apiResponse(null, 'Failed to update category.', false, 500);
+        }
+        return apiResponse(new CategoryResource($category), 'Category updated successfully');
+    }
+
     public function destroy(Category $category)
     {
-        $result = $this->category->deleteCategory($category);
+        $result = $this->category->deleteCategory($category, $this->userData);
+        if ($result === "not found") {
+            return apiResponse(null, 'Category not found.', false, 404);
+        }
         if ($result === false) {
             return apiResponse(null, 'Category cannot be deleted because they have assigned tasks.', false, 400);
         }

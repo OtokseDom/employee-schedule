@@ -30,7 +30,6 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
-// TODO: multi assignee task fetch
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
 	const {

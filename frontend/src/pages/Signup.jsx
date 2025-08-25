@@ -24,7 +24,6 @@ export default function Signup() {
 	const passwordRef = useRef();
 	const passwordConfiramtionRef = useRef();
 
-	// TODO: Fix signup flow, organization first
 	// Track theme (dark/light) by observing <html> class changes
 	const [theme, setTheme] = useState(() => (document.documentElement.classList.contains("dark") ? "dark" : "light"));
 
