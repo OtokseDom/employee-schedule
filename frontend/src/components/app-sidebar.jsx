@@ -41,6 +41,13 @@ import { sub } from "date-fns";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
+import { useUserStore } from "@/store/user/userStore";
 
 // Menu items.
 const items = [
@@ -113,6 +120,13 @@ const items = [
 export function AppSidebar() {
 	const { user, setToken, setUser } = useAuthContext();
 	const { isMobile, openMobile, setOpenMobile } = useSidebar(); // Add this line
+	const { setTasks } = useTasksStore();
+	const { setUsers } = useUsersStore();
+	const { setProjects } = useProjectsStore();
+	const { setCategories } = useCategoriesStore();
+	const { setTaskStatuses } = useTaskStatusesStore();
+	const { setReports } = useDashboardStore();
+	const { setUserReports } = useUserStore();
 
 	// Darkmode set session
 	const [theme, setTheme] = useState(() => {
@@ -152,6 +166,13 @@ export function AppSidebar() {
 		e.preventDefault();
 		axiosClient.post(API().logout).then(() => {
 			setUser({});
+			setTasks([]);
+			setUsers([]);
+			setProjects([]);
+			setCategories([]);
+			setTaskStatuses([]);
+			setReports([]);
+			setUserReports([]);
 			setToken(null);
 		});
 	};
