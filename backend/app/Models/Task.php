@@ -118,6 +118,9 @@ class Task extends Model
 
     public function storeTask($request, $userData)
     {
+        if ($request->organization_id !== $userData->organization_id) {
+            return "not found";
+        }
         $task = $this->create($request->validated());
 
         // attach multiple assignees if provided
@@ -190,7 +193,9 @@ class Task extends Model
 
     public function updateTask($request, $task, $userData)
     {
-
+        if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
+            return null;
+        }
         $original = $task->getOriginal();
         $validated = $request->validated();
 

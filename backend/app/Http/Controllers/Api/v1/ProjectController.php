@@ -27,7 +27,10 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request)
     {
-        $project = $this->project->storeProject($request);
+        $project = $this->project->storeProject($request, $this->userData);
+        if ($project === "not found") {
+            return apiResponse(null, 'Organization not found.', false, 404);
+        }
         if (!$project) {
             return apiResponse(null, 'Project creation failed', false, 404);
         }
@@ -45,7 +48,10 @@ class ProjectController extends Controller
 
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $updated = $project->update($request->validated());
+        $updated = $this->project->updateProject($request, $project, $this->userData);
+        if ($updated === "not found") {
+            return apiResponse(null, 'Project not found.', false, 404);
+        }
         if (!$updated) {
             return apiResponse(null, 'Failed to update project.', false, 500);
         }
@@ -55,7 +61,10 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        $result = $this->project->deleteProject($project);
+        $result = $this->project->deleteProject($project, $this->userData);
+        if ($result === "not found") {
+            return apiResponse(null, 'Project not found.', false, 404);
+        }
         if ($result === false) {
             return apiResponse(null, 'Project cannot be deleted because they have assigned tasks.', false, 400);
         }

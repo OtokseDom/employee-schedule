@@ -38,12 +38,14 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
-        return apiResponse(
-            $this->task->storeTask($request, $this->userData),
-            'Task created successfully',
-            true,
-            201
-        );
+        $task = $this->task->storeTask($request, $this->userData);
+        if ($task === "not found") {
+            return apiResponse(null, 'Organization not found.', false, 404);
+        }
+        if (!$task) {
+            return apiResponse(null, 'Task creation failed', false, 404);
+        }
+        return apiResponse($task, 'Task created successfully', true, 201);
     }
 
     public function show($id)
@@ -61,6 +63,9 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $updated = $this->task->updateTask($request, $task, $this->userData);
+        if ($updated === null) {
+            return apiResponse(null, 'Task not found.', false, 404);
+        }
         if (!$updated) {
             return apiResponse(null, 'Failed to update task.', false, 500);
         }
@@ -69,6 +74,10 @@ class TaskController extends Controller
 
     public function destroy(Request $request, Task $task)
     {
+
+        if ($task->organization_id !== $this->userData->organization_id) {
+            return apiResponse(null, 'Task not found', false, 404);
+        }
         // Delete subtasks or not
         if ($request->boolean('delete_subtasks')) {
             if (!$this->task->deleteSubtasks($task)) {
