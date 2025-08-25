@@ -29,7 +29,7 @@ class ReportService
         $this->organization_id = Auth::user()->organization_id;
     }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
-
+    // TODO: Status reading from all org
     /**
      * Display reports for section cards. Section Cards
      */
@@ -55,8 +55,8 @@ class ReportService
             $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
             $progress_query->whereIn('project_id', $projectIds);
         }
-        $cancelled = $this->task_status->where('name', 'cancelled')->value('id');
-        $completed = $this->task_status->where('name', 'completed')->value('id');
+        $cancelled = $this->task_status->where('name', 'cancelled')->where('organization_id', $this->organization_id)->value('id');
+        $completed = $this->task_status->where('name', 'completed')->where('organization_id', $this->organization_id)->value('id');
         // Total tasks excluding cancelled
         $totalTasks = (clone $progress_query)->where('status_id', '!=', $cancelled)->where('status_id', '!=', null)->count();
         // Completed tasks count
@@ -105,7 +105,7 @@ class ReportService
         }
         $avg_performance = $avg_performance_query->avg('performance_rating');
         /* ----------------------------- // Task at Risk ---------------------------- */
-        $completed = $this->task_status->where('name', 'completed')->value('id');
+        $completed = $this->task_status->where('name', 'completed')->where('organization_id', $this->organization_id)->value('id');
         $task_at_risk_query = $this->task
             ->where('status_id', '!=', $completed)
             ->where('organization_id', $this->organization_id)
@@ -208,7 +208,7 @@ class ReportService
         }
 
         // Fetch statuses from DB (only id & name)
-        $statuses = $this->task_status->select('id', 'name')->get();
+        $statuses = $this->task_status->select('id', 'name')->where('organization_id', $this->organization_id)->get();
 
         $chart_data = [];
         foreach ($statuses as $index => $status) {
