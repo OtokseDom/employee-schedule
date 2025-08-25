@@ -28,7 +28,7 @@ class StoreProjectRequest extends FormRequest
             'description'     => 'nullable|string',
             'target_date'     => 'nullable|date',
             'estimated_date'  => 'nullable|date',
-            'priority'        => 'required|in:Low,Medium,High,Urgent,Critical',
+            'priority'        => 'nullable|in:Low,Medium,High,Urgent,Critical',
             'remarks'         => 'nullable|string',
         ];
     }

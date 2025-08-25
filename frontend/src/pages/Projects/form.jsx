@@ -17,6 +17,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { format, parseISO } from "date-fns";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 const formSchema = z.object({
 	title: z.string().refine((data) => data.trim() !== "", {
@@ -26,12 +27,8 @@ const formSchema = z.object({
 	target_date: z.date().optional(),
 	estimated_date: z.date().optional(),
 	remarks: z.string().optional(),
-	priority: z.string({
-		required_error: "Priority is required.",
-	}),
-	status: z.string({
-		required_error: "Status is required.",
-	}),
+	priority: z.string().optional(),
+	status_id: z.number().optional(),
 });
 
 export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
@@ -39,6 +36,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { addProject, updateProject } = useProjectsStore([]);
+	const { taskStatuses } = useTaskStatusesStore();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -48,13 +46,13 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 			estimated_date: undefined,
 			priority: "",
 			remarks: "",
-			status: undefined,
+			status_id: undefined,
 		},
 	});
 
 	useEffect(() => {
 		if (updateData) {
-			const { title, description, target_date, estimated_date, priority, remarks, status } = updateData;
+			const { title, description, target_date, estimated_date, priority, remarks, status_id } = updateData;
 			form.reset({
 				title: title || "",
 				description: description || "",
@@ -62,7 +60,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 				estimated_date: estimated_date ? parseISO(target_date) : undefined,
 				priority: priority || "",
 				remarks: remarks || "",
-				status: status || undefined,
+				status_id: status_id || undefined,
 			});
 		}
 	}, [updateData, form]);
@@ -169,7 +167,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 						];
 						return (
 							<FormItem>
-								<FormLabel>Priority *</FormLabel>
+								<FormLabel>Priority</FormLabel>
 								<Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
 									<FormControl>
 										<SelectTrigger>
@@ -195,35 +193,28 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 				/>
 				<FormField
 					control={form.control}
-					name="status"
+					name="status_id"
 					render={({ field }) => {
-						const statuses = [
-							{ id: 1, name: "Pending" },
-							{ id: 2, name: "In Progress" },
-							{ id: 3, name: "For Review" },
-							{ id: 4, name: "Completed" },
-							{ id: 5, name: "Delayed" },
-							{ id: 6, name: "On Hold" },
-							{ id: 7, name: "Cancelled" },
-						];
 						return (
 							<FormItem>
-								<FormLabel>Status *</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+								<FormLabel>Status</FormLabel>
+								<Select onValueChange={(value) => field.onChange(Number(value))} value={field.value ? field.value.toString() : ""}>
 									<FormControl>
 										<SelectTrigger>
-											<SelectValue placeholder="Select a status"></SelectValue>
+											<SelectValue placeholder="Select a status">
+												{field.value ? taskStatuses?.find((taskStatus) => taskStatus.id == field.value).name : "Select a status"}
+											</SelectValue>
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{Array.isArray(statuses) && statuses.length > 0 ? (
-											statuses?.map((status) => (
-												<SelectItem key={status?.id} value={status?.name}>
-													{status?.name}
+										{Array.isArray(taskStatuses) && taskStatuses.length > 0 ? (
+											taskStatuses.map((taskStatus) => (
+												<SelectItem key={taskStatus.id} value={taskStatus.id.toString()}>
+													{taskStatus.name}
 												</SelectItem>
 											))
 										) : (
-											<SelectItem disabled>No status available</SelectItem>
+											<></>
 										)}
 									</SelectContent>
 								</Select>

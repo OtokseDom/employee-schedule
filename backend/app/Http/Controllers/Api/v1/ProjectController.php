@@ -49,6 +49,7 @@ class ProjectController extends Controller
         if (!$updated) {
             return apiResponse(null, 'Failed to update project.', false, 500);
         }
+        $project->load(['status:id,name,color']);
         return apiResponse(new ProjectResource($project), 'Project updated successfully');
     }
 

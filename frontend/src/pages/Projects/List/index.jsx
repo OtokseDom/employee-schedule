@@ -6,37 +6,31 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableProjects } from "./data-table";
 import { API } from "@/constants/api";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 export default function Projects() {
 	const { setLoading } = useLoadContext();
-	const { projects, setProjects, removeProject } = useProjectsStore([]);
+	const { projects, removeProject } = useProjectsStore([]);
+	const { taskStatuses } = useTaskStatusesStore();
+	const { fetchProjects, fetchTaskStatuses } = useTaskHelpers();
+
 	const showToast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [dialogOpen, setDialogOpen] = useState(false);
-	// TODO: Fix update not seting status
 	useEffect(() => {
 		if (!isOpen) setUpdateData({});
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Projects";
-		if (!projects || projects.length === 0) fetchData();
+		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!projects || projects.length === 0) fetchProjects();
 	}, []);
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const projectResponse = await axiosClient.get(API().project());
-			setProjects(projectResponse.data.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			const projectResponse = await axiosClient.delete(API().project(id));
+			await axiosClient.delete(API().project(id));
 			removeProject(id);
 			showToast("Success!", "Project deleted.", 3000);
 		} catch (e) {
