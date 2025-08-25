@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTaskStatusRequest extends FormRequest
 {
@@ -23,7 +24,13 @@ class UpdateTaskStatusRequest extends FormRequest
     {
         return [
             'organization_id' => 'required|exists:organizations,id',
-            'name' => 'required|string|max:255|unique:task_statuses,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('task_statuses', 'name')
+                    ->where(fn($query) => $query->where('organization_id', $this->organization_id)),
+            ],
             'description' => 'nullable|string',
             'color' => 'nullable|string'
         ];
