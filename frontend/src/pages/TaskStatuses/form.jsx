@@ -29,7 +29,7 @@ const formSchema = z.object({
 });
 export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
-	const { taskStatuses: data, setTaskStatuses, updateTaskStatus, addTaskStatus } = useTaskStatusesStore();
+	const { updateTaskStatus, addTaskStatus } = useTaskStatusesStore();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -118,6 +118,7 @@ export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData })
 							{ id: 4, name: "Gray" },
 							{ id: 5, name: "Orange" },
 							{ id: 6, name: "Purple" },
+							{ id: 7, name: "Red" },
 						];
 						return (
 							<FormItem>
