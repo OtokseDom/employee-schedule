@@ -34,7 +34,13 @@ class ReportService
      */
     public function overallProgress($id = null, $filter)
     {
-        $progress_query = $this->task->where('organization_id', $this->organization_id);
+        $progress_query = $this->task
+            ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
 
         if ($id) {
             $progress_query->whereHas('assignees', function ($query) use ($id) {
@@ -82,7 +88,12 @@ class ReportService
     public function sectionCards($id = null, $filter)
     {
         /* ------------------------- // Average Performance ------------------------- */
-        $avg_performance_query = $this->task->where('organization_id', $this->organization_id);
+        $avg_performance_query = $this->task->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
 
         if ($id) {
             $avg_performance_query->whereHas('assignees', function ($query) use ($id) {
@@ -108,6 +119,11 @@ class ReportService
         $task_at_risk_query = $this->task
             ->where('status_id', '!=', $completed)
             ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            })
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
         if ($id) {
@@ -133,11 +149,21 @@ class ReportService
         $avg_completion_time = $this->task
             ->where('status_id', $completed)
             ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            })
             ->avg('time_taken');
         /* --------------------------- // Time Efficiency --------------------------- */
         $time_efficiency_query = $this->task
             ->where('status_id', $completed)
-            ->where('organization_id', $this->organization_id);
+            ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
         if ($id) {
             $time_efficiency_query->whereHas('assignees', function ($query) use ($id) {
                 $query->where('users.id', $id);
@@ -159,7 +185,12 @@ class ReportService
         $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
         /* ------------------------- // Task Completion Rate ------------------------ */
         $task_completion_query = $this->task
-            ->where('organization_id', $this->organization_id);
+            ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
         if ($id) {
             $task_completion_query->whereHas('assignees', function ($query) use ($id) {
                 $query->where('users.id', $id);
@@ -216,7 +247,12 @@ class ReportService
 
             $query = $this->task
                 ->where('organization_id', $this->organization_id)
-                ->where('status_id', $status->id);
+                ->where('status_id', $status->id)
+                ->where(function ($query) {
+                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                        $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                    });
+                });
 
             if ($id && $variant !== 'dashboard') {
                 $query->whereHas('assignees', function ($q) use ($id) {
@@ -279,7 +315,12 @@ class ReportService
             $query = $this->task
                 ->whereYear('start_date', $m['year'])
                 ->whereMonth('start_date', $m['month_num'])
-                ->where('organization_id', $this->organization_id);
+                ->where('organization_id', $this->organization_id)
+                ->where(function ($query) {
+                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                        $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                    });
+                });
             if ($id && $variant !== 'dashboard') {
                 $query->whereHas('assignees', function ($q) use ($id) {
                     $q->where('users.id', $id);
@@ -361,7 +402,12 @@ class ReportService
                 })
                 ->where('organization_id', $this->organization_id)
                 ->whereYear('start_date', $m['year'])
-                ->whereMonth('start_date', $m['month_num']);
+                ->whereMonth('start_date', $m['month_num'])
+                ->where(function ($query) {
+                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                        $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                    });
+                });
 
             if ($filter && $filter['from'] && $filter['to']) {
                 $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
@@ -423,7 +469,19 @@ class ReportService
                     $join->whereIn('project_id', $projectIds);
                 }
             })
-            ->where('categories.organization_id', $this->organization_id);
+            ->where('categories.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
+        // ->where(function ($query) {
+        //     $query->whereNotNull('tasks.parent_id')
+        //         ->orWhere(function ($subQuery) {
+        //             $subQuery->whereNull('tasks.parent_id')
+        //                 ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+        //         });
+        // });
 
         $ratings = $query->select(
             'categories.name as category',
@@ -468,7 +526,12 @@ class ReportService
             ->whereHas('assignees', function ($query) use ($id) {
                 $query->where('users.id', $id);
             })
-            ->where('organization_id', $this->organization_id);
+            ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
@@ -545,7 +608,14 @@ class ReportService
                 $join->on('tasks.id', '=', 'task_assignees.task_id')
                     ->where('tasks.organization_id', $this->organization_id);
             })
-            ->where('users.organization_id', $this->organization_id);
+            ->where('users.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            });
 
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
@@ -602,7 +672,14 @@ class ReportService
                 $join->on('tasks.id', '=', 'task_assignees.task_id')
                     ->where('tasks.organization_id', $this->organization_id);
             })
-            ->where('users.organization_id', $this->organization_id);
+            ->where('users.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            });
 
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
@@ -650,7 +727,14 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN time_taken > time_estimate THEN time_taken - time_estimate ELSE 0 END),2) as overrun'),
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
-            ->where('tasks.organization_id', $this->organization_id);
+            ->where('tasks.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            });
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
