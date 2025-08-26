@@ -168,7 +168,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 						return (
 							<FormItem>
 								<FormLabel>Priority</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+								<Select onValueChange={field.onChange} defaultValue={updateData?.priority || field.value}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select priority"></SelectValue>
