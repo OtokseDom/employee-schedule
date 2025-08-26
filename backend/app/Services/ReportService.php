@@ -29,7 +29,6 @@ class ReportService
         $this->organization_id = Auth::user()->organization_id;
     }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
-    // TODO: Status reading from all org
     /**
      * Display reports for section cards. Section Cards
      */

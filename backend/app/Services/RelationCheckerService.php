@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RelationCheckerService
 {
@@ -32,7 +33,7 @@ class RelationCheckerService
 
     public function checkTaskAssignee($value)
     {
-        return $this->task->where('assignee_id', $value)->where('organization_id', $this->organization_id)->exists();
+        return DB::table('task_assignees')->where('assignee_id', $value)->exists();
     }
     public function checkTaskChildren($value)
     {

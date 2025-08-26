@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 // TOOD: Role based restrictions
 class User extends Authenticatable
@@ -105,7 +106,7 @@ class User extends Authenticatable
         if ($user->organization_id !== $userData->organization_id) {
             return "not found";
         }
-        if (Task::where('assignee_id', $user->id)->exists()) {
+        if (DB::table('task_assignees')->where('assignee_id', $user->id)->exists()) {
             return false;
         }
         if (!$user->delete()) {

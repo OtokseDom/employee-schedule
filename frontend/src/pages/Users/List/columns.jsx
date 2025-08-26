@@ -195,7 +195,7 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 				<div className="ml-4 text-base">
 					{hasRelation && (
 						<>
-							<span className="text-yellow-800">Status cannot be deleted because it has assigned tasks.</span>
+							<span className="text-yellow-800">User cannot be deleted because it has assigned tasks.</span>
 						</>
 					)}
 				</div>
