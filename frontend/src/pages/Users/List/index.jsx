@@ -22,6 +22,9 @@ export default function Users() {
 			fetchData();
 		}
 	}, []);
+	useEffect(() => {
+		if (!isOpen) setUpdateData({});
+	}, [isOpen]);
 
 	const fetchData = async () => {
 		setLoading(true);
