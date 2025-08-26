@@ -43,8 +43,11 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 
 	const handleUpdateUser = (user, event) => {
 		event.stopPropagation();
-		setIsOpen(true);
-		setUpdateData(user);
+		// wait for dialog menu to close
+		setTimeout(() => {
+			setIsOpen(true);
+			setUpdateData(user);
+		}, 10);
 	};
 
 	const handleApproval = async (userRow = {}) => {
