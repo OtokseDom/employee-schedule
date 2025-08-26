@@ -24,12 +24,8 @@ const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
 		message: "Name is required.",
 	}),
-	position: z.string().refine((data) => data.trim() !== "", {
-		message: "Position is required.",
-	}),
-	dob: z.date({
-		required_error: "Birthday is required.",
-	}),
+	position: z.string().optional(),
+	dob: z.date().optional(),
 	role: z.string().refine((data) => data.trim() !== "", {
 		message: "Role is required.",
 	}),

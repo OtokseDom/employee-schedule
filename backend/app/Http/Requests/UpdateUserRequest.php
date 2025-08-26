@@ -25,8 +25,8 @@ class UpdateUserRequest extends FormRequest
             // 'organization_id' => 'required|exists:organizations,id',
             'name' => 'required|string|max:255',
             'role' => 'required|in:Superadmin,Admin,Manager,Employee',
-            'position' => 'required|string|max:255',
-            'dob' => 'required|date_format:Y-m-d',
+            'position' => 'nullable|string|max:255',
+            'dob' => 'nullable|date_format:Y-m-d',
             'email' => 'required|email|unique:users,email,' . $this->user->id, // Ignore the current user's email
             'password' => 'sometimes|nullable|string|min:8', //sometimes null if value is unchanged
             'status' => 'required|string|in:active,inactive,pending,rejected,banned',

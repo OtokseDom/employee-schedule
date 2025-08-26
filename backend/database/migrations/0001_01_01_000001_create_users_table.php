@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');
             $table->string('name');
-            $table->string('dob');
-            $table->string('position');
+            $table->string('dob')->nullable();
+            $table->string('position')->nullable();
             $table->string('role');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
