@@ -12,13 +12,13 @@ import { useUsersStore } from "@/store/users/usersStore";
 
 export const useTaskHelpers = () => {
 	const { setLoading } = useLoadContext();
-	const { projectFilter, setProjectFilter, userFilter, setUserFilter } = useDashboardStore();
+	const { projectFilter, setProjectFilter, userFilter, setUserFilter, setReports } = useDashboardStore();
 	const { setTasks, setTaskHistory, setOptions, setSelectedUser } = useTasksStore();
 	const { projects, setProjects } = useProjectsStore();
 	const { users, setUsers } = useUsersStore();
 	const { setCategories } = useCategoriesStore();
 	const { setTaskStatuses } = useTaskStatusesStore();
-	const { profileProjectFilter, setProfileProjectFilter } = useUserStore();
+	const { profileProjectFilter, setProfileProjectFilter, setUserReports } = useUserStore();
 
 	const fetchTasks = async () => {
 		setLoading(true);
@@ -96,12 +96,39 @@ export const useTaskHelpers = () => {
 		}
 	};
 
+	const fetchReports = async () => {
+		setLoading(true);
+		try {
+			const reportsRes = await axiosClient.get(API().dashboard());
+			setReports(reportsRes.data.data);
+			setLoading(false);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchUserReports = async (id) => {
+		setLoading(true);
+		try {
+			const reportsRes = await axiosClient.get(API().user_reports(id));
+			setUserReports(reportsRes?.data?.data);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return {
 		fetchTasks,
 		fetchProjects,
 		fetchUsers,
 		fetchCategories,
 		fetchTaskStatuses,
+		fetchReports,
+		fetchUserReports,
 	};
 };
 

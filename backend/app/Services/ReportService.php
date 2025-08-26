@@ -471,17 +471,12 @@ class ReportService
             })
             ->where('categories.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
+                $query->whereNotNull('tasks.parent_id') // include subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
             });
-        // ->where(function ($query) {
-        //     $query->whereNotNull('tasks.parent_id')
-        //         ->orWhere(function ($subQuery) {
-        //             $subQuery->whereNull('tasks.parent_id')
-        //                 ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
-        //         });
-        // });
 
         $ratings = $query->select(
             'categories.name as category',
