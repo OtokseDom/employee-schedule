@@ -27,7 +27,7 @@ export default function UserProfile() {
 	const { reports, setReports, userFilter, projectFilter, filters, setFilters, selectedProjects, setSelectedProjects, selectedUsers, setSelectedUsers } =
 		useDashboardStore();
 	// Fetch Hooks
-	const { fetchProjects, fetchUsers } = useTaskHelpers();
+	const { fetchProjects, fetchUsers, fetchReports } = useTaskHelpers();
 
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -37,18 +37,6 @@ export default function UserProfile() {
 		if (!users || users.length === 0) fetchUsers();
 		if (!projects || projects.length === 0) fetchProjects();
 	}, []);
-	const fetchReports = async () => {
-		setLoading(true);
-		try {
-			const reportsRes = await axiosClient.get(API().dashboard());
-			setReports(reportsRes.data.data);
-			setLoading(false);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly
 		const updated = {

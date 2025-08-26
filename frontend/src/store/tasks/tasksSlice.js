@@ -72,4 +72,8 @@ export const createTasksSlice = (set) => ({
 	// Multi-select users
 	options: [],
 	setOptions: (options) => set({ options }),
+	addOption: (option) =>
+		set((state) => ({
+			options: [...state.options, option],
+		})),
 });

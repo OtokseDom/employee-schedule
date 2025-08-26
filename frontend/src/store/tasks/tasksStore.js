@@ -30,5 +30,6 @@ export const useTasksStore = () => {
 		// Multi-select users
 		options: useAppStore((state) => state.options),
 		setOptions: useAppStore((state) => state.setOptions),
+		addOption: useAppStore((state) => state.addOption),
 	};
 };

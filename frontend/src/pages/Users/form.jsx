@@ -18,6 +18,7 @@ import DateInput from "@/components/form/DateInput";
 import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useUserStore } from "@/store/user/userStore";
+import { useTasksStore } from "@/store/tasks/tasksStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -46,6 +47,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 	const showToast = useToast();
 	const { addUser, updateUser } = useUsersStore();
 	const { setUser: setProfileUser } = useUserStore();
+	const { addOption } = useTasksStore();
 
 	const [date, setDate] = useState();
 
@@ -87,6 +89,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 			if (Object.keys(updateData).length === 0) {
 				const userResponse = await axiosClient.post(API().user(), formattedData);
 				addUser(userResponse.data.data);
+				addOption({ value: userResponse.data.data.id, label: userResponse.data.data.name });
 				showToast("Success!", "User added.", 3000);
 			} else {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);

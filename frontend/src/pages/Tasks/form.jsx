@@ -22,6 +22,8 @@ import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { useTaskHelpers } from "@/utils/taskHelpers";
+import { useUserStore } from "@/store/user/userStore";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -47,9 +49,11 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+	const { fetchReports, fetchUserReports } = useTaskHelpers();
 	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
+	const { user } = useUserStore();
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
 	const { loading, setLoading } = useLoadContext();
@@ -262,6 +266,10 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 			}
 		} finally {
 			setLoading(false);
+			fetchReports();
+			if (user?.id && Array.isArray(formData.assignees) && formData.assignees.includes(user.id)) {
+				fetchUserReports(user.id);
+			}
 		}
 	};
 

@@ -49,7 +49,7 @@ export default function UserProfile() {
 	const { tasks, setRelations, setActiveTab } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	// Fetch Hooks
-	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses, fetchUserReports } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
 	const showToast = useToast();
@@ -96,7 +96,7 @@ export default function UserProfile() {
 	useEffect(() => {
 		// Because 'view account' when on profile page already does not trigger rerender
 		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
-		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchData();
+		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchUserReports(id);
 	}, [id]);
 
 	const fetchDetails = async () => {
@@ -110,23 +110,12 @@ export default function UserProfile() {
 			setDetailsLoading(false);
 		}
 	};
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const reportsRes = await axiosClient.get(API().user_reports(id));
-			setUserReports(reportsRes?.data?.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
 			await axiosClient.delete(API().task(id));
-			fetchData();
+			fetchUserReports(id);
 			showToast("Success!", "Task deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
@@ -300,7 +289,7 @@ export default function UserProfile() {
 								setHasRelation,
 								setIsOpen,
 								setUpdateData,
-								fetchData,
+								fetchTasks,
 							});
 							return (
 								<>

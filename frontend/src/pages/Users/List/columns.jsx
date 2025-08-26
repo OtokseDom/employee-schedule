@@ -43,8 +43,11 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 
 	const handleUpdateUser = (user, event) => {
 		event.stopPropagation();
-		setIsOpen(true);
-		setUpdateData(user);
+		// wait for dialog menu to close
+		setTimeout(() => {
+			setIsOpen(true);
+			setUpdateData(user);
+		}, 10);
 	};
 
 	const handleApproval = async (userRow = {}) => {
@@ -195,7 +198,7 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 				<div className="ml-4 text-base">
 					{hasRelation && (
 						<>
-							<span className="text-yellow-800">Status cannot be deleted because it has assigned tasks.</span>
+							<span className="text-yellow-800">User cannot be deleted because it has assigned tasks.</span>
 						</>
 					)}
 				</div>
