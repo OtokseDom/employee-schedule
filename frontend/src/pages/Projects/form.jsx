@@ -18,6 +18,7 @@ import { API } from "@/constants/api";
 import { format, parseISO } from "date-fns";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 const formSchema = z.object({
 	title: z.string().refine((data) => data.trim() !== "", {
@@ -36,6 +37,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { addProject, updateProject } = useProjectsStore([]);
+	const { fetchTasks } = useTaskHelpers();
 	const { taskStatuses } = useTaskStatusesStore();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -88,6 +90,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});
+			fetchTasks();
 			setLoading(false);
 			setIsOpen(false);
 		}

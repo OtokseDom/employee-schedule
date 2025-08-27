@@ -19,6 +19,7 @@ import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useUserStore } from "@/store/user/userStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -43,6 +44,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 	const showToast = useToast();
 	const { addUser, updateUser } = useUsersStore();
 	const { setUser: setProfileUser } = useUserStore();
+	const { fetchTasks } = useTaskHelpers();
 	const { addOption } = useTasksStore();
 
 	const [date, setDate] = useState();
@@ -101,6 +103,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});
+			fetchTasks();
 			setLoading(false);
 			setIsOpen(false);
 		}
