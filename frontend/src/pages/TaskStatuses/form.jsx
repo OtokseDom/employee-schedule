@@ -15,6 +15,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -30,6 +31,7 @@ const formSchema = z.object({
 export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { updateTaskStatus, addTaskStatus } = useTaskStatusesStore();
+	const { fetchTasks } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -70,6 +72,7 @@ export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData })
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});
+			fetchTasks();
 			setLoading(false);
 			setIsOpen(false);
 		}

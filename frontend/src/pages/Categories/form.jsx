@@ -14,6 +14,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -27,6 +28,7 @@ const formSchema = z.object({
 export default function CategoryForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { categories: data, setCategories, updateCategory, addCategory } = useCategoriesStore();
+	const { fetchTasks } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const form = useForm({
@@ -65,6 +67,7 @@ export default function CategoryForm({ setIsOpen, updateData, setUpdateData }) {
 			console.error("Error fetching data:", e);
 		} finally {
 			setUpdateData({});
+			fetchTasks();
 			setLoading(false);
 			setIsOpen(false);
 		}

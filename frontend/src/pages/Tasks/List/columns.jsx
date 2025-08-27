@@ -36,7 +36,6 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 	useEffect(() => {
 		if (!dialogOpen) setHasRelation(false);
 	}, [dialogOpen]);
-	// TODO: updated project not reflecting in table
 	const handleUpdate = (task) => {
 		// wait for dialog menu to close
 		setTimeout(() => {
