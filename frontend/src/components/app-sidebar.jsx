@@ -13,6 +13,7 @@ import {
 	Building,
 	FolderKanban,
 	ListCheck,
+	KanbanSquareDashedIcon,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -55,6 +56,13 @@ const items = [
 		title: "Dashboard",
 		url: "/dashboard",
 		icon: Gauge,
+		collapsible: false,
+		subItems: [],
+	},
+	{
+		title: "Kanban Board",
+		url: "/kanban",
+		icon: KanbanSquareDashedIcon,
 		collapsible: false,
 		subItems: [],
 	},
