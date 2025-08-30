@@ -23,9 +23,7 @@ export default function Droppable({ id, title, cards, activeCard }) {
 				cards.map((card) =>
 					// Show ghost if this is the active card and it's in the source column
 					activeCard?.id === card.id ? (
-						<div key={card.id} className="p-3 my-2 rounded border border-dashed border-muted-foreground bg-muted/40">
-							Ghost
-						</div>
+						<div key={card.id} className="p-6 my-2 rounded border border-dashed border-muted-foreground bg-muted/40"></div>
 					) : (
 						<Draggable key={card.id} id={card.id} title={card.title} />
 					)
