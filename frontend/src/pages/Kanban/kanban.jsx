@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOverlay } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import Droppable from "./droppable";
 import Draggable from "./draggable";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 export default function KanbanBoard() {
-	const [columns, setColumns] = useState({
-		todo: [
-			{ id: "c1", title: "Card 1" },
-			{ id: "c2", title: "Card 2" },
-		],
-		doing: [{ id: "c3", title: "Card 3" }],
-		done: [{ id: "c4", title: "Card 4" }],
-		cancelled: [{ id: "c5", title: "Card 5" }],
-		delayed: [{ id: "c6", title: "Card 6" }],
-	});
+	const { tasks } = useTasksStore(); // tasks object
+	const { taskStatuses } = useTaskStatusesStore(); // statuses array
 
-	const [columnOrder] = useState(["todo", "doing", "done", "cancelled", "delayed"]);
+	// --- Build columns dynamically based on statuses ---
+	const buildColumns = () => {
+		const cols = {};
+		taskStatuses.forEach((status) => {
+			cols[status.id] = Object.values(tasks).filter((t) => t.status_id === status.id);
+		});
+		return cols;
+	};
+
+	// const [columns, setColumns] = useState(buildColumns);
+	// Initialize columns once
+	const [columns, setColumns] = useState(() => {
+		const cols = {};
+		taskStatuses.forEach((status) => {
+			cols[status.id] = Object.values(tasks).filter((t) => t.status_id === status.id);
+		});
+		return cols;
+	});
+	const columnOrder = taskStatuses.map((s) => s.id);
 
 	const [activeCard, setActiveCard] = useState(null);
 	const [sourceCol, setSourceCol] = useState(null);
@@ -29,7 +41,21 @@ export default function KanbanBoard() {
 
 	const findContainer = (cardId) => Object.keys(columns).find((col) => columns[col].some((c) => c.id === cardId));
 
-	// When drag starts
+	// --- Sync columns whenever tasks or taskStatuses change ---
+	// useEffect(() => {
+	// 	setColumns(buildColumns());
+	// }, [tasks, taskStatuses]);
+	useEffect(() => {
+		setColumns((prev) => {
+			const cols = { ...prev };
+			taskStatuses.forEach((status) => {
+				if (!cols[status.id]) cols[status.id] = [];
+			});
+			return cols;
+		});
+	}, [taskStatuses]);
+
+	// --- Drag handlers ---
 	const handleDragStart = ({ active }) => {
 		const col = findContainer(active.id);
 		if (!col) return;
@@ -73,7 +99,6 @@ export default function KanbanBoard() {
 			// Move across columns
 			setColumns((prev) => {
 				const newSource = prev[fromCol].filter((c) => c.id !== active.id);
-
 				const overIndex = prev[toCol].findIndex((c) => c.id === over.id);
 				const newDest =
 					overIndex === -1 ? [...prev[toCol], activeCard] : [...prev[toCol].slice(0, overIndex), activeCard, ...prev[toCol].slice(overIndex)];
@@ -108,13 +133,13 @@ export default function KanbanBoard() {
 
 	return (
 		<DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-			<div className="flex gap-4 p-4 h-full">
-				{columnOrder.map((colId) => (
-					<SortableContext key={colId} items={columns[colId].map((c) => c.id)} strategy={verticalListSortingStrategy}>
+			<div className="flex gap-4 p-4 h-full overflow-x-auto max-w-full">
+				{columnOrder.map((statusId) => (
+					<SortableContext key={statusId} items={columns[statusId]?.map((c) => c.id) || []} strategy={verticalListSortingStrategy}>
 						<Droppable
-							id={colId}
-							title={colId.toUpperCase()}
-							cards={getDisplayCards(colId)} // ghost preview here
+							id={statusId}
+							title={taskStatuses.find((s) => s.id === statusId)?.name || "Unknown"}
+							cards={getDisplayCards(statusId)}
 							activeCard={activeCard}
 						/>
 					</SortableContext>
