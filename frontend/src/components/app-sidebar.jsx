@@ -192,8 +192,8 @@ export function AppSidebar() {
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
 				<SidebarMenu>
-					<div className="flex justify-between cursor-pointer" onClick={() => navigate("/")}>
-						<img src={logo} className="overflow-hidden transition-all w-20" alt="logo" />
+					<div className="flex justify-between cursor-pointer">
+						<img src={logo} className="overflow-hidden transition-all w-20" alt="logo" onClick={() => navigate("/")} />
 						<SidebarTrigger className="hidden md:flex w-8 h-8" />
 					</div>
 				</SidebarMenu>
