@@ -9,7 +9,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 export default function KanbanBoard() {
 	const { tasks } = useTasksStore(); // tasks object
 	const { taskStatuses } = useTaskStatusesStore(); // statuses array
-
+	const [columnOrder, setColumnOrder] = useState(taskStatuses.map((status) => status.id));
 	// --- Build columns dynamically based on statuses ---
 	const buildColumns = () => {
 		const cols = {};
@@ -28,7 +28,7 @@ export default function KanbanBoard() {
 		});
 		return cols;
 	});
-	const columnOrder = taskStatuses.map((s) => s.id);
+	// const columnOrder = taskStatuses.map((status) => status.id);
 
 	const [activeCard, setActiveCard] = useState(null);
 	const [sourceCol, setSourceCol] = useState(null);
@@ -42,18 +42,18 @@ export default function KanbanBoard() {
 	const findContainer = (cardId) => Object.keys(columns).find((col) => columns[col].some((c) => c.id === cardId));
 
 	// --- Sync columns whenever tasks or taskStatuses change ---
-	// useEffect(() => {
-	// 	setColumns(buildColumns());
-	// }, [tasks, taskStatuses]);
 	useEffect(() => {
-		setColumns((prev) => {
-			const cols = { ...prev };
-			taskStatuses.forEach((status) => {
-				if (!cols[status.id]) cols[status.id] = [];
-			});
-			return cols;
-		});
-	}, [taskStatuses]);
+		setColumns(buildColumns());
+	}, [tasks, taskStatuses]);
+	// useEffect(() => {
+	// 	setColumns((prev) => {
+	// 		const cols = { ...prev };
+	// 		taskStatuses.forEach((status) => {
+	// 			if (!cols[status.id]) cols[status.id] = [];
+	// 		});
+	// 		return cols;
+	// 	});
+	// }, [taskStatuses]);
 
 	// --- Drag handlers ---
 	const handleDragStart = ({ active }) => {
@@ -65,9 +65,27 @@ export default function KanbanBoard() {
 	};
 
 	// While dragging, only update "hover state" for ghost
+	// const handleDragOver = ({ active, over }) => {
+	// 	if (!over) return;
+	// 	const destCol = findContainer(over.id) || over.id;
+	// 	setOverCol(destCol);
+	// 	setOverId(over.id);
+	// };
 	const handleDragOver = ({ active, over }) => {
-		if (!over) return;
-		const destCol = findContainer(over.id) || over.id;
+		if (!over) {
+			setOverCol(null);
+			setOverId(null);
+			return;
+		}
+
+		// Try to find which column contains this item
+		let destCol = findContainer(over.id);
+
+		// If not found, assume over.id is a column ID itself
+		if (!destCol) {
+			destCol = over.id;
+		}
+
 		setOverCol(destCol);
 		setOverId(over.id);
 	};
@@ -141,6 +159,7 @@ export default function KanbanBoard() {
 							title={taskStatuses.find((s) => s.id === statusId)?.name || "Unknown"}
 							cards={getDisplayCards(statusId)}
 							activeCard={activeCard}
+							overCol={overCol}
 						/>
 					</SortableContext>
 				))}
