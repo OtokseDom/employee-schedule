@@ -3,7 +3,7 @@ import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOv
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import Droppable from "./droppable";
 import Draggable from "./draggable";
-
+// TODO: FIX via DND-doc
 export default function KanbanBoard() {
 	// State to store cards in each column
 	const [columns, setColumns] = useState({
