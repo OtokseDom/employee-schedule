@@ -15,7 +15,7 @@ import Organization from "./pages/Organization";
 import ErrorFallback from "./pages/ErrorFallback";
 import Projects from "./pages/Projects/List";
 import TaskStatuses from "./pages/TaskStatuses/List";
-import KanbanBoard from "./pages/Kanban";
+import Kanban from "./pages/Kanban";
 
 const router = createBrowserRouter(
 	[
@@ -37,7 +37,7 @@ const router = createBrowserRouter(
 					path: "/kanban",
 					element: (
 						<ErrorFallback>
-							<KanbanBoard />
+							<Kanban />
 						</ErrorFallback>
 					),
 				},
