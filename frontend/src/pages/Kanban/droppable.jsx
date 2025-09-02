@@ -8,7 +8,7 @@ export default function Droppable({ id, title, cards, activeCard }) {
 	return (
 		<div
 			ref={setNodeRef} // Reference for DnD detection
-			className={`min-w-[20rem] h-fit p-4 rounded border bg-card text-foreground flex flex-col transition-colors ${
+			className={`min-w-[20rem] max-h-[calc(100vh-200px)] h-fit overflow-y-auto p-4 rounded border bg-card text-foreground flex flex-col transition-colors ${
 				isOver ? "border-blue-500" : "border-sidebar-accent"
 			}`}
 		>
@@ -20,16 +20,14 @@ export default function Droppable({ id, title, cards, activeCard }) {
 				// Placeholder for empty column
 				<div className="h-24 bg-muted border-2 border-dashed border-muted-foreground rounded flex items-center justify-center">Drop here</div>
 			) : (
-				cards.map((card) =>
-					// Show ghost if this is the active card and it's in the source column
-					activeCard?.id === card.id ? (
-						<div key={card.id} className="p-3 my-2 rounded border border-dashed border-muted-foreground bg-muted/40">
-							Ghost
-						</div>
-					) : (
-						<Draggable key={card.id} id={card.id} title={card.title} />
-					)
-				)
+				cards.map((card) => (
+					<Draggable
+						key={card.id} // keep key as raw id
+						id={card.id}
+						title={card.title}
+						isActive={activeCard?.id === card.id} // pass prop for ghost styling
+					/>
+				))
 			)}
 		</div>
 	);
