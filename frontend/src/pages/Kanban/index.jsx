@@ -3,8 +3,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
-import KanbanBoard from "./kanban";
-
+import KanbanBoard2 from "./kanban2";
 export default function Kanban() {
 	const { setLoading } = useLoadContext();
 	const { tasks } = useTasksStore();
@@ -29,7 +28,7 @@ export default function Kanban() {
 				<h1 className=" font-extrabold text-3xl">Board</h1>
 				<p>View list of all tasks by Project</p>
 			</div>
-			<KanbanBoard />
+			<KanbanBoard2 />
 		</div>
 	);
 }
