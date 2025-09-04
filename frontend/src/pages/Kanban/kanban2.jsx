@@ -4,34 +4,32 @@ import { SortableContext, arrayMove, horizontalListSortingStrategy, sortableKeyb
 import Container from "./container";
 import Items from "./items";
 import debounce from "lodash.debounce";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
 export default function KanbanBoard2() {
-	const [containers, setContainers] = useState([
-		{
-			id: "container-1",
-			title: "Container 1",
-			items: [
-				{
-					id: "item-1",
-					title: "Item 1",
-				},
-			],
-		},
-		{
-			id: "container-2",
-			title: "Container 2",
-			items: [
-				{
-					id: "item-2",
-					title: "Item 2",
-				},
-				{
-					id: "item-3",
-					title: "Item 3",
-				},
-			],
-		},
-	]);
+	const { tasks } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const [statusTasks, setStatusTasks] = useState([]);
+	const [containers, setContainers] = useState([]);
+
+	useEffect(() => {
+		if (!taskStatuses?.length) return;
+
+		const mapped = taskStatuses.map((status) => ({
+			id: `container-${status.id}`, // force string
+			title: status.name, // adjust field name if different
+			items: tasks
+				.filter((task) => task.status_id === status.id)
+				.map((task) => ({
+					id: `item-${task.id}`, // force string
+					title: task.title, // adjust field name if different
+				})),
+		}));
+
+		setContainers(mapped);
+	}, [taskStatuses, tasks]);
+
 	const [activeId, setActiveId] = useState(null);
 	const [currentContainerId, setCurrentContainerId] = useState();
 	const [containerName, setContainerName] = useState("");
@@ -65,7 +63,6 @@ export default function KanbanBoard2() {
 	};
 
 	const handleDragMove = ({ active, over }) => {
-		console.log("moved");
 		// Handle item sorting
 		if (active.id.toString().includes("item") && over?.id.toString().includes("item") && active && over && active.id !== over.id) {
 			// Find the active container and over container
