@@ -20,21 +20,30 @@ const Container = ({ id, children, title, onAddItem }) => {
 				transition,
 				transform: CSS.Translate.toString(transform),
 			}}
-			className={clsx("max-w-[350px] w-full h-fit p-4 bg-card border border-accent rounded-xl flex flex-col gap-y-4", isDragging && "opacity-50")}
+			className={clsx(
+				"min-w-[300px] h-fit max-h-[calc(100vh-9rem)] p-4 bg-card border border-accent rounded-xl flex flex-col",
+				isDragging && "opacity-50"
+			)}
 		>
-			<div className="flex items-center justify-start gap-3">
+			{/* Header */}
+			<div className="flex items-center justify-start gap-3 mb-4">
 				<Button variant="primary" className="p-2 text-xs" {...listeners}>
 					<GripVertical />
 				</Button>
 				<div className="flex flex-col gap-y-1">
-					<h1 className="text-foreground text-xl">{title}</h1>
+					<h1 className="text-foreground text-lg">{title}</h1>
 				</div>
 			</div>
 
-			{children}
-			<Button variant="ghost" onClick={onAddItem}>
-				Add Item
-			</Button>
+			{/* Scrollable content */}
+			<div className="flex-1 overflow-y-auto flex flex-col gap-y-4">{children}</div>
+
+			{/* Fixed bottom button */}
+			<div className="sticky bottom-0 bg-card pt-2">
+				<Button variant="ghost" onClick={onAddItem} className="w-full">
+					Add Item
+				</Button>
+			</div>
 		</div>
 	);
 };
