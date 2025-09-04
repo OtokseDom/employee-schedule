@@ -3,9 +3,10 @@ import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { GripVerticalIcon } from "lucide-react";
+import { Check, GripVerticalIcon, MoreVerticalIcon, Text } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
 
-const Items = ({ id, title }) => {
+const Items = ({ id, title, description }) => {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
 		id: id,
 		data: {
@@ -25,11 +26,15 @@ const Items = ({ id, title }) => {
 				isDragging && "opacity-50"
 			)}
 		>
-			<div className="flex items-center justify-start gap-3">
-				<Button variant="primary" className="p-2 text-xs" {...listeners}>
-					<GripVerticalIcon />
-				</Button>
-				{title}
+			<div className="w-full p-2 hover:cursor-grab active:cursor-grabbing" {...listeners} />
+			<div className="flex px-1 items-center justify-start gap-3 group">
+				<Toggle variant="outline" size={"xxs"} aria-label="Toggle" className="rounded-full self-start hidden group-hover:block data-[state=on]:block">
+					<Check />
+				</Toggle>
+				<div className="w-full">
+					<p>{title}</p>
+					<p>{description && <Text size={14} className="text-muted-foreground" />}</p>
+				</div>
 			</div>
 		</div>
 	);

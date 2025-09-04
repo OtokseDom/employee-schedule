@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { GripVertical } from "lucide-react";
+import { GripVertical, MoreHorizontal, MoreVertical } from "lucide-react";
 
 const Container = ({ id, children, title, onAddItem }) => {
 	const { attributes, setNodeRef, listeners, transform, transition, isDragging } = useSortable({
@@ -21,18 +21,22 @@ const Container = ({ id, children, title, onAddItem }) => {
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"min-w-[300px] h-fit max-h-[calc(100vh-9rem)] p-4 bg-card border border-accent rounded-xl flex flex-col",
+				"min-w-[350px] h-fit max-h-[calc(100vh-9rem)] p-4 bg-card border border-accent rounded-xl flex flex-col",
 				isDragging && "opacity-50"
 			)}
 		>
+			{/* Drag Handle */}
+			<div className="w-full py-2 hover:cursor-grab active:cursor-grabbing" {...listeners} />
 			{/* Header */}
-			<div className="flex items-center justify-start gap-3 mb-4">
-				<Button variant="primary" className="p-2 text-xs" {...listeners}>
-					<GripVertical />
-				</Button>
-				<div className="flex flex-col gap-y-1">
+			<div className="flex items-center justify-between gap-3 mb-4">
+				<div className="flex flex-col w-full gap-y-1">
 					<h1 className="text-foreground text-lg">{title}</h1>
 				</div>
+				{/* Drag Handle on empty space */}
+				<div className="w-full p-3 hover:cursor-grab active:cursor-grabbing" {...listeners} />
+				<Button variant="ghost">
+					<MoreHorizontal />
+				</Button>
 			</div>
 
 			{/* Scrollable content */}
