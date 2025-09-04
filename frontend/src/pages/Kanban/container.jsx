@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { GripVertical } from "lucide-react";
 
-const Container = ({ id, children, title, description, onAddItem }) => {
+const Container = ({ id, children, title, onAddItem }) => {
 	const { attributes, setNodeRef, listeners, transform, transition, isDragging } = useSortable({
 		id: id,
 		data: {
@@ -27,8 +27,7 @@ const Container = ({ id, children, title, description, onAddItem }) => {
 					<GripVertical />
 				</Button>
 				<div className="flex flex-col gap-y-1">
-					<h1 className="text-gray-800 text-xl">{title}</h1>
-					<p className="text-gray-400 text-sm">{description}</p>
+					<h1 className="text-foreground text-xl">{title}</h1>
 				</div>
 			</div>
 

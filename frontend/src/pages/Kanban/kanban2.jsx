@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOverlay, pointerWithin, KeyboardSensor, closestCorners } from "@dnd-kit/core";
 import { SortableContext, arrayMove, horizontalListSortingStrategy, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import Container from "./container";
 import Items from "./items";
+import debounce from "lodash.debounce";
 
 export default function KanbanBoard2() {
 	const [containers, setContainers] = useState([
@@ -62,7 +63,9 @@ export default function KanbanBoard2() {
 		const { id } = active;
 		setActiveId(id);
 	};
+
 	const handleDragMove = ({ active, over }) => {
+		console.log("moved");
 		// Handle item sorting
 		if (active.id.toString().includes("item") && over?.id.toString().includes("item") && active && over && active.id !== over.id) {
 			// Find the active container and over container
@@ -130,12 +133,21 @@ export default function KanbanBoard2() {
 			setContainers(newItems);
 		}
 	};
+	// Wrap with debounce (10ms delay)
+	const debouncedHandleDragMove = debounce(handleDragMove, 10);
+
 	const handleDragEnd = () => {
 		setActiveId(null);
 	};
 
 	return (
-		<DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
+		<DndContext
+			sensors={sensors}
+			collisionDetection={closestCorners}
+			onDragStart={handleDragStart}
+			onDragMove={debouncedHandleDragMove}
+			onDragEnd={handleDragEnd}
+		>
 			<div className="flex gap-4 p-4 h-full">
 				<SortableContext items={containers.map((i) => i.id)}>
 					{containers.map((container) => (
