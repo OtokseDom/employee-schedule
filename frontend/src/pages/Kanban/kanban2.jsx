@@ -117,8 +117,22 @@ export default function KanbanBoard2() {
 			newItems[overContainerIndex].items.push(removedItem);
 			setContainers(newItems);
 		}
+
+		// Originally in handleDragEnd
+		// Hanlde container sorting
+		if (active.id.toString().includes("container") && over.id.toString().includes("container") && active && over && active.id !== over.id) {
+			const activeContainerIndex = containers.findIndex((container) => container.id === active.id);
+			const overContainerIndex = containers.findIndex((container) => container.id === over.id);
+
+			// Swap the active and over container
+			let newItems = [...containers];
+			newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex);
+			setContainers(newItems);
+		}
 	};
-	const handleDragEnd = ({ active, over }) => {};
+	const handleDragEnd = () => {
+		setActiveId(null);
+	};
 
 	return (
 		<DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
