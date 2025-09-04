@@ -24,6 +24,7 @@ export default function KanbanBoard2() {
 				.map((task) => ({
 					id: `item-${task.id}`, // force string
 					title: task.title, // adjust field name if different
+					description: task.description,
 				})),
 		}));
 
@@ -160,7 +161,7 @@ export default function KanbanBoard2() {
 							<SortableContext items={container.items.map((i) => i.id)}>
 								<div className="flex items-start flex-col gap-y-4">
 									{container.items.map((item) => (
-										<Items key={item.id} id={item.id} title={item.title} />
+										<Items key={item.id} id={item.id} title={item.title} description={item.description} />
 									))}
 								</div>
 							</SortableContext>
