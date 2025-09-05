@@ -2,8 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Button } from "@/components/ui/button";
-import { Check, GripVerticalIcon, MoreVerticalIcon, Text } from "lucide-react";
+import { Check, Text } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
 const Items = ({ id, title, description }) => {

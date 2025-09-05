@@ -1,127 +1,174 @@
-import { useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOverlay, pointerWithin } from "@dnd-kit/core";
-import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import Droppable from "./droppable";
-import Draggable from "./draggable";
-// TODO: FIX via DND-doc
+import { useEffect, useState } from "react";
+import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOverlay, pointerWithin, KeyboardSensor, closestCorners } from "@dnd-kit/core";
+import { SortableContext, arrayMove, horizontalListSortingStrategy, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import Container from "./container";
+import Items from "./items";
+import debounce from "lodash.debounce";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+
 export default function KanbanBoard() {
-	// State to store cards in each column
-	const [columns, setColumns] = useState({
-		todo: [
-			{ id: "1", title: "Card 1" },
-			{ id: "2", title: "Card 2" },
-			{ id: "3", title: "Card 2" },
-			{ id: "4", title: "Card 2" },
-			{ id: "5", title: "Card 2" },
-			{ id: "6", title: "Card 2" },
-			{ id: "7", title: "Card 2" },
-			{ id: "8", title: "Card 2" },
-			{ id: "9", title: "Card 2" },
-			{ id: "10", title: "Card 2" },
-			{ id: "11", title: "Card 2" },
-			{ id: "12", title: "Card 2" },
-			{ id: "13", title: "Card 2" },
-			{ id: "14", title: "Card 2" },
-			{ id: "15", title: "Card 2" },
-			{ id: "16", title: "Card 2" },
-			{ id: "17", title: "Card 2" },
-			{ id: "18", title: "Card 2" },
-			{ id: "19", title: "Card 2" },
-		],
-		doing: [{ id: "20", title: "Card 3" }],
-		done: [{ id: "21", title: "Card 4" }],
-	});
+	const { tasks } = useTasksStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const [statusTasks, setStatusTasks] = useState([]);
+	const [containers, setContainers] = useState([]);
 
-	// State to maintain the order of columns
-	const [columnOrder] = useState(["todo", "doing", "done"]);
+	useEffect(() => {
+		if (!taskStatuses?.length) return;
 
-	// State to keep track of currently dragged card
-	const [activeCard, setActiveCard] = useState(null);
-	// Keep track of source column too
-	const [sourceCol, setSourceCol] = useState(null);
+		const mapped = taskStatuses.map((status) => ({
+			id: `container-${status.id}`, // force string
+			title: status.name, // adjust field name if different
+			items: tasks
+				.filter((task) => task.status_id === status.id)
+				.map((task) => ({
+					id: `item-${task.id}`, // force string
+					title: task.title, // adjust field name if different
+					description: task.description,
+				})),
+		}));
 
-	// Setup pointer sensor for drag events
-	const sensors = useSensors(useSensor(PointerSensor));
+		setContainers(mapped);
+	}, [taskStatuses, tasks]);
 
-	// Helper: find which column a card belongs to
-	const findContainer = (cardId) => Object.keys(columns).find((col) => columns[col].some((c) => c.id === cardId));
+	const [activeId, setActiveId] = useState(null);
+	const [currentContainerId, setCurrentContainerId] = useState();
+	const [containerName, setContainerName] = useState("");
+	const [itemName, setItemName] = useState("");
+	const [showAddContainerModal, setShowAddContainerModal] = useState(false);
+	const [showAddItemModal, setShowAddItemModal] = useState(false);
 
-	// When drag starts, store the dragged card's info
+	// Find the value of the items
+	function findValueOfItems(id, type) {
+		if (type === "container") {
+			return containers.find((item) => item.id === id);
+		}
+		if (type === "item") {
+			return containers.find((container) => container.items.find((item) => item.id === id));
+		}
+	}
+
+	/* -------------------------------------------------------------------------- */
+	/*                                 DND handlers                               */
+	/* -------------------------------------------------------------------------- */
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
+	);
+
 	const handleDragStart = ({ active }) => {
-		const col = findContainer(active.id);
-		if (!col) return;
-		setSourceCol(col);
-		const card = columns[col].find((c) => c.id === active.id);
-		setActiveCard(card);
+		const { id } = active;
+		setActiveId(id);
 	};
 
-	// When dragging over another column or card
-	const handleDragOver = ({ active, over }) => {
-		if (!over) return;
+	const handleDragMove = ({ active, over }) => {
+		// Handle item sorting
+		if (active.id.toString().includes("item") && over?.id.toString().includes("item") && active && over && active.id !== over.id) {
+			// Find the active container and over container
+			const activeContainer = findValueOfItems(active.id, "item");
+			const overContainer = findValueOfItems(over.id, "item");
 
-		const sourceCol = findContainer(active.id); // Original column
-		const destCol = findContainer(over.id) || over.id; // Destination column
+			// If the active and over container is undefined, return
+			if (!activeContainer || !overContainer) return;
 
-		if (!sourceCol || !destCol) return;
+			// Find the active and over container index
+			const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
+			const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
 
-		// Moving within the same column
-		if (sourceCol === destCol) {
-			const oldIndex = columns[sourceCol].findIndex((c) => c.id === active.id);
-			const newIndex = columns[destCol].findIndex((c) => c.id === over.id);
+			// Find the active and over item index
+			const activeItemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
+			const overItemIndex = overContainer.items.findIndex((item) => item.id === over.id);
 
-			if (oldIndex !== newIndex && newIndex !== -1) {
-				setColumns((prev) => ({
-					...prev,
-					[sourceCol]: arrayMove(prev[sourceCol], oldIndex, newIndex),
-				}));
+			// In the same container
+			if (activeContainerIndex === overContainerIndex) {
+				let newItems = [...containers];
+				newItems[activeContainerIndex].items = arrayMove(newItems[activeContainerIndex].items, activeItemIndex, overItemIndex);
+
+				setContainers(newItems);
+			} else {
+				// In different container
+				let newItems = [...containers];
+				const [removedItem] = newItems[activeContainerIndex].items.splice(activeItemIndex, 1);
+				newItems[overContainerIndex].items.splice(overItemIndex, 0, removedItem);
+				setContainers(newItems);
 			}
-			return;
 		}
 
-		// Update columns: remove from source, insert into destination
-		setColumns((prev) => {
-			// remove from source column
-			const newSource = prev[sourceCol].filter((c) => c.id !== active.id);
+		// Handling Item Drop into a container
+		if (active.id.toString().includes("item") && over?.id.toString().includes("container") && active && over && active.id !== over.id) {
+			// Find the active and over container
+			const activeContainer = findValueOfItems(active.id, "item");
+			const overContainer = findValueOfItems(over.id, "container");
 
-			let newDest;
-			if (Array.isArray(prev[destCol])) {
-				// Insert into specific index if over a card
-				const overIndex = prev[destCol].findIndex((c) => c.id === over.id);
-				newDest =
-					overIndex === -1
-						? [...prev[destCol], activeCard] // Add to end
-						: [...prev[destCol].slice(0, overIndex), activeCard, ...prev[destCol].slice(overIndex)]; // Insert before
-			} else {
-				newDest = [activeCard]; // Column is empty
-			}
+			// If the active or over container is undefined, return
+			if (!activeContainer || !overContainer) return;
 
-			return {
-				...prev,
-				[sourceCol]: newSource,
-				[destCol]: newDest,
-			};
-		});
+			// Find the index of active and over container
+			const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
+			const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
+
+			// Find the index of the active item in the active container
+			const activeItemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
+
+			// Remove the active item from the active container and add it to the over container
+			let newItems = [...containers];
+			const [removedItem] = newItems[activeContainerIndex].items.splice(activeItemIndex, 1);
+			newItems[overContainerIndex].items.push(removedItem);
+			setContainers(newItems);
+		}
+
+		// Originally in handleDragEnd
+		// Hanlde container sorting
+		if (active.id.toString().includes("container") && over.id.toString().includes("container") && active && over && active.id !== over.id) {
+			const activeContainerIndex = containers.findIndex((container) => container.id === active.id);
+			const overContainerIndex = containers.findIndex((container) => container.id === over.id);
+
+			// Swap the active and over container
+			let newItems = [...containers];
+			newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex);
+			setContainers(newItems);
+		}
 	};
+	// Wrap with debounce (10ms delay)
+	const debouncedHandleDragMove = debounce(handleDragMove, 10);
 
-	// When drag ends, clear active card
 	const handleDragEnd = () => {
-		setActiveCard(null);
+		setActiveId(null);
 	};
 
 	return (
-		// Main drag-and-drop context
-		<DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-			{/* Kanban columns */}
+		<DndContext
+			sensors={sensors}
+			collisionDetection={closestCorners}
+			onDragStart={handleDragStart}
+			onDragMove={debouncedHandleDragMove}
+			onDragEnd={handleDragEnd}
+		>
 			<div className="flex gap-4 p-4 h-full">
-				{columnOrder.map((colId) => (
-					<SortableContext key={colId} items={columns[colId].map((c) => c.id)} strategy={verticalListSortingStrategy}>
-						<Droppable id={colId} title={colId.toUpperCase()} cards={columns[colId]} activeCard={activeCard} />
-					</SortableContext>
-				))}
+				<SortableContext items={containers.map((i) => i.id)}>
+					{containers.map((container) => (
+						<Container
+							key={container.id}
+							id={container.id}
+							title={container.title}
+							onAddItem={() => {
+								setShowAddItemModal(true);
+								setCurrentContainerId(container.id);
+							}}
+						>
+							<SortableContext items={container.items.map((i) => i.id)}>
+								<div className="flex items-start flex-col gap-y-4">
+									{container.items.map((item) => (
+										<Items key={item.id} id={item.id} title={item.title} description={item.description} />
+									))}
+								</div>
+							</SortableContext>
+						</Container>
+					))}
+				</SortableContext>
 			</div>
-
-			{/* Drag overlay shows the card being dragged */}
-			<DragOverlay>{activeCard ? <Draggable id={activeCard.id} title={activeCard.title} /> : null}</DragOverlay>
 		</DndContext>
 	);
 }
