@@ -7,6 +7,14 @@ import debounce from "lodash.debounce";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
+// TODO: BUG: dragging columns without card not working
+// TODO: Add filter of tasks by project
+// TODO: Refactor task to add order field
+// TODO: Research about status container order db structure
+// TODO: Update task on move
+// TODO: open details on click
+// TODO: Add task on selected status
+// TODO: Status menu - sorting options
 export default function KanbanBoard() {
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
