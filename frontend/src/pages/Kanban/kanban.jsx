@@ -7,7 +7,6 @@ import debounce from "lodash.debounce";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 
-// TODO: BUG: dragging columns without card not working
 // TODO: Add filter of tasks by project
 // TODO: Refactor task to add order field
 // TODO: Research about status container order db structure
@@ -214,7 +213,7 @@ export default function KanbanBoard() {
 						>
 							<SortableContext items={container.items.map((i) => i.id)}>
 								{container.items.length === 0 && (
-									<div className="py-[50px] text-sm text-muted-foreground border-2 border-dashed rounded-md text-center">Drop items here</div>
+									<div className="py-24 text-sm text-muted-foreground border-2 border-dashed rounded-md text-center">Drop items here</div>
 								)}
 								<div className="flex items-start flex-col gap-y-4">
 									{container.items.map((item) => (
