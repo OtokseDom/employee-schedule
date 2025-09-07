@@ -213,9 +213,9 @@ export default function KanbanBoard() {
 							}}
 						>
 							<SortableContext items={container.items.map((i) => i.id)}>
-								{/* {container.items.length === 0 && (
-									<div className="py-[15vh] text-sm text-muted-foreground border rounded-md">Drop items here</div>
-								)} */}
+								{container.items.length === 0 && (
+									<div className="py-[50px] text-sm text-muted-foreground border-2 border-dashed rounded-md text-center">Drop items here</div>
+								)}
 								<div className="flex items-start flex-col gap-y-4">
 									{container.items.map((item) => (
 										<Items key={item.id} id={item.id} title={item.title} description={item.description} />
