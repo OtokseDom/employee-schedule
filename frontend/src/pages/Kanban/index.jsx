@@ -4,16 +4,20 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
 import KanbanBoard from "./kanban";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 export default function Kanban() {
 	const { setLoading } = useLoadContext();
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
-	const { fetchTasks, fetchTaskStatuses } = useTaskHelpers();
+	const { projects } = useProjectsStore();
+	const { fetchTasks, fetchTaskStatuses, fetchProjects } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Board";
 		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!projects || projects.length === 0) fetchProjects();
 	}, []);
 
 	return (
@@ -24,9 +28,31 @@ export default function Kanban() {
 				}`}
 				aria-hidden="true"
 			/> */}
-			<div>
-				<h1 className=" font-extrabold text-3xl">Board</h1>
-				<p>View list of all tasks by Project</p>
+			<div className="flex flex-row justify-between w-full">
+				<div className="fixed top-8 left z-50 w-40">
+					<Select
+					// onValueChange={(value) => {
+					// 	const selected = users.find((user) => user.id === value);
+					// 	setSelectedUser(selected);
+					// }}
+					// value={selectedUser?.id || ""}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select a project"></SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							{Array.isArray(projects) && projects?.length > 0 ? (
+								projects?.map((project) => (
+									<SelectItem key={project?.id} value={project?.id}>
+										{project?.title}
+									</SelectItem>
+								))
+							) : (
+								<SelectItem disabled>No projects available</SelectItem>
+							)}
+						</SelectContent>
+					</Select>
+				</div>
 			</div>
 			<KanbanBoard />
 		</div>

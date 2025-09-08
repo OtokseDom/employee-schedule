@@ -199,7 +199,7 @@ export default function KanbanBoard() {
 			onDragMove={debouncedHandleDragMove}
 			onDragEnd={handleDragEnd}
 		>
-			<div className="flex gap-4 p-4 h-full">
+			<div className="flex gap-4 py-4 mt-14 h-full">
 				<SortableContext items={containers.map((i) => i.id)}>
 					{containers.map((container) => (
 						<Container
