@@ -14,7 +14,7 @@ export const useTaskHelpers = () => {
 	const { setLoading } = useLoadContext();
 	const { projectFilter, setProjectFilter, userFilter, setUserFilter, setReports } = useDashboardStore();
 	const { setTasks, setTaskHistory, setOptions, setSelectedUser } = useTasksStore();
-	const { projects, setProjects } = useProjectsStore();
+	const { projects, setProjects, setSelectedProject } = useProjectsStore();
 	const { users, setUsers } = useUsersStore();
 	const { setCategories } = useCategoriesStore();
 	const { setTaskStatuses } = useTaskStatusesStore();
@@ -38,6 +38,7 @@ export const useTaskHelpers = () => {
 		try {
 			const res = await axiosClient.get(API().project());
 			setProjects(res?.data?.data);
+			setSelectedProject(res?.data?.data[0]);
 			if (res.data.data.length !== projectFilter.length || res.data.data.length !== profileProjectFilter.length) {
 				const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
 				// Used in user profile
