@@ -98,4 +98,9 @@ class Project extends Model
         }
         return true;
     }
+
+    public function getKanbanColumns()
+    {
+        return KanbanColumn::orderBy("id", "DESC")->get();
+    }
 }

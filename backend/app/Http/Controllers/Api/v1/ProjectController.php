@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
+use App\Models\KanbanColumn;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,12 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = $this->project->getProjects($this->userData->organization_id);
-        return apiResponse($projects, 'Projects fetched successfully');
+        $kanbanColumns = $this->project->getKanbanColumns();
+        $data = [
+            "projects" => $projects,
+            "kanbanColumns" => $kanbanColumns
+        ];
+        return apiResponse($data, 'Projects and Kanban Columns fetched successfully');
     }
 
     public function store(StoreProjectRequest $request)
