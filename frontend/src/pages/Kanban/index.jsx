@@ -10,7 +10,7 @@ export default function Kanban() {
 	const { setLoading } = useLoadContext();
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
-	const { projects } = useProjectsStore();
+	const { projects, selectedProject, setSelectedProject } = useProjectsStore();
 	const { fetchTasks, fetchTaskStatuses, fetchProjects } = useTaskHelpers();
 
 	useEffect(() => {
@@ -18,6 +18,7 @@ export default function Kanban() {
 		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!projects || projects.length === 0) fetchProjects();
+		else if (!selectedProject) setSelectedProject(projects[0]);
 	}, []);
 
 	return (
@@ -31,11 +32,11 @@ export default function Kanban() {
 			<div className="flex flex-row justify-between w-full">
 				<div className="fixed top-8 left z-50 w-40">
 					<Select
-					// onValueChange={(value) => {
-					// 	const selected = users.find((user) => user.id === value);
-					// 	setSelectedUser(selected);
-					// }}
-					// value={selectedUser?.id || ""}
+						onValueChange={(value) => {
+							const selected = projects.find((project) => project.id === value);
+							setSelectedProject(selected);
+						}}
+						value={selectedProject?.id || ""}
 					>
 						<SelectTrigger>
 							<SelectValue placeholder="Select a project"></SelectValue>
