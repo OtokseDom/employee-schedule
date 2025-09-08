@@ -4,6 +4,7 @@ import { API } from "@/constants/api";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
+import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
@@ -19,6 +20,7 @@ export const useTaskHelpers = () => {
 	const { setCategories } = useCategoriesStore();
 	const { setTaskStatuses } = useTaskStatusesStore();
 	const { profileProjectFilter, setProfileProjectFilter, setUserReports } = useUserStore();
+	const { setKanbanColumns } = useKanbanColumnsStore();
 
 	const fetchTasks = async () => {
 		setLoading(true);
@@ -37,10 +39,11 @@ export const useTaskHelpers = () => {
 		setLoading(true);
 		try {
 			const res = await axiosClient.get(API().project());
-			setProjects(res?.data?.data);
-			setSelectedProject(res?.data?.data[0]);
-			if (res.data.data.length !== projectFilter.length || res.data.data.length !== profileProjectFilter.length) {
-				const mappedProjects = res.data.data.map((project) => ({ value: project.id, label: project.title }));
+			setProjects(res?.data?.data?.projects);
+			setKanbanColumns(res?.data?.data?.kanbanColumns);
+			setSelectedProject(res?.data?.data?.projects[0]);
+			if (res.data.data.projects.length !== projectFilter.length || res.data.data.projects.length !== profileProjectFilter.length) {
+				const mappedProjects = res.data.data.projects.map((project) => ({ value: project.id, label: project.title }));
 				// Used in user profile
 				setProfileProjectFilter(mappedProjects);
 				// Used in dashboard
