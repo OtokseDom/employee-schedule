@@ -41,6 +41,7 @@ class TaskFactory extends Factory
             'delay_reason' => $this->faker->sentence,
             'performance_rating' => $this->faker->numberBetween(0, 10),
             'remarks' => $this->faker->paragraph,
+            'position' => 0, // placeholder, will update in seeder
         ];
     }
 }

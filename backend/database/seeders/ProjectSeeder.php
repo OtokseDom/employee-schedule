@@ -34,6 +34,16 @@ class ProjectSeeder extends Seeder
                     'estimated_date' => Carbon::parse('2025-07-12'),
                     'priority' => 'Medium',
                     'remarks' => 'Module adjustments'
+                ],
+                [
+                    'organization_id' => 1,
+                    'status_id' => 3,
+                    'title' => 'Project Charlie',
+                    'description' => 'Pioneer Project',
+                    'target_date' => Carbon::parse('2025-08-12'),
+                    'estimated_date' => Carbon::parse('2025-07-12'),
+                    'priority' => 'Urgent',
+                    'remarks' => 'Delayed due to feature creeps'
                 ]
             ];
 
