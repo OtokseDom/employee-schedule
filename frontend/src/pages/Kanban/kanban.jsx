@@ -8,8 +8,6 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 
-// TODO: Refactor task to add order field
-// TODO: Research about status container order db structure
 // TODO: Update task on move
 // TODO: open details on click
 // TODO: Add task on selected status
@@ -18,7 +16,6 @@ export default function KanbanBoard() {
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
-	const [statusTasks, setStatusTasks] = useState([]);
 	const [containers, setContainers] = useState([]);
 
 	useEffect(() => {

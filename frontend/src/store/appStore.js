@@ -7,6 +7,7 @@ import { createUserSlice } from "./user/userSlice";
 import { createCategoriesSlice } from "./categories/categoriesSlice";
 import { createOrganizationSlice } from "./organization/organizationSlice";
 import { createTaskStatusesSlice } from "./taskStatuses/taskStatusesSlice";
+import { createKanbanColumnsSlice } from "./kanbanColumns/kanbanColumnsSlice";
 
 export const useAppStore = create((set) => ({
 	...createDashboardSlice(set),
@@ -17,4 +18,5 @@ export const useAppStore = create((set) => ({
 	...createUserSlice(set),
 	...createCategoriesSlice(set),
 	...createOrganizationSlice(set),
+	...createKanbanColumnsSlice(set),
 }));
