@@ -31,6 +31,7 @@ class Task extends Model
         'delay_reason',
         'performance_rating',
         'remarks',
+        'position',
     ];
 
     protected $casts = [

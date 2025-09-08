@@ -34,6 +34,7 @@ return new class extends Migration
             $table->text('remarks')->nullable();
             $table->integer('position'); //kanban
             $table->timestamps();
+            $table->unique(['project_id', 'status_id', 'position']);
         });
     }
 
