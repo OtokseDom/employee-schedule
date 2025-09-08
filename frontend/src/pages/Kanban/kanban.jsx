@@ -8,6 +8,7 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 
+// TODO: Update kanbanColumns on container move
 // TODO: Update task on move
 // TODO: open details on click
 // TODO: Add task on selected status
