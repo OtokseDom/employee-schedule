@@ -3,9 +3,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { GripVertical, MoreHorizontal, MoreVertical } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { statusColors } from "@/utils/taskHelpers";
 
-const Container = ({ id, children, title, onAddItem }) => {
+const Container = ({ id, children, title, color, onAddItem }) => {
 	const { attributes, setNodeRef, listeners, transform, transition, isDragging } = useSortable({
 		id: id,
 		data: {
@@ -30,7 +31,7 @@ const Container = ({ id, children, title, onAddItem }) => {
 			{/* Header */}
 			<div className="flex items-center justify-between gap-3 mb-4">
 				<div className="flex flex-col w-full gap-y-1">
-					<h1 className="text-foreground text-lg">{title}</h1>
+					<h1 className={`px-2 py-1 text-center whitespace-nowrap rounded text-md ${statusColors[color?.toLowerCase()] || ""}`}>{title}</h1>
 				</div>
 				{/* Drag Handle on empty space */}
 				<div className="w-full p-3 hover:cursor-grab active:cursor-grabbing" {...listeners} />

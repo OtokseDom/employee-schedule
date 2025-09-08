@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors, closestCenter, DragOverlay, pointerWithin, KeyboardSensor, closestCorners } from "@dnd-kit/core";
-import { SortableContext, arrayMove, horizontalListSortingStrategy, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, PointerSensor, useSensor, useSensors, KeyboardSensor, closestCorners } from "@dnd-kit/core";
+import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Container from "./container";
 import Items from "./items";
 import debounce from "lodash.debounce";
@@ -27,6 +27,7 @@ export default function KanbanBoard() {
 		const mapped = taskStatuses.map((status) => ({
 			id: `container-${status.id}`, // force string
 			title: status.name, // adjust field name if different
+			color: status.color, // adjust field name if different
 			items: tasks
 				.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
 				.map((task) => ({
@@ -207,6 +208,7 @@ export default function KanbanBoard() {
 							key={container.id}
 							id={container.id}
 							title={container.title}
+							color={container.color}
 							onAddItem={() => {
 								setShowAddItemModal(true);
 								setCurrentContainerId(container.id);
@@ -214,7 +216,9 @@ export default function KanbanBoard() {
 						>
 							<SortableContext items={container.items.map((i) => i.id)}>
 								{container.items.length === 0 && (
-									<div className="py-24 text-sm text-muted-foreground border-2 border-dashed rounded-md text-center">Drop items here</div>
+									<div className="py-24 text-sm text-muted-foreground border-2 border-dashed rounded-md text-center cursor-default">
+										Drop items here
+									</div>
 								)}
 								<div className="flex items-start flex-col gap-y-4">
 									{container.items.map((item) => (
