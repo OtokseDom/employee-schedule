@@ -6,8 +6,9 @@ import { useTaskHelpers } from "@/utils/taskHelpers";
 import KanbanBoard from "./kanban";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { Skeleton } from "@/components/ui/skeleton";
 export default function Kanban() {
-	const { setLoading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { projects, selectedProject, setSelectedProject } = useProjectsStore();
@@ -55,7 +56,15 @@ export default function Kanban() {
 					</Select>
 				</div>
 			</div>
-			<KanbanBoard />
+			{loading ? (
+				<div className="flex flex-row space-x-3 w-full max-h-[calc(100vh-9rem)] h-screen mt-14">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<Skeleton key={i} index={i * 0.9} className="h-full w-full" />
+					))}
+				</div>
+			) : (
+				<KanbanBoard />
+			)}
 		</div>
 	);
 }
