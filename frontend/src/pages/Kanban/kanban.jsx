@@ -6,8 +6,8 @@ import Items from "./items";
 import debounce from "lodash.debounce";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
-// TODO: Add filter of tasks by project
 // TODO: Refactor task to add order field
 // TODO: Research about status container order db structure
 // TODO: Update task on move
@@ -17,6 +17,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 export default function KanbanBoard() {
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
+	const { selectedProject } = useProjectsStore();
 	const [statusTasks, setStatusTasks] = useState([]);
 	const [containers, setContainers] = useState([]);
 
@@ -27,7 +28,7 @@ export default function KanbanBoard() {
 			id: `container-${status.id}`, // force string
 			title: status.name, // adjust field name if different
 			items: tasks
-				.filter((task) => task.status_id === status.id)
+				.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
 				.map((task) => ({
 					id: `item-${task.id}`, // force string
 					title: task.title, // adjust field name if different
@@ -36,7 +37,7 @@ export default function KanbanBoard() {
 		}));
 
 		setContainers(mapped);
-	}, [taskStatuses, tasks]);
+	}, [taskStatuses, tasks, selectedProject]);
 
 	const [activeId, setActiveId] = useState(null);
 	const [currentContainerId, setCurrentContainerId] = useState();
