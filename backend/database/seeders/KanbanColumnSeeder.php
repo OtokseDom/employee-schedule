@@ -22,6 +22,7 @@ class KanbanColumnSeeder extends Seeder
         foreach ($projects as $project) {
             foreach ($statuses as $index => $status) {
                 DB::table('kanban_columns')->insert([
+                    'organization_id' => 1,
                     'project_id' => $project->id,
                     'task_status_id' => $status->id,
                     'position' => $index + 1, // start positions at 1
