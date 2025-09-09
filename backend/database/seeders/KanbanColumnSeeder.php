@@ -25,7 +25,7 @@ class KanbanColumnSeeder extends Seeder
                     'organization_id' => 1,
                     'project_id' => $project->id,
                     'task_status_id' => $status->id,
-                    'position' => $index, // start positions at 1
+                    'position' => $index + 1, // start positions at 1
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

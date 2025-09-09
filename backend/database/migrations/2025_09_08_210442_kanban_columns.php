@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('task_status_id')->constrained('task_statuses')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('position');
             $table->timestamps();
+            $table->unique(['organization_id', 'project_id', 'position']);
         });
     }
 
