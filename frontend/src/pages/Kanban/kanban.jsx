@@ -7,6 +7,7 @@ import debounce from "lodash.debounce";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
 
 // TODO: Update kanbanColumns on container move
 // TODO: Update task on move
@@ -17,23 +18,34 @@ export default function KanbanBoard() {
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
+	const { kanbanColumns } = useKanbanColumnsStore();
 	const [containers, setContainers] = useState([]);
 
 	useEffect(() => {
-		if (!taskStatuses?.length) return;
+		if (!selectedProject?.id || !kanbanColumns?.length || !taskStatuses?.length) return;
 
-		const mapped = taskStatuses.map((status) => ({
-			id: `container-${status.id}`, // force string
-			title: status.name, // adjust field name if different
-			color: status.color, // adjust field name if different
-			items: tasks
-				.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
-				.map((task) => ({
-					id: `item-${task.id}`, // force string
-					title: task.title, // adjust field name if different
-					description: task.description,
-				})),
-		}));
+		// filter kanban columns for the selected project
+		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
+
+		const mapped = projectColumns
+			.map((col) => {
+				const status = taskStatuses.find((s) => s.id === col.task_status_id);
+				if (!status) return null; // skip if no matching status
+
+				return {
+					id: `container-${status.id}`, // string
+					title: status.name,
+					color: status.color,
+					items: tasks
+						.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
+						.map((task) => ({
+							id: `item-${task.id}`,
+							title: task.title,
+							description: task.description,
+						})),
+				};
+			})
+			.filter(Boolean);
 
 		setContainers(mapped);
 	}, [taskStatuses, tasks, selectedProject]);
