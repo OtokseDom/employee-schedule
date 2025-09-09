@@ -29,13 +29,7 @@ class StoreKanbanColumnRequest extends FormRequest
             'position' => [
                 'required',
                 'integer',
-                'min:1',
-                // unique per project + status + position
-                Rule::unique('kanban_columns')->where(function ($query) {
-                    return $query
-                        ->where('project_id', $this->input('project_id'))
-                        ->where('task_status_id', $this->input('task_status_id'));
-                }),
+                'min:0',
             ],
         ];
     }

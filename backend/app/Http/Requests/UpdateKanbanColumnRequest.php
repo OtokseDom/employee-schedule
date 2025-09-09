@@ -23,20 +23,10 @@ class UpdateKanbanColumnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'organization_id' => 'required|exists:organizations,id',
-            'project_id' => ['required', 'exists:projects,id'],
-            'task_status_id' => ['required', 'exists:task_statuses,id'],
             'position' => [
                 'required',
                 'integer',
-                'min:1',
-                // unique per project + status + position
-                Rule::unique('kanban_columns')->where(function ($query) {
-                    return $query
-                        ->where('project_id', $this->input('project_id'))
-                        ->where('task_status_id', $this->input('task_status_id'))
-                        ->ignore($this->route('kanban_column'));
-                }),
+                'min:0', // use 0-based index for drag-drop
             ],
         ];
     }
