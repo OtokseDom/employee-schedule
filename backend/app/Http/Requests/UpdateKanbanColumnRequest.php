@@ -22,11 +22,12 @@ class UpdateKanbanColumnRequest extends FormRequest
      */
     public function rules(): array
     {
+        // TODO: ⭐ update not working
         return [
             'position' => [
                 'required',
                 'integer',
-                'min:0', // use 0-based index for drag-drop
+                'min:1'
             ],
         ];
     }

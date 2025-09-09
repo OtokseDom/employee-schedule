@@ -6,46 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\KanbanColumn;
 use App\Http\Requests\StoreKanbanColumnRequest;
 use App\Http\Requests\UpdateKanbanColumnRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 // TODO: Kanban CRUD on project and status add & delete. Update kanban columns is the only function needed here
 class KanbanColumnController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreKanbanColumnRequest $request)
+    protected KanbanColumn $kanbanColumn;
+    protected $userData;
+    public function __construct(KanbanColumn $kanbanColumn)
     {
-        //
+        $this->kanbanColumn = $kanbanColumn;
+        $this->userData = Auth::user();
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(KanbanColumn $kanbanColumn)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateKanbanColumnRequest $request, KanbanColumn $kanbanColumn)
     {
-        //
-    }
+        $validated = $request->validated();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(KanbanColumn $kanbanColumn)
-    {
-        //
+        $this->kanbanColumn->updatePosition($validated, $kanbanColumn, $this->userData->organization_id);
+        $updated = $this->kanbanColumn->where('organization_id', $this->userData->organization_id)->where('project_id', $kanbanColumn->project_id)->orderBy("id", "DESC")->get();
+        return response()->json([
+            'message' => 'Kanban column updated successfully.',
+            'columns' => $updated
+
+        ]);
     }
 }
