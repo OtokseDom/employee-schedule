@@ -28,11 +28,10 @@ class KanbanColumnController extends Controller
         $validated = $request->validated();
 
         $this->kanbanColumn->updatePosition($validated, $kanbanColumn, $this->userData->organization_id);
-        $updated = $this->kanbanColumn->where('organization_id', $this->userData->organization_id)->where('project_id', $kanbanColumn->project_id)->orderBy("id", "DESC")->get();
-        return response()->json([
-            'message' => 'Kanban column updated successfully.',
-            'columns' => $updated
-
-        ]);
+        $updated = $this->kanbanColumn->where('organization_id', $this->userData->organization_id)->where('project_id', $kanbanColumn->project_id)->orderBy("position", "ASC")->get();
+        return apiResponse(
+            $updated,
+            'Kanban column updated successfully.'
+        );
     }
 }

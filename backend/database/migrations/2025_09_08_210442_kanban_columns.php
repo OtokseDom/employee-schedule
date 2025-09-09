@@ -11,7 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // TODO: When adding new project, insert kanban columns
         Schema::create('kanban_columns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade')->onUpdate('cascade');

@@ -33,25 +33,58 @@ class KanbanColumn extends Model
     public function updatePosition($validated, $kanbanColumn, $organization_id)
     {
         $newPosition = $validated['position'];
-        $originalPosition = $kanbanColumn->position;
-        // Find the current column
-        DB::transaction(function () use ($kanbanColumn, $newPosition, $originalPosition, $organization_id) {
-            // Find the column that currently has the target position
-            $other = self::where('organization_id', $organization_id)
-                ->where('project_id', $kanbanColumn->project_id)
-                ->where('position', $newPosition)
-                ->lockForUpdate() // prevents race condition
-                ->firstOrFail();
-            // Use a temp position outside possible range to avoid unique violation
-            $temp = -1 * time(); // just a unique negative value
-            // Step 1: Move $other to temp
-            $other->update(['position' => $temp]);
+        $oldPosition = $kanbanColumn->position;
 
-            // Step 2: Move $column to new position
-            $kanbanColumn->update(['position' => $newPosition]);
+        if ($newPosition === $oldPosition) return;
 
-            // Step 3: Move $other to old position
-            $other->update(['position' => $originalPosition]);
+        DB::transaction(function () use ($kanbanColumn, $newPosition, $oldPosition, $organization_id) {
+
+            $projectId = $kanbanColumn->project_id;
+
+            // Step 0: move dragged column out of range
+            $kanbanColumn->update(['position' => -1000000]);
+
+            if ($newPosition < $oldPosition) {
+                // Moving up
+                $affected = self::where('organization_id', $organization_id)
+                    ->where('project_id', $projectId)
+                    ->whereBetween('position', [$newPosition, $oldPosition - 1])
+                    ->orderBy('position', 'ASC')
+                    ->get();
+
+                // Temporarily move affected columns out of range
+                foreach ($affected as $col) {
+                    $col->update(['position' => $col->position + 1000000]);
+                }
+
+                // Place dragged column in its new position
+                $kanbanColumn->update(['position' => $newPosition]);
+
+                // Bring affected columns back, preserving order
+                foreach ($affected as $i => $col) {
+                    $col->update(['position' => $newPosition + 1 + $i]);
+                }
+            } elseif ($newPosition > $oldPosition) {
+                // Moving down
+                $affected = self::where('organization_id', $organization_id)
+                    ->where('project_id', $projectId)
+                    ->whereBetween('position', [$oldPosition + 1, $newPosition])
+                    ->orderBy('position', 'DESC')
+                    ->get();
+
+                // Temporarily move affected columns out of range
+                foreach ($affected as $col) {
+                    $col->update(['position' => $col->position - 1000000]);
+                }
+
+                // Place dragged column in its new position
+                $kanbanColumn->update(['position' => $newPosition]);
+
+                // Bring affected columns back, preserving order
+                foreach ($affected as $i => $col) {
+                    $col->update(['position' => $newPosition - 1 - $i]);
+                }
+            }
         });
     }
 }
