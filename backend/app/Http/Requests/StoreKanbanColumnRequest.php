@@ -23,6 +23,7 @@ class StoreKanbanColumnRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'organization_id' => 'required|exists:organizations,id',
             'project_id' => ['required', 'exists:projects,id'],
             'task_status_id' => ['required', 'exists:task_statuses,id'],
             'position' => [

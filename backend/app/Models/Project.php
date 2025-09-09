@@ -99,8 +99,8 @@ class Project extends Model
         return true;
     }
 
-    public function getKanbanColumns()
+    public function getKanbanColumns($organization_id)
     {
-        return KanbanColumn::orderBy("id", "DESC")->get();
+        return KanbanColumn::where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
     }
 }

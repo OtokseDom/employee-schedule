@@ -23,7 +23,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = $this->project->getProjects($this->userData->organization_id);
-        $kanbanColumns = $this->project->getKanbanColumns();
+        $kanbanColumns = $this->project->getKanbanColumns($this->userData->organization_id);
         $data = [
             "projects" => $projects,
             "kanbanColumns" => $kanbanColumns
