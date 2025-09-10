@@ -118,6 +118,7 @@ class Task extends Model
             ->orderBy('id', 'DESC')->get());
     }
 
+    // Add task should add correct position
     public function storeTask($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {
@@ -193,6 +194,7 @@ class Task extends Model
         return new TaskResource($task);
     }
 
+    // TODO: updating task status or project should update position correctly.
     public function updateTask($request, $task, $userData)
     {
         if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {

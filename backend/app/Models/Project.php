@@ -55,6 +55,7 @@ class Project extends Model
             ->get();
     }
 
+    // Add project should populate kanban columns with all statuses with position
     public function storeProject($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {

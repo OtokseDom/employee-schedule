@@ -30,6 +30,7 @@ class TaskStatus extends Model
         return $this->orderBy("id", "DESC")->where('organization_id', $organization_id)->get();
     }
 
+    // Add status should populate kanban columns with correct position
     public function storeTaskStatus($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {

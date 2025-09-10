@@ -11,6 +11,7 @@ import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore"
 import { API } from "@/constants/api";
 import axiosClient from "@/axios.client";
 
+// TODO: Fix: moving columns reverts back to old position on rerender. Not updating order via response value
 // TODO: open details on click
 // TODO: Add task on selected status
 // TODO: Status menu - sorting options
