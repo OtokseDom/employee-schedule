@@ -38,7 +38,6 @@ const Items = ({ id, title, description, position }) => {
 			</div>
 			<div className="flex px-1 items-center justify-start gap-3">
 				<div className="w-full">
-					<p>{position}</p>
 					<p>{title}</p>
 					<p>{description && <Text size={14} className="text-muted-foreground" />}</p>
 				</div>

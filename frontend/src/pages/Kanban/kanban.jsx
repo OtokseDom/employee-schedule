@@ -11,12 +11,11 @@ import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore"
 import { API } from "@/constants/api";
 import axiosClient from "@/axios.client";
 
-// TODO: Update task on move
 // TODO: open details on click
 // TODO: Add task on selected status
 // TODO: Status menu - sorting options
 export default function KanbanBoard() {
-	const { tasks } = useTasksStore();
+	const { tasks, updateTaskPosition, mergeTaskPositions } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
 	const { kanbanColumns } = useKanbanColumnsStore();
@@ -24,7 +23,6 @@ export default function KanbanBoard() {
 
 	useEffect(() => {
 		if (!selectedProject?.id || !kanbanColumns?.length || !taskStatuses?.length) return;
-
 		// filter kanban columns for the selected project
 		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
 
@@ -46,8 +44,8 @@ export default function KanbanBoard() {
 							id: `item-${task.id}`,
 							title: task.title,
 							description: task.description,
-							position: task.position, // keep in memory for later
-							status_id: task.status_id, // keep in memory for later
+							position: task.position,
+							status_id: task.status_id,
 						})),
 				};
 			})
@@ -145,6 +143,7 @@ export default function KanbanBoard() {
 
 	const handleDragEnd = async ({ active, over }) => {
 		setActiveId(null);
+		if (!active || !over) return;
 
 		// Handling Container Sorting
 		if (active.id.toString().includes("container") && over?.id.toString().includes("container") && active && over && active.id !== over.id) {
@@ -186,8 +185,8 @@ export default function KanbanBoard() {
 									id: `item-${task.id}`,
 									title: task.title,
 									description: task.description,
-									position: task.position, // keep in memory for later
-									status_id: task.status_id, // keep in memory for later
+									position: task.position,
+									status_id: task.status_id,
 								})),
 						};
 					})
@@ -199,52 +198,44 @@ export default function KanbanBoard() {
 			}
 		}
 
-		// Handling item Sorting
-		if (active.id.toString().includes("item") && over?.id.toString().includes("item") && active && over && active.id !== over.id) {
-			// Find the active and over container
-			const activeContainer = findValueOfItems(active.id, "item");
-			const overContainer = findValueOfItems(over.id, "item");
+		// // Handling item Sorting
+		if (active.id.includes("item")) {
+			const activeTaskId = parseInt(active.id.replace("item-", ""));
+			let newStatusId;
+			let newPosition;
 
-			// If the active or over container is not found, return
-			if (!activeContainer || !overContainer) return;
-			// Find the index of the active and over container
-			const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
-			const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
-			// Find the index of the active and over item
-			const activeitemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
-			const overitemIndex = overContainer.items.findIndex((item) => item.id === over.id);
+			if (over.id.includes("item")) {
+				// dropped over another item
+				const overContainer = findValueOfItems(over.id, "item");
+				const overItemIndex = overContainer.items.findIndex((i) => i.id === over.id);
 
-			// In the same container
-			if (activeContainerIndex === overContainerIndex) {
-				let newItems = [...containers];
-				newItems[activeContainerIndex].items = arrayMove(newItems[activeContainerIndex].items, activeitemIndex, overitemIndex);
-				setContainers(newItems);
+				newStatusId = parseInt(overContainer.id.replace("container-", ""));
+				// newStatusId = overContainer.items[overItemIndex].status_id;
+				newPosition = overItemIndex + 1; // adjust depending if you want 0/1 indexing
+			} else if (over.id.includes("container")) {
+				// dropped into empty container
+				const overContainer = findValueOfItems(over.id, "container");
+				newStatusId = parseInt(overContainer.id.replace("container-", ""));
+				newPosition = overContainer.items.length + 1;
 			} else {
-				// In different containers
-				let newItems = [...containers];
-				const [removeditem] = newItems[activeContainerIndex].items.splice(activeitemIndex, 1);
-				newItems[overContainerIndex].items.splice(overitemIndex, 0, removeditem);
-				setContainers(newItems);
+				return;
 			}
-		}
-		// Handling item dropping into Container
-		if (active.id.toString().includes("item") && over?.id.toString().includes("container") && active && over && active.id !== over.id) {
-			// Find the active and over container
-			const activeContainer = findValueOfItems(active.id, "item");
-			const overContainer = findValueOfItems(over.id, "container");
 
-			// If the active or over container is not found, return
-			if (!activeContainer || !overContainer) return;
-			// Find the index of the active and over container
-			const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
-			const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
-			// Find the index of the active and over item
-			const activeitemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
+			// ✅ 1. Optimistic update in Zustand
+			updateTaskPosition(activeTaskId, newStatusId, newPosition);
 
-			let newItems = [...containers];
-			const [removeditem] = newItems[activeContainerIndex].items.splice(activeitemIndex, 1);
-			newItems[overContainerIndex].items.push(removeditem);
-			setContainers(newItems);
+			try {
+				// ✅ 2. Call backend
+				const res = await axiosClient.patch(API().task_move(activeTaskId), {
+					status_id: newStatusId,
+					position: newPosition,
+				});
+				// ✅ 3. Merge backend response
+				mergeTaskPositions(res.data.data);
+			} catch (err) {
+				console.error("Failed to update task position:", err);
+				// Optional rollback: refetch tasks from API
+			}
 		}
 	};
 
