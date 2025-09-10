@@ -11,7 +11,6 @@ import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore"
 import { API } from "@/constants/api";
 import axiosClient from "@/axios.client";
 
-// TODO: Update kanbanColumns on container move
 // TODO: Update task on move
 // TODO: open details on click
 // TODO: Add task on selected status
@@ -42,10 +41,13 @@ export default function KanbanBoard() {
 					position: col.position,
 					items: tasks
 						.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
+						.sort((a, b) => a.position - b.position) // <-- order by position
 						.map((task) => ({
 							id: `item-${task.id}`,
 							title: task.title,
 							description: task.description,
+							position: task.position, // keep in memory for later
+							status_id: task.status_id, // keep in memory for later
 						})),
 				};
 			})
@@ -56,10 +58,6 @@ export default function KanbanBoard() {
 
 	const [activeId, setActiveId] = useState(null);
 	const [currentContainerId, setCurrentContainerId] = useState();
-	const [containerName, setContainerName] = useState("");
-	const [itemName, setItemName] = useState("");
-	const [showAddContainerModal, setShowAddContainerModal] = useState(false);
-	const [showAddItemModal, setShowAddItemModal] = useState(false);
 
 	// Find the value of the items
 	function findValueOfItems(id, type) {
@@ -155,7 +153,7 @@ export default function KanbanBoard() {
 
 			if (activeContainerIndex === -1 || overContainerIndex === -1) return;
 
-			// 2️⃣ Optimistically update the state locally
+			// Optimistically update the state locally
 			const newContainers = arrayMove([...containers], activeContainerIndex, overContainerIndex);
 			setContainers(newContainers);
 
@@ -163,11 +161,11 @@ export default function KanbanBoard() {
 			const overContainer = containers[overContainerIndex];
 			try {
 				const kanbanColumnId = parseInt(activeContainer.column);
-				// Call backend API to swap positions
+				// Call backend API to shift positions
 				const res = await axiosClient.patch(API().kanban_column(kanbanColumnId), {
 					position: overContainer.position, // send the new position
 				});
-				// Re-map backend columns into your DnD containers format
+				// Re-map backend columns into DnD containers format
 				const projectColumns = res.data.data.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position);
 
 				const mapped = projectColumns
@@ -183,10 +181,13 @@ export default function KanbanBoard() {
 							position: col.position,
 							items: tasks
 								.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
+								.sort((a, b) => a.position - b.position) // <-- order by position
 								.map((task) => ({
 									id: `item-${task.id}`,
 									title: task.title,
 									description: task.description,
+									position: task.position, // keep in memory for later
+									status_id: task.status_id, // keep in memory for later
 								})),
 						};
 					})
@@ -196,14 +197,6 @@ export default function KanbanBoard() {
 			} catch (error) {
 				console.error("Failed to swap columns:", error);
 			}
-			/* ---------------------------- FRONTEND SORTING ---------------------------- */
-			// Find the index of the active and over container
-			// const activeContainerIndex = containers.findIndex((container) => container.id === active.id);
-			// const overContainerIndex = containers.findIndex((container) => container.id === over.id);
-			// // Swap the active and over container
-			// let newItems = [...containers];
-			// newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex);
-			// setContainers(newItems);
 		}
 
 		// Handling item Sorting
@@ -284,7 +277,7 @@ export default function KanbanBoard() {
 								)}
 								<div className="flex items-start flex-col gap-y-4">
 									{container.items.map((item) => (
-										<Items key={item.id} id={item.id} title={item.title} description={item.description} />
+										<Items key={item.id} id={item.id} title={item.title} description={item.description} position={item.position} />
 									))}
 								</div>
 							</SortableContext>
