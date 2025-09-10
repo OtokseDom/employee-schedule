@@ -6,6 +6,7 @@ use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Task extends Model
 {
@@ -337,5 +338,132 @@ class Task extends Model
         $childIds = $this->where('parent_id', $task->id)->pluck('id')->toArray();
         // Delete all child tasks
         return $this->whereIn('id', $childIds)->delete();
+    }
+
+    public function updateTaskPosition(Task $task, int $newStatusId, int $newPosition, int $organizationId)
+    {
+        $oldStatusId = $task->status_id;
+        $oldPosition = $task->position;
+        $projectId = $task->project_id;
+
+        // If nothing changes, return early
+        if ($oldStatusId === $newStatusId && $oldPosition === $newPosition) return collect([$task]);
+
+        return DB::transaction(function () use ($task, $oldStatusId, $oldPosition, $newStatusId, $newPosition, $projectId, $organizationId) {
+
+            $affectedTasks = collect();
+
+            // Step 0: temporarily move the dragged task out of the range
+            $task->update(['position' => -1000000]);
+
+            // --- SAME COLUMN MOVE ---
+            if ($oldStatusId === $newStatusId) {
+                if ($newPosition < $oldPosition) {
+                    // Moving up
+                    $affected = self::where('organization_id', $organizationId)
+                        ->where('project_id', $projectId)
+                        ->where('status_id', $oldStatusId)
+                        ->whereBetween('position', [$newPosition, $oldPosition - 1])
+                        ->orderBy('position', 'ASC')
+                        ->get();
+
+                    // Temporarily move affected tasks out of range
+                    foreach ($affected as $t) {
+                        $t->update(['position' => $t->position + 1000000]);
+                    }
+
+                    // Place dragged task in its new position
+                    $task->update(['position' => $newPosition]);
+
+                    // Bring affected tasks back, preserving order
+                    foreach ($affected as $i => $t) {
+                        $t->update(['position' => $newPosition + 1 + $i]);
+                    }
+
+                    $affectedTasks = $affected->push($task);
+                } else {
+                    // Moving down
+                    $affected = self::where('organization_id', $organizationId)
+                        ->where('project_id', $projectId)
+                        ->where('status_id', $oldStatusId)
+                        ->whereBetween('position', [$oldPosition + 1, $newPosition])
+                        ->orderBy('position', 'DESC')
+                        ->get();
+
+                    foreach ($affected as $t) {
+                        $t->update(['position' => $t->position - 1000000]);
+                    }
+
+                    $task->update(['position' => $newPosition]);
+
+                    foreach ($affected as $i => $t) {
+                        $t->update(['position' => $newPosition - 1 - $i]);
+                    }
+
+                    $affectedTasks = $affected->push($task);
+                }
+            }
+
+            // --- CROSS COLUMN MOVE ---
+            else {
+                // Shift tasks in new column at or after new position
+                $newColumnAffected = self::where('organization_id', $organizationId)
+                    ->where('project_id', $projectId)
+                    ->where('status_id', $newStatusId)
+                    ->where('position', '>=', $newPosition)
+                    ->orderBy('position', 'ASC')
+                    ->get();
+
+                foreach ($newColumnAffected as $t) {
+                    $t->update(['position' => $t->position + 1000000]);
+                }
+
+                // Place dragged task in new column/position
+                $task->update([
+                    'status_id' => $newStatusId,
+                    'position' => $newPosition,
+                ]);
+
+                foreach ($newColumnAffected as $i => $t) {
+                    $t->update(['position' => $newPosition + 1 + $i]);
+                }
+
+                // Shift tasks in old column after old position
+                $oldColumnAffected = self::where('organization_id', $organizationId)
+                    ->where('project_id', $projectId)
+                    ->where('status_id', $oldStatusId)
+                    ->where('position', '>', $oldPosition)
+                    ->orderBy('position', 'ASC')
+                    ->get();
+
+                foreach ($oldColumnAffected as $i => $t) {
+                    $t->update(['position' => $oldPosition + $i]);
+                }
+
+                $affectedTasks = $newColumnAffected->push($task)->merge($oldColumnAffected);
+            }
+
+            // return TaskResource::collection($affectedTasks->sortBy('position')->values());
+            return TaskResource::collection($this->with([
+                'status:id,name,color',
+                // 'assignee:id,name,email,role,position',
+                'assignees:id,name,email,role,position',
+                'category',
+                'project:id,title',
+                'parent:id,title',
+                'children' => function ($query) {
+                    $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                        ->with([
+                            'status:id,name,color',
+                            // 'assignee:id,name,email,role,position',
+                            'assignees:id,name,email,role,position',
+                            'project:id,title',
+                            'category'
+                        ]);
+                },
+            ])
+                ->where('organization_id', $organizationId)
+                ->orderBy('id', 'DESC')->get());
+        });
     }
 }

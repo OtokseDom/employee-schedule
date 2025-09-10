@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function () {
 
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
+        Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
         Route::post('/relation-check', [RelationCheckerController::class, 'check']);
     });

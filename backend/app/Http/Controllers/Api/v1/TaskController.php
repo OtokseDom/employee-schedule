@@ -90,4 +90,26 @@ class TaskController extends Controller
         }
         return apiResponse('', 'Task deleted successfully');
     }
+
+
+    public function move(Request $request, Task $task)
+    {
+
+        $validated = $request->validate([
+            'status_id'   => 'required|exists:task_statuses,id',
+            'position'    => 'required|integer|min:1',
+        ]);
+
+        $affectedTasks = $task->updateTaskPosition(
+            $task,
+            $validated['status_id'],
+            $validated['position'],
+            $this->userData->organization_id
+        );
+
+        return apiResponse(
+            $affectedTasks,
+            'Task position updated successfully.'
+        );
+    }
 }
