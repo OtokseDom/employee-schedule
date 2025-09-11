@@ -64,15 +64,6 @@ class UpdateTaskRequest extends FormRequest
             'delay_reason' => 'nullable|string',
             'performance_rating' => 'nullable|integer|min:0|max:10',
             'remarks' => 'nullable|string',
-            'position' => [
-                'required',
-                'integer',
-                Rule::unique('tasks')->ignore($this->id)->where(function ($query) {
-                    return $query
-                        ->where('status_id', $this->input('status_id'))
-                        ->where('project_id', $this->input('project_id'));
-                }),
-            ],
         ];
     }
 
@@ -97,7 +88,6 @@ class UpdateTaskRequest extends FormRequest
             'time_estimate' => 'Time estimate must be greater than 0',
             'time_taken' => 'Actual time must be greater than 0',
             'delay' => 'Delay time must be greater than 0 or set to null',
-            'position' => 'Position should be unique per Project-Status',
         ];
     }
 }
