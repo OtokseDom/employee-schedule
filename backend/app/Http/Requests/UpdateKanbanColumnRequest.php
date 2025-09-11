@@ -22,7 +22,6 @@ class UpdateKanbanColumnRequest extends FormRequest
      */
     public function rules(): array
     {
-        // TODO: ⭐ update not working
         return [
             'position' => [
                 'required',

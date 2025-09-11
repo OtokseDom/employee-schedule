@@ -30,6 +30,7 @@ class KanbanColumn extends Model
     /* -------------------------------------------------------------------------- */
     /*                          Controller Logic Function                         */
     /* -------------------------------------------------------------------------- */
+    // TODO: updating position should add task history entry
     public function updatePosition($validated, $kanbanColumn, $organization_id)
     {
         $newPosition = $validated['position'];

@@ -194,7 +194,8 @@ class Task extends Model
         return new TaskResource($task);
     }
 
-    // TODO: updating task status or project should update position correctly.
+    // TODO: Make adding task history entry as global funtion - use in kanbanColumn model when updating task
+    // TODO: updating task status or project should update position correctly in origin status and destination status.
     public function updateTask($request, $task, $userData)
     {
         if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
@@ -334,6 +335,7 @@ class Task extends Model
         return $data;
     }
 
+    // TODO: Removing task should update succeeding tasks position
     public function deleteSubtasks($task)
     {
         // Get all child task IDs

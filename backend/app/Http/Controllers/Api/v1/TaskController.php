@@ -72,7 +72,6 @@ class TaskController extends Controller
         return apiResponse($updated, 'Task updated successfully');
     }
 
-    // TODO: Removing task should update following tasks position
     public function destroy(Request $request, Task $task)
     {
 

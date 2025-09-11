@@ -9,7 +9,6 @@ use App\Http\Requests\UpdateKanbanColumnRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-// TODO: Kanban CRUD on project and status add & delete. Update kanban columns is the only function needed here
 class KanbanColumnController extends Controller
 {
 

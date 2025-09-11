@@ -31,6 +31,7 @@ class ProjectController extends Controller
         return apiResponse($data, 'Projects and Kanban Columns fetched successfully');
     }
 
+    // TODO: add kanban columns with all status for new project added
     public function store(StoreProjectRequest $request)
     {
         $project = $this->project->storeProject($request, $this->userData);
@@ -65,6 +66,7 @@ class ProjectController extends Controller
         return apiResponse(new ProjectResource($project), 'Project updated successfully');
     }
 
+    // TODO: remove kanban columns for deleted project
     public function destroy(Project $project)
     {
         $result = $this->project->deleteProject($project, $this->userData);
