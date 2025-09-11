@@ -19,14 +19,13 @@ export default function KanbanBoard() {
 	const { tasks, updateTaskPosition, mergeTaskPositions } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
-	const { kanbanColumns } = useKanbanColumnsStore();
+	const { kanbanColumns, updateKanbanColumns } = useKanbanColumnsStore();
 	const [containers, setContainers] = useState([]);
 
 	useEffect(() => {
-		if (!selectedProject?.id || !kanbanColumns?.length || !taskStatuses?.length) return;
+		// if (!selectedProject.id || !kanbanColumns.length || !taskStatuses.length) return;
 		// filter kanban columns for the selected project
 		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
-
 		const mapped = projectColumns
 			.map((col) => {
 				const status = taskStatuses.find((s) => s.id === col.task_status_id);
@@ -53,7 +52,7 @@ export default function KanbanBoard() {
 			.filter(Boolean);
 
 		setContainers(mapped);
-	}, [taskStatuses, tasks, selectedProject]);
+	}, [taskStatuses, tasks, selectedProject, kanbanColumns]);
 
 	const [activeId, setActiveId] = useState(null);
 	const [currentContainerId, setCurrentContainerId] = useState();
@@ -146,7 +145,7 @@ export default function KanbanBoard() {
 		setActiveId(null);
 		if (!active || !over) return;
 
-		// Handling Container Sorting
+		/* ----------------------- Handling Container Sorting ----------------------- */
 		if (active.id.toString().includes("container") && over?.id.toString().includes("container") && active && over && active.id !== over.id) {
 			const activeContainerIndex = containers.findIndex((c) => c.id === active.id);
 			const overContainerIndex = containers.findIndex((c) => c.id === over.id);
@@ -168,22 +167,41 @@ export default function KanbanBoard() {
 				// Re-map backend columns into DnD containers format
 				const projectColumns = res.data.data.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position);
 
-				const mapped = projectColumns
+				// For store (only column info, int ids, no items)
+				const mappedForStore = projectColumns
 					.map((col) => {
 						const status = taskStatuses.find((s) => s.id === col.task_status_id);
 						if (!status) return null;
 
 						return {
-							id: `container-${status.id}`,
+							id: col.id, // int
+							organization_id: col.organization_id,
+							task_status_id: col.task_status_id,
+							project_id: col.project_id,
+							position: col.position,
+							created_at: col.created_at,
+							updated_at: col.updated_at,
+						};
+					})
+					.filter(Boolean);
+
+				// For DnD (full items, string ids)
+				const mappedForDnD = projectColumns
+					.map((col) => {
+						const status = taskStatuses.find((s) => s.id === col.task_status_id);
+						if (!status) return null;
+
+						return {
+							id: `container-${status.id}`, // string
 							column: col.id,
 							title: status.name,
 							color: status.color,
 							position: col.position,
 							items: tasks
 								.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
-								.sort((a, b) => a.position - b.position) // <-- order by position
+								.sort((a, b) => a.position - b.position)
 								.map((task) => ({
-									id: `item-${task.id}`,
+									id: `item-${task.id}`, // string
 									title: task.title,
 									description: task.description,
 									position: task.position,
@@ -193,13 +211,15 @@ export default function KanbanBoard() {
 					})
 					.filter(Boolean);
 
-				setContainers(mapped);
+				// Apply updates
+				updateKanbanColumns(selectedProject.id, mappedForStore); // store: ints, no items
+				setContainers(mappedForDnD); // DnD: strings + items
 			} catch (error) {
 				console.error("Failed to swap columns:", error);
 			}
 		}
 
-		// // Handling item Sorting
+		/* -------------------------- Handling item Sorting ------------------------- */
 		if (active.id.includes("item")) {
 			const activeTaskId = parseInt(active.id.replace("item-", ""));
 			let newStatusId;
