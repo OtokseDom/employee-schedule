@@ -17,4 +17,15 @@ export const createKanbanColumnsSlice = (set) => ({
 		set((state) => ({
 			kanbanColumns: state.kanbanColumns.filter((t) => t.id !== id),
 		})),
+	/** new bulk updater */
+	updateKanbanColumns: (projectId, updatedColumns) =>
+		set((state) => {
+			// Remove existing columns for this project
+			const filtered = state.kanbanColumns.filter((col) => col.project_id !== projectId);
+
+			// Add back updated ones
+			return {
+				kanbanColumns: [...filtered, ...updatedColumns],
+			};
+		}),
 });
