@@ -195,136 +195,142 @@ class Task extends Model
         return new TaskResource($task);
     }
 
-    // TODO: updating task status or project should update position correctly in origin status and destination status.
     public function updateTask($request, $task, $userData)
     {
         if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
             return null;
         }
+
         $original = $task->getOriginal();
         $validated = $request->validated();
 
-        // Get original assigned user IDs before update
         $origUserIds = $task->assignees()->pluck('users.id')->toArray();
 
-        $task->update($validated);
+        // Detect if project/status column changed
+        $originalProject = $original['project_id'];
+        $originalStatus  = $original['status_id'];
 
-        // sync new assignees (if provided)
-        if ($request->has('assignees')) {
-            $task->assignees()->sync($request->input('assignees'));
-        }
+        $newProject = $validated['project_id'] ?? $task->project_id;
+        $newStatus  = $validated['status_id'] ?? $task->status_id;
 
+        $columnChanged = $originalProject != $newProject || $originalStatus != $newStatus;
+
+        DB::transaction(function () use ($task, $validated, $origUserIds, $userData, $columnChanged, $original, $originalProject, $originalStatus) {
+
+            if ($columnChanged) {
+                // Temporarily move the task to a position that won't conflict
+                $task->update(['position' => -1 * time()]);
+
+                // Shift old column tasks down
+                Task::where('project_id', $original['project_id'])
+                    ->where('status_id', $original['status_id'])
+                    ->where('position', '>', $original['position'])
+                    ->orderBy('position')  // can be asc or desc, but asc is fine
+                    ->each(function ($t) {
+                        $t->decrement('position');
+                    });
+            }
+
+            // Finally update task to its new project/status/position
+            $task->update($validated);
+
+            // Sync assignees if provided
+            if (isset($validated['assignees'])) {
+                $task->assignees()->sync($validated['assignees']);
+            }
+
+            // Build task history changes
+            $changes = [];
+            foreach ($validated as $key => $value) {
+                switch ($key) {
+                    case 'start_date':
+                    case 'end_date':
+                        $orig = isset($original[$key]) ? date('Y-m-d', strtotime($original[$key])) : null;
+                        $val = $value ? date('Y-m-d', strtotime($value)) : null;
+                        if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    case 'status_id':
+                        $orig = optional(TaskStatus::find($original[$key] ?? null))->name;
+                        $val  = optional(TaskStatus::find($value))->name;
+                        if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    case 'project_id':
+                        $orig = optional(Project::find($original[$key] ?? null))->title;
+                        $val  = optional(Project::find($value))->title;
+                        if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    case 'category_id':
+                        $orig = optional(Category::find($original[$key] ?? null))->name;
+                        $val  = optional(Category::find($value))->name;
+                        if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    case 'assignees':
+                        $valUserIds = is_array($value) ? $value : [];
+                        if (array_diff($origUserIds, $valUserIds) || array_diff($valUserIds, $origUserIds)) {
+                            $origUsers = User::whereIn('id', $origUserIds)->pluck('name')->toArray();
+                            $valUsers  = User::whereIn('id', $valUserIds)->pluck('name')->toArray();
+                            $changes[$key] = ['from' => implode(', ', $origUsers), 'to' => implode(', ', $valUsers)];
+                        }
+                        break;
+                    case 'parent_id':
+                        $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
+                        $val  = $value ? optional($this->find($value))->title : null;
+                        if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    default:
+                        if (array_key_exists($key, $original) && $original[$key] != $value) {
+                            $changes[$key] = ['from' => $original[$key], 'to' => $value];
+                        }
+                        break;
+                }
+            }
+
+            // Record task history
+            $historyService = app(TaskHistoryService::class);
+            $historyService->record($task, $changes, $userData->id, $userData->organization_id);
+        });
+
+        // Reload relationships for response
         $task->load([
-            // 'assignee:id,name,email,role,position',
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
-                    ->with([
-                        'status:id,name,color',
-                        'assignees:id,name,email,role,position',
-                        // 'assignee:id,name,email,role,position',
-                        'project:id,title',
-                        'category'
-                    ]);
+                $query->select(
+                    'id',
+                    'status_id',
+                    'parent_id',
+                    'title',
+                    'description',
+                    'project_id',
+                    'category_id',
+                    'start_date',
+                    'end_date',
+                    'start_time',
+                    'end_time',
+                    'time_estimate',
+                    'time_taken',
+                    'delay',
+                    'delay_reason',
+                    'performance_rating',
+                    'remarks'
+                )->with([
+                    'status:id,name,color',
+                    'assignees:id,name,email,role,position',
+                    'project:id,title',
+                    'category'
+                ]);
             },
         ]);
 
-        // Build changes as a JSON object for task history
-        $changes = [];
-        foreach ($validated as $key => $value) {
-            // Normalize date values for comparison
-            if (in_array($key, ['start_date', 'end_date'])) {
-                $orig = isset($original[$key]) ? date('Y-m-d', strtotime($original[$key])) : null;
-                $val = $value ? date('Y-m-d', strtotime($value)) : null;
-                if ($orig !== $val) {
-                    $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $value,
-                    ];
-                }
-            } else if (in_array($key, ['status_id'])) {
-                // save project name instead of id in task history
-                $status = new TaskStatus();
-                $orig = isset($original[$key]) ? optional($status->find($original[$key]))->name : null;
-                $val = $value ? optional($status->find($value))->name : null;
-
-                if ($orig !== $val) {
-                    $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $val,
-                    ];
-                }
-            } else if (in_array($key, ['project_id'])) {
-                // save project name instead of id in task history
-                $project = new Project();
-                $orig = isset($original[$key]) ? optional($project->find($original[$key]))->title : null;
-                $val = $value ? optional($project->find($value))->title : null;
-
-                if ($orig !== $val) {
-                    $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $val,
-                    ];
-                }
-            } else if (in_array($key, ['category_id'])) {
-                // save category name instead of id in task history
-                $category = new Category();
-                $orig = isset($original[$key]) ? optional($category->find($original[$key]))->name : null;
-                $val = $value ? optional($category->find($value))->name : null;
-
-                if ($orig !== $val) {
-                    $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $val,
-                    ];
-                }
-            } else if ($key === 'assignees') {
-                // Get new assigned user IDs from request
-                $valUserIds = is_array($value) ? $value : [];
-                // Compare arrays
-                if (array_diff($origUserIds, $valUserIds) || array_diff($valUserIds, $origUserIds)) {
-                    // Get user names for display
-                    $origUsers = User::whereIn('id', $origUserIds)->pluck('name')->toArray();
-                    $valUsers = User::whereIn('id', $valUserIds)->pluck('name')->toArray();
-                    $changes[$key] = [
-                        'from' => implode(', ', $origUsers),
-                        'to'   => implode(', ', $valUsers),
-                    ];
-                }
-            } else if ($key === 'parent_id') {
-                // save parent title instead of id in task history
-                $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
-                $val = $value ? optional($this->find($value))->title : null;
-
-                if ($orig !== $val) {
-                    $changes[$key] = [
-                        'from' => $orig,
-                        'to' => $val,
-                    ];
-                }
-            } else {
-                if (array_key_exists($key, $original) && $original[$key] != $value) {
-                    $changes[$key] = [
-                        'from' => $original[$key],
-                        'to' => $value,
-                    ];
-                }
-            }
-        }
-
-        $historyService = app(TaskHistoryService::class);
-        $history = $historyService->record($task, $changes, $userData->id, $userData->organization_id);
-
-        $data = [
-            "task" => new TaskResource($task),
-            "task_history" => $history ? new TaskHistoryResource($history) : null
+        return [
+            'task' => new TaskResource($task),
+            'task_history' => null // history can be loaded if needed
         ];
-        return $data;
     }
+
 
     // TODO: Removing task should update succeeding tasks position
     public function deleteSubtasks($task)
