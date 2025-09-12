@@ -119,7 +119,7 @@ class Task extends Model
             ->orderBy('id', 'DESC')->get());
     }
 
-    // Add task should add correct position
+    // TODO: Add task should add correct position
     public function storeTask($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {
@@ -151,15 +151,15 @@ class Task extends Model
             },
         ]);
 
-        // Record Addition in Task History
-        $taskHistory = $task->taskHistories()->create([
-            'organization_id' => $userData->organization_id,
-            'task_id' => $task->id,
-            'status_id' => $task->status_id,
-            'changed_by' => $userData->id,
-            'changed_at' => now(),
-            'remarks' => "Task Added",
-        ]);
+        // Use TaskHistoryService 
+        $historyService = app(TaskHistoryService::class);
+        $taskHistory = $historyService->record(
+            $task,
+            "Task Added", // passing a simple change set
+            $userData->id,
+            $userData->organization_id
+        );
+
         $data = [
             "task" => new TaskResource($task),
             "task_history" => new TaskHistoryResource($taskHistory)
@@ -195,7 +195,6 @@ class Task extends Model
         return new TaskResource($task);
     }
 
-    // TODO: Make adding task history entry as global funtion - use in kanbanColumn model when updating task
     // TODO: updating task status or project should update position correctly in origin status and destination status.
     public function updateTask($request, $task, $userData)
     {
