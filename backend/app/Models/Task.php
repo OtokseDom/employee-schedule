@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Http\Resources\TaskHistoryResource;
 use App\Http\Resources\TaskResource;
+use App\Services\TaskHistoryService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -315,19 +316,10 @@ class Task extends Model
                 }
             }
         }
-        $history = null;
-        // Record changes in Task History if there are any
-        if (!empty($changes)) {
-            // Record Update in Task History
-            $history = $task->taskHistories()->create([
-                'organization_id' => $userData->organization_id,
-                'task_id' => $task->id,
-                'status_id' => $task->status_id,
-                'changed_by' => $userData->id,
-                'changed_at' => now(),
-                'remarks' => $changes ? json_encode($changes) : null,
-            ]);
-        }
+
+        $historyService = app(TaskHistoryService::class);
+        $history = $historyService->record($task, $changes, $userData->id, $userData->organization_id);
+
         $data = [
             "task" => new TaskResource($task),
             "task_history" => $history ? new TaskHistoryResource($history) : null

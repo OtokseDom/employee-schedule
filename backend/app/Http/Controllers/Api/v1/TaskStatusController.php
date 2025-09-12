@@ -25,7 +25,6 @@ class TaskStatusController extends Controller
         return apiResponse($task_statuses, 'Task statuses fetched successfully');
     }
 
-    // TODO: add kanban column entry when adding status
     public function store(StoreTaskStatusRequest $request)
     {
         $task_status = $this->task_status->storeTaskStatus($request, $this->userData);
@@ -62,7 +61,7 @@ class TaskStatusController extends Controller
         }
         return apiResponse(new TaskStatusResource($task_status), 'Task status updated successfully');
     }
-    // TODO: add kanban column entry when adding status
+
     public function destroy(TaskStatus $task_status)
     {
         $result = $this->task_status->deleteTaskStatus($task_status, $this->userData);
