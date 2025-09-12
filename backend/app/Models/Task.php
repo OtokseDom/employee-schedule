@@ -336,9 +336,30 @@ class Task extends Model
     public function deleteSubtasks($task)
     {
         // Get all child task IDs
-        $childIds = $this->where('parent_id', $task->id)->pluck('id')->toArray();
-        // Delete all child tasks
-        return $this->whereIn('id', $childIds)->delete();
+        return DB::transaction(function () use ($task) {
+            // Get all child tasks
+            $childTasks = $this->where('parent_id', $task->id)->get();
+
+            foreach ($childTasks as $child) {
+                $projectId = $child->project_id;
+                $statusId = $child->status_id;
+                $position  = $child->position;
+
+                // Delete the child task
+                $child->delete();
+
+                // Shift succeeding tasks in the same project/status column
+                $this->where('project_id', $projectId)
+                    ->where('status_id', $statusId)
+                    ->where('position', '>', $position)
+                    ->orderBy('position', 'ASC')
+                    ->each(function ($t) {
+                        $t->decrement('position');
+                    });
+            }
+
+            return true;
+        });
     }
 
     public function updateTaskPosition(Task $task, int $newStatusId, int $newPosition, int $organizationId)
@@ -352,7 +373,6 @@ class Task extends Model
 
         return DB::transaction(function () use ($task, $oldStatusId, $oldPosition, $newStatusId, $newPosition, $projectId, $organizationId) {
 
-            $affectedTasks = collect();
 
             // Step 0: temporarily move the dragged task out of the range
             $task->update(['position' => -1000000]);
@@ -380,8 +400,6 @@ class Task extends Model
                     foreach ($affected as $i => $t) {
                         $t->update(['position' => $newPosition + 1 + $i]);
                     }
-
-                    $affectedTasks = $affected->push($task);
                 } else {
                     // Moving down
                     $affected = self::where('organization_id', $organizationId)
@@ -400,8 +418,6 @@ class Task extends Model
                     foreach ($affected as $i => $t) {
                         $t->update(['position' => $newPosition - 1 - $i]);
                     }
-
-                    $affectedTasks = $affected->push($task);
                 }
             }
 
@@ -440,8 +456,6 @@ class Task extends Model
                 foreach ($oldColumnAffected as $i => $t) {
                     $t->update(['position' => $oldPosition + $i]);
                 }
-
-                $affectedTasks = $newColumnAffected->push($task)->merge($oldColumnAffected);
             }
 
             // return TaskResource::collection($affectedTasks->sortBy('position')->values());
