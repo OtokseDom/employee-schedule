@@ -214,9 +214,14 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				delay: delayDecimal !== undefined ? Number(delayDecimal.toFixed(2)) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
-			// TODO: Calculate new position and insert as payload
 			if (Object.keys(updateData).length === 0) {
 				// ADD
+
+				// Calculate new position
+				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
+				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
+				parsedForm.position = maxPosition + 1;
+
 				const taskResponse = await axiosClient.post(API().task(), parsedForm);
 				// cannot update stores, need to update parent task
 				fetchData();
@@ -241,6 +246,12 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				}
 			} else if (updateData?.calendar_add) {
 				// ADD but in calendar
+
+				// Calculate new position
+				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
+				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
+				parsedForm.position = maxPosition + 1;
+
 				await axiosClient.post(API().task(), parsedForm);
 				// cannot update stores, need to update parent task
 				fetchData();
