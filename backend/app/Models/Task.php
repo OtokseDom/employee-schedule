@@ -313,31 +313,45 @@ class Task extends Model
         ];
     }
 
-
-    // TODO: Removing task should update succeeding tasks position
-    public function deleteSubtasks($task)
+    // Deletes this task and optionally its subtasks, shifts positions properly
+    public function deleteWithSubtasks(bool $deleteSubtasks = false)
     {
-        // Get all child task IDs
-        return DB::transaction(function () use ($task) {
-            // Get all child tasks
-            $childTasks = $this->where('parent_id', $task->id)->get();
+        $organizationId = $this->organization_id;
 
-            foreach ($childTasks as $child) {
-                $projectId = $child->project_id;
-                $statusId = $child->status_id;
-                $position  = $child->position;
+        return DB::transaction(function () use ($deleteSubtasks, $organizationId) {
 
-                // Delete the child task
-                $child->delete();
+            // 1️⃣ Collect subtasks if requested
+            $childTasks = $deleteSubtasks
+                ? self::where('parent_id', $this->id)->get()
+                : collect();
 
-                // Shift succeeding tasks in the same project/status column
-                $this->where('project_id', $projectId)
-                    ->where('status_id', $statusId)
-                    ->where('position', '>', $position)
-                    ->orderBy('position', 'ASC')
-                    ->each(function ($t) {
-                        $t->decrement('position');
-                    });
+            // 2️⃣ Include the main task
+            $allTasks = $childTasks->concat([$this]);
+
+            // 3️⃣ Group tasks by project + status for shifting
+            $groups = [];
+            foreach ($allTasks as $t) {
+                $groups[$t->project_id][$t->status_id][] = $t->position;
+            }
+
+            // 4️⃣ Delete all tasks in one query
+            $idsToDelete = $allTasks->pluck('id')->toArray();
+            self::whereIn('id', $idsToDelete)->delete();
+
+            // 5️⃣ Shift remaining tasks per column
+            foreach ($groups as $projectId => $statuses) {
+                foreach ($statuses as $statusId => $positions) {
+                    $minPosition = min($positions);
+                    $countDeleted = count($positions);
+
+                    self::where('organization_id', $organizationId)
+                        ->where('project_id', $projectId)
+                        ->where('status_id', $statusId)
+                        ->where('position', '>', $minPosition)
+                        ->update([
+                            'position' => DB::raw("position - $countDeleted")
+                        ]);
+                }
             }
 
             return true;
