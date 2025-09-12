@@ -56,7 +56,6 @@ class Project extends Model
             ->get();
     }
 
-    // Add project should populate kanban columns with all statuses with position
     public function storeProject($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {
@@ -113,10 +112,18 @@ class Project extends Model
         if (Task::where('project_id', $project->id)->exists()) {
             return false;
         }
-        if (!$project->delete()) {
-            return null;
-        }
-        return true;
+
+        return DB::transaction(function () use ($project) {
+            // Delete kanban columns linked to this status
+            KanbanColumn::where('project_id', $project->id)->delete();
+
+            // Delete the project itself
+            if (!$project->delete()) {
+                return null;
+            }
+
+            return true;
+        });
     }
 
     public function getKanbanColumns($organization_id)
