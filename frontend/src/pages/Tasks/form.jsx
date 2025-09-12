@@ -260,6 +260,26 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				setTaskAdded(true);
 			} else {
 				// UPDATE
+
+				// Determine if project/status changed
+				const originalProjectId = updateData.project_id;
+				const originalStatusId = updateData.status_id;
+
+				const projectChanged = parsedForm.project_id !== originalProjectId;
+				const statusChanged = parsedForm.status_id !== originalStatusId;
+
+				// Calculate new position if moved to a new column
+				if (projectChanged || statusChanged) {
+					const tasksInNewColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
+
+					const maxPosition = tasksInNewColumn.length ? Math.max(...tasksInNewColumn.map((t) => t.position || 0)) : 0;
+
+					parsedForm.position = maxPosition + 1;
+				} else {
+					// Keep current position if column didn't change
+					parsedForm.position = updateData.position;
+				}
+
 				await axiosClient.put(API().task(updateData?.id), parsedForm);
 				// cannot update stores, need to update parent task
 				fetchData();
