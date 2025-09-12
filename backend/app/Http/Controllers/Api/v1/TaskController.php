@@ -75,36 +75,12 @@ class TaskController extends Controller
 
     public function destroy(Request $request, Task $task)
     {
-        $organization_id = $this->userData->organization_id;
-
-        if ($task->organization_id !== $organization_id) {
+        if ($task->organization_id !== $this->userData->organization_id) {
             return apiResponse(null, 'Task not found', false, 404);
         }
 
-        DB::transaction(function () use ($request, $task, $organization_id) {
+        $task->deleteWithSubtasks($request->boolean('delete_subtasks'));
 
-            // Delete subtasks if requested
-            if ($request->boolean('delete_subtasks')) {
-                $this->task->deleteSubtasks($task);
-            }
-
-            $project_id = $task->project_id;
-            $status_id = $task->status_id;
-            $position = $task->position;
-
-            // Delete the main task
-            $task->delete();
-
-            // Shift positions of succeeding tasks in the same project/status column
-            $this->task->where('organization_id', $organization_id)
-                ->where('project_id', $project_id)
-                ->where('status_id', $status_id)
-                ->where('position', '>', $position)
-                ->orderBy('position', 'ASC')
-                ->each(function ($t) {
-                    $t->decrement('position');
-                });
-        });
         return apiResponse('', 'Task deleted successfully');
     }
 
