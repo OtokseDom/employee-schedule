@@ -119,12 +119,12 @@ class Task extends Model
             ->orderBy('id', 'DESC')->get());
     }
 
-    // TODO: Add task should add correct position
     public function storeTask($request, $userData)
     {
         if ($request->organization_id !== $userData->organization_id) {
             return "not found";
         }
+
         $task = $this->create($request->validated());
 
         // attach multiple assignees if provided
