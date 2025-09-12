@@ -105,7 +105,7 @@ class Task extends Model
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('*')
                     ->with([
                         'status:id,name,color',
                         // 'assignee:id,name,email,role,position',
@@ -140,7 +140,7 @@ class Task extends Model
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('*')
                     ->with([
                         'status:id,name,color',
                         'assignees:id,name,email,role,position',
@@ -177,7 +177,7 @@ class Task extends Model
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                $query->select('*')
                     ->with([
                         'status:id,name,color',
                         'assignees:id,name,email,role,position',
@@ -298,25 +298,7 @@ class Task extends Model
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
-                $query->select(
-                    'id',
-                    'status_id',
-                    'parent_id',
-                    'title',
-                    'description',
-                    'project_id',
-                    'category_id',
-                    'start_date',
-                    'end_date',
-                    'start_time',
-                    'end_time',
-                    'time_estimate',
-                    'time_taken',
-                    'delay',
-                    'delay_reason',
-                    'performance_rating',
-                    'remarks'
-                )->with([
+                $query->select('*')->with([
                     'status:id,name,color',
                     'assignees:id,name,email,role,position',
                     'project:id,title',
@@ -467,7 +449,7 @@ class Task extends Model
                 'project:id,title',
                 'parent:id,title',
                 'children' => function ($query) {
-                    $query->select('id', 'status_id', 'parent_id', 'title', 'description', 'project_id', 'category_id', 'start_date', 'end_date', 'start_time', 'end_time', 'time_estimate', 'time_taken', 'delay', 'delay_reason', 'performance_rating', 'remarks')
+                    $query->select('*')
                         ->with([
                             'status:id,name,color',
                             // 'assignee:id,name,email,role,position',
