@@ -11,10 +11,18 @@ class KanbanColumn extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organization_id',
         'project_id',
         'task_status_id',
         'position'
     ];
+
+
+    // Relationship with Organization
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     // Relationship with Project
     public function project()
