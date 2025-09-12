@@ -101,12 +101,16 @@ class TaskStatus extends Model
         if (Task::where('status_id', $taskStatus->id)->exists()) {
             return false;
         }
+        return DB::transaction(function () use ($taskStatus) {
+            // Delete kanban columns linked to this status
+            KanbanColumn::where('task_status_id', $taskStatus->id)->delete();
 
-        // Delete the status itself
-        if (!$taskStatus->delete()) {
-            return null;
-        }
+            // Delete the status itself
+            if (!$taskStatus->delete()) {
+                return null;
+            }
 
-        return true;
+            return true;
+        });
     }
 }
