@@ -29,15 +29,8 @@ class StoreKanbanColumnRequest extends FormRequest
             'position' => [
                 'required',
                 'integer',
-                'min:0',
+                'min:1',
             ],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'position.unique' => 'This position is already taken for the project-status combination.',
         ];
     }
 }

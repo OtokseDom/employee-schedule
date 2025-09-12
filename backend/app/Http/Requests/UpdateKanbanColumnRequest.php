@@ -30,11 +30,4 @@ class UpdateKanbanColumnRequest extends FormRequest
             ],
         ];
     }
-
-    public function messages(): array
-    {
-        return [
-            'position.unique' => 'This position is already taken for the project-status combination.',
-        ];
-    }
 }
