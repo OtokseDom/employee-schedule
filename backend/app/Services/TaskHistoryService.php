@@ -17,7 +17,7 @@ class TaskHistoryService
      * @param int $organizationId
      * @return TaskHistory|null
      */
-    public function record(Task $task, array $changes, int $changedBy, int $organizationId)
+    public function record(Task $task, $changes, int $changedBy, int $organizationId)
     {
         if (empty($changes)) {
             return null; // nothing to record
@@ -29,7 +29,7 @@ class TaskHistoryService
             'status_id'       => $task->status_id,
             'changed_by'      => $changedBy,
             'changed_at'      => now(),
-            'remarks'         => json_encode($changes),
+            'remarks' => is_array($changes) ? json_encode($changes) : $changes,
         ]);
     }
 }
