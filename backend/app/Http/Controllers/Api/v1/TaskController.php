@@ -10,6 +10,7 @@ use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -74,20 +75,36 @@ class TaskController extends Controller
 
     public function destroy(Request $request, Task $task)
     {
+        $organization_id = $this->userData->organization_id;
 
-        if ($task->organization_id !== $this->userData->organization_id) {
+        if ($task->organization_id !== $organization_id) {
             return apiResponse(null, 'Task not found', false, 404);
         }
-        // Delete subtasks or not
-        if ($request->boolean('delete_subtasks')) {
-            if (!$this->task->deleteSubtasks($task)) {
-                return apiResponse(null, 'Failed to delete subtasks', false, 500);
-            }
-        }
 
-        if (!$task->delete()) {
-            return apiResponse(null, 'Failed to delete task.', false, 500);
-        }
+        DB::transaction(function () use ($request, $task, $organization_id) {
+
+            // Delete subtasks if requested
+            if ($request->boolean('delete_subtasks')) {
+                $this->task->deleteSubtasks($task);
+            }
+
+            $project_id = $task->project_id;
+            $status_id = $task->status_id;
+            $position = $task->position;
+
+            // Delete the main task
+            $task->delete();
+
+            // Shift positions of succeeding tasks in the same project/status column
+            $this->task->where('organization_id', $organization_id)
+                ->where('project_id', $project_id)
+                ->where('status_id', $status_id)
+                ->where('position', '>', $position)
+                ->orderBy('position', 'ASC')
+                ->each(function ($t) {
+                    $t->decrement('position');
+                });
+        });
         return apiResponse('', 'Task deleted successfully');
     }
 
