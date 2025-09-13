@@ -215,7 +215,7 @@ class Task extends Model
 
         $columnChanged = $originalProject != $newProject || $originalStatus != $newStatus;
 
-        DB::transaction(function () use ($task, $validated, $origUserIds, $userData, $columnChanged, $original, $originalProject, $originalStatus) {
+        DB::transaction(function () use ($task, $validated, $origUserIds, $userData, $columnChanged, $original) {
 
             if ($columnChanged) {
                 // Temporarily move the task to a position that won't conflict
@@ -276,6 +276,9 @@ class Task extends Model
                         $orig = isset($original[$key]) ? optional($this->find($original[$key]))->title : null;
                         $val  = $value ? optional($this->find($value))->title : null;
                         if ($orig !== $val) $changes[$key] = ['from' => $orig, 'to' => $val];
+                        break;
+                    case 'position':
+                        // Ignore position changes completely
                         break;
                     default:
                         if (array_key_exists($key, $original) && $original[$key] != $value) {
