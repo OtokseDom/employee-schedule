@@ -24,12 +24,6 @@ export default function Kanban() {
 
 	return (
 		<div className="w-screen md:w-full">
-			{/* <div
-				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					dialogOpen ? "opacity-100" : "opacity-0"
-				}`}
-				aria-hidden="true"
-			/> */}
 			<div className="flex flex-row justify-between w-full">
 				<div className="fixed top-8 left z-50 w-40">
 					<Select

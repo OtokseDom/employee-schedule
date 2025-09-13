@@ -52,6 +52,12 @@ const Container = ({ id, children, title, color, onAddItem }) => {
 				isDragging && "opacity-50"
 			)}
 		>
+			<div
+				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
+					isOpenDialog ? "opacity-100" : "opacity-0"
+				}`}
+				aria-hidden="true"
+			/>
 			{/* Drag Handle */}
 			<div className="w-full py-2 hover:cursor-grab active:cursor-grabbing" {...listeners} />
 			{/* Header */}
