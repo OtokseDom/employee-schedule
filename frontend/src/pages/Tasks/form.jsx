@@ -86,6 +86,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			calendar_add: false,
+			kanban_add: false,
 			status_id: undefined,
 			title: "",
 			description: "",
@@ -116,6 +117,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 		if (updateData && projects && users && categories) {
 			const {
 				calendar_add,
+				kanban_add,
 				status_id,
 				title,
 				description,
@@ -137,6 +139,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 			} = updateData;
 			form.reset({
 				calendar_add: calendar_add || false,
+				kanban_add: kanban_add || false,
 				status_id: status_id || undefined,
 				title: title || "",
 				description: description || "",
@@ -258,6 +261,20 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
 				setTaskAdded(true);
+			} else if (updateData?.kanban_add) {
+				// ADD but in kanban
+
+				// Calculate new position
+				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
+				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
+				parsedForm.position = maxPosition + 1;
+
+				await axiosClient.post(API().task(), parsedForm);
+				// cannot update stores, need to update parent task
+				fetchData();
+				showToast("Success!", "Task added to kanban.", 3000);
+				setIsOpen(false);
+				setTaskAdded(true);
 			} else {
 				// UPDATE
 
@@ -367,6 +384,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 		user_auth?.data?.role === "Manager" ||
 		Object.keys(updateData).length === 0 ||
 		updateData?.calendar_add ||
+		updateData?.kanban_add ||
 		updateData?.assignees?.some((assignee) => assignee.id === user_auth?.data?.id) ||
 		!updateData?.assignees;
 	return (
@@ -924,7 +942,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 					<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150 p-4 mt-auto">
 						<Button type="submit" disabled={loading} className="w-full">
 							{loading && <Loader2 className="animate-spin mr-5 -ml-11 text-background" />}{" "}
-							{Object.keys(updateData).length === 0 || updateData?.calendar_add ? "Submit" : "Update"}
+							{Object.keys(updateData).length === 0 || updateData?.calendar_add || updateData?.kanban_add ? "Submit" : "Update"}
 						</Button>
 					</div>
 				) : (

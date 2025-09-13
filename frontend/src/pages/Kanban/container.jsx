@@ -1,12 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { statusColors } from "@/utils/taskHelpers";
+import { statusColors, useTaskHelpers } from "@/utils/taskHelpers";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import History from "@/components/task/History";
+import Relations from "@/components/task/Relations";
+import TaskForm from "../Tasks/form";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useTasksStore } from "@/store/tasks/tasksStore";
+import Tabs from "@/components/task/Tabs";
+import { useProjectsStore } from "@/store/projects/projectsStore";
 
 const Container = ({ id, children, title, color, onAddItem }) => {
+	// Task Form
+	const { loading } = useLoadContext();
+	const { selectedProject } = useProjectsStore();
+	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab } = useTasksStore();
+	const { fetchTasks } = useTaskHelpers();
+	const [isOpenDialog, setIsOpenDialog] = useState(null);
+	const [updateData, setUpdateData] = useState({});
+	const [taskAdded, setTaskAdded] = useState(false);
+	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
+
+	useEffect(() => {
+		if (!isOpenDialog) {
+			setRelations({});
+			setActiveTab("update");
+			setParentId(null);
+		}
+	}, [isOpenDialog]);
+
 	const { attributes, setNodeRef, listeners, transform, transition, isDragging } = useSortable({
 		id: id,
 		data: {
@@ -45,9 +71,46 @@ const Container = ({ id, children, title, color, onAddItem }) => {
 
 			{/* Fixed bottom button */}
 			<div className="sticky bottom-0 bg-card pt-2">
-				<Button variant="ghost" onClick={onAddItem} className="w-full">
-					Add Item
-				</Button>
+				<Sheet open={isOpenDialog} onOpenChange={setIsOpenDialog} modal={false}>
+					<SheetTrigger
+						asChild
+						onClick={() => {
+							setUpdateData({
+								kanban_add: true,
+								project_id: selectedProject.id !== "undefined" ? selectedProject.id : null,
+								status_id: id !== "undefined" ? parseInt(id.replace("container-", ""), 10) : null,
+							});
+							setIsOpenDialog(true);
+						}}
+					>
+						<Button variant="ghost" className="w-full">
+							Add Item
+						</Button>
+					</SheetTrigger>
+					<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+						<SheetHeader>
+							<SheetTitle>
+								<Tabs loading={loading} updateData={updateData} activeTab={activeTab} setActiveTab={setActiveTab} parentId={parentId} />
+							</SheetTitle>
+							<SheetDescription className="sr-only">Navigate through the app using the options below.</SheetDescription>
+						</SheetHeader>
+						{activeTab == "history" ? (
+							<History selectedTaskHistory={selectedTaskHistory} />
+						) : activeTab == "relations" ? (
+							<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
+						) : (
+							<TaskForm
+								isOpen={isOpenDialog}
+								setIsOpen={setIsOpenDialog}
+								updateData={updateData}
+								setUpdateData={setUpdateData}
+								fetchData={fetchTasks}
+								setTaskAdded={setTaskAdded}
+								parentId={parentId}
+							/>
+						)}
+					</SheetContent>
+				</Sheet>
 			</div>
 		</div>
 	);
