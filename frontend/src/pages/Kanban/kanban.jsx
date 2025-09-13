@@ -15,14 +15,13 @@ import axiosClient from "@/axios.client";
 // TODO: Add task on selected status
 // TODO: Status menu - sorting options
 export default function KanbanBoard() {
-	const { tasks, updateTaskPosition, mergeTaskPositions } = useTasksStore();
+	const { tasks, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
 	const { kanbanColumns, updateKanbanColumns } = useKanbanColumnsStore();
 	const [containers, setContainers] = useState([]);
 
 	useEffect(() => {
-		// if (!selectedProject.id || !kanbanColumns.length || !taskStatuses.length) return;
 		// filter kanban columns for the selected project
 		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
 		const mapped = projectColumns
@@ -230,8 +229,7 @@ export default function KanbanBoard() {
 				const overItemIndex = overContainer.items.findIndex((i) => i.id === over.id);
 
 				newStatusId = parseInt(overContainer.id.replace("container-", ""));
-				// newStatusId = overContainer.items[overItemIndex].status_id;
-				newPosition = overItemIndex + 1; // adjust depending if you want 0/1 indexing
+				newPosition = overItemIndex + 1;
 			} else if (over.id.includes("container")) {
 				// dropped into empty container
 				const overContainer = findValueOfItems(over.id, "container");
@@ -241,17 +239,19 @@ export default function KanbanBoard() {
 				return;
 			}
 
-			// ✅ 1. Optimistic update in Zustand
+			// 1. Optimistic update in Zustand
 			updateTaskPosition(activeTaskId, newStatusId, newPosition);
 
 			try {
-				// ✅ 2. Call backend
+				// 2. Call backend
 				const res = await axiosClient.patch(API().task_move(activeTaskId), {
 					status_id: newStatusId,
 					position: newPosition,
 				});
-				// ✅ 3. Merge backend response
-				mergeTaskPositions(res.data.data);
+				// 3.1. Merge backend response
+				mergeTaskPositions(res.data.data.tasks);
+				// 3.2 Add history since status changed
+				addTaskHistory(res.data.data.history);
 			} catch (err) {
 				console.error("Failed to update task position:", err);
 				// Optional rollback: refetch tasks from API
