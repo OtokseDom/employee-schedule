@@ -7,17 +7,23 @@ import KanbanBoard from "./kanban";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
 export default function Kanban() {
 	const { loading, setLoading } = useLoadContext();
 	const { tasks } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
+	const { users } = useUsersStore();
+	const { categories } = useCategoriesStore();
 	const { projects, selectedProject, setSelectedProject } = useProjectsStore();
-	const { fetchTasks, fetchTaskStatuses, fetchProjects } = useTaskHelpers();
+	const { fetchTasks, fetchTaskStatuses, fetchProjects, fetchCategories, fetchUsers } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Board";
 		if (!tasks || tasks.length === 0) fetchTasks();
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
+		if (!users || users.length === 0) fetchUsers();
+		if (!categories || categories.length === 0) fetchCategories();
 		if (!projects || projects.length === 0) fetchProjects();
 		else if (!selectedProject) setSelectedProject(projects[0]);
 	}, []);
