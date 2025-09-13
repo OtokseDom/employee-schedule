@@ -462,11 +462,11 @@ class Task extends Model
                 $val  = optional(TaskStatus::find($newStatusId))->name;
                 $change['status'] = ["from" => $orig, "to" => $val];
                 $historyService = app(TaskHistoryService::class);
-                $historyService->record($task, $change, $userId, $organization_id);
+                $history = $historyService->record($task, $change, $userId, $organization_id);
             }
 
             // return TaskResource::collection($affectedTasks->sortBy('position')->values());
-            return TaskResource::collection($this->with([
+            $tasks = TaskResource::collection($this->with([
                 'status:id,name,color',
                 // 'assignee:id,name,email,role,position',
                 'assignees:id,name,email,role,position',
@@ -486,6 +486,11 @@ class Task extends Model
             ])
                 ->where('organization_id', $organization_id)
                 ->orderBy('id', 'DESC')->get());
+
+            return [
+                'tasks'   => $tasks,
+                'history' => $history ? new TaskHistoryResource($history) : null,
+            ];
         });
     }
 }
