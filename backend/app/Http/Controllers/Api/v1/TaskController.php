@@ -97,6 +97,7 @@ class TaskController extends Controller
             $task,
             $validated['status_id'],
             $validated['position'],
+            $this->userData->id,
             $this->userData->organization_id
         );
 

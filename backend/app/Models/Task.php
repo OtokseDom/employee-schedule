@@ -361,7 +361,7 @@ class Task extends Model
         });
     }
 
-    public function updateTaskPosition(Task $task, int $newStatusId, int $newPosition, int $organizationId)
+    public function updateTaskPosition(Task $task, int $newStatusId, int $newPosition, int $userId, int $organization_id)
     {
         $oldStatusId = $task->status_id;
         $oldPosition = $task->position;
@@ -370,7 +370,7 @@ class Task extends Model
         // If nothing changes, return early
         if ($oldStatusId === $newStatusId && $oldPosition === $newPosition) return collect([$task]);
 
-        return DB::transaction(function () use ($task, $oldStatusId, $oldPosition, $newStatusId, $newPosition, $projectId, $organizationId) {
+        return DB::transaction(function () use ($task, $oldStatusId, $oldPosition, $newStatusId, $newPosition, $projectId, $userId, $organization_id) {
 
 
             // Step 0: temporarily move the dragged task out of the range
@@ -380,7 +380,7 @@ class Task extends Model
             if ($oldStatusId === $newStatusId) {
                 if ($newPosition < $oldPosition) {
                     // Moving up
-                    $affected = self::where('organization_id', $organizationId)
+                    $affected = self::where('organization_id', $organization_id)
                         ->where('project_id', $projectId)
                         ->where('status_id', $oldStatusId)
                         ->whereBetween('position', [$newPosition, $oldPosition - 1])
@@ -401,7 +401,7 @@ class Task extends Model
                     }
                 } else {
                     // Moving down
-                    $affected = self::where('organization_id', $organizationId)
+                    $affected = self::where('organization_id', $organization_id)
                         ->where('project_id', $projectId)
                         ->where('status_id', $oldStatusId)
                         ->whereBetween('position', [$oldPosition + 1, $newPosition])
@@ -423,7 +423,7 @@ class Task extends Model
             // --- CROSS COLUMN MOVE ---
             else {
                 // Shift tasks in new column at or after new position
-                $newColumnAffected = self::where('organization_id', $organizationId)
+                $newColumnAffected = self::where('organization_id', $organization_id)
                     ->where('project_id', $projectId)
                     ->where('status_id', $newStatusId)
                     ->where('position', '>=', $newPosition)
@@ -445,7 +445,7 @@ class Task extends Model
                 }
 
                 // Shift tasks in old column after old position
-                $oldColumnAffected = self::where('organization_id', $organizationId)
+                $oldColumnAffected = self::where('organization_id', $organization_id)
                     ->where('project_id', $projectId)
                     ->where('status_id', $oldStatusId)
                     ->where('position', '>', $oldPosition)
@@ -455,6 +455,14 @@ class Task extends Model
                 foreach ($oldColumnAffected as $i => $t) {
                     $t->update(['position' => $oldPosition + $i]);
                 }
+
+                // Record status change in task history
+                // Convert status id to name
+                $orig = optional(TaskStatus::find($oldStatusId ?? null))->name;
+                $val  = optional(TaskStatus::find($newStatusId))->name;
+                $change['status'] = ["from" => $orig, "to" => $val];
+                $historyService = app(TaskHistoryService::class);
+                $historyService->record($task, $change, $userId, $organization_id);
             }
 
             // return TaskResource::collection($affectedTasks->sortBy('position')->values());
@@ -476,7 +484,7 @@ class Task extends Model
                         ]);
                 },
             ])
-                ->where('organization_id', $organizationId)
+                ->where('organization_id', $organization_id)
                 ->orderBy('id', 'DESC')->get());
         });
     }
