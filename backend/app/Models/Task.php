@@ -465,7 +465,6 @@ class Task extends Model
                 $history = $historyService->record($task, $change, $userId, $organization_id);
             }
 
-            // return TaskResource::collection($affectedTasks->sortBy('position')->values());
             $tasks = TaskResource::collection($this->with([
                 'status:id,name,color',
                 // 'assignee:id,name,email,role,position',
@@ -486,11 +485,14 @@ class Task extends Model
             ])
                 ->where('organization_id', $organization_id)
                 ->orderBy('id', 'DESC')->get());
-
-            return [
-                'tasks'   => $tasks,
-                'history' => $history ? new TaskHistoryResource($history) : null,
-            ];
+            if ($history) {
+                return [
+                    'tasks'   => $tasks,
+                    'history' => new TaskHistoryResource($history),
+                ];
+            } else {
+                return $tasks;
+            }
         });
     }
 }
