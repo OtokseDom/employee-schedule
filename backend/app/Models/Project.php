@@ -68,9 +68,10 @@ class Project extends Model
 
             // Fetch all statuses for this organization
             $statuses = TaskStatus::where('organization_id', $userData->organization_id)->get();
+            $kanbanColumns = [];
 
             foreach ($statuses as $key => $status) {
-                KanbanColumn::create([
+                $kanbanColumns[] = KanbanColumn::create([
                     'project_id'      => $project->id,
                     'task_status_id'       => $status->id,
                     'position'        => ++$key,
@@ -80,7 +81,11 @@ class Project extends Model
 
             $project->load(['status:id,name,color']);
 
-            return new ProjectResource($project);
+            $data = [
+                "project" => $project,
+                "kanban" => $kanbanColumns,
+            ];
+            return $data;
         });
     }
 
