@@ -16,6 +16,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
+import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -31,6 +32,7 @@ const formSchema = z.object({
 export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData }) {
 	const { user } = useAuthContext();
 	const { updateTaskStatus, addTaskStatus } = useTaskStatusesStore();
+	const { addKanbanColumn } = useKanbanColumnsStore();
 	const { fetchTasks } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -60,7 +62,8 @@ export default function TaskStatusForm({ setIsOpen, updateData, setUpdateData })
 		try {
 			if (Object.keys(updateData).length === 0) {
 				const taskStatusResponse = await axiosClient.post(API().task_status(), form);
-				addTaskStatus(taskStatusResponse.data.data);
+				addTaskStatus(taskStatusResponse.data.data.status);
+				addKanbanColumn(taskStatusResponse.data.data.kanban);
 				showToast("Success!", "Task Status added.", 3000);
 			} else {
 				await axiosClient.put(API().task_status(updateData?.id), form);
