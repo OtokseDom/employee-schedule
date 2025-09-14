@@ -24,6 +24,7 @@ export default function KanbanBoard() {
 
 	useEffect(() => {
 		// filter kanban columns for the selected project
+		console.log(taskHistory);
 		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
 		const mapped = projectColumns
 			.map((col) => {
@@ -242,6 +243,12 @@ export default function KanbanBoard() {
 			} else {
 				return;
 			}
+
+			// Check: if nothing actually changed, skip
+			if (task.status_id === newStatusId && task.position === newPosition) {
+				return;
+			}
+			// Checkk: if moved to another column (status change)
 			const movedToAnotherColumn = task.status_id !== newStatusId;
 			// 1. Optimistic update in Zustand
 			updateTaskPosition(activeTaskId, newStatusId, newPosition);
