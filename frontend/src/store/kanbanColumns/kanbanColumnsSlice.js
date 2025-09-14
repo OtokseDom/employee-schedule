@@ -3,9 +3,9 @@ export const createKanbanColumnsSlice = (set) => ({
 
 	setKanbanColumns: (kanbanColumns) => set({ kanbanColumns }),
 
-	addKanbanColumn: (kanbanColumns) =>
+	addKanbanColumn: (newColumns) =>
 		set((state) => ({
-			kanbanColumns: [kanbanColumns, ...state.kanbanColumns],
+			kanbanColumns: [...newColumns, ...state.kanbanColumns],
 		})),
 
 	updateKanbanColumn: (id, updates) =>
