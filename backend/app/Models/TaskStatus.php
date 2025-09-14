@@ -43,10 +43,10 @@ class TaskStatus extends Model
             // Get all projects under this organization
             $projects = Project::where('organization_id', $userData->organization_id)->get();
             $kanbanColumns = [];
-            foreach ($projects as $key => $project) {
+            foreach ($projects as $project) {
                 $maxPosition = KanbanColumn::where('project_id', $project->id)->max('position');
 
-                $kanbanColumns[$key] = KanbanColumn::create([
+                $kanbanColumns[] = KanbanColumn::create([
                     'organization_id' => $userData->organization_id,
                     'project_id'      => $project->id,
                     'task_status_id'       => $status->id,
