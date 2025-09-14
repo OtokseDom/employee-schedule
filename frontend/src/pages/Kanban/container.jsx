@@ -48,7 +48,7 @@ const Container = ({ id, children, title, color, onAddItem }) => {
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"min-w-[350px] h-fit min-h-[50vh] max-h-[calc(100vh-9rem)] p-2 bg-card border border-accent rounded-xl flex flex-col draggable touch-none",
+				"min-w-[350px] h-fit min-h-[50vh] max-h-[calc(100vh-9rem)] p-2 bg-card border border-accent rounded-xl flex flex-col",
 				isDragging && "opacity-50"
 			)}
 		>
@@ -59,7 +59,7 @@ const Container = ({ id, children, title, color, onAddItem }) => {
 				aria-hidden="true"
 			/>
 			{/* Drag Handle */}
-			<div className="w-full py-1 hover:cursor-grab active:cursor-grabbing" {...listeners}>
+			<div className="w-full py-1 hover:cursor-grab active:cursor-grabbing draggable touch-none" {...listeners}>
 				<GripVertical size={16} />
 			</div>
 			{/* Header */}

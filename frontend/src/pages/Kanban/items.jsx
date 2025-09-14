@@ -21,11 +21,11 @@ const Items = ({ id, title, description, position }) => {
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"p-2 bg-sidebar-accent shadow-md rounded-md w-full border border-transparent hover:border-foreground cursor-pointer group draggable touch-none",
+				"p-2 bg-sidebar-accent shadow-md rounded-md w-full border border-transparent hover:border-foreground cursor-pointer group",
 				isDragging && "opacity-50"
 			)}
 		>
-			<div className="flex flex-row w-full">
+			<div className="flex flex-row w-full draggable touch-none">
 				<div className="w-full py-1 hover:cursor-grab active:cursor-grabbing" {...listeners}>
 					<GripVertical size={16} />
 				</div>
