@@ -26,7 +26,7 @@ const Items = ({ id, title, description, position }) => {
 			)}
 		>
 			<div className="flex flex-row w-full">
-				<div className="w-full py-3 hover:cursor-grab active:cursor-grabbing" {...listeners}>
+				<div className="w-full py-1 hover:cursor-grab active:cursor-grabbing" {...listeners}>
 					<GripVertical size={16} />
 				</div>
 			</div>

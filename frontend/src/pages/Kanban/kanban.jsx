@@ -279,7 +279,7 @@ export default function KanbanBoard() {
 			onDragMove={debouncedHandleDragMove}
 			onDragEnd={handleDragEnd}
 		>
-			<div className="flex gap-4 py-4 mt-14 h-full">
+			<div className="flex gap-4 py-2 h-full">
 				<SortableContext items={containers.map((i) => i.id)}>
 					{containers.map((container) => (
 						<Container
@@ -298,7 +298,7 @@ export default function KanbanBoard() {
 										Drop items here
 									</div>
 								)}
-								<div className="flex items-start flex-col gap-y-4">
+								<div className="flex items-start flex-col gap-y-2">
 									{container.items.map((item) => (
 										<Items key={item.id} id={item.id} title={item.title} description={item.description} position={item.position} />
 									))}
