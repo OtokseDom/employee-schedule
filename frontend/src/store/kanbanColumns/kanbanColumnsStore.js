@@ -7,6 +7,7 @@ export const useKanbanColumnsStore = () => {
 		addKanbanColumn: useAppStore((state) => state.addKanbanColumn),
 		updateKanbanColumn: useAppStore((state) => state.updateKanbanColumn),
 		removeKanbanColumnByStatus: useAppStore((state) => state.removeKanbanColumnByStatus),
+		removeKanbanColumnByProject: useAppStore((state) => state.removeKanbanColumnByProject),
 		updateKanbanColumns: useAppStore((state) => state.updateKanbanColumns),
 	};
 };
