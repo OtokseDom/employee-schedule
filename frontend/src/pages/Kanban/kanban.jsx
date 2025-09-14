@@ -16,7 +16,7 @@ import axiosClient from "@/axios.client";
 // TODO: Add task on selected status
 // TODO: Status menu - sorting options
 export default function KanbanBoard() {
-	const { tasks, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
+	const { tasks, taskHistory, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
 	const { kanbanColumns, updateKanbanColumns } = useKanbanColumnsStore();
@@ -221,6 +221,9 @@ export default function KanbanBoard() {
 		/* -------------------------- Handling item Sorting ------------------------- */
 		if (active.id.includes("item")) {
 			const activeTaskId = parseInt(active.id.replace("item-", ""));
+			const task = tasks.find((t) => t.id === activeTaskId);
+			if (!task) return;
+
 			let newStatusId;
 			let newPosition;
 
@@ -239,7 +242,7 @@ export default function KanbanBoard() {
 			} else {
 				return;
 			}
-
+			const movedToAnotherColumn = task.status_id !== newStatusId;
 			// 1. Optimistic update in Zustand
 			updateTaskPosition(activeTaskId, newStatusId, newPosition);
 
@@ -252,7 +255,9 @@ export default function KanbanBoard() {
 				// 3.1. Merge backend response
 				mergeTaskPositions(res.data.data.tasks);
 				// 3.2 Add history since status changed
-				addTaskHistory(res.data.data.history);
+				if (movedToAnotherColumn) {
+					addTaskHistory(res.data.data.history);
+				}
 			} catch (err) {
 				console.error("Failed to update task position:", err);
 				// Optional rollback: refetch tasks from API
