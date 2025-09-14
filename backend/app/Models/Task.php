@@ -490,7 +490,10 @@ class Task extends Model
                     'history' => new TaskHistoryResource($history),
                 ];
             } else {
-                return $tasks;
+                return [
+                    'tasks'   => $tasks,
+                    'history' => null,
+                ];
             }
         });
     }
