@@ -29,42 +29,47 @@ export default function Kanban() {
 	}, []);
 
 	return (
-		<div className="w-screen md:w-full">
-			<div className="flex flex-row justify-between w-full">
-				<div className="fixed top-8 left z-50 w-40">
-					<Select
-						onValueChange={(value) => {
-							const selected = projects.find((project) => project.id === value);
-							setSelectedProject(selected);
-						}}
-						value={selectedProject?.id || ""}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="Select a project"></SelectValue>
-						</SelectTrigger>
-						<SelectContent>
-							{Array.isArray(projects) && projects?.length > 0 ? (
-								projects?.map((project) => (
-									<SelectItem key={project?.id} value={project?.id}>
-										{project?.title}
-									</SelectItem>
-								))
-							) : (
-								<SelectItem disabled>No projects available</SelectItem>
-							)}
-						</SelectContent>
-					</Select>
+		<div className="flex flex-col gap-2 mt-5 md:mt-0 w-screen md:w-full md:max-w-[calc(100vw-20rem)] h-[calc(100vh-4rem)]">
+			{/* Top section: project select */}
+			<div className="flex flex-row justify-between w-[250px] ml-2 md:ml-0">
+				<Select
+					onValueChange={(value) => {
+						const selected = projects.find((project) => project.id === value);
+						setSelectedProject(selected);
+					}}
+					value={selectedProject?.id || ""}
+				>
+					<SelectTrigger>
+						<SelectValue placeholder="Select a project" />
+					</SelectTrigger>
+					<SelectContent>
+						{Array.isArray(projects) && projects.length > 0 ? (
+							projects.map((project) => (
+								<SelectItem key={project.id} value={project.id}>
+									{project.title}
+								</SelectItem>
+							))
+						) : (
+							<SelectItem disabled>No projects available</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
+			</div>
+			{/* Kanban section: scrollable */}
+			<div className="w-full overflow-x-auto h-full">
+				<div className="min-w-full">
+					{loading ? (
+						// <div className="flex flex-row space-x-3 w-max h-full">
+						<div className="flex flex-col md:flex-row space-y-2 md:space-x-2 w-full h-[calc(100vh-11rem)]">
+							{Array.from({ length: 4 }).map((_, i) => (
+								<Skeleton key={i} index={i * 0.9} className="h-full w-full mt-2" />
+							))}
+						</div>
+					) : (
+						<KanbanBoard />
+					)}
 				</div>
 			</div>
-			{loading ? (
-				<div className="flex flex-row space-x-3 w-full max-h-[calc(100vh-9rem)] h-screen mt-14">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton key={i} index={i * 0.9} className="h-full w-full" />
-					))}
-				</div>
-			) : (
-				<KanbanBoard />
-			)}
 		</div>
 	);
 }

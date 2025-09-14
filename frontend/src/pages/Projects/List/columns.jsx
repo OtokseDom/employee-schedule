@@ -45,11 +45,11 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 	// Define color classes based on status value
 	const priorityColors = {
-		Low: "bg-gray-100 border border-gray-800 border-2 text-gray-800",
-		Medium: "bg-yellow-100 border border-yellow-800 border-2 text-yellow-800",
-		High: "bg-orange-100 border border-orange-800 border-2 text-orange-800",
-		Urgent: "bg-red-100 border border-red-800 border-2 text-red-800",
-		Critical: "bg-purple-100 border border-purple-800 border-2 text-purple-800",
+		Low: "bg-gray-100 border border-gray-800 border-2 text-foreground bg-opacity-20",
+		Medium: "bg-yellow-100 border border-yellow-800 border-2 text-foreground bg-opacity-20",
+		High: "bg-orange-100 border border-orange-800 border-2 text-foreground bg-opacity-20",
+		Urgent: "bg-red-100 border border-red-800 border-2 text-foreground bg-opacity-20",
+		Critical: "bg-purple-100 border border-purple-800 border-2 text-foreground bg-opacity-20",
 	};
 	const baseColumns = useMemo(
 		() => [

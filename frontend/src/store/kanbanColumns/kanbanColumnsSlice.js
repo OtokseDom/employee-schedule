@@ -3,9 +3,9 @@ export const createKanbanColumnsSlice = (set) => ({
 
 	setKanbanColumns: (kanbanColumns) => set({ kanbanColumns }),
 
-	addKanbanColumn: (kanbanColumns) =>
+	addKanbanColumn: (newColumns) =>
 		set((state) => ({
-			kanbanColumns: [kanbanColumns, ...state.kanbanColumns],
+			kanbanColumns: [...newColumns, ...state.kanbanColumns],
 		})),
 
 	updateKanbanColumn: (id, updates) =>
@@ -13,10 +13,15 @@ export const createKanbanColumnsSlice = (set) => ({
 			kanbanColumns: state.kanbanColumns.map((t) => (t.id === id ? { ...t, ...updates } : t)),
 		})),
 
-	removeKanbanColumn: (id) =>
+	removeKanbanColumnByStatus: (statusId) =>
 		set((state) => ({
-			kanbanColumns: state.kanbanColumns.filter((t) => t.id !== id),
+			kanbanColumns: state.kanbanColumns.filter((c) => c.task_status_id !== statusId),
 		})),
+	removeKanbanColumnByProject: (projectId) =>
+		set((state) => ({
+			kanbanColumns: state.kanbanColumns.filter((c) => c.project_id !== projectId),
+		})),
+
 	/** new bulk updater */
 	updateKanbanColumns: (projectId, updatedColumns) =>
 		set((state) => {

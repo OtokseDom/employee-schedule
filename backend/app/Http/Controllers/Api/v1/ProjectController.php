@@ -33,14 +33,18 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request)
     {
-        $project = $this->project->storeProject($request, $this->userData);
-        if ($project === "not found") {
+        $new = $this->project->storeProject($request, $this->userData);
+        if ($new === "not found") {
             return apiResponse(null, 'Organization not found.', false, 404);
         }
-        if (!$project) {
+        if (!$new) {
             return apiResponse(null, 'Project creation failed', false, 404);
         }
-        return apiResponse(new ProjectResource($project), 'Project created successfully', true, 201);
+        $data = [
+            "project" => new ProjectResource($new['project']),
+            "kanban" => $new['kanban']
+        ];
+        return apiResponse($data, 'Project created successfully', true, 201);
     }
 
     public function show(Project $project)

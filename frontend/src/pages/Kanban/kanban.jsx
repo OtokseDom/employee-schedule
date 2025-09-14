@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors, KeyboardSensor, closestCorners } from "@dnd-kit/core";
+import { DndContext, PointerSensor, useSensor, useSensors, KeyboardSensor, closestCorners, TouchSensor } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Container from "./container";
 import Items from "./items";
@@ -11,11 +11,12 @@ import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore"
 import { API } from "@/constants/api";
 import axiosClient from "@/axios.client";
 
+// TODO: mobile responsiveness
 // TODO: open details on click
 // TODO: Add task on selected status
 // TODO: Status menu - sorting options
 export default function KanbanBoard() {
-	const { tasks, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
+	const { tasks, taskHistory, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { selectedProject } = useProjectsStore();
 	const { kanbanColumns, updateKanbanColumns } = useKanbanColumnsStore();
@@ -72,6 +73,11 @@ export default function KanbanBoard() {
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+		useSensor(TouchSensor, {
+			activationConstraint: {
+				distance: 5, // minimum movement to start drag
+			},
 		})
 	);
 
@@ -220,6 +226,9 @@ export default function KanbanBoard() {
 		/* -------------------------- Handling item Sorting ------------------------- */
 		if (active.id.includes("item")) {
 			const activeTaskId = parseInt(active.id.replace("item-", ""));
+			const task = tasks.find((t) => t.id === activeTaskId);
+			if (!task) return;
+
 			let newStatusId;
 			let newPosition;
 
@@ -239,6 +248,12 @@ export default function KanbanBoard() {
 				return;
 			}
 
+			// Check: if nothing actually changed, skip
+			if (task.status_id === newStatusId && task.position === newPosition) {
+				return;
+			}
+			// Checkk: if moved to another column (status change)
+			const movedToAnotherColumn = task.status_id !== newStatusId;
 			// 1. Optimistic update in Zustand
 			updateTaskPosition(activeTaskId, newStatusId, newPosition);
 
@@ -251,7 +266,9 @@ export default function KanbanBoard() {
 				// 3.1. Merge backend response
 				mergeTaskPositions(res.data.data.tasks);
 				// 3.2 Add history since status changed
-				addTaskHistory(res.data.data.history);
+				if (movedToAnotherColumn) {
+					addTaskHistory(res.data.data.history);
+				}
 			} catch (err) {
 				console.error("Failed to update task position:", err);
 				// Optional rollback: refetch tasks from API
@@ -267,7 +284,7 @@ export default function KanbanBoard() {
 			onDragMove={debouncedHandleDragMove}
 			onDragEnd={handleDragEnd}
 		>
-			<div className="flex gap-4 py-4 mt-14 h-full">
+			<div className="flex gap-4 py-2 h-full">
 				<SortableContext items={containers.map((i) => i.id)}>
 					{containers.map((container) => (
 						<Container
@@ -286,7 +303,7 @@ export default function KanbanBoard() {
 										Drop items here
 									</div>
 								)}
-								<div className="flex items-start flex-col gap-y-4">
+								<div className="flex items-start flex-col gap-y-2">
 									{container.items.map((item) => (
 										<Items key={item.id} id={item.id} title={item.title} description={item.description} position={item.position} />
 									))}
