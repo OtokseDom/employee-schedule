@@ -27,14 +27,18 @@ class TaskStatusController extends Controller
 
     public function store(StoreTaskStatusRequest $request)
     {
-        $task_status = $this->task_status->storeTaskStatus($request, $this->userData);
-        if ($task_status === "not found") {
+        $new = $this->task_status->storeTaskStatus($request, $this->userData);
+        if ($new['status'] === "not found") {
             return apiResponse(null, 'Organization not found.', false, 404);
         }
-        if (!$task_status) {
+        if (!$new) {
             return apiResponse(null, 'Task status creation failed', false, 404);
         }
-        return apiResponse(new TaskStatusResource($task_status), 'Task status created successfully', true, 201);
+        $data = [
+            "status" => new TaskStatusResource($new['status']),
+            "kanban" => $new['kanban']
+        ];
+        return apiResponse($data, 'Task status created successfully', true, 201);
     }
 
     public function show(TaskStatus $task_status)
