@@ -21,7 +21,7 @@ const Items = ({ id, title, description, position }) => {
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"p-2 bg-sidebar-accent shadow-md rounded-md w-full border border-transparent hover:border-foreground cursor-pointer group",
+				"p-2 bg-sidebar-accent shadow-md rounded-md w-full border border-transparent hover:border-foreground cursor-pointer group draggable touch-none",
 				isDragging && "opacity-50"
 			)}
 		>

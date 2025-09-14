@@ -48,7 +48,7 @@ const Container = ({ id, children, title, color, onAddItem }) => {
 				transform: CSS.Translate.toString(transform),
 			}}
 			className={clsx(
-				"min-w-[350px] h-fit min-h-[50vh] max-h-[calc(100vh-9rem)] p-2 bg-card border border-accent rounded-xl flex flex-col",
+				"min-w-[350px] h-fit min-h-[50vh] max-h-[calc(100vh-9rem)] p-2 bg-card border border-accent rounded-xl flex flex-col draggable touch-none",
 				isDragging && "opacity-50"
 			)}
 		>
