@@ -366,13 +366,12 @@ class Task extends Model
         $oldStatusId = $task->status_id;
         $oldPosition = $task->position;
         $projectId = $task->project_id;
-
         // If nothing changes, return early
         if ($oldStatusId === $newStatusId && $oldPosition === $newPosition) return collect([$task]);
 
         return DB::transaction(function () use ($task, $oldStatusId, $oldPosition, $newStatusId, $newPosition, $projectId, $userId, $organization_id) {
 
-
+            $history = "";
             // Step 0: temporarily move the dragged task out of the range
             $task->update(['position' => -1000000]);
 
