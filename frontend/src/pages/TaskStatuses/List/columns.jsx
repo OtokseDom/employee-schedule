@@ -12,9 +12,11 @@ import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { statusColors } from "@/utils/taskHelpers";
+import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
 export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
 	const { taskStatuses, removeTaskStatus } = useTaskStatusesStore();
+	const { removeKanbanColumnByStatus } = useKanbanColumnsStore();
 	const showToast = useToast();
 	const { user } = useAuthContext(); // Get authenticated user details
 	const [selectedTaskStatusId, setSelectedTaskStatusId] = useState(null);
@@ -45,6 +47,7 @@ export const columnsTaskStatus = ({ setIsOpen, setUpdateData, dialogOpen, setDia
 		try {
 			await axiosClient.delete(API().task_status(id));
 			removeTaskStatus(id);
+			removeKanbanColumnByStatus(id);
 			showToast("Success!", "Task Status deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
