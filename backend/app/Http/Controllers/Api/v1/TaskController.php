@@ -10,6 +10,7 @@ use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -74,20 +75,35 @@ class TaskController extends Controller
 
     public function destroy(Request $request, Task $task)
     {
-
         if ($task->organization_id !== $this->userData->organization_id) {
             return apiResponse(null, 'Task not found', false, 404);
         }
-        // Delete subtasks or not
-        if ($request->boolean('delete_subtasks')) {
-            if (!$this->task->deleteSubtasks($task)) {
-                return apiResponse(null, 'Failed to delete subtasks', false, 500);
-            }
-        }
 
-        if (!$task->delete()) {
-            return apiResponse(null, 'Failed to delete task.', false, 500);
-        }
+        $task->deleteWithSubtasks($request->boolean('delete_subtasks'));
+
         return apiResponse('', 'Task deleted successfully');
+    }
+
+
+    public function move(Request $request, Task $task)
+    {
+
+        $validated = $request->validate([
+            'status_id'   => 'required|exists:task_statuses,id',
+            'position'    => 'required|integer|min:1',
+        ]);
+
+        $affectedTasks = $task->updateTaskPosition(
+            $task,
+            $validated['status_id'],
+            $validated['position'],
+            $this->userData->id,
+            $this->userData->organization_id
+        );
+
+        return apiResponse(
+            $affectedTasks,
+            'Task position updated successfully.'
+        );
     }
 }

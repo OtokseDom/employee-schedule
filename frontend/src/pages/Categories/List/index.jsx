@@ -1,15 +1,12 @@
-import axiosClient from "@/axios.client";
 import React, { useEffect, useState } from "react";
 import { columnsCategory } from "./columns";
-import { useToast } from "@/contexts/ToastContextProvider";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { DataTableCategories } from "./data-table";
-import { API } from "@/constants/api";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 export default function Categories() {
-	const { setLoading } = useLoadContext();
-	const { categories, setCategories } = useCategoriesStore();
+	const { categories } = useCategoriesStore();
+	const { fetchCategories } = useTaskHelpers();
 	const [isOpen, setIsOpen] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,21 +16,21 @@ export default function Categories() {
 	}, [isOpen]);
 	useEffect(() => {
 		document.title = "Task Management | Categories";
-		if (!categories || categories.length === 0) fetchData();
+		if (!categories || categories.length === 0) fetchCategories();
 	}, []);
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			// Make both API calls concurrently using Promise.all
-			const categoryResponse = await axiosClient.get(API().category());
-			setCategories(categoryResponse.data.data);
-		} catch (e) {
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			// Always stop loading when done
-			setLoading(false);
-		}
-	};
+	// const fetchData = async () => {
+	// 	setLoading(true);
+	// 	try {
+	// 		// Make both API calls concurrently using Promise.all
+	// 		const categoryResponse = await axiosClient.get(API().category());
+	// 		setCategories(categoryResponse.data.data);
+	// 	} catch (e) {
+	// 		if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+	// 	} finally {
+	// 		// Always stop loading when done
+	// 		setLoading(false);
+	// 	}
+	// };
 
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">

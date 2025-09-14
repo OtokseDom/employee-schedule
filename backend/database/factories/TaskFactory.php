@@ -16,6 +16,8 @@ class TaskFactory extends Factory
 {
     protected $model = Task::class;
 
+    // static counters to track per (project_id, status_id)
+    protected static array $positionCounters = [];
     /**
      * Define the model's default state.
      *
@@ -23,9 +25,19 @@ class TaskFactory extends Factory
      */
     public function definition()
     {
+        $statusId = TaskStatus::inRandomOrder()->value('id'); // still random, but we'll handle sequence
+        $projectId = 1; // you can randomize later if needed
+
+        // initialize counter for this project + status
+        $key = $projectId . '-' . $statusId;
+        if (!isset(self::$positionCounters[$key])) {
+            self::$positionCounters[$key] = 1;
+        } else {
+            self::$positionCounters[$key]++;
+        }
         return [
             'organization_id' => 1,
-            'status_id' => TaskStatus::inRandomOrder()->value('id'),
+            'status_id' => $statusId,
             'project_id' => 1,
             'category_id' => Category::inRandomOrder()->value('id'),
             'title' => $this->faker->sentence,
@@ -41,6 +53,7 @@ class TaskFactory extends Factory
             'delay_reason' => $this->faker->sentence,
             'performance_rating' => $this->faker->numberBetween(0, 10),
             'remarks' => $this->faker->paragraph,
+            'position' => self::$positionCounters[$key],
         ];
     }
 }

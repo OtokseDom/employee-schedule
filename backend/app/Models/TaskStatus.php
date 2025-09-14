@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class TaskStatus extends Model
 {
@@ -35,7 +36,25 @@ class TaskStatus extends Model
         if ($request->organization_id !== $userData->organization_id) {
             return "not found";
         }
-        return $this->create($request->validated());
+        return DB::transaction(function () use ($request, $userData) {
+            // Create the new status
+            $status = $this->create($request->validated());
+
+            // Get all projects under this organization
+            $projects = Project::where('organization_id', $userData->organization_id)->get();
+            foreach ($projects as $project) {
+                $maxPosition = KanbanColumn::where('project_id', $project->id)->max('position');
+
+                KanbanColumn::create([
+                    'organization_id' => $userData->organization_id,
+                    'project_id'      => $project->id,
+                    'task_status_id'       => $status->id,
+                    'position'        => $maxPosition ? $maxPosition + 1 : 1,
+                ]);
+            }
+
+            return $status;
+        });
     }
 
     public function showTaskStatus($organization_id, $status_id)
@@ -82,9 +101,16 @@ class TaskStatus extends Model
         if (Task::where('status_id', $taskStatus->id)->exists()) {
             return false;
         }
-        if (!$taskStatus->delete()) {
-            return null;
-        }
-        return true;
+        return DB::transaction(function () use ($taskStatus) {
+            // Delete kanban columns linked to this status
+            KanbanColumn::where('task_status_id', $taskStatus->id)->delete();
+
+            // Delete the status itself
+            if (!$taskStatus->delete()) {
+                return null;
+            }
+
+            return true;
+        });
     }
 }

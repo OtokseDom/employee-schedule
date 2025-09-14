@@ -32,7 +32,9 @@ return new class extends Migration
             $table->text('delay_reason')->nullable();
             $table->integer('performance_rating')->nullable();
             $table->text('remarks')->nullable();
+            $table->integer('position'); //kanban
             $table->timestamps();
+            $table->unique(['project_id', 'status_id', 'position']);
         });
     }
 

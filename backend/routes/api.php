@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\CategoryController;
 use App\Http\Controllers\Api\v1\DashboardReportController;
+use App\Http\Controllers\Api\v1\KanbanColumnController;
 use App\Http\Controllers\Api\v1\OrganizationController;
 use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\RelationCheckerController;
@@ -44,6 +45,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
 
         /* ---------------------------------- OTHER --------------------------------- */
+        Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
+        Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
         Route::post('/relation-check', [RelationCheckerController::class, 'check']);
     });

@@ -690,10 +690,10 @@ class ReportService
         $chart_data = $query->select(
             'users.id',
             'name',
-            'position',
+            'users.position',
             DB::raw('ROUND(AVG(tasks.performance_rating),2) as avg_performance_rating')
         )
-            ->groupBy('users.id', 'name', 'position')
+            ->groupBy('users.id', 'name', 'users.position')
             ->orderByDesc('avg_performance_rating')
             ->limit(10)
             ->get();

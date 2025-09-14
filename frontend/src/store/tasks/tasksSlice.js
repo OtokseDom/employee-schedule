@@ -76,4 +76,36 @@ export const createTasksSlice = (set) => ({
 		set((state) => ({
 			options: [...state.options, option],
 		})),
+	// Move task position
+	updateTaskPosition: (taskId, newStatusId, newPosition) =>
+		set((state) => {
+			const tasks = [...state.tasks];
+			const task = tasks.find((t) => t.id === taskId);
+			if (!task) return { tasks };
+
+			const oldStatusId = task.status_id;
+			const oldPosition = task.position;
+
+			// Remove task from old column and shift
+			tasks.filter((t) => t.status_id === oldStatusId && t.position > oldPosition).forEach((t) => t.position--);
+
+			// Shift tasks in new column
+			tasks.filter((t) => t.status_id === newStatusId && t.position >= newPosition).forEach((t) => t.position++);
+
+			// Update moved task
+			task.status_id = newStatusId;
+			task.position = newPosition;
+
+			return { tasks };
+		}),
+	// Merge backend authoritative data
+	mergeTaskPositions: (affectedTasks) =>
+		set((state) => {
+			const affectedMap = new Map();
+			affectedTasks.forEach((t) => affectedMap.set(t.id, t));
+
+			return {
+				tasks: state.tasks.map((t) => affectedMap.get(t.id) ?? t),
+			};
+		}),
 });

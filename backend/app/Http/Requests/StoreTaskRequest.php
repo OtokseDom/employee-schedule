@@ -64,6 +64,11 @@ class StoreTaskRequest extends FormRequest
             'delay_reason' => 'nullable|string',
             'performance_rating' => 'nullable|integer|min:0|max:10',
             'remarks' => 'nullable|string',
+            'position' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
         ];
     }
 

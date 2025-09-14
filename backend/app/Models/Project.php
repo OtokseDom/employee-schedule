@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Http\Resources\ProjectResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Project extends Model
 {
@@ -60,9 +61,27 @@ class Project extends Model
         if ($request->organization_id !== $userData->organization_id) {
             return "not found";
         }
-        $project = $this->create($request->validated());
-        $project->load(['status:id,name,color']);
-        return new ProjectResource($project);
+
+        return DB::transaction(function () use ($request, $userData) {
+            // Create the new project
+            $project = $this->create($request->validated());
+
+            // Fetch all statuses for this organization
+            $statuses = TaskStatus::where('organization_id', $userData->organization_id)->get();
+
+            foreach ($statuses as $key => $status) {
+                KanbanColumn::create([
+                    'project_id'      => $project->id,
+                    'task_status_id'       => $status->id,
+                    'position'        => ++$key,
+                    'organization_id' => $userData->organization_id,
+                ]);
+            }
+
+            $project->load(['status:id,name,color']);
+
+            return new ProjectResource($project);
+        });
     }
 
     public function showProject($organization_id, $project_id)
@@ -93,9 +112,22 @@ class Project extends Model
         if (Task::where('project_id', $project->id)->exists()) {
             return false;
         }
-        if (!$project->delete()) {
-            return null;
-        }
-        return true;
+
+        return DB::transaction(function () use ($project) {
+            // Delete kanban columns linked to this status
+            KanbanColumn::where('project_id', $project->id)->delete();
+
+            // Delete the project itself
+            if (!$project->delete()) {
+                return null;
+            }
+
+            return true;
+        });
+    }
+
+    public function getKanbanColumns($organization_id)
+    {
+        return KanbanColumn::where('organization_id', $organization_id)->orderBy("id", "DESC")->get();
     }
 }

@@ -31,5 +31,9 @@ export const useTasksStore = () => {
 		options: useAppStore((state) => state.options),
 		setOptions: useAppStore((state) => state.setOptions),
 		addOption: useAppStore((state) => state.addOption),
+		// Move task position
+		updateTaskPosition: useAppStore((state) => state.updateTaskPosition),
+		// Merge backend authoritative data
+		mergeTaskPositions: useAppStore((state) => state.mergeTaskPositions),
 	};
 };

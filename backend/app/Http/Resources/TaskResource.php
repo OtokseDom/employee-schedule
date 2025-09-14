@@ -35,6 +35,7 @@ class TaskResource extends JsonResource
             'delay_reason' => $this->delay_reason,
             'performance_rating' => $this->performance_rating,
             'remarks' => $this->remarks,
+            'position' => $this->position,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'assignees' => $this->assignees && $this->assignees->count() > 0

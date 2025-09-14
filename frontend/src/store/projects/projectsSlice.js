@@ -17,4 +17,7 @@ export const createProjectsSlice = (set) => ({
 		set((state) => ({
 			projects: state.projects.filter((t) => t.id !== id),
 		})),
+	// Kanban filter
+	selectedProject: null,
+	setSelectedProject: (selectedProject) => set({ selectedProject }),
 });

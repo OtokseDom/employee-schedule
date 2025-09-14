@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TaskSeeder::class,
             TaskHistorySeeder::class,
             TaskAssigneeSeeder::class,
+            KanbanColumnSeeder::class,
         ]);
     }
 }

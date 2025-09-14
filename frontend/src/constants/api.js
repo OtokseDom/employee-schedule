@@ -14,4 +14,6 @@ export const API = (version = "v1") => ({
 	organization: (id = "") => `/${version}/organization${id ? `/${id}` : ""}`,
 	organization_generate_code: (id) => `/${version}/organization/${id}/generate-code`,
 	dashboard: (from = "", to = "", users = "", projects = "") => `/${version}/dashboard?from=${from}&to=${to}&users=${users}&projects=${projects}`,
+	kanban_column: (id = "") => `/${version}/kanban-column/${id}`,
+	task_move: (id = "") => `/${version}/tasks/${id}/move`,
 });
