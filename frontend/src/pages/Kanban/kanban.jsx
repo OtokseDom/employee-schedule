@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors, KeyboardSensor, closestCorners } from "@dnd-kit/core";
+import { DndContext, PointerSensor, useSensor, useSensors, KeyboardSensor, closestCorners, TouchSensor } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Container from "./container";
 import Items from "./items";
@@ -73,6 +73,11 @@ export default function KanbanBoard() {
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+		useSensor(TouchSensor, {
+			activationConstraint: {
+				distance: 5, // minimum movement to start drag
+			},
 		})
 	);
 
