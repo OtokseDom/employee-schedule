@@ -22,9 +22,9 @@ export function DataTableProjects({ columns, isOpen, setIsOpen, updateData, setU
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [columnVisibility, setColumnVisibility] = useState([]);
-	const { projects: data } = useProjectsStore([]);
+	const { projects: data } = useProjectsStore();
 	const table = useReactTable({
-		data,
+		data: data || [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
