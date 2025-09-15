@@ -20,6 +20,7 @@ import { useUsersStore } from "@/store/users/usersStore";
 import { useUserStore } from "@/store/user/userStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 
 const formSchema = z.object({
 	name: z.string().refine((data) => data.trim() !== "", {
@@ -44,6 +45,7 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 	const showToast = useToast();
 	const { addUser, updateUser } = useUsersStore();
 	const { setUser: setProfileUser } = useUserStore();
+	const { addUserFilter, updateUserFilter } = useDashboardStore();
 	const { fetchTasks } = useTaskHelpers();
 	const { addOption } = useTasksStore();
 
@@ -88,10 +90,12 @@ export default function UserForm({ setIsOpen, updateData, setUpdateData, userPro
 				const userResponse = await axiosClient.post(API().user(), formattedData);
 				addUser(userResponse.data.data);
 				addOption({ value: userResponse.data.data.id, label: userResponse.data.data.name });
+				addUserFilter(userResponse.data.data);
 				showToast("Success!", "User added.", 3000);
 			} else {
 				const userResponse = await axiosClient.put(API().user(updateData?.id), formattedData);
 				updateUser(updateData.id, userResponse.data.data);
+				updateUserFilter(updateData?.id, { label: userResponse.data.data.name });
 				if (userProfileId) setProfileUser(userResponse.data.data);
 				// Update auth user data if the updated user is the current logged-in user
 				const formattedAuthData = { data: userResponse.data.data };

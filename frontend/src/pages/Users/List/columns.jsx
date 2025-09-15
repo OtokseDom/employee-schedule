@@ -11,9 +11,11 @@ import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 
 export const columns = ({ setIsOpen, setUpdateData }) => {
 	const { users, updateUser, removeUser } = useUsersStore();
+	const { removeUserFilter } = useDashboardStore();
 	const { user } = useAuthContext();
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
@@ -73,6 +75,7 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 			console.log(id);
 			const userResponse = await axiosClient.delete(API().user(id));
 			removeUser(id);
+			removeUserFilter(id);
 			showToast("Success!", userResponse?.data?.message, 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
