@@ -2,8 +2,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Check, Clock, GripVertical, Text } from "lucide-react";
+import { Check, Clock, Edit, GripVertical, Text } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { Button } from "@/components/ui/button";
 
 const Items = ({ item }) => {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -40,10 +41,23 @@ const Items = ({ item }) => {
 				isDragging && "opacity-50"
 			)}
 		>
-			<div className="flex flex-row w-full draggable touch-none">
+			<div className="flex flex-row w-full items-center justify-between draggable touch-none">
+				{/* Grip handle */}
 				<div className="w-full py-1 hover:cursor-grab active:cursor-grabbing" {...listeners}>
 					<GripVertical size={16} />
 				</div>
+
+				{/* Edit button */}
+				<Button
+					variant="ghost"
+					onClick={() => console.log("Edit", item.id)}
+					className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+					// prevent this button from being draggable
+					onMouseDown={(e) => e.stopPropagation()}
+					onTouchStart={(e) => e.stopPropagation()}
+				>
+					<Edit size={16} />
+				</Button>
 			</div>
 			<div className="flex justify-start">
 				<Toggle variant="default" size="none" aria-label="Toggle" className="group h-fit py-2">
@@ -55,7 +69,7 @@ const Items = ({ item }) => {
 					<p>{item.title}</p>
 					<span className="flex flex-row items-center gap-x-1 text-sm text-muted-foreground">
 						<span
-							className={`flex items-center gap-x-1 px-1 rounded ${
+							className={`flex items-center gap-x-1 p-1 rounded ${
 								endDate && isBeforeToday(endDate)
 									? "bg-red-300 text-black" // overdue
 									: endDate && isTodayOrTomorrow(endDate)
