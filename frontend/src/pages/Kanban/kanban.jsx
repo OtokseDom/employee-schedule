@@ -24,7 +24,7 @@ export default function KanbanBoard() {
 
 	useEffect(() => {
 		// filter kanban columns for the selected project
-		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
+		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject?.id).sort((a, b) => a.position - b.position); // enforce ordering
 		const mapped = projectColumns
 			.map((col) => {
 				const status = taskStatuses.find((s) => s.id === col.task_status_id);
@@ -37,7 +37,7 @@ export default function KanbanBoard() {
 					color: status.color,
 					position: col.position,
 					items: tasks
-						.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
+						.filter((task) => task.status_id === status.id && task.project_id === selectedProject?.id)
 						.sort((a, b) => a.position - b.position) // <-- order by position
 						.map((task) => ({
 							id: `item-${task.id}`,
@@ -169,7 +169,7 @@ export default function KanbanBoard() {
 					position: overContainer.position, // send the new position
 				});
 				// Re-map backend columns into DnD containers format
-				const projectColumns = res.data.data.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position);
+				const projectColumns = res.data.data.filter((col) => col.project_id === selectedProject?.id).sort((a, b) => a.position - b.position);
 
 				// For store (only column info, int ids, no items)
 				const mappedForStore = projectColumns
@@ -202,7 +202,7 @@ export default function KanbanBoard() {
 							color: status.color,
 							position: col.position,
 							items: tasks
-								.filter((task) => task.status_id === status.id && task.project_id === selectedProject.id)
+								.filter((task) => task.status_id === status.id && task.project_id === selectedProject?.id)
 								.sort((a, b) => a.position - b.position)
 								.map((task) => ({
 									id: `item-${task.id}`, // string
@@ -216,7 +216,7 @@ export default function KanbanBoard() {
 					.filter(Boolean);
 
 				// Apply updates
-				updateKanbanColumns(selectedProject.id, mappedForStore); // store: ints, no items
+				updateKanbanColumns(selectedProject?.id, mappedForStore); // store: ints, no items
 				setContainers(mappedForDnD); // DnD: strings + items
 			} catch (error) {
 				console.error("Failed to swap columns:", error);

@@ -22,11 +22,17 @@ export default function Kanban() {
 		document.title = "Task Management | Board";
 		if (tasks === null) fetchTasks();
 		if (projects === null) fetchProjects();
+		else setSelectedProject(projects[0]);
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		else if (!selectedProject) setSelectedProject(projects[0]);
 	}, []);
+	useEffect(() => {
+		if (projects && projects.length > 0 && !selectedProject) {
+			setSelectedProject(projects[0]);
+			console.log("Project 0 2:", projects[0]);
+		}
+	}, [projects, selectedProject]);
 
 	return (
 		<div className="flex flex-col gap-2 mt-5 md:mt-0 w-screen md:w-full md:max-w-[calc(100vw-20rem)] h-[calc(100vh-4rem)]">
@@ -34,10 +40,10 @@ export default function Kanban() {
 			<div className="flex flex-row justify-between w-[250px] ml-2 md:ml-0">
 				<Select
 					onValueChange={(value) => {
-						const selected = projects.find((project) => project.id === value);
+						const selected = projects.find((project) => String(project.id) === value);
 						setSelectedProject(selected);
 					}}
-					value={selectedProject?.id || ""}
+					value={selectedProject ? String(selectedProject.id) : ""}
 				>
 					<SelectTrigger>
 						<SelectValue placeholder="Select a project" />
@@ -45,7 +51,8 @@ export default function Kanban() {
 					<SelectContent>
 						{Array.isArray(projects) && projects.length > 0 ? (
 							projects.map((project) => (
-								<SelectItem key={project.id} value={project.id}>
+								// <SelectItem key={project.id} value={project.id}>
+								<SelectItem key={project.id} value={String(project.id)}>
 									{project.title}
 								</SelectItem>
 							))
