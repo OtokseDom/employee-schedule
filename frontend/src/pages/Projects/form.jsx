@@ -20,6 +20,7 @@ import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 
 const formSchema = z.object({
 	title: z.string().refine((data) => data.trim() !== "", {
@@ -38,6 +39,7 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { addProject, updateProject } = useProjectsStore([]);
+	const { updateProjectFilter, addProjectFilter } = useDashboardStore();
 	const { addKanbanColumn } = useKanbanColumnsStore();
 	const { fetchTasks } = useTaskHelpers();
 	const { taskStatuses } = useTaskStatusesStore();
@@ -82,10 +84,12 @@ export default function ProjectForm({ setIsOpen, updateData, setUpdateData }) {
 				const projectResponse = await axiosClient.post(API().project(), parsedForm);
 				addProject(projectResponse.data.data.project);
 				addKanbanColumn(projectResponse.data.data.kanban);
+				addProjectFilter(projectResponse.data.data.project);
 				showToast("Success!", "Project added.", 3000);
 			} else {
 				const projectResponse = await axiosClient.put(API().project(updateData?.id), parsedForm);
 				updateProject(updateData?.id, projectResponse.data.data);
+				updateProjectFilter(updateData?.id, { label: projectResponse.data.data.title });
 				showToast("Success!", "Project updated.", 3000);
 			}
 		} catch (e) {
