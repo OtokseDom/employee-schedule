@@ -67,10 +67,10 @@ export default function UserProfile() {
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const [tableData, setTableData] = useState([]);
 	useEffect(() => {
-		if (tasks || tasks?.length > 0) {
-			const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
-			setTableData(flattenTasks(filteredUserTasks));
-		}
+		// if (tasks !== null) {
+		const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
+		setTableData(flattenTasks(filteredUserTasks));
+		// }
 	}, [tasks, id]);
 
 	useEffect(() => {
@@ -87,15 +87,15 @@ export default function UserProfile() {
 	useEffect(() => {
 		document.title = "Task Management | User Profile";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (!tasks || tasks.length === 0) fetchTasks();
-		if (!projects || projects.length === 0) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
+		if (tasks === null) fetchTasks();
+		if (projects === null) fetchProjects();
 	}, []);
 
 	useEffect(() => {
 		// Because 'view account' when on profile page already does not trigger rerender
-		if (Object.keys(user).length === 0 || user.id !== id) fetchDetails();
+		if (Object.keys(user).length === 0 || parseInt(user.id) !== parseInt(id)) fetchDetails();
 		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchUserReports(id);
 	}, [id]);
 

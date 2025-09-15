@@ -20,11 +20,11 @@ export default function Kanban() {
 
 	useEffect(() => {
 		document.title = "Task Management | Board";
-		if (!tasks || tasks.length === 0) fetchTasks();
+		if (tasks === null) fetchTasks();
+		if (projects === null) fetchProjects();
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!projects || projects.length === 0) fetchProjects();
 		else if (!selectedProject) setSelectedProject(projects[0]);
 	}, []);
 

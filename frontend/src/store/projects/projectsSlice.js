@@ -1,5 +1,5 @@
 export const createProjectsSlice = (set) => ({
-	projects: [],
+	projects: null,
 
 	setProjects: (projects) => set({ projects }),
 

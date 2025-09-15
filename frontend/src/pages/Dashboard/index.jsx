@@ -35,7 +35,7 @@ export default function UserProfile() {
 		document.title = "Task Management";
 		if (!reports || Object.keys(reports).length === 0) fetchReports();
 		if (!users || users.length === 0) fetchUsers();
-		if (!projects || projects.length === 0) fetchProjects();
+		if (projects === null) fetchProjects();
 	}, []);
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly

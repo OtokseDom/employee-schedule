@@ -35,11 +35,11 @@ export default function ScheduleCalendar() {
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (!projects || projects.length === 0) fetchProjects();
+		if (projects === null) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		else if (!selectedUser) setSelectedUser(users[0]);
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!tasks || tasks.length === 0) fetchTasks();
+		if (tasks === null) fetchTasks();
 	}, []);
 
 	// For week view - get the start of the week (Sunday)

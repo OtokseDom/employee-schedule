@@ -1,5 +1,5 @@
 export const createTasksSlice = (set) => ({
-	tasks: [],
+	tasks: null,
 
 	setTasks: (tasks) => set({ tasks }),
 

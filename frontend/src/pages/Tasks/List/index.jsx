@@ -42,12 +42,13 @@ export default function Tasks() {
 	}, [isOpen]);
 
 	useEffect(() => {
+		console.log(tasks);
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (!projects || projects.length === 0) fetchProjects();
+		if (projects === null) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (!tasks || tasks.length === 0) fetchTasks();
+		if (tasks === null) fetchTasks();
 	}, []);
 
 	useEffect(() => {

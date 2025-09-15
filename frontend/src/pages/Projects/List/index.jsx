@@ -27,7 +27,7 @@ export default function Projects() {
 	useEffect(() => {
 		document.title = "Task Management | Projects";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (!projects || projects.length === 0) fetchProjects();
+		if (projects === null) fetchProjects();
 	}, []);
 	const handleDelete = async (id) => {
 		setLoading(true);
