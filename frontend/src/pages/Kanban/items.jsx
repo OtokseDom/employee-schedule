@@ -2,16 +2,31 @@ import { useSortable } from "@dnd-kit/sortable";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Check, GripVertical, Text } from "lucide-react";
+import { Check, Clock, GripVertical, Text } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
-const Items = ({ id, title, description, position }) => {
+const Items = ({ item }) => {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-		id: id,
+		id: item.id,
 		data: {
 			type: "item",
 		},
 	});
+	// Local today/tomorrow
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const tomorrow = new Date(today);
+	tomorrow.setDate(today.getDate() + 1);
+
+	// Convert task dates to local
+	const startDate = item.start_date ? new Date(item.start_date) : null;
+	const endDate = item.end_date ? new Date(item.end_date) : null;
+
+	// Helper functions
+	const isBeforeToday = (date) => date < today;
+	const isTodayOrTomorrow = (date) => date >= today && date <= tomorrow;
+
 	return (
 		<div
 			ref={setNodeRef}
@@ -37,8 +52,27 @@ const Items = ({ id, title, description, position }) => {
 					</div>
 				</Toggle>
 				<div className="w-full">
-					<p>{title}</p>
-					<p>{description && <Text size={14} className="text-muted-foreground" />}</p>
+					<p>{item.title}</p>
+					<span className="flex flex-row items-center gap-x-1 text-sm text-muted-foreground">
+						<span
+							className={`flex items-center gap-x-1 px-1 rounded ${
+								endDate && isBeforeToday(endDate)
+									? "bg-red-300 text-black" // overdue
+									: endDate && isTodayOrTomorrow(endDate)
+									? "bg-yellow-700 text-black" // near due
+									: ""
+							}`}
+						>
+							{endDate && <Clock size={16} />}
+							{startDate && `${startDate.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - `}
+							{endDate &&
+								endDate.toLocaleDateString(undefined, {
+									month: "short",
+									day: "numeric",
+								})}
+						</span>
+						{item.description && <Text size={14} className="text-muted-foreground" />}
+					</span>
 				</div>
 			</div>
 		</div>
