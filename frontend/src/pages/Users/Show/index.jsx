@@ -30,19 +30,12 @@ import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 export default function UserProfile() {
 	const { id } = useParams(); // Get user ID from URL
-	const {
-		user,
-		setUser,
-		userReports,
-		setUserReports,
-		profileProjectFilter,
-		profileFilters,
-		setProfileFilters,
-		profileSelectedProjects,
-		setProfileSelectedProjects,
-	} = useUserStore();
+	const { user, setUser, userReports, setUserReports, profileFilters, setProfileFilters, profileSelectedProjects, setProfileSelectedProjects } =
+		useUserStore();
+	const { projectFilter } = useDashboardStore();
 	const { users } = useUsersStore();
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
@@ -191,7 +184,7 @@ export default function UserProfile() {
 								setReports={setUserReports}
 								filters={profileFilters}
 								setFilters={setProfileFilters}
-								projects={profileProjectFilter}
+								projects={projectFilter}
 								selectedProjects={profileSelectedProjects}
 								setSelectedProjects={setProfileSelectedProjects}
 								userId={id}
