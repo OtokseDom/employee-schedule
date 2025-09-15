@@ -20,4 +20,5 @@ export const createProjectsSlice = (set) => ({
 	// Kanban filter
 	selectedProject: null,
 	setSelectedProject: (selectedProject) => set({ selectedProject }),
+	removeSelectedProject: () => set({ selectedProject: null }),
 });

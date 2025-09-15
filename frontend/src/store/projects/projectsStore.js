@@ -9,5 +9,6 @@ export const useProjectsStore = () => {
 		removeProject: useAppStore((state) => state.removeProject),
 		selectedProject: useAppStore((state) => state.selectedProject),
 		setSelectedProject: useAppStore((state) => state.setSelectedProject),
+		removeSelectedProject: useAppStore((state) => state.removeSelectedProject),
 	};
 };
