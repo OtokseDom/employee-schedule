@@ -22,16 +22,11 @@ export default function Kanban() {
 		document.title = "Task Management | Board";
 		if (tasks === null) fetchTasks();
 		if (projects === null) fetchProjects();
-		else setSelectedProject(projects[0]);
+		else if (!selectedProject) setSelectedProject(projects[0]);
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
 	}, []);
-	useEffect(() => {
-		if (projects && projects.length > 0 && !selectedProject) {
-			setSelectedProject(projects[0]);
-		}
-	}, [projects, selectedProject]);
 
 	return (
 		<div className="flex flex-col gap-2 mt-5 md:mt-0 w-screen md:w-full md:max-w-[calc(100vw-20rem)] h-[calc(100vh-4rem)]">

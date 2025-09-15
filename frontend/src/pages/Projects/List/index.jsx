@@ -13,7 +13,7 @@ import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 
 export default function Projects() {
 	const { setLoading } = useLoadContext();
-	const { projects, removeProject } = useProjectsStore([]);
+	const { projects, removeProject, removeSelectedProject } = useProjectsStore([]);
 	const { taskStatuses } = useTaskStatusesStore();
 	const { removeKanbanColumnByProject } = useKanbanColumnsStore();
 	const { removeProjectFilter } = useDashboardStore();
@@ -38,6 +38,7 @@ export default function Projects() {
 			removeProject(id);
 			removeKanbanColumnByProject(id);
 			removeProjectFilter(id);
+			removeSelectedProject();
 			showToast("Success!", "Project deleted.", 3000);
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
