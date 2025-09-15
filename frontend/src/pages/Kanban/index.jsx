@@ -30,7 +30,6 @@ export default function Kanban() {
 	useEffect(() => {
 		if (projects && projects.length > 0 && !selectedProject) {
 			setSelectedProject(projects[0]);
-			console.log("Project 0 2:", projects[0]);
 		}
 	}, [projects, selectedProject]);
 

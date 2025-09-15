@@ -139,7 +139,6 @@ export default function Week({
 
 													// Calculate duration in hours
 													const duration = endHour - startHour + (endMin - startMin) / 60;
-													// console.log(duration ?? duration);
 													return (
 														<div
 															key={task.id}

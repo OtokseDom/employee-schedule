@@ -72,7 +72,6 @@ export const columns = ({ setIsOpen, setUpdateData }) => {
 	const handleDelete = async (id) => {
 		setLoading(true);
 		try {
-			console.log(id);
 			const userResponse = await axiosClient.delete(API().user(id));
 			removeUser(id);
 			removeUserFilter(id);
