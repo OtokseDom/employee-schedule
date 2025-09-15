@@ -2,7 +2,6 @@ export const createDashboardSlice = (set) => ({
 	// STATE
 	reports: {},
 	userFilter: [],
-	projectFilter: [],
 	selectedUsers: [],
 	selectedProjects: [],
 	filters: {
@@ -18,10 +17,26 @@ export const createDashboardSlice = (set) => ({
 		},
 	},
 
+	// Project Filter
+	projectFilter: [],
+	setProjectFilter: (projectFilter) => set({ projectFilter }),
+	addProjectFilter: (project) =>
+		set((state) => ({
+			projectFilter: [{ value: project.id, label: project.title }, ...state.projectFilter],
+		})),
+
+	updateProjectFilter: (value, updates) =>
+		set((state) => ({
+			projectFilter: state.projectFilter.map((t) => (t.value === value ? { ...t, ...updates } : t)),
+		})),
+
+	removeProjectFilter: (value) =>
+		set((state) => ({
+			projectFilter: state.projectFilter.filter((t) => t.value !== value),
+		})),
 	// ACTIONS
 	setReports: (reports) => set({ reports }),
 	setUserFilter: (userFilter) => set({ userFilter }),
-	setProjectFilter: (projectFilter) => set({ projectFilter }),
 	setSelectedUsers: (selectedUsers) => set({ selectedUsers }),
 	setSelectedProjects: (selectedProjects) => set({ selectedProjects }),
 	// Filter Actions
