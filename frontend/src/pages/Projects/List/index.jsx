@@ -13,7 +13,7 @@ import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 
 export default function Projects() {
 	const { setLoading } = useLoadContext();
-	const { projects, removeProject, removeSelectedProject } = useProjectsStore([]);
+	const { projects, projectsLoaded, removeProject, removeSelectedProject } = useProjectsStore([]);
 	const { taskStatuses } = useTaskStatusesStore();
 	const { removeKanbanColumnByProject } = useKanbanColumnsStore();
 	const { removeProjectFilter } = useDashboardStore();
@@ -29,7 +29,7 @@ export default function Projects() {
 	useEffect(() => {
 		document.title = "Task Management | Projects";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (projects === null) fetchProjects();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
 	const handleDelete = async (id) => {
 		setLoading(true);

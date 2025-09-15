@@ -1,7 +1,8 @@
 export const createTasksSlice = (set) => ({
-	tasks: null,
+	tasks: [],
+	tasksLoaded: false, // flag to know if fetched
 
-	setTasks: (tasks) => set({ tasks }),
+	setTasks: (tasks) => set({ tasks, tasksLoaded: true }),
 
 	addTask: (task) =>
 		set((state) => ({

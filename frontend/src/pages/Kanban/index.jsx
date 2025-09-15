@@ -11,17 +11,17 @@ import { useUsersStore } from "@/store/users/usersStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 export default function Kanban() {
 	const { loading, setLoading } = useLoadContext();
-	const { tasks } = useTasksStore();
+	const { tasks, tasksLoaded } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
 	const { categories } = useCategoriesStore();
-	const { projects, selectedProject, setSelectedProject } = useProjectsStore();
+	const { projects, projectsLoaded, selectedProject, setSelectedProject } = useProjectsStore();
 	const { fetchTasks, fetchTaskStatuses, fetchProjects, fetchCategories, fetchUsers } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Board";
-		if (tasks === null) fetchTasks();
-		if (projects === null) fetchProjects();
+		if ((!tasks || tasks.length === 0) && !tasksLoaded) fetchTasks();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 		else if (!selectedProject) setSelectedProject(projects[0]);
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();

@@ -174,9 +174,9 @@ export function AppSidebar() {
 		e.preventDefault();
 		axiosClient.post(API().logout).then(() => {
 			setUser({});
-			setTasks(null);
+			setTasks([]);
 			setUsers([]);
-			setProjects(null);
+			setProjects([]);
 			setCategories([]);
 			setTaskStatuses([]);
 			setReports([]);

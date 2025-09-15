@@ -9,10 +9,10 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 // TODO: Task discussion/comment section
 export default function Tasks() {
-	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { tasks, tasksLoaded, setRelations, setActiveTab } = useTasksStore();
 	const { users } = useUsersStore();
 	const { taskStatuses } = useTaskStatusesStore();
-	const { projects } = useProjectsStore();
+	const { projects, projectsLoaded } = useProjectsStore();
 	const { categories } = useCategoriesStore();
 	// Fetch Hooks
 	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
@@ -44,10 +44,10 @@ export default function Tasks() {
 	useEffect(() => {
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (projects === null) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (tasks === null) fetchTasks();
+		if ((!tasks || tasks.length === 0) && !tasksLoaded) fetchTasks();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
 
 	useEffect(() => {

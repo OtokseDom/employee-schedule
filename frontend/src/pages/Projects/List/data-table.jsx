@@ -24,7 +24,7 @@ export function DataTableProjects({ columns, isOpen, setIsOpen, updateData, setU
 	const [columnVisibility, setColumnVisibility] = useState([]);
 	const { projects: data } = useProjectsStore();
 	const table = useReactTable({
-		data: data || [],
+		data: data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),

@@ -24,9 +24,9 @@ export default function ScheduleCalendar() {
 	const end_date = endOfWeek(endOfMonth(currentMonth));
 
 	// API Data
-	const { tasks, selectedUser, setSelectedUser } = useTasksStore();
+	const { tasks, tasksLoaded, selectedUser, setSelectedUser } = useTasksStore();
 	const { users } = useUsersStore();
-	const { projects } = useProjectsStore();
+	const { projects, projectsLoaded } = useProjectsStore();
 	const { categories } = useCategoriesStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	// Fetch Hooks
@@ -35,11 +35,11 @@ export default function ScheduleCalendar() {
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
-		if (projects === null) fetchProjects();
 		if (!users || users.length === 0) fetchUsers();
 		else if (!selectedUser) setSelectedUser(users[0]);
 		if (!categories || categories.length === 0) fetchCategories();
-		if (tasks === null) fetchTasks();
+		if ((!tasks || tasks.length === 0) && !tasksLoaded) fetchTasks();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
 
 	// For week view - get the start of the week (Sunday)

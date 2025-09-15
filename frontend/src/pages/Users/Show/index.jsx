@@ -37,9 +37,9 @@ export default function UserProfile() {
 		useUserStore();
 	const { projectFilter } = useDashboardStore();
 	const { users } = useUsersStore();
-	const { projects } = useProjectsStore();
+	const { projects, projectsLoaded } = useProjectsStore();
 	const { categories } = useCategoriesStore();
-	const { tasks, setRelations, setActiveTab } = useTasksStore();
+	const { tasks, tasksLoaded, setRelations, setActiveTab } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	// Fetch Hooks
 	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses, fetchUserReports } = useTaskHelpers();
@@ -82,8 +82,8 @@ export default function UserProfile() {
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
 		if (!categories || categories.length === 0) fetchCategories();
-		if (tasks === null) fetchTasks();
-		if (projects === null) fetchProjects();
+		if ((!tasks || tasks.length === 0) && !tasksLoaded) fetchTasks();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
 
 	useEffect(() => {

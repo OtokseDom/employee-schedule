@@ -3,6 +3,7 @@ import { useAppStore } from "../appStore";
 export const useProjectsStore = () => {
 	return {
 		projects: useAppStore((state) => state.projects),
+		projectsLoaded: useAppStore((state) => state.projectsLoaded),
 		setProjects: useAppStore((state) => state.setProjects),
 		addProject: useAppStore((state) => state.addProject),
 		updateProject: useAppStore((state) => state.updateProject),

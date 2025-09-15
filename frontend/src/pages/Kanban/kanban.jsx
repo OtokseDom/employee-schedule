@@ -24,7 +24,7 @@ export default function KanbanBoard() {
 
 	useEffect(() => {
 		// filter kanban columns for the selected project
-		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject.id).sort((a, b) => a.position - b.position); // enforce ordering
+		const projectColumns = kanbanColumns.filter((col) => col.project_id === selectedProject?.id).sort((a, b) => a.position - b.position); // enforce ordering
 		const mapped = projectColumns
 			.map((col) => {
 				const status = taskStatuses.find((s) => s.id === col.task_status_id);
