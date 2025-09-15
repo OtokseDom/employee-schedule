@@ -42,7 +42,6 @@ export default function Tasks() {
 	}, [isOpen]);
 
 	useEffect(() => {
-		console.log(tasks);
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (projects === null) fetchProjects();
@@ -52,7 +51,7 @@ export default function Tasks() {
 	}, []);
 
 	useEffect(() => {
-		setTableData(flattenTasks(tasks));
+		if (tasks !== null) setTableData(flattenTasks(tasks));
 	}, [tasks]);
 
 	return (

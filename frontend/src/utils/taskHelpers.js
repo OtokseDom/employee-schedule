@@ -26,7 +26,7 @@ export const useTaskHelpers = () => {
 		setLoading(true);
 		try {
 			const res = await axiosClient.get(API().task());
-			setTasks(res?.data?.data?.tasks ?? []);
+			setTasks(res?.data?.data?.tasks || []);
 			setTaskHistory(res?.data?.data?.task_history);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
@@ -39,7 +39,7 @@ export const useTaskHelpers = () => {
 		setLoading(true);
 		try {
 			const res = await axiosClient.get(API().project());
-			setProjects(res?.data?.data?.projects ?? []);
+			setProjects(res?.data?.data?.projects || []);
 			setKanbanColumns(res?.data?.data?.kanbanColumns);
 			setSelectedProject(res?.data?.data?.projects[res?.data?.data?.projects?.length - 1]);
 			if (res.data.data.projects.length !== projectFilter.length || res.data.data.projects.length !== profileProjectFilter.length) {
@@ -147,7 +147,7 @@ export function flattenTasks(tasks) {
 	});
 
 	// Filter only tasks NOT in children list (top-level only)
-	const topLevelTasks = tasks.filter((task) => !childIds.has(task.id));
+	const topLevelTasks = (tasks ?? []).filter((task) => !childIds.has(task.id));
 
 	const flatten = (taskList, depth = 0) => {
 		let flat = [];
