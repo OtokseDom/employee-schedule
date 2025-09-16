@@ -370,6 +370,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 				id: "actions",
 				cell: ({ row, table }) => {
 					const task = row.original;
+					const selectedCount = table.getSelectedRowModel().rows.length;
 					return (
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
@@ -380,20 +381,21 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
+								{selectedCount < 2 && (
+									<DropdownMenuItem
+										className="cursor-pointer"
+										onClick={(e) => {
+											e.stopPropagation();
+											handleUpdate(task);
+										}}
+									>
+										View and Update Task
+									</DropdownMenuItem>
+								)}
 								<DropdownMenuItem
 									className="cursor-pointer"
 									onClick={(e) => {
 										e.stopPropagation();
-										handleUpdate(task);
-									}}
-								>
-									View and Update Task
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									className="cursor-pointer"
-									onClick={(e) => {
-										e.stopPropagation();
-										// 🔥 Get selected rows
 										const selected = table.getSelectedRowModel().rows.map((r) => r.original);
 										console.log("Selected:", selected);
 									}}
