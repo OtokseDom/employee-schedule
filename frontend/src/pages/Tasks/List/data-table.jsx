@@ -16,6 +16,12 @@ import History from "@/components/task/History";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useUsersStore } from "@/store/users/usersStore";
+import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
+import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import UpdateDialog from "./updateDialog";
 
 export function DataTableTasks({
 	columns,
@@ -37,6 +43,14 @@ export function DataTableTasks({
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
+	const { tasks, taskHistory, setSelectedTaskHistory, setRelations, selectedUser, options } = useTasksStore();
+	const { users } = useUsersStore();
+	const { taskStatuses } = useTaskStatusesStore();
+	const { projects } = useProjectsStore();
+	const { categories } = useCategoriesStore();
+	const [selectedTasks, setSelectedTasks] = useState([]);
+	const [bulkAction, setBulkAction] = useState(null);
+
 	const handleUpdate = (task) => {
 		setIsOpen(true);
 		setUpdateData(task);
@@ -198,6 +212,26 @@ export function DataTableTasks({
 					</div>
 				</div>
 			</div>
+
+			{table.getFilteredSelectedRowModel().rows.length > 0 && (
+				<div className="flex flex-wrap justify-end bg-muted/50 gap-2 p-3 rounded-lg border border-primary/50 mb-2">
+					<Button size="sm" className="text-xs" onClick={() => setBulkAction("status")}>
+						Update Status
+					</Button>
+					<Button size="sm" className="text-xs" onClick={() => setBulkAction("assignees")}>
+						Update Assignees
+					</Button>
+					<Button size="sm" className="text-xs" onClick={() => setBulkAction("project")}>
+						Update Project
+					</Button>
+					<Button size="sm" className="text-xs" onClick={() => setBulkAction("category")}>
+						Update Category
+					</Button>
+					<Button size="sm" className="text-xs" variant="destructive" onClick={() => setBulkAction("delete")}>
+						Delete
+					</Button>
+				</div>
+			)}
 			<div className="flex justify-between items-center w-full m-0">
 				<div className="flex items-center space-x-2">
 					<p className="text-sm font-medium">Show</p>
@@ -298,6 +332,12 @@ export function DataTableTasks({
 					<ChevronRight />
 				</Button>
 			</div>
+			<UpdateDialog
+				open={!!bulkAction}
+				onClose={() => setBulkAction(null)}
+				action={bulkAction}
+				selectedTasks={table.getFilteredSelectedRowModel().rows.map((r) => r.original)}
+			/>
 		</div>
 	);
 }
