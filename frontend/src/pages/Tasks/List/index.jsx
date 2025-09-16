@@ -42,7 +42,6 @@ export default function Tasks() {
 	}, [isOpen]);
 
 	useEffect(() => {
-		console.log((!tasks || tasks.length === 0) && !tasksLoaded);
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
@@ -67,7 +66,6 @@ export default function Tasks() {
 				<h1 className=" font-extrabold text-3xl">Tasks</h1>
 				<p>View list of all tasks</p>
 			</div>
-
 			{/* Updated table to fix dialog per column issue */}
 			{(() => {
 				const { columnsTask: taskColumns, dialog } = columnsTask({

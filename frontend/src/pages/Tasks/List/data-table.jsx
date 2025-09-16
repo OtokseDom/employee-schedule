@@ -104,6 +104,7 @@ export function DataTableTasks({
 				}`}
 				aria-hidden="true"
 			/>
+
 			<div className="flex flex-col md:flex-row justify-between py-4">
 				<div className="flex flex-row gap-4">
 					{/* Input field to enter filter value */}
@@ -195,7 +196,12 @@ export function DataTableTasks({
 					</div>
 				</div>
 			</div>
-			<div className="w-full m-0 text-right">
+			<div className="flex justify-between items-center w-full m-0">
+				{table.getFilteredSelectedRowModel().rows.length > 0 && (
+					<div className="text-muted-foreground flex-1 text-sm">
+						{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} task(s) selected.
+					</div>
+				)}
 				<Button variant="link" className="text-muted-foreground" onClick={() => setSorting([])}>
 					Reset sort
 				</Button>
@@ -251,6 +257,13 @@ export function DataTableTasks({
 				</Table>
 			</div>
 			<div className="flex items-center justify-end space-x-2 py-4">
+				{table.getFilteredSelectedRowModel().rows.length > 0 ? (
+					<div className="text-muted-foreground flex-1 text-sm">
+						{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} task(s) selected.
+					</div>
+				) : (
+					<div className="text-muted-foreground flex-1 text-sm">Showing 10 out of {table.getFilteredRowModel().rows.length} task(s).</div>
+				)}
 				<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
 					<ChevronLeft />
 				</Button>
