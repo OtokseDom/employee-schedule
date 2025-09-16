@@ -54,6 +54,7 @@ export default function Tasks() {
 		if (tasks !== null) setTableData(flattenTasks(tasks));
 	}, [tasks]);
 
+	// TODO: bulk update status, delete, assign user, category, project
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 			<div
@@ -68,14 +69,17 @@ export default function Tasks() {
 			</div>
 			{/* Updated table to fix dialog per column issue */}
 			{(() => {
-				const { columnsTask: taskColumns, dialog } = columnsTask({
+				const {
+					columnsTask: taskColumns,
+					dialog,
+					bulkDialog,
+				} = columnsTask({
 					dialogOpen,
 					setDialogOpen,
 					hasRelation,
 					setHasRelation,
 					setIsOpen,
 					setUpdateData,
-					fetchTasks,
 				});
 				return (
 					<>
@@ -93,6 +97,7 @@ export default function Tasks() {
 							fetchData={fetchTasks}
 						/>
 						{dialog}
+						{bulkDialog}
 					</>
 				);
 			})()}
