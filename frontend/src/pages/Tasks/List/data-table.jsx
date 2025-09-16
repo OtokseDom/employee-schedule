@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { flexRender, getSortedRowModel, getFilteredRowModel, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -84,6 +84,7 @@ export function DataTableTasks({
 					"performance rating": false,
 					delay: false,
 					remarks: false,
+					action: true,
 			  }
 			: {
 					id: false,
@@ -93,6 +94,7 @@ export function DataTableTasks({
 					"delay reason": false,
 					delay: false,
 					remarks: false,
+					action: true,
 			  }
 	);
 	const table = useReactTable({
@@ -112,6 +114,16 @@ export function DataTableTasks({
 		},
 		enableRowSelection: true,
 	});
+
+	// 👇 toggle actions column automatically
+	useEffect(() => {
+		const hasSelection = table.getSelectedRowModel().rows.length > 0;
+
+		setColumnVisibility((prev) => ({
+			...prev,
+			actions: !hasSelection,
+		}));
+	}, [table.getSelectedRowModel().rows.length]);
 	return (
 		<div className="w-full scrollbar-custom">
 			<div

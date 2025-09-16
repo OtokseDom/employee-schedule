@@ -57,7 +57,6 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 			setRelations(parentTask);
 		}
 	};
-
 	const baseColumns = useMemo(
 		() => [
 			{
@@ -362,17 +361,15 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								{selectedCount < 2 && (
-									<DropdownMenuItem
-										className="cursor-pointer"
-										onClick={(e) => {
-											e.stopPropagation();
-											handleUpdate(task);
-										}}
-									>
-										View and Update Task
-									</DropdownMenuItem>
-								)}
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={(e) => {
+										e.stopPropagation();
+										handleUpdate(task);
+									}}
+								>
+									View and Update Task
+								</DropdownMenuItem>
 								{table.getFilteredSelectedRowModel().rows.length === 0 && (
 									<>
 										<DropdownMenuItem
