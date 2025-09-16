@@ -26,7 +26,7 @@ export default function AdminLayout() {
 	}, [expanded]);
 
 	return (
-		<SidebarProvider defaultOpen={expanded} className="flex min-h-[100dvh] w-screen">
+		<SidebarProvider defaultOpen={expanded} className="flex min-h-[100dvh] w-full">
 			<AppSidebar />
 			<SidebarTrigger className="block md:hidden fixed" />
 			<main className="flex w-screen flex-col items-center justify-between p-8">
