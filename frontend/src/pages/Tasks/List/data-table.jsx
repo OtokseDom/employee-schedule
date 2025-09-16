@@ -58,6 +58,7 @@ export function DataTableTasks({
 		showLess
 			? {
 					// status: false,
+					id: false,
 					"start date": false,
 					"end date": true,
 					"start time": false,
@@ -71,6 +72,7 @@ export function DataTableTasks({
 					remarks: false,
 			  }
 			: {
+					id: false,
 					"expected output": false,
 					"time estimate": false,
 					"time taken": false,
