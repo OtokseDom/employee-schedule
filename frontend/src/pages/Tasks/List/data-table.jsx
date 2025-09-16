@@ -197,11 +197,34 @@ export function DataTableTasks({
 				</div>
 			</div>
 			<div className="flex justify-between items-center w-full m-0">
-				{table.getFilteredSelectedRowModel().rows.length > 0 && (
-					<div className="text-muted-foreground flex-1 text-sm">
-						{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} task(s) selected.
-					</div>
-				)}
+				<div className="flex items-center space-x-2">
+					<p className="text-sm font-medium">Show</p>
+					<Select
+						value={`${table.getState().pagination.pageSize}`}
+						onValueChange={(value) => {
+							table.setPageSize(Number(value));
+						}}
+					>
+						<SelectTrigger className="h-8 w-[90px]">
+							<SelectValue placeholder={table.getState().pagination.pageSize} />
+						</SelectTrigger>
+						<SelectContent side="top">
+							{[10, 20, 30, 40, 50, data.length].map((pageSize) => (
+								<SelectItem key={pageSize} value={`${pageSize}`}>
+									{pageSize === data.length ? "All" : pageSize}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+
+					{table.getFilteredSelectedRowModel().rows.length > 0 ? (
+						<div className="text-muted-foreground flex-1 text-sm">
+							{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} task(s) selected.
+						</div>
+					) : (
+						<span></span>
+					)}
+				</div>
 				<Button variant="link" className="text-muted-foreground" onClick={() => setSorting([])}>
 					Reset sort
 				</Button>
@@ -262,7 +285,9 @@ export function DataTableTasks({
 						{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} task(s) selected.
 					</div>
 				) : (
-					<div className="text-muted-foreground flex-1 text-sm">Showing 10 out of {table.getFilteredRowModel().rows.length} task(s).</div>
+					<div className="text-muted-foreground flex-1 text-sm">
+						Showing {table.getState().pagination.pageSize} out of {table.getFilteredRowModel().rows.length} task(s).
+					</div>
 				)}
 				<Button variant="outline" size="" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
 					<ChevronLeft />
