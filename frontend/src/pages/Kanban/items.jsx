@@ -69,7 +69,7 @@ const Items = ({ item }) => {
 					<p>{item.title}</p>
 					<span className="flex flex-row items-center gap-x-1 text-sm text-muted-foreground">
 						<span
-							className={`flex items-center gap-x-1 p-1 rounded ${
+							className={`flex items-center text-xs gap-x-1 p-1 rounded ${
 								endDate && isBeforeToday(endDate)
 									? "bg-red-300 text-black" // overdue
 									: endDate && isTodayOrTomorrow(endDate)
