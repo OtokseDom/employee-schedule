@@ -128,9 +128,9 @@ const items = [
 export function AppSidebar() {
 	const { user, setToken, setUser } = useAuthContext();
 	const { isMobile, openMobile, setOpenMobile } = useSidebar(); // Add this line
-	const { setTasks } = useTasksStore();
+	const { setTasks, setTasksLoaded } = useTasksStore();
 	const { setUsers } = useUsersStore();
-	const { setProjects } = useProjectsStore();
+	const { setProjects, setProjectsLoaded } = useProjectsStore();
 	const { setCategories } = useCategoriesStore();
 	const { setTaskStatuses } = useTaskStatusesStore();
 	const { setReports } = useDashboardStore();
@@ -181,6 +181,8 @@ export function AppSidebar() {
 			setTaskStatuses([]);
 			setReports([]);
 			setUserReports([]);
+			setTasksLoaded(false);
+			setProjectsLoaded(false);
 			setToken(null);
 		});
 	};

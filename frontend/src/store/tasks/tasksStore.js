@@ -4,6 +4,7 @@ export const useTasksStore = () => {
 	return {
 		tasks: useAppStore((state) => state.tasks),
 		tasksLoaded: useAppStore((state) => state.tasksLoaded),
+		setTasksLoaded: useAppStore((state) => state.setTasksLoaded),
 		setTasks: useAppStore((state) => state.setTasks),
 		addTask: useAppStore((state) => state.addTask),
 		updateTask: useAppStore((state) => state.updateTask),

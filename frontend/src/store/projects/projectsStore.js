@@ -4,6 +4,7 @@ export const useProjectsStore = () => {
 	return {
 		projects: useAppStore((state) => state.projects),
 		projectsLoaded: useAppStore((state) => state.projectsLoaded),
+		setProjectsLoaded: useAppStore((state) => state.setProjectsLoaded),
 		setProjects: useAppStore((state) => state.setProjects),
 		addProject: useAppStore((state) => state.addProject),
 		updateProject: useAppStore((state) => state.updateProject),
