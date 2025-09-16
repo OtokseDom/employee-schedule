@@ -94,6 +94,7 @@ export function DataTableTasks({
 			columnFilters,
 			columnVisibility,
 		},
+		enableRowSelection: true,
 	});
 	return (
 		<div className="w-full scrollbar-custom">

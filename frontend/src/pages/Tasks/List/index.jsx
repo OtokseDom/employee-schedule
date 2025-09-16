@@ -42,6 +42,7 @@ export default function Tasks() {
 	}, [isOpen]);
 
 	useEffect(() => {
+		console.log((!tasks || tasks.length === 0) && !tasksLoaded);
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();

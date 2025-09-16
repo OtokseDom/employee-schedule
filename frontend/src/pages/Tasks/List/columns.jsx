@@ -13,6 +13,7 @@ import { API } from "@/constants/api";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { Checkbox } from "@/components/ui/checkbox";
 export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRelation, setIsOpen, setUpdateData, fetchTasks }) => {
 	const { user } = useAuthContext(); // Get authenticated user details
 	const { tasks, taskHistory, setSelectedTaskHistory, setRelations } = useTasksStore();
@@ -78,6 +79,19 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 
 	const baseColumns = useMemo(
 		() => [
+			{
+				id: "select",
+				header: ({ table }) => (
+					<Checkbox
+						checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+						onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+						aria-label="Select all"
+					/>
+				),
+				cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+				enableSorting: false,
+				enableHiding: false,
+			},
 			{
 				id: "id",
 				accessorKey: "id",
@@ -354,7 +368,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 			},
 			{
 				id: "actions",
-				cell: ({ row }) => {
+				cell: ({ row, table }) => {
 					const task = row.original;
 					return (
 						<DropdownMenu modal={false}>
@@ -374,6 +388,17 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 									}}
 								>
 									View and Update Task
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={(e) => {
+										e.stopPropagation();
+										// 🔥 Get selected rows
+										const selected = table.getSelectedRowModel().rows.map((r) => r.original);
+										console.log("Selected:", selected);
+									}}
+								>
+									Change Status
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									className="w-full text-left cursor-pointer"
