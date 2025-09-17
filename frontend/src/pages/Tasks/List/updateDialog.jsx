@@ -69,6 +69,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 				value,
 			});
 			fetchTasks();
+			showToast("Success!", "Tasks' " + action.toUpperCase() + " updated.", 3000);
 		} catch (e) {
 			// Optionally show error toast
 			console.error("Bulk update failed", e);
