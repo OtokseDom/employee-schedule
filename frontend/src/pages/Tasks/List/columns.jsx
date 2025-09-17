@@ -4,46 +4,25 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { statusColors } from "@/utils/taskHelpers";
 import { useTasksStore } from "@/store/tasks/tasksStore";
-import { useEffect, useMemo, useState } from "react";
-import axiosClient from "@/axios.client";
-import { API } from "@/constants/api";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
-import { useToast } from "@/contexts/ToastContextProvider";
+import { useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Checkbox } from "@/components/ui/checkbox";
 import UpdateDialog from "./updateDialog";
 import DeleteDialog from "./deleteDialog";
 
-export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRelation, setIsOpen, setUpdateData }) => {
-	const { user } = useAuthContext(); // Get authenticated user details
+export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateData }) => {
 	const { tasks, taskHistory, setSelectedTaskHistory, setRelations } = useTasksStore();
-	const [selectedTaskId, setSelectedTaskId] = useState(null);
 	const [selectedTasks, setSelectedTasks] = useState([]);
 	const [bulkAction, setBulkAction] = useState(null);
-	const { loading, setLoading } = useLoadContext();
-	const showToast = useToast();
-	const openDialog = async (task = {}) => {
-		setLoading(true);
+
+	const openDialog = (tasksToDelete = []) => {
+		setSelectedTasks(tasksToDelete);
 		setDialogOpen(true);
-		setSelectedTaskId(task.id);
-		try {
-			const hasRelationResponse = await axiosClient.post(API().relation_check("children", task.id));
-			setHasRelation(hasRelationResponse?.data?.data?.exists);
-		} catch (e) {
-			showToast("Failed!", e.response?.data?.message, 3000, "fail");
-			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
-		} finally {
-			setLoading(false);
-		}
 	};
-	useEffect(() => {
-		if (!dialogOpen) setHasRelation(false);
-	}, [dialogOpen]);
+
 	const handleUpdate = (task) => {
-		// wait for dialog menu to close
 		setTimeout(() => {
 			setIsOpen(true);
 			setUpdateData(task);
@@ -350,11 +329,9 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 				id: "actions",
 				cell: ({ row, table }) => {
 					const task = row.original;
-					const selectedCount = table.getSelectedRowModel().rows.length;
 					return (
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
-								{/* //stop propagation when parent row is clicked */}
 								<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
 									<span className="sr-only">Open menu</span>
 									<MoreHorizontal className="h-4 w-4" />
@@ -370,71 +347,16 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 								>
 									View and Update Task
 								</DropdownMenuItem>
-								{table.getFilteredSelectedRowModel().rows.length === 0 && (
-									<>
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
-
-												setSelectedTasks(selected);
-												setBulkAction("status");
-											}}
-										>
-											Update Status
-										</DropdownMenuItem>
-
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
-
-												setSelectedTasks(selected);
-												setBulkAction("assignees");
-											}}
-										>
-											Update Assignees
-										</DropdownMenuItem>
-
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
-
-												setSelectedTasks(selected);
-												setBulkAction("project");
-											}}
-										>
-											Update Project
-										</DropdownMenuItem>
-
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
-
-												setSelectedTasks(selected);
-												setBulkAction("category");
-											}}
-										>
-											Update Category
-										</DropdownMenuItem>
-									</>
-								)}
-
 								<DropdownMenuItem
 									className="w-full text-left cursor-pointer"
 									onClick={(e) => {
 										e.stopPropagation();
-										openDialog(task);
+										const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);
+										if (selectedRows.length > 0) {
+											openDialog(selectedRows);
+										} else {
+											openDialog([task]);
+										}
 									}}
 								>
 									Delete Task
@@ -451,7 +373,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, hasRelation, setHasRela
 	// Return columns and dialog as an object (consumer should use columns and render dialog outside table)
 	return {
 		columnsTask: baseColumns,
-		dialog: <DeleteDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} hasRelation={hasRelation} selectedTaskId={selectedTaskId} />,
+		dialog: <DeleteDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} selectedTasks={selectedTasks} />,
 		bulkDialog: <UpdateDialog open={!!bulkAction} onClose={() => setBulkAction(null)} action={bulkAction} selectedTasks={selectedTasks} />,
 	};
 };
