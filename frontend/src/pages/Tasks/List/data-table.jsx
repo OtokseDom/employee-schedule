@@ -155,7 +155,7 @@ export function DataTableTasks({
 		<div className="w-full scrollbar-custom">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					isOpen || bulkAction !== null ? "opacity-100" : "opacity-0"
+					isOpen ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>

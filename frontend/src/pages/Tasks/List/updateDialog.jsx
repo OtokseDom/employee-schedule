@@ -79,7 +79,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 		}
 	};
 	return (
-		<Dialog open={open} onOpenChange={onClose} modal={false}>
+		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Bulk Update {action && action.charAt(0).toUpperCase() + action.slice(1)}</DialogTitle>
