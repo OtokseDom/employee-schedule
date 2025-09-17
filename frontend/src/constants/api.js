@@ -17,4 +17,5 @@ export const API = (version = "v1") => ({
 	kanban_column: (id = "") => `/${version}/kanban-column/${id}`,
 	task_move: (id = "") => `/${version}/tasks/${id}/move`,
 	task_bulk_update: () => `/${version}/tasks/bulk-update`,
+	task_bulk_delete: () => `/${version}/tasks/bulk-delete`,
 });

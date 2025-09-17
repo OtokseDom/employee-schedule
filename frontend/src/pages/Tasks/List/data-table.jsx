@@ -16,12 +16,8 @@ import History from "@/components/task/History";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { useUsersStore } from "@/store/users/usersStore";
-import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
-import { useProjectsStore } from "@/store/projects/projectsStore";
-import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import UpdateDialog from "./updateDialog";
+import DeleteDialog from "./deleteDialog";
 
 export function DataTableTasks({
 	columns,
@@ -38,23 +34,32 @@ export function DataTableTasks({
 	setProjectId,
 }) {
 	const { selectedTaskHistory, activeTab, setActiveTab } = useTasksStore();
-	const { loading } = useLoadContext();
+	const { loading, setLoading } = useLoadContext();
 	const [sorting, setSorting] = useState([]);
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [selectedColumn, setSelectedColumn] = useState(null);
 	const [filterValue, setFilterValue] = useState("");
-	const { tasks, taskHistory, setSelectedTaskHistory, setRelations, selectedUser, options } = useTasksStore();
-	const { users } = useUsersStore();
-	const { taskStatuses } = useTaskStatusesStore();
-	const { projects } = useProjectsStore();
-	const { categories } = useCategoriesStore();
-	const [selectedTasks, setSelectedTasks] = useState([]);
 	const [bulkAction, setBulkAction] = useState(null);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-	const handleUpdate = (task) => {
-		setIsOpen(true);
-		setUpdateData(task);
+	// Helper to clear selection and reset dialogs
+	const clearSelection = () => {
+		table.resetRowSelection();
+		setBulkAction(null);
+		setDeleteDialogOpen(false);
 	};
+	// When bulkAction is "delete", just open the dialog
+	useEffect(() => {
+		if (bulkAction === "delete") {
+			setDeleteDialogOpen(true);
+		}
+	}, [bulkAction]);
+
+	const handleDeleteDialogClose = (open) => {
+		setDeleteDialogOpen(open);
+		if (!open) setBulkAction(null);
+	};
+
 	// Select what column to filter
 	const handleColumnChange = (columnId) => {
 		setSelectedColumn(columnId);
@@ -115,6 +120,28 @@ export function DataTableTasks({
 		enableRowSelection: true,
 	});
 
+	// Only render the dialog for the current action
+	let dialog = null;
+	if (bulkAction === "delete" && deleteDialogOpen) {
+		dialog = (
+			<DeleteDialog
+				dialogOpen={deleteDialogOpen}
+				setDialogOpen={handleDeleteDialogClose}
+				selectedTasks={table.getFilteredSelectedRowModel().rows.map((r) => r.original)}
+				clearSelection={clearSelection} // Pass the callback
+			/>
+		);
+	} else if (bulkAction && bulkAction !== "delete") {
+		dialog = (
+			<UpdateDialog
+				open={!!bulkAction}
+				onClose={() => setBulkAction(null)}
+				action={bulkAction}
+				selectedTasks={table.getFilteredSelectedRowModel().rows.map((r) => r.original)}
+			/>
+		);
+	}
+
 	// 👇 toggle actions column automatically
 	useEffect(() => {
 		const hasSelection = table.getSelectedRowModel().rows.length > 0;
@@ -128,7 +155,7 @@ export function DataTableTasks({
 		<div className="w-full scrollbar-custom">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					isOpen ? "opacity-100" : "opacity-0"
+					isOpen || bulkAction !== null ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
@@ -344,12 +371,7 @@ export function DataTableTasks({
 					<ChevronRight />
 				</Button>
 			</div>
-			<UpdateDialog
-				open={!!bulkAction}
-				onClose={() => setBulkAction(null)}
-				action={bulkAction}
-				selectedTasks={table.getFilteredSelectedRowModel().rows.map((r) => r.original)}
-			/>
+			{dialog}
 		</div>
 	);
 }
