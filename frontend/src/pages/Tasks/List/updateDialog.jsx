@@ -10,10 +10,14 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useTasksStore } from "@/store/tasks/tasksStore";
+import axiosClient from "@/axios.client";
+import { API } from "@/constants/api";
 import { useUsersStore } from "@/store/users/usersStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
+import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
 
 const formSchema = z.object({
 	status_id: z.number().optional(),
@@ -21,6 +25,8 @@ const formSchema = z.object({
 	category_id: z.number().optional(),
 });
 export default function UpdateDialog({ open, onClose, action, selectedTasks = [] }) {
+	const { loading, setLoading } = useLoadContext();
+	const showToast = useToast();
 	const { options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { projects } = useProjectsStore();
@@ -34,25 +40,42 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 			category: undefined,
 		},
 	});
+	const { mergeTasks } = useTasksStore();
 	const handleBulkUpdate = async (action, data, tasks) => {
 		const ids = tasks.map((t) => t.id);
+		let value;
 		switch (action) {
 			case "status":
-				console.log(ids, data.status_id);
-				// await api.bulkUpdateStatus(ids, data.status_id);
+				value = data.status_id;
 				break;
 			case "assignees":
-				console.log(ids, data.assignees);
-				// await api.bulkUpdateAssignees(ids, data.assignees);
+				value = data.assignees;
 				break;
 			case "project":
-				console.log(ids, data.project_id);
-				// await api.bulkUpdateProject(ids, data.project_id);
+				value = data.project_id;
 				break;
 			case "category":
-				console.log(ids, data.category_id);
-				// await api.bulkUpdateCategory(ids, data.category_id);
+				value = data.category_id;
 				break;
+			default:
+				return;
+		}
+		try {
+			setLoading(true);
+			const res = await axiosClient.patch(API().task_bulk_update(), {
+				ids,
+				action,
+				value,
+			});
+			if (res?.data?.data) {
+				mergeTasks(res.data.data);
+				showToast("Success!", "Selected tasks' " + action.toUpperCase() + " updated.", 3000);
+			}
+		} catch (e) {
+			// Optionally show error toast
+			console.error("Bulk update failed", e);
+		} finally {
+			setLoading(false);
 		}
 	};
 	return (
