@@ -329,6 +329,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 				id: "actions",
 				cell: ({ row, table }) => {
 					const task = row.original;
+					const selectedCount = table.getSelectedRowModel().rows.length;
 					return (
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
@@ -347,6 +348,65 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 								>
 									View and Update Task
 								</DropdownMenuItem>
+								{table.getFilteredSelectedRowModel().rows.length === 0 && (
+									<>
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={(e) => {
+												e.stopPropagation();
+												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+												if (selected.length === 0) selected = [row.original];
+
+												setSelectedTasks(selected);
+												setBulkAction("status");
+											}}
+										>
+											Update Status
+										</DropdownMenuItem>
+
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={(e) => {
+												e.stopPropagation();
+												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+												if (selected.length === 0) selected = [row.original];
+
+												setSelectedTasks(selected);
+												setBulkAction("assignees");
+											}}
+										>
+											Update Assignees
+										</DropdownMenuItem>
+
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={(e) => {
+												e.stopPropagation();
+												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+												if (selected.length === 0) selected = [row.original];
+
+												setSelectedTasks(selected);
+												setBulkAction("project");
+											}}
+										>
+											Update Project
+										</DropdownMenuItem>
+
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={(e) => {
+												e.stopPropagation();
+												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+												if (selected.length === 0) selected = [row.original];
+
+												setSelectedTasks(selected);
+												setBulkAction("category");
+											}}
+										>
+											Update Category
+										</DropdownMenuItem>
+									</>
+								)}
 								<DropdownMenuItem
 									className="w-full text-left cursor-pointer"
 									onClick={(e) => {
