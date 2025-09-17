@@ -8,31 +8,34 @@ import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 
-export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, selectedTaskId }) {
+export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, selectedTaskId, selectedTasks = [], clearSelection }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
 	const { fetchTasks } = useTaskHelpers();
 
-	const handleDelete = async (id, deleteSubtasks = false) => {
+	const ids = selectedTasks.map((t) => t.id);
+	const isBulk = ids.length > 1;
+	const hasAnyRelation = selectedTasks.some((t) => t.children && t.children.length > 0);
+
+	const handleDelete = async (ids, deleteSubtasks = false) => {
 		setLoading(true);
 		try {
-			if (deleteSubtasks) {
-				await axiosClient.delete(API().task(id), {
-					data: { delete_subtasks: true }, // send in request body
+			if (isBulk) {
+				await axiosClient.delete(API().task_bulk_delete(), {
+					data: { ids, delete_subtasks: deleteSubtasks },
 				});
 			} else {
-				await axiosClient.delete(API().task(id), {
-					data: { delete_subtasks: false }, // send in request body
+				await axiosClient.delete(API().task(ids[0]), {
+					data: { delete_subtasks: deleteSubtasks },
 				});
 			}
-			// needs to remove all children tasks as well
 			fetchTasks();
-			showToast("Success!", "Task deleted.", 3000);
+			showToast("Success!", "Task(s) deleted.", 3000);
+			if (clearSelection) clearSelection(); // <-- Only clear after success
 		} catch (e) {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
@@ -44,9 +47,9 @@ export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, s
 					<DialogDescription>This action cannot be undone.</DialogDescription>
 				</DialogHeader>
 				<div className="ml-4 text-base">
-					{hasRelation && (
+					{hasAnyRelation && (
 						<>
-							<span className="text-yellow-800">Warning: Task has subtasks</span>
+							<span className="text-yellow-800">Warning: {isBulk ? "Some tasks have subtasks" : "Task has subtasks"}</span>
 							<br />
 							<span>Do you wish to delete subtasks as well?</span>
 						</>
@@ -58,26 +61,26 @@ export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, s
 							Close
 						</Button>
 					</DialogClose>
-					{hasRelation && (
+					{hasAnyRelation && (
 						<Button
 							disabled={loading}
 							variant="destructive"
-							onClick={(e) => {
+							onClick={() => {
 								setDialogOpen(false);
-								handleDelete(selectedTaskId, true);
+								handleDelete(ids, true);
 							}}
 						>
-							Delete with subtasks
+							Delete {isBulk ? "with all subtasks" : "with subtasks"}
 						</Button>
 					)}
 					<Button
 						disabled={loading}
-						onClick={(e) => {
+						onClick={() => {
 							setDialogOpen(false);
-							handleDelete(selectedTaskId);
+							handleDelete(ids, false);
 						}}
 					>
-						{hasRelation ? "Delete this task only" : "Yes, delete"}
+						{hasAnyRelation ? (isBulk ? "Delete selected tasks only" : "Delete this task only") : isBulk ? "Yes, delete selected" : "Yes, delete"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
