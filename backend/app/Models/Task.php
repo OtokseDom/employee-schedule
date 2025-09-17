@@ -555,4 +555,51 @@ class Task extends Model
                 'children',
             ])->get();
     }
+
+    public function bulkDelete(array $ids, bool $deleteSubtasks, int $organization_id)
+    {
+        $tasks = self::whereIn('id', $ids)->where('organization_id', $organization_id)->get();
+
+        return DB::transaction(function () use ($tasks, $deleteSubtasks, $organization_id) {
+            $allIdsToDelete = [];
+            foreach ($tasks as $task) {
+                $idsToDelete = [$task->id];
+                if ($deleteSubtasks) {
+                    $childIds = self::where('parent_id', $task->id)->pluck('id')->toArray();
+                    $idsToDelete = array_merge($idsToDelete, $childIds);
+                }
+                $allIdsToDelete = array_merge($allIdsToDelete, $idsToDelete);
+            }
+            $allIdsToDelete = array_unique($allIdsToDelete);
+
+            // Group by project/status for position shifting
+            $grouped = self::whereIn('id', $allIdsToDelete)
+                ->get()
+                ->groupBy(function ($t) {
+                    return $t->project_id . '-' . $t->status_id;
+                });
+
+            // Delete all
+            self::whereIn('id', $allIdsToDelete)->delete();
+
+            // Shift positions
+            foreach ($grouped as $group) {
+                $projectId = $group->first()->project_id;
+                $statusId = $group->first()->status_id;
+                $positions = $group->pluck('position')->toArray();
+                $minPosition = min($positions);
+                $countDeleted = count($positions);
+
+                self::where('organization_id', $organization_id)
+                    ->where('project_id', $projectId)
+                    ->where('status_id', $statusId)
+                    ->where('position', '>', $minPosition)
+                    ->update([
+                        'position' => DB::raw("position - $countDeleted")
+                    ]);
+            }
+
+            return true;
+        });
+    }
 }

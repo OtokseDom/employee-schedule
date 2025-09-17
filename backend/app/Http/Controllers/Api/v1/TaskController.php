@@ -129,4 +129,20 @@ class TaskController extends Controller
         $updatedTasks = $this->task->bulkUpdate($ids, $action, $value, $organization_id);
         return apiResponse($updatedTasks, 'Tasks updated successfully');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:tasks,id',
+            'delete_subtasks' => 'required|boolean',
+        ]);
+        $organization_id = $this->userData->organization_id;
+        $ids = $validated['ids'];
+        $deleteSubtasks = $validated['delete_subtasks'];
+
+        $result = $this->task->bulkDelete($ids, $deleteSubtasks, $organization_id);
+
+        return apiResponse($result, 'Tasks deleted successfully');
+    }
 }

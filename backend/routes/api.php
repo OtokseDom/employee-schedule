@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function () {
 
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
+        Route::delete('/tasks/bulk-delete', [TaskController::class, 'bulkDelete']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
         Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
