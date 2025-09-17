@@ -32,7 +32,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 	const { taskStatuses } = useTaskStatusesStore();
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
-	const [selectedAssignees, setSelectedAssignees] = useState(selectedTasks?.flatMap((t) => t.assignees?.map((a) => a.id)) || []);
+	const [selectedAssignees, setSelectedAssignees] = useState(Array.from(new Set(selectedTasks?.flatMap((t) => t.assignees?.map((a) => a.id)) || [])));
 	const { fetchTasks } = useTaskHelpers();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
