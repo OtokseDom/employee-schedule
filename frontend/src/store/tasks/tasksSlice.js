@@ -1,4 +1,14 @@
+// ...existing code...
 export const createTasksSlice = (set) => ({
+	// ...existing code...
+	// Merge/replace tasks from backend (bulk update)
+	mergeTasks: (updatedTasks) =>
+		set((state) => {
+			const updatedMap = new Map(updatedTasks.map((t) => [t.id, t]));
+			return {
+				tasks: state.tasks.map((t) => updatedMap.get(t.id) || t),
+			};
+		}),
 	tasks: [],
 	tasksLoaded: false, // flag to know if fetched
 

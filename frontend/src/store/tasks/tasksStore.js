@@ -1,3 +1,4 @@
+// ...existing code...
 import { useAppStore } from "../appStore";
 
 export const useTasksStore = () => {
@@ -37,5 +38,7 @@ export const useTasksStore = () => {
 		updateTaskPosition: useAppStore((state) => state.updateTaskPosition),
 		// Merge backend authoritative data
 		mergeTaskPositions: useAppStore((state) => state.mergeTaskPositions),
+		// Merge tasks after bulk update
+		mergeTasks: useAppStore((state) => state.mergeTasks),
 	};
 };
