@@ -22,7 +22,6 @@ export default function Tasks() {
 	const [updateData, setUpdateData] = useState({});
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
 	const [projectId, setProjectId] = useState(null); //for adding subtasks from relations tab
-	const [hasRelation, setHasRelation] = useState(false);
 
 	// Flatten tasks for datatable usage (also groups children below parent)
 	const [tableData, setTableData] = useState([]);
@@ -38,10 +37,6 @@ export default function Tasks() {
 	}, [isOpen]);
 
 	useEffect(() => {
-		if (!isOpen) setHasRelation(false);
-	}, [isOpen]);
-
-	useEffect(() => {
 		document.title = "Task Management | Tasks";
 		if (!taskStatuses || taskStatuses.length === 0) fetchTaskStatuses();
 		if (!users || users.length === 0) fetchUsers();
@@ -54,7 +49,6 @@ export default function Tasks() {
 		if (tasks !== null) setTableData(flattenTasks(tasks));
 	}, [tasks]);
 
-	// TODO: bulk update status, delete, assign user, category, project
 	return (
 		<div className="w-screen md:w-full bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 			<div
@@ -76,8 +70,6 @@ export default function Tasks() {
 				} = columnsTask({
 					dialogOpen,
 					setDialogOpen,
-					hasRelation,
-					setHasRelation,
 					setIsOpen,
 					setUpdateData,
 				});
