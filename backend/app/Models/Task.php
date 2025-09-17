@@ -497,4 +497,62 @@ class Task extends Model
             }
         });
     }
+    // TODO: Consider kanban positioning on status update
+    public function bulkUpdate(array $ids, string $action, $value, int $organization_id)
+    {
+        $tasks = self::whereIn('id', $ids)->where('organization_id', $organization_id)->get();
+
+        if ($action === 'status') {
+            // Get all tasks in the destination status/column for this org
+            $destinationTasks = self::where('organization_id', $organization_id)
+                ->where('status_id', $value)
+                ->orderBy('position', 'asc')
+                ->get();
+
+            $lastPosition = $destinationTasks->count() > 0
+                ? $destinationTasks->max('position')
+                : 0;
+
+            $position = $lastPosition;
+
+            foreach ($tasks as $task) {
+                if ($task->status_id != $value) {
+                    // Move to new status and set position to last+1, then increment
+                    $position++;
+                    $task->status_id = $value;
+                    $task->position = $position;
+                    $task->save();
+                }
+                // If status is already the same, do nothing (retain position)
+            }
+        } else {
+            foreach ($tasks as $task) {
+                switch ($action) {
+                    case 'assignees':
+                        $task->assignees()->sync($value);
+                        break;
+                    case 'project':
+                        $task->project_id = $value;
+                        $task->save();
+                        break;
+                    case 'category':
+                        $task->category_id = $value;
+                        $task->save();
+                        break;
+                }
+            }
+        }
+
+        // Reload with relationships for response
+        return self::whereIn('id', $ids)
+            ->where('organization_id', $organization_id)
+            ->with([
+                'status:id,name,color',
+                'assignees:id,name,email,role,position',
+                'category',
+                'project:id,title',
+                'parent:id,title',
+                'children',
+            ])->get();
+    }
 }

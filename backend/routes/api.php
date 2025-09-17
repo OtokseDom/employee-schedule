@@ -45,6 +45,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard', [DashboardReportController::class, 'dashboardReports']);
 
         /* ---------------------------------- OTHER --------------------------------- */
+        Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
         Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);

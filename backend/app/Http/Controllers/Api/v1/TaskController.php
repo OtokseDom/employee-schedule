@@ -84,7 +84,6 @@ class TaskController extends Controller
         return apiResponse('', 'Task deleted successfully');
     }
 
-
     public function move(Request $request, Task $task)
     {
 
@@ -105,5 +104,29 @@ class TaskController extends Controller
             $affectedTasks,
             'Task position updated successfully.'
         );
+    }
+
+    /**
+     * Bulk update tasks (status, assignees, project, category)
+     */
+    public function bulkUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:tasks,id',
+            'action' => 'required|string|in:status,assignees,project,category',
+            'value' => 'required',
+        ]);
+        $organization_id = $this->userData->organization_id;
+
+        $ids = $validated['ids'];
+        $action = $validated['action'];
+        $value = $validated['value'];
+        // For assignees, value should be array
+        if ($action === 'assignees' && !is_array($value)) {
+            $value = [$value];
+        }
+        $updatedTasks = $this->task->bulkUpdate($ids, $action, $value, $organization_id);
+        return apiResponse($updatedTasks, 'Tasks updated successfully');
     }
 }
