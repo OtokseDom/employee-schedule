@@ -257,7 +257,7 @@ export function DataTableTasks({
 							<SelectValue placeholder={table.getState().pagination.pageSize} />
 						</SelectTrigger>
 						<SelectContent side="top">
-							{[10, 20, 30, 40, 50, data.length].map((pageSize) => (
+							{Array.from(new Set([10, 20, 30, 40, 50, data.length])).map((pageSize) => (
 								<SelectItem key={pageSize} value={`${pageSize}`}>
 									{pageSize === data.length ? "All" : pageSize}
 								</SelectItem>
