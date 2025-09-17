@@ -118,6 +118,7 @@ class TaskController extends Controller
             'value' => 'required',
         ]);
         $organization_id = $this->userData->organization_id;
+        $userId = $this->userData->id;
 
         $ids = $validated['ids'];
         $action = $validated['action'];
@@ -126,7 +127,7 @@ class TaskController extends Controller
         if ($action === 'assignees' && !is_array($value)) {
             $value = [$value];
         }
-        $updatedTasks = $this->task->bulkUpdate($ids, $action, $value, $organization_id);
+        $updatedTasks = $this->task->bulkUpdate($ids, $action, $value, $userId, $organization_id);
         return apiResponse($updatedTasks, 'Tasks updated successfully');
     }
 

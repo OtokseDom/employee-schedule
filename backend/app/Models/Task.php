@@ -497,10 +497,10 @@ class Task extends Model
             }
         });
     }
-    // TODO: Consider kanban positioning on status update
-    public function bulkUpdate(array $ids, string $action, $value, int $organization_id)
+    public function bulkUpdate(array $ids, string $action, $value, int $userId, int $organization_id)
     {
         $tasks = self::whereIn('id', $ids)->where('organization_id', $organization_id)->get();
+        $historyService = app(\App\Services\TaskHistoryService::class);
 
         if ($action === 'status') {
             // Get all tasks in the destination status/column for this org
@@ -516,29 +516,77 @@ class Task extends Model
             $position = $lastPosition;
 
             foreach ($tasks as $task) {
+                $original = $task->getOriginal();
+                $changes = [];
+
                 if ($task->status_id != $value) {
                     // Move to new status and set position to last+1, then increment
                     $position++;
+                    $orig = optional(\App\Models\TaskStatus::find($original['status_id'] ?? null))->name;
+                    $val  = optional(\App\Models\TaskStatus::find($value))->name;
+                    if ($orig !== $val) {
+                        $changes['status_id'] = ['from' => $orig, 'to' => $val];
+                    }
                     $task->status_id = $value;
                     $task->position = $position;
                     $task->save();
                 }
                 // If status is already the same, do nothing (retain position)
+
+                // Record history if there are changes
+                if (!empty($changes)) {
+                    $historyService->record(
+                        $task,
+                        $changes,
+                        $userId,
+                        $organization_id
+                    );
+                }
             }
         } else {
             foreach ($tasks as $task) {
+                $original = $task->getOriginal();
+                $changes = [];
+
                 switch ($action) {
                     case 'assignees':
+                        $origUserIds = $task->assignees()->pluck('users.id')->toArray();
+                        $valUserIds = is_array($value) ? $value : [];
+                        if (array_diff($origUserIds, $valUserIds) || array_diff($valUserIds, $origUserIds)) {
+                            $origUsers = \App\Models\User::whereIn('id', $origUserIds)->pluck('name')->toArray();
+                            $valUsers  = \App\Models\User::whereIn('id', $valUserIds)->pluck('name')->toArray();
+                            $changes['assignees'] = ['from' => implode(', ', $origUsers), 'to' => implode(', ', $valUsers)];
+                        }
                         $task->assignees()->sync($value);
                         break;
                     case 'project':
+                        $orig = optional(\App\Models\Project::find($original['project_id'] ?? null))->title;
+                        $val  = optional(\App\Models\Project::find($value))->title;
+                        if ($orig !== $val) {
+                            $changes['project_id'] = ['from' => $orig, 'to' => $val];
+                        }
                         $task->project_id = $value;
                         $task->save();
                         break;
                     case 'category':
+                        $orig = optional(\App\Models\Category::find($original['category_id'] ?? null))->name;
+                        $val  = optional(\App\Models\Category::find($value))->name;
+                        if ($orig !== $val) {
+                            $changes['category_id'] = ['from' => $orig, 'to' => $val];
+                        }
                         $task->category_id = $value;
                         $task->save();
                         break;
+                }
+
+                // Record history if there are changes
+                if (!empty($changes)) {
+                    $historyService->record(
+                        $task,
+                        $changes,
+                        $userId,
+                        $organization_id
+                    );
                 }
             }
         }
