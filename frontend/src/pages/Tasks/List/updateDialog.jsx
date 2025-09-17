@@ -18,6 +18,7 @@ import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 const formSchema = z.object({
 	status_id: z.number().optional(),
@@ -32,6 +33,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
 	const [selectedAssignees, setSelectedAssignees] = useState(selectedTasks?.flatMap((t) => t.assignees?.map((a) => a.id)) || []);
+	const { fetchTasks } = useTaskHelpers();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -40,7 +42,6 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 			category: undefined,
 		},
 	});
-	const { mergeTasks } = useTasksStore();
 	const handleBulkUpdate = async (action, data, tasks) => {
 		const ids = tasks.map((t) => t.id);
 		let value;
@@ -62,18 +63,16 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 		}
 		try {
 			setLoading(true);
-			const res = await axiosClient.patch(API().task_bulk_update(), {
+			await axiosClient.patch(API().task_bulk_update(), {
 				ids,
 				action,
 				value,
 			});
-			if (res?.data?.data) {
-				mergeTasks(res.data.data);
-				showToast("Success!", "Selected tasks' " + action.toUpperCase() + " updated.", 3000);
-			}
+			fetchTasks();
 		} catch (e) {
 			// Optionally show error toast
 			console.error("Bulk update failed", e);
+			showToast("Bulk update failed", e.message, 3000, "fail");
 		} finally {
 			setLoading(false);
 		}
