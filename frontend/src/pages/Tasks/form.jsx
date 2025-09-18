@@ -48,7 +48,7 @@ const formSchema = z.object({
 	remarks: z.string().optional(),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
 	const { fetchReports, fetchUserReports } = useTaskHelpers();
 	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
@@ -260,7 +260,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				fetchData();
 				showToast("Success!", "Task added to calendar.", 3000);
 				setIsOpen(false);
-				setTaskAdded(true);
+				// setTaskAdded(true);
 			} else if (updateData?.kanban_add) {
 				// ADD but in kanban
 
@@ -274,7 +274,7 @@ export default function TaskForm({ parentId, projectId, setTaskAdded, isOpen, se
 				fetchData();
 				showToast("Success!", "Task added to kanban.", 3000);
 				setIsOpen(false);
-				setTaskAdded(true);
+				// setTaskAdded(true);
 			} else {
 				// UPDATE
 
