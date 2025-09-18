@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -145,5 +146,61 @@ class TaskController extends Controller
         $result = $this->task->bulkDelete($ids, $deleteSubtasks, $organization_id);
 
         return apiResponse($result, 'Tasks deleted successfully');
+    }
+
+    public function uploadTaskImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:5120', // 5MB
+        ]);
+        $org_id = $this->userData->organization_id;
+        $orgName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $org_id->name);
+        $path = "images/{$orgName}/task";
+        $file = $request->file('image');
+        $filename = uniqid('taskimg_') . '.' . $file->getClientOriginalExtension();
+
+        // Ensure directory exists
+        Storage::makeDirectory($path);
+
+        // Save to storage/app/images/{org}/task
+        $file->storeAs($path, $filename);
+
+        // Return a URL for the frontend to access (you may need a download endpoint)
+        return response()->json([
+            'url' => "/api/tasks/image/{$orgName}/task/{$filename}",
+            'filename' => $filename,
+            'folder' => 'task',
+            'org' => $orgName,
+        ]);
+    }
+
+    // Optional: Serve images securely (not public)
+    public function getTaskImage($org, $folder, $filename)
+    {
+        $path = "images/{$org}/{$folder}/{$filename}";
+        if (!Storage::exists($path)) {
+            abort(404);
+        }
+        return response()->file(storage_path("app/{$path}"));
+    }
+
+    public function deleteTaskImage(Request $request)
+    {
+        $url = $request->input('url');
+        if (!$url) return response()->json(['error' => 'No URL provided'], 400);
+
+        // Parse /api/tasks/image/{org}/{folder}/{filename}
+        $matches = [];
+        if (preg_match('#/api/tasks/image/([^/]+)/([^/]+)/([^/]+)$#', $url, $matches)) {
+            $org = $matches[1];
+            $folder = $matches[2];
+            $filename = $matches[3];
+            $path = "images/{$org}/{$folder}/{$filename}";
+            if (Storage::exists($path)) {
+                Storage::delete($path);
+                return response()->json(['success' => true]);
+            }
+        }
+        return response()->json(['error' => 'File not found'], 404);
     }
 }

@@ -24,6 +24,7 @@ import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useUserStore } from "@/store/user/userStore";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -593,6 +594,19 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				<FormField
 					control={form.control}
 					name="description"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Description</FormLabel>
+							<FormControl>
+								<RichTextEditor value={field.value || ""} onChange={field.onChange} orgName={user_auth?.data?.organization_name} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				{/* <FormField
+					control={form.control}
+					name="description"
 					render={({ field }) => {
 						return (
 							<FormItem>
@@ -604,7 +618,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 							</FormItem>
 						);
 					}}
-				/>
+				/> */}
 				{showMore & !updateData.calendar_add ? (
 					<>
 						<FormField

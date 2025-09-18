@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('tasks')->onDelete('set null')->onUpdate('cascade');
             // $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->string('title');
-            $table->text('description')->nullable();
+            $table->longText('description')->nullable();
             $table->text('expected_output')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
