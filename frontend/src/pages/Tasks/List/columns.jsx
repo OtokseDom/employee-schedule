@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpDown, CornerDownRight } from "lucide-react";
+import { ArrowUpDown, Copy, CornerDownRight, FileCheck, FileQuestion, FileQuestionIcon, FolderKanbanIcon, Trash2Icon, UserCheck2, View } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -346,7 +346,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 										handleUpdate(task);
 									}}
 								>
-									View and Update Task
+									<View /> View and Update Task
 								</DropdownMenuItem>
 								{table.getFilteredSelectedRowModel().rows.length === 0 && (
 									<>
@@ -364,7 +364,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 												setIsOpen(true);
 											}}
 										>
-											Clone Task
+											<Copy /> Clone Task
 										</DropdownMenuItem>
 										<DropdownMenuItem
 											className="cursor-pointer"
@@ -377,7 +377,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 												setBulkAction("status");
 											}}
 										>
-											Update Status
+											<FileCheck /> Update Status
 										</DropdownMenuItem>
 
 										<DropdownMenuItem
@@ -391,7 +391,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 												setBulkAction("assignees");
 											}}
 										>
-											Update Assignees
+											<UserCheck2 /> Update Assignees
 										</DropdownMenuItem>
 
 										<DropdownMenuItem
@@ -405,7 +405,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 												setBulkAction("project");
 											}}
 										>
-											Update Project
+											<FolderKanbanIcon /> Update Project
 										</DropdownMenuItem>
 
 										<DropdownMenuItem
@@ -419,7 +419,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 												setBulkAction("category");
 											}}
 										>
-											Update Category
+											<FileQuestionIcon /> Update Category
 										</DropdownMenuItem>
 									</>
 								)}
@@ -435,7 +435,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 										}
 									}}
 								>
-									Delete Task
+									<Trash2Icon className="text-destructive" /> Delete Task
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
