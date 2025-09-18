@@ -354,6 +354,22 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 											className="cursor-pointer"
 											onClick={(e) => {
 												e.stopPropagation();
+												const clonedTask = {
+													...task,
+													id: undefined,
+													title: task.title + " (Clone)",
+													calendar_add: true,
+												};
+												setUpdateData(clonedTask);
+												setIsOpen(true);
+											}}
+										>
+											Clone Task
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											className="cursor-pointer"
+											onClick={(e) => {
+												e.stopPropagation();
 												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
 												if (selected.length === 0) selected = [row.original];
 
