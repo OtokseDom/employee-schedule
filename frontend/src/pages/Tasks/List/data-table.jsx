@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileCheck, FileQuestion, FolderKanban, Trash2, UserCheck2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
@@ -255,19 +255,19 @@ export function DataTableTasks({
 			{table.getFilteredSelectedRowModel().rows.length > 0 && (
 				<div className="flex flex-wrap justify-end bg-muted/50 gap-2 p-3 rounded-lg border border-primary/50 mb-2">
 					<Button size="sm" className="text-xs" onClick={() => setBulkAction("status")}>
-						Update Status
+						<FileCheck /> Update Status
 					</Button>
 					<Button size="sm" className="text-xs" onClick={() => setBulkAction("assignees")}>
-						Update Assignees
+						<UserCheck2 /> Update Assignees
 					</Button>
 					<Button size="sm" className="text-xs" onClick={() => setBulkAction("project")}>
-						Update Project
+						<FolderKanban /> Update Project
 					</Button>
 					<Button size="sm" className="text-xs" onClick={() => setBulkAction("category")}>
-						Update Category
+						<FileQuestion /> Update Category
 					</Button>
 					<Button size="sm" className="text-xs" variant="destructive" onClick={() => setBulkAction("delete")}>
-						Delete
+						<Trash2 className="text-destructive-foreground" /> Delete
 					</Button>
 				</div>
 			)}
