@@ -10,10 +10,8 @@ use App\Models\TaskHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class TaskController extends Controller
 {
@@ -180,22 +178,17 @@ class TaskController extends Controller
     // Optional: Serve images securely (not public)
     public function getTaskImage($org, $filename)
     {
-        try {
-            $path = "images/{$org}/{$filename}";
-            if (!Storage::exists($path)) {
-                Log::error("Image not found: $path");
-                abort(404);
-            }
-            $mime = Storage::mimeType($path);
-            $file = Storage::get($path);
-            return response($file, 200)
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Content-Type', $mime)
-                ->header('Cache-Control', 'public, max-age=86400');
-        } catch (Throwable $e) {
-            Log::error("getTaskImage error: " . $e->getMessage());
-            return response()->json(['error' => 'Server error', 'details' => $e->getMessage()], 500);
+        $path = "images/{$org}/{$filename}";
+        if (!Storage::exists($path)) {
+            Log::error("Image not found: $path");
+            abort(404);
         }
+        $mime = Storage::mimeType($path);
+        $file = Storage::get($path);
+        return response($file, 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Content-Type', $mime)
+            ->header('Cache-Control', 'public, max-age=86400');
     }
 
     public function deleteTaskImage(Request $request)
