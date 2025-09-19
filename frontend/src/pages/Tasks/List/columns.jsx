@@ -1,5 +1,17 @@
 "use client";
-import { ArrowUpDown, Copy, CornerDownRight, FileCheck, FileQuestion, FileQuestionIcon, FolderKanbanIcon, Trash2Icon, UserCheck2, View } from "lucide-react";
+import {
+	ArrowUpDown,
+	Copy,
+	CornerDownRight,
+	FileCheck,
+	FileQuestion,
+	FileQuestionIcon,
+	FolderKanbanIcon,
+	Text,
+	Trash2Icon,
+	UserCheck2,
+	View,
+} from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -84,7 +96,8 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 							<div>
 								{title}
 								<br />
-								<span className="text-sm text-gray-500">{description}</span>
+								{description && <Text className="text-sm text-gray-500" size={14} />}
+								{/* <span className="text-sm text-gray-500">{description}</span> */}
 							</div>
 						</div>
 					);
