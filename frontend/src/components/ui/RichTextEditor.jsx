@@ -11,6 +11,7 @@ import { Button } from "./button";
 import { useEffect, useRef } from "react";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
+import { ImagePlus, List, ListOrdered } from "lucide-react";
 
 export default function RichTextEditor({ value, onChange, orgName }) {
 	const inputFile = useRef();
@@ -20,7 +21,7 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 		const formData = new FormData();
 		formData.append("image", file);
 		try {
-			const res = await axiosClient.post(API().task_upload_image, formData, {
+			const res = await axiosClient.post(API().task_upload_image(), formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
 			if (res.data.url) {
@@ -118,7 +119,7 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 			removed.forEach(async (src) => {
 				if (src && src.startsWith("/api/tasks/image/")) {
 					try {
-						await axiosClient.delete(API().task_delete_image, { data: { url: src } });
+						await axiosClient.delete(API().task_delete_image(), { data: { url: src } });
 					} catch {}
 				}
 			});
@@ -178,7 +179,7 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 					onClick={() => editor.chain().focus().toggleBulletList().run()}
 					variant={editor.isActive("bulletList") ? "default" : "outline"}
 				>
-					• List
+					<List />
 				</Button>
 				<Button
 					type="button"
@@ -186,13 +187,13 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 					onClick={() => editor.chain().focus().toggleOrderedList().run()}
 					variant={editor.isActive("orderedList") ? "default" : "outline"}
 				>
-					1. List
+					<ListOrdered />
 				</Button>
 				<Button type="button" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()} variant="outline">
 					—
 				</Button>
 				<Button type="button" size="sm" onClick={addImage} variant="outline">
-					Image
+					<ImagePlus />
 				</Button>
 				<input type="file" accept="image/*" ref={inputFile} style={{ display: "none" }} onChange={handleImageUpload} />
 			</div>

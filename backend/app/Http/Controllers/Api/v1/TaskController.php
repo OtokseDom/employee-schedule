@@ -153,8 +153,8 @@ class TaskController extends Controller
         $request->validate([
             'image' => 'required|image|max:5120', // 5MB
         ]);
-        $org_id = $this->userData->organization_id;
-        $orgName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $org_id->name);
+        $org_name = $this->userData->organization->name;
+        $orgName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $org_name);
         $path = "images/{$orgName}/task";
         $file = $request->file('image');
         $filename = uniqid('taskimg_') . '.' . $file->getClientOriginalExtension();
@@ -167,6 +167,7 @@ class TaskController extends Controller
 
         // Return a URL for the frontend to access (you may need a download endpoint)
         return response()->json([
+            'success' => true,
             'url' => "/api/tasks/image/{$orgName}/task/{$filename}",
             'filename' => $filename,
             'folder' => 'task',
