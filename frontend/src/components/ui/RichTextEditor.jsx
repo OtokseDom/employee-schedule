@@ -16,7 +16,8 @@ import { ImagePlus, List, ListOrdered } from "lucide-react";
 export default function RichTextEditor({ value, onChange, orgName }) {
 	const inputFile = useRef();
 
-	// Helper to upload and insert image
+	const blobToApiUrlMap = new Map();
+
 	const handleImageFile = async (file, view = null) => {
 		const formData = new FormData();
 		formData.append("image", file);
@@ -24,15 +25,21 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 			const res = await axiosClient.post(API().task_upload_image(), formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
-			if (res.data.url) {
-				if (editor) {
-					editor.chain().focus().setImage({ src: res.data.url }).run();
-				} else if (view) {
-					const { state, dispatch } = view;
-					const { tr } = state;
-					const node = state.schema.nodes.image.create({ src: res.data.url });
-					dispatch(tr.replaceSelectionWith(node));
-				}
+
+			// Fetch the image as Blob
+			const imageResponse = await axiosClient.get(res.data.url, { responseType: "blob" });
+			const blobUrl = URL.createObjectURL(imageResponse.data);
+
+			// Save mapping
+			blobToApiUrlMap.set(blobUrl, res.data.url);
+
+			if (editor) {
+				editor.chain().focus().setImage({ src: blobUrl }).run();
+			} else if (view) {
+				const { state, dispatch } = view;
+				const { tr } = state;
+				const node = state.schema.nodes.image.create({ src: blobUrl });
+				dispatch(tr.replaceSelectionWith(node));
 			}
 		} catch {
 			alert("Image upload failed");
@@ -52,8 +59,8 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 				addOptions() {
 					return {
 						...this.parent?.(),
-						allowBase64: false,
-						inline: false,
+						allowBase64: true,
+						inline: true,
 						HTMLAttributes: {
 							class: "rounded shadow max-w-full h-auto",
 							draggable: true,
@@ -106,24 +113,35 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 	// Remove image from server when removed from editor
 	useEffect(() => {
 		if (!editor) return;
+		// Initialize prevImages from current editor content
 		let prevImages = [];
-		const updateHandler = () => {
+		const extractImages = (doc) => {
 			const images = [];
 			const traverse = (node) => {
 				if (!node) return;
 				if (node.type === "image" && node.attrs?.src) images.push(node.attrs.src);
 				if (node.content) node.content.forEach(traverse);
 			};
-			traverse(editor.getJSON());
-			const removed = prevImages.filter((src) => !images.includes(src));
-			removed.forEach(async (src) => {
-				if (src && src.startsWith("/api/tasks/image/")) {
+			traverse(doc);
+			return images;
+		};
+		prevImages = extractImages(editor.getJSON());
+		const updateHandler = () => {
+			const currentImages = extractImages(editor.getJSON());
+			// Images that were removed
+			const removed = prevImages.filter((src) => !currentImages.includes(src));
+			removed.forEach(async (blobUrl) => {
+				const apiUrl = blobToApiUrlMap.get(blobUrl);
+				if (apiUrl) {
 					try {
-						await axiosClient.delete(API().task_delete_image(), { data: { url: src } });
-					} catch {}
+						await axiosClient.delete(API().task_delete_image(), { data: { url: apiUrl } });
+						blobToApiUrlMap.delete(blobUrl);
+					} catch (e) {
+						console.error("Failed to delete image:", e);
+					}
 				}
 			});
-			prevImages = images;
+			prevImages = currentImages;
 		};
 		editor.on("update", updateHandler);
 		return () => editor.off("update", updateHandler);

@@ -11,7 +11,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class TaskController extends Controller
 {
@@ -153,36 +155,47 @@ class TaskController extends Controller
         $request->validate([
             'image' => 'required|image|max:5120', // 5MB
         ]);
-        $org_name = $this->userData->organization->name;
-        $orgName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $org_name);
-        $path = "images/{$orgName}/task";
+        $org_id = $this->userData->organization_id;
+        $path = "images/{$org_id}";
         $file = $request->file('image');
         $filename = uniqid('taskimg_') . '.' . $file->getClientOriginalExtension();
 
         // Ensure directory exists
         Storage::makeDirectory($path);
 
-        // Save to storage/app/images/{org}/task
+        // Save to storage/app/images/{org}
         $file->storeAs($path, $filename);
 
+        // Return full URL (including API prefix) so frontend doesn’t need to guess
+        $url = url("api/v1/tasks/images/{$org_id}/{$filename}");
         // Return a URL for the frontend to access (you may need a download endpoint)
         return response()->json([
             'success' => true,
-            'url' => "/api/tasks/image/{$orgName}/task/{$filename}",
+            'url' => $url,
             'filename' => $filename,
-            'folder' => 'task',
-            'org' => $orgName,
+            'org' => $org_id,
         ]);
     }
 
     // Optional: Serve images securely (not public)
-    public function getTaskImage($org, $folder, $filename)
+    public function getTaskImage($org, $filename)
     {
-        $path = "images/{$org}/{$folder}/{$filename}";
-        if (!Storage::exists($path)) {
-            abort(404);
+        try {
+            $path = "images/{$org}/{$filename}";
+            if (!Storage::exists($path)) {
+                Log::error("Image not found: $path");
+                abort(404);
+            }
+            $mime = Storage::mimeType($path);
+            $file = Storage::get($path);
+            return response($file, 200)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Content-Type', $mime)
+                ->header('Cache-Control', 'public, max-age=86400');
+        } catch (Throwable $e) {
+            Log::error("getTaskImage error: " . $e->getMessage());
+            return response()->json(['error' => 'Server error', 'details' => $e->getMessage()], 500);
         }
-        return response()->file(storage_path("app/{$path}"));
     }
 
     public function deleteTaskImage(Request $request)
@@ -190,13 +203,12 @@ class TaskController extends Controller
         $url = $request->input('url');
         if (!$url) return response()->json(['error' => 'No URL provided'], 400);
 
-        // Parse /api/tasks/image/{org}/{folder}/{filename}
+        // Match /api/v1/tasks/images/{org}/{filename}
         $matches = [];
-        if (preg_match('#/api/tasks/image/([^/]+)/([^/]+)/([^/]+)$#', $url, $matches)) {
+        if (preg_match('#/api/v1/tasks/images/([^/]+)/([^/]+)$#', $url, $matches)) {
             $org = $matches[1];
-            $folder = $matches[2];
-            $filename = $matches[3];
-            $path = "images/{$org}/{$folder}/{$filename}";
+            $filename = $matches[2];
+            $path = "images/{$org}/{$filename}";
             if (Storage::exists($path)) {
                 Storage::delete($path);
                 return response()->json(['success' => true]);
