@@ -12,7 +12,8 @@ import { useEffect, useRef } from "react";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
 import { ImagePlus, List, ListOrdered } from "lucide-react";
-
+// TODO: Show saved description on update
+// TODO: Delete images in server when dialog closes without saving. When updating task with image, make sure to not affect the existing image if the user cancels the update.
 export default function RichTextEditor({ value, onChange, orgName }) {
 	const inputFile = useRef();
 	const editor = useEditor({
