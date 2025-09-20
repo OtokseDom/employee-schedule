@@ -395,7 +395,7 @@ export default function RichTextEditor({ value, onChange, orgName, skipImageClea
 				<Button type="button" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()} variant="outline">
 					—
 				</Button>
-				<Button type="button" size="sm" onClick={addImage} variant="outline">
+				<Button type="button" size="sm" disabled onClick={addImage} variant="outline">
 					<ImagePlus />
 				</Button>
 				<input type="file" accept="image/*" ref={inputFile} style={{ display: "none" }} onChange={handleImageUpload} />
