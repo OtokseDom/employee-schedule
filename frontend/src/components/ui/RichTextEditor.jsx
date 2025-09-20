@@ -14,7 +14,7 @@ import { API } from "@/constants/api";
 import { ImagePlus, List, ListOrdered } from "lucide-react";
 // TODO: Show saved description on update
 // TODO: Delete images in server when dialog closes without saving. When updating task with image, make sure to not affect the existing image if the user cancels the update.
-export default function RichTextEditor({ value, onChange, orgName }) {
+export default function RichTextEditor({ value, onChange, orgName, skipImageCleanup }) {
 	const inputFile = useRef();
 	const editor = useEditor({
 		extensions: [
@@ -41,7 +41,17 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 		],
 		content: value,
 		onUpdate: ({ editor }) => {
-			onChange(editor.getHTML());
+			// Replace all blob URLs in HTML with their mapped API URLs before saving
+			let html = editor.getHTML();
+			// Replace <img src="blob:..."> with <img src="api-url">
+			html = html.replace(/<img([^>]+)src=["'](blob:[^"']+)["']/g, (match, pre, blobUrl) => {
+				const apiUrl = blobToApiUrlMapRef.current.get(blobUrl);
+				if (apiUrl) {
+					return `<img${pre}src="${apiUrl}"`;
+				}
+				return match;
+			});
+			onChange(html);
 		},
 		editorProps: {
 			handleDrop(view, event, _slice, moved) {
@@ -70,6 +80,59 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 			},
 		},
 	});
+
+	// Populate richtext editor on update
+	useEffect(() => {
+		if (editor && value !== undefined && value !== editor.getHTML()) {
+			editor.commands.setContent(value || "");
+		}
+	}, [value, editor]);
+	/* -------------------- Fetching Images on form populate -------------------- */
+
+	// // Utility to check if a src is an API image URL
+	// function isApiImageUrl(src) {
+	// 	return typeof src === "string" && src.startsWith("/api/v1/tasks/images/");
+	// }
+
+	// // Utility to fetch image as blob and return blob URL
+	// async function fetchImageAsBlobUrl(src) {
+	// 	try {
+	// 		const response = await axiosClient.get(src, { responseType: "blob" });
+	// 		return URL.createObjectURL(response.data);
+	// 	} catch (e) {
+	// 		console.error("Failed to fetch image:", src, e);
+	// 		return src;
+	// 	}
+	// }
+
+	// // Effect: When editor or value changes, fetch images that require auth and replace their src with blob URLs
+	// useEffect(() => {
+	// 	if (!editor) return;
+	// 	// Find all images in the editor content that are API URLs
+	// 	const images = [];
+	// 	editor.state.doc.descendants((node, pos) => {
+	// 		if (node.type.name === "image" && isApiImageUrl(node.attrs.src)) {
+	// 			images.push({ pos, src: node.attrs.src });
+	// 		}
+	// 	});
+	// 	console.log("images");
+
+	// 	if (images.length === 0) return;
+	// 	console.log("has images");
+
+	// 	images.forEach(async ({ pos, src }) => {
+	// 		const blobUrl = await fetchImageAsBlobUrl(src);
+	// 		console.log(blobUrl);
+	// 		// Only update if still at same src (user may have changed it)
+	// 		const node = editor.state.doc.nodeAt(pos);
+	// 		if (node && node.attrs.src === src) {
+	// 			editor.commands.command(({ tr }) => {
+	// 				tr.setNodeMarkup(pos, undefined, { ...node.attrs, src: blobUrl });
+	// 				return true;
+	// 			});
+	// 		}
+	// 	});
+	// }, [editor, value]);
 
 	// Use refs to persist mapping across renders
 	const blobToApiUrlMapRef = useRef(new Map()); // blobUrl -> apiUrl
@@ -154,9 +217,9 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 		}
 	};
 
-	// Remove image from server when removed from editor
+	// Remove image from server when removed from editor, unless skipImageCleanup is true
 	useEffect(() => {
-		if (!editor) return;
+		if (!editor || skipImageCleanup) return;
 
 		let prevImages = [];
 
@@ -258,7 +321,7 @@ export default function RichTextEditor({ value, onChange, orgName }) {
 		return () => {
 			editor.off("update", updateHandler);
 		};
-	}, [editor]);
+	}, [editor, skipImageCleanup]);
 
 	// Toolbar actions
 	const addImage = () => inputFile.current.click();

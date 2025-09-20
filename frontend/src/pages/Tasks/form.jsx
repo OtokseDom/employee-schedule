@@ -598,7 +598,12 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						<FormItem>
 							<FormLabel>Description</FormLabel>
 							<FormControl>
-								<RichTextEditor value={field.value || ""} onChange={field.onChange} orgName={user_auth?.data?.organization_name} />
+								<RichTextEditor
+									value={field.value || ""}
+									onChange={field.onChange}
+									orgName={user_auth?.data?.organization_name}
+									skipImageCleanup={!isOpen}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
