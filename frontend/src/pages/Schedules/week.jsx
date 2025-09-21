@@ -158,7 +158,7 @@ export default function Week({
 															}}
 															className={`
 														absolute left-0 right-0 mx-1 p-1 rounded border z-10 overflow-clip
-														${statusColors[task.status.color] || "bg-gray-100 border-gray-300 text-black"}
+														${statusColors[task?.status?.color] || "bg-secondary border-foreground/50 text-foreground"}
 														`}
 															style={{ height: `${duration * 4}rem`, top: `${(startMin / 60) * 4}rem` }}
 														>
