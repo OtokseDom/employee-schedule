@@ -194,7 +194,7 @@ export function DataTableTasks({
 							<SheetTrigger asChild>
 								<Button variant="">Add Task</Button>
 							</SheetTrigger>
-							<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+							<SheetContent side="right" className="overflow-y-auto w-full sm:w-[640px] p-2 md:p-6">
 								<SheetHeader>
 									<SheetTitle>
 										<Tabs loading={loading} updateData={updateData} activeTab={activeTab} setActiveTab={setActiveTab} parentId={parentId} />

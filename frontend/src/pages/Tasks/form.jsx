@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, parseISO } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { AlarmClock, CalculatorIcon, CalendarDays, Loader2, Sparkles } from "lucide-react";
 import DateInput from "@/components/form/DateInput";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { API } from "@/constants/api";
@@ -36,11 +36,16 @@ const formSchema = z.object({
 		message: "Title is required.",
 	}),
 	description: z.string().optional(),
-	expected_output: z.string().optional(),
+	// expected_output: z.string().optional(),
 	start_date: z.date().optional(),
 	end_date: z.date().optional(),
+	actual_date: z.date().optional(),
+	days_estimate: z.coerce.number().optional(),
+	days_taken: z.coerce.number().optional(),
+	days_delay: z.coerce.number().optional(),
 	start_time: z.string().optional(),
 	end_time: z.string().optional(),
+	actual_time: z.string().optional(),
 	time_estimate: z.coerce.number().optional(),
 	time_taken: z.coerce.number().optional(),
 	delay: z.coerce.number().optional(),
@@ -123,14 +128,18 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				title,
 				description,
 				parent_id,
-				// assignee_id,
 				project_id,
 				category_id,
-				expected_output,
+				// expected_output,
 				start_date,
 				end_date,
+				actual_date,
+				days_estimate,
+				days_taken,
+				days_delay,
 				start_time,
 				end_time,
+				actual_time,
 				time_estimate,
 				time_taken,
 				delay,
@@ -145,14 +154,18 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				title: title || "",
 				description: description || "",
 				parent_id: parent_id || parentId || undefined,
-				// assignee_id: assignee_id || selectedUser || undefined,
 				project_id: project_id || projectId || undefined,
 				category_id: category_id || undefined,
-				expected_output: expected_output || "",
+				// expected_output: expected_output || "",
 				start_date: typeof start_date === "string" ? parseISO(start_date) : start_date || undefined,
 				end_date: typeof end_date === "string" ? parseISO(end_date) : end_date || undefined,
+				actual_date: typeof actual_date === "string" ? parseISO(actual_date) : actual_date || undefined,
+				days_estimate: days_estimate || "",
+				days_taken: days_taken || "",
+				days_delay: days_delay || "",
 				start_time: start_time || "",
 				end_time: end_time || "",
+				actual_time: actual_time || "",
 				time_estimate: time_estimate || "",
 				time_taken: time_taken || "",
 				delay: delay || "",
@@ -160,7 +173,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
 			});
-			// Set hour/minute fields for time_estimate and delay
+			// Set hour/minute fields for time_estimate, actual_time, and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
 				const te = parseFloat(time_estimate);
 				setTimeEstimateHour(Math.floor(te).toString());
@@ -211,8 +224,10 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				organization_id: user_auth.data.organization_id,
 				start_date: formData.start_date ? format(formData.start_date, "yyyy-MM-dd") : null,
 				end_date: formData.end_date ? format(formData.end_date, "yyyy-MM-dd") : null,
+				actual_date: formData.actual_date ? format(formData.actual_date, "yyyy-MM-dd") : null,
 				start_time: formatTime(formData.start_time),
 				end_time: formatTime(formData.end_time),
+				actual_time: formatTime(formData.actual_time),
 				time_estimate: timeEstimateDecimal !== undefined ? Number(timeEstimateDecimal.toFixed(2)) : undefined,
 				time_taken: timeTakenDecimal !== undefined ? Number(timeTakenDecimal.toFixed(2)) : undefined,
 				delay: delayDecimal !== undefined ? Number(delayDecimal.toFixed(2)) : undefined,
@@ -349,7 +364,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				setEstimateError("Invalid time format.");
 			}
 		} else {
-			setEstimateError("Start and End Time is requred to calculate Estimate");
+			setEstimateError("Start and End Time is requred to calculate Time Estimate");
 		}
 	};
 	// Auto-suggest delay time based on estimate and actual
@@ -375,7 +390,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				setDelayError("Invalid time format.");
 			}
 		} else {
-			setDelayError("Estimate and Time Taken is requred to calculate Delay");
+			setDelayError("Time Estimate and Time Taken is requred to calculate Delay");
 		}
 	};
 
@@ -396,7 +411,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					handleSubmit({ ...formData, assignees: selectedUsers });
 				})}
 				// onSubmit={form.handleSubmit(handleSubmit)}
-				className="flex flex-col gap-4 max-w-md w-full"
+				className="flex flex-col gap-4 w-full"
 			>
 				<FormField
 					control={form.control}
@@ -624,211 +639,356 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						);
 					}}
 				/> */}
-				{showMore & !updateData.calendar_add ? (
+				{showMore || updateData.calendar_add ? (
 					<>
-						<FormField
-							control={form.control}
-							name="expected_output"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>Expected output</FormLabel>
-										<FormControl>
-											<Textarea disabled={!isEditable} placeholder="Expected output" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="start_date"
-							render={({ field }) => {
-								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="end_date"
-							render={({ field }) => {
-								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="start_time"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>Start Time</FormLabel>
-										<FormControl>
-											<Input
-												disabled={!isEditable}
-												type="time"
-												step="60"
-												inputMode="numeric"
-												pattern="[0-9]{2}:[0-9]{2}"
-												className="bg-background appearance-none"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="end_time"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>End Time</FormLabel>
-										<FormControl>
-											<Input
-												disabled={!isEditable}
-												type="time"
-												step="any"
-												// placeholder="Rating &#40;1-10&#41;"
-												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="time_estimate"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Time Estimate</FormLabel>
-									<div>
-										<div className="flex flex-row justify-between gap-2">
-											<div className="flex flex-row gap-2">
-												<Input
-													disabled={!isEditable}
-													type="number"
-													min="0"
-													placeholder="hr"
-													value={timeEstimateHour}
-													onChange={(e) => {
-														const val = e.target.value.replace(/[^0-9]/g, "");
-														setTimeEstimateHour(val);
-														const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
-														field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
-													}}
-													className="w-20"
-												/>
-												<span>hr</span>
-												<Input
-													disabled={!isEditable}
-													type="number"
-													min="0"
-													max="59"
-													placeholder="min"
-													value={timeEstimateMinute}
-													onChange={(e) => {
-														let val = e.target.value.replace(/[^0-9]/g, "");
-														if (parseInt(val, 10) > 59) val = "59";
-														setTimeEstimateMinute(val);
-														const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
-														field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
-													}}
-													className="w-20"
-												/>
-												<span>min</span>
-											</div>
-											<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateEstimate()}>
-												Auto Calculate
-											</Button>
-										</div>
-										{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
-										<FormMessage /> {/* ✅ Now linked to time_estimate */}
-									</div>
-								</FormItem>
-							)}
-						/>
-						{/* Time Taken (hr/min) */}
-						<FormItem>
-							<FormLabel>Time Taken</FormLabel>
-							<div className="flex gap-2">
-								<Input
-									disabled={!isEditable}
-									type="number"
-									min="0"
-									placeholder="hr"
-									value={timeTakenHour}
-									onChange={(e) => {
-										const val = e.target.value.replace(/[^0-9]/g, "");
-										setTimeTakenHour(val);
-									}}
-									className="w-20"
-								/>
-								<span>hr</span>
-								<Input
-									disabled={!isEditable}
-									type="number"
-									min="0"
-									max="59"
-									placeholder="min"
-									value={timeTakenMinute}
-									onChange={(e) => {
-										let val = e.target.value.replace(/[^0-9]/g, "");
-										if (parseInt(val, 10) > 59) val = "59";
-										setTimeTakenMinute(val);
-									}}
-									className="w-20"
-								/>
-								<span>min</span>
+						<div className="flex flex-col gap-4 bg-secondary p-4 rounded-lg">
+							<div className="flex flex-row items-center justify-start gap-2 w-full font-medium text-base text-muted-foreground">
+								<CalendarDays size={20} /> Date Details
 							</div>
-							<FormMessage />
-						</FormItem>
-						<FormItem>
-							<FormLabel>Delay</FormLabel>
-							<div>
-								<div className="flex flex-row justify-between gap-2">
+							<div className="flex flex-col md:flex-row justify-between gap-4">
+								<FormField
+									control={form.control}
+									name="start_date"
+									render={({ field }) => {
+										return (
+											<DateInput
+												disabled={!isEditable}
+												field={field}
+												label={"Start date"}
+												placeholder={"Select start date"}
+												className="w-full"
+											/>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="end_date"
+									render={({ field }) => {
+										return (
+											<DateInput
+												disabled={!isEditable}
+												field={field}
+												label={"End date"}
+												placeholder={"Select end date"}
+												className="w-full"
+											/>
+										);
+									}}
+								/>
+							</div>
+							<div className="flex flex-col md:flex-row justify-between gap-4">
+								<FormField
+									control={form.control}
+									name="days_estimate"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>
+													<div className="flex flex-row justify-between">
+														<span>Days Estimate</span>
+														<Sparkles size={16} className="text-muted-foreground hover:text-primary hover:cursor-pointer" />
+													</div>
+												</FormLabel>
+												<FormControl>
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Days estimate" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="actual_date"
+									render={({ field }) => {
+										return (
+											<DateInput
+												disabled={!isEditable}
+												field={field}
+												label={<div>Actual Date</div>}
+												placeholder={"Select actual date"}
+												className="w-full"
+											/>
+										);
+									}}
+								/>
+							</div>
+							<div className="flex flex-row justify-between gap-4">
+								<FormField
+									control={form.control}
+									name="days_taken"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>
+													<div className="flex flex-row justify-between">
+														<span>Days Taken</span>
+														<Sparkles
+															size={16}
+															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
+															onClick={() => calculateDelay()}
+														/>
+													</div>
+												</FormLabel>
+												<FormControl>
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Days taken" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="days_delay"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>
+													<div className="flex flex-row justify-between">
+														<span>Days Delay</span>
+														<Sparkles
+															size={16}
+															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
+															onClick={() => calculateDelay()}
+														/>
+													</div>
+												</FormLabel>
+												<FormControl>
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Days delay" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+							</div>
+						</div>
+						<div className="flex flex-col gap-4 bg-secondary p-4 rounded-lg">
+							<div className="flex flex-row items-center justify-start gap-2 w-full font-medium text-base text-muted-foreground">
+								<AlarmClock size={20} /> Time Details
+							</div>
+							<div className="flex flex-row justify-between gap-4">
+								<FormField
+									control={form.control}
+									name="start_time"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>Start Time</FormLabel>
+												<FormControl>
+													<Input
+														disabled={!isEditable}
+														type="time"
+														step="60"
+														inputMode="numeric"
+														pattern="[0-9]{2}:[0-9]{2}"
+														className="bg-background appearance-none"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name="end_time"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>End Time</FormLabel>
+												<FormControl>
+													<Input
+														disabled={!isEditable}
+														type="time"
+														step="any"
+														// placeholder="Rating &#40;1-10&#41;"
+														className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+							</div>
+							<div className="flex flex-row justify-between gap-4">
+								<FormField
+									control={form.control}
+									name="time_estimate"
+									render={({ field }) => (
+										<FormItem className="w-full">
+											<FormLabel>
+												<div className="flex flex-row justify-between">
+													<span>Time Estimate</span>
+													<Sparkles
+														size={16}
+														className="text-muted-foreground text-xs hover:text-primary hover:cursor-pointer"
+														onClick={() => calculateEstimate()}
+													/>
+												</div>
+											</FormLabel>
+											<div>
+												<div className="flex flex-row justify-between gap-2">
+													<div className="flex flex-row gap-2 w-full">
+														<Input
+															disabled={!isEditable}
+															type="number"
+															min="0"
+															placeholder="hr"
+															value={timeEstimateHour}
+															onChange={(e) => {
+																const val = e.target.value.replace(/[^0-9]/g, "");
+																setTimeEstimateHour(val);
+																const decimal = parseInt(val || "0", 10) + parseInt(timeEstimateMinute || "0", 10) / 60;
+																field.onChange(val || timeEstimateMinute ? Number(decimal.toFixed(2)) : "");
+															}}
+															className="w-full"
+														/>
+														{/* <span>hr</span> */}
+														<Input
+															disabled={!isEditable}
+															type="number"
+															min="0"
+															max="59"
+															placeholder="min"
+															value={timeEstimateMinute}
+															onChange={(e) => {
+																let val = e.target.value.replace(/[^0-9]/g, "");
+																if (parseInt(val, 10) > 59) val = "59";
+																setTimeEstimateMinute(val);
+																const decimal = parseInt(timeEstimateHour || "0", 10) + parseInt(val || "0", 10) / 60;
+																field.onChange(timeEstimateHour || val ? Number(decimal.toFixed(2)) : "");
+															}}
+															className="w-full"
+														/>
+														{/* <span>min</span> */}
+													</div>
+												</div>
+												{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
+												<FormMessage /> {/* ✅ Now linked to time_estimate */}
+											</div>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="actual_time"
+									render={({ field }) => {
+										return (
+											<FormItem className="w-full">
+												<FormLabel>
+													<div>Actual Time</div>
+												</FormLabel>
+												<FormControl>
+													<Input
+														disabled={!isEditable}
+														type="time"
+														step="any"
+														// placeholder="Rating &#40;1-10&#41;"
+														className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+							</div>
+							<div className="flex flex-col md:flex-row justify-between gap-4">
+								<FormItem className="w-full">
+									<FormLabel>
+										<div className="flex flex-row justify-between">
+											<span>Time Taken</span>
+											<Sparkles size={16} className="text-muted-foreground hover:text-primary hover:cursor-pointer" />
+										</div>
+									</FormLabel>
 									<div className="flex gap-2">
 										<Input
 											disabled={!isEditable}
 											type="number"
 											min="0"
 											placeholder="hr"
-											value={delayHour}
+											value={timeTakenHour}
 											onChange={(e) => {
 												const val = e.target.value.replace(/[^0-9]/g, "");
-												setDelayHour(val);
+												setTimeTakenHour(val);
 											}}
-											className="w-20"
+											className="w-full"
 										/>
-										<span>hr</span>
+										{/* <span>hr</span> */}
 										<Input
 											disabled={!isEditable}
 											type="number"
 											min="0"
 											max="59"
 											placeholder="min"
-											value={delayMinute}
+											value={timeTakenMinute}
 											onChange={(e) => {
 												let val = e.target.value.replace(/[^0-9]/g, "");
 												if (parseInt(val, 10) > 59) val = "59";
-												setDelayMinute(val);
+												setTimeTakenMinute(val);
 											}}
-											className="w-20"
+											className="w-full"
 										/>
-										<span>min</span>
+										{/* <span>min</span> */}
 									</div>
-
-									<Button type="button" variant="ghost" className="w-fit" onClick={() => calculateDelay()}>
-										Auto Calculate
-									</Button>
-								</div>
-								{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
+									<FormMessage />
+								</FormItem>
+								<FormItem className="w-full">
+									<FormLabel>
+										<div className="flex flex-row justify-between">
+											<span>Time Delay</span>
+											<Sparkles
+												size={16}
+												className="text-muted-foreground hover:text-primary hover:cursor-pointer"
+												onClick={() => calculateDelay()}
+											/>
+										</div>
+									</FormLabel>
+									<div>
+										<div className="flex flex-row justify-between gap-2">
+											<div className="flex gap-2 w-full">
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													placeholder="hr"
+													value={delayHour}
+													onChange={(e) => {
+														const val = e.target.value.replace(/[^0-9]/g, "");
+														setDelayHour(val);
+													}}
+													className="w-full"
+												/>
+												{/* <span>hr</span> */}
+												<Input
+													disabled={!isEditable}
+													type="number"
+													min="0"
+													max="59"
+													placeholder="min"
+													value={delayMinute}
+													onChange={(e) => {
+														let val = e.target.value.replace(/[^0-9]/g, "");
+														if (parseInt(val, 10) > 59) val = "59";
+														setDelayMinute(val);
+													}}
+													className="w-full"
+												/>
+												{/* <span>min</span> */}
+											</div>
+										</div>
+										{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
+									</div>
+								</FormItem>
 							</div>
-						</FormItem>
+						</div>
 						<FormField
 							control={form.control}
 							name="delay_reason"
@@ -854,7 +1014,15 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 											<FormItem>
 												<FormLabel>Rating &#40;1-10&#41;</FormLabel>
 												<FormControl>
-													<Input disabled={!isEditable} type="number" step="any" placeholder="Rating &#40;1-10&#41;" {...field} />
+													<Input
+														disabled={!isEditable}
+														type="number"
+														min={0}
+														max={10}
+														step="any"
+														placeholder="Rating &#40;1-10&#41;"
+														{...field}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -878,68 +1046,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 								/>
 							</>
 						)}
-					</>
-				) : updateData.calendar_add ? (
-					<>
-						<FormField
-							control={form.control}
-							name="start_date"
-							render={({ field }) => {
-								return <DateInput disabled={!isEditable} field={field} label={"Start date"} placeholder={"Select start date"} />;
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="end_date"
-							render={({ field }) => {
-								return <DateInput disabled={!isEditable} field={field} label={"End date"} placeholder={"Select end date"} />;
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="start_time"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>Start Time</FormLabel>
-										<FormControl>
-											<Input
-												disabled={!isEditable}
-												type="time"
-												step="60"
-												inputMode="numeric"
-												pattern="[0-9]{2}:[0-9]{2}"
-												className="bg-background appearance-none"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
-						<FormField
-							control={form.control}
-							name="end_time"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel>End Time</FormLabel>
-										<FormControl>
-											<Input
-												disabled={!isEditable}
-												type="time"
-												step="any"
-												// placeholder="Rating &#40;1-10&#41;"
-												className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								);
-							}}
-						/>
 					</>
 				) : (
 					""

@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
-export default function DateInput({ field, label, placeholder, disabled = false, disableFuture = false }) {
+export default function DateInput({ field, label, placeholder, disabled = false, disableFuture = false, className }) {
 	/* -------------------------------------------------------------------------- */
 	/*                                 Date field                                 */
 	/* -------------------------------------------------------------------------- */
@@ -61,7 +61,7 @@ export default function DateInput({ field, label, placeholder, disabled = false,
 	};
 	/* ------------------------------------ end date field ----------------------------------- */
 	return (
-		<FormItem>
+		<FormItem className={className}>
 			<FormLabel>{label}</FormLabel>
 			<Popover>
 				<PopoverTrigger asChild>
