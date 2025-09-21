@@ -77,8 +77,14 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 	const [timeTakenMinute, setTimeTakenMinute] = useState("");
 	const [delayHour, setDelayHour] = useState("");
 	const [delayMinute, setDelayMinute] = useState("");
-	const [estimateError, setEstimateError] = useState("");
-	const [delayError, setDelayError] = useState("");
+	const [autoCalculateErrors, setAutoCalculateErrors] = useState({
+		days_estimate: "",
+		days_taken: "",
+		delay_days: "",
+		time_estimate: "",
+		time_taken: "",
+		time_delay: "",
+	});
 	const [selectedUsers, setSelectedUsers] = useState(
 		updateData?.assignees?.map((assignee) => parseInt(assignee.id)) || (updateData.calendar_add ? [selectedUser?.id] : []) || []
 	);
@@ -341,56 +347,125 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 		}
 	};
 
-	// Auto-suggest time estimate based on start and end time
-	const calculateEstimate = () => {
-		const { start_time, end_time } = form.getValues();
-		if (start_time && end_time) {
-			setEstimateError("");
-			// Parse times as HH:mm or HH:mm:ss
-			const parseTime = (t) => {
-				const [h, m, s] = t.split(":").map(Number);
-				return h * 60 + m + (s ? s / 60 : 0);
-			};
-			try {
-				const startMin = parseTime(start_time);
-				const endMin = parseTime(end_time);
-				let diff = endMin - startMin;
-				if (diff < 0) diff += 24 * 60; // handle overnight
-				const hours = Math.floor(diff / 60);
-				const minutes = Math.round(diff % 60);
-				setTimeEstimateHour(hours.toString());
-				setTimeEstimateMinute(minutes.toString());
-			} catch (e) {
-				setEstimateError("Invalid time format.");
-			}
-		} else {
-			setEstimateError("Start and End Time is requred to calculate Time Estimate");
-		}
-	};
-	// Auto-suggest delay time based on estimate and actual
-	const calculateDelay = () => {
-		if (timeEstimateHour && timeEstimateMinute && timeTakenHour && timeTakenMinute) {
-			setDelayError("");
-			// Parse times as HH:mm or HH:mm:ss
-			const parseTime = (h, m) => {
-				return h * 60 + m;
-			};
-			try {
-				const estimate = parseTime(parseInt(timeEstimateHour), parseInt(timeEstimateMinute));
-				const actual = parseTime(parseInt(timeTakenHour), parseInt(timeTakenMinute));
-				let delay = actual - estimate;
-				if (delay > 0) {
-					setDelayHour(Math.floor(delay / 60) > 0 ? Math.floor(delay / 60).toString() : "0");
-					setDelayMinute(Math.floor(delay % 60).toString());
-				} else {
-					setDelayHour("");
-					setDelayMinute("");
+	// Unified calculation function for all date/time fields
+	const calculateField = (type) => {
+		const values = form.getValues();
+		// Helper for time parsing
+		const parseTime = (t) => {
+			if (!t) return 0;
+			const [h, m, s] = t.split(":").map(Number);
+			return h * 60 + m + (s ? s / 60 : 0);
+		};
+		// Helper for date parsing
+		const parseDate = (d) => {
+			if (!d) return null;
+			if (typeof d === "string") return new Date(d);
+			return d;
+		};
+		try {
+			switch (type) {
+				case "days_estimate": {
+					const start = parseDate(values.start_date);
+					const end = parseDate(values.end_date);
+					if (start && end) {
+						setAutoCalculateErrors((prev) => ({ ...prev, days_estimate: "" }));
+						const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+						if (diff <= 0) setAutoCalculateErrors((prev) => ({ ...prev, days_estimate: "End date should be same or past the start date" }));
+						else form.setValue("days_estimate", diff);
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, days_estimate: "Start and End Date is required to calculate Days Estimate" }));
+					}
+					break;
 				}
-			} catch (e) {
-				setDelayError("Invalid time format.");
+				case "days_taken": {
+					const start = parseDate(values.start_date);
+					const actual = parseDate(values.actual_date);
+					if (start && actual) {
+						setAutoCalculateErrors((prev) => ({ ...prev, days_taken: "" }));
+						const diff = Math.ceil((actual - start) / (1000 * 60 * 60 * 24)) + 1;
+						if (diff <= 0) setAutoCalculateErrors((prev) => ({ ...prev, days_taken: "Actual date should be same or past the start date" }));
+						else form.setValue("days_taken", diff);
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, days_taken: "Start and Actual Date is required to calculate Days Taken" }));
+					}
+					break;
+				}
+				case "delay_days": {
+					const est = Number(values.days_estimate);
+					const taken = Number(values.days_taken);
+					if (est && taken) {
+						setAutoCalculateErrors((prev) => ({ ...prev, delay_days: "" }));
+						const delay = taken - est;
+						form.setValue("delay_days", delay > 0 ? delay : 0);
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, delay_days: "Estimate and Taken Days is required to calculate Days Taken" }));
+					}
+					break;
+				}
+				case "time_estimate": {
+					const start = values.start_time;
+					const end = values.end_time;
+					if (start && end) {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_estimate: "" }));
+						let diff = parseTime(end) - parseTime(start);
+						if (diff < 0) diff += 24 * 60;
+						const hours = Math.floor(diff / 60);
+						const minutes = Math.round(diff % 60);
+						setTimeEstimateHour(hours.toString());
+						setTimeEstimateMinute(minutes.toString());
+						const decimal = hours + minutes / 60;
+						form.setValue("time_estimate", Number(decimal.toFixed(2)));
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_estimate: "Start and End Time is required to calculate Time Estimate" }));
+					}
+					break;
+				}
+				case "time_taken": {
+					const start = values.start_time;
+					const actual = values.actual_time;
+					if (start && actual) {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_taken: "" }));
+						let diff = parseTime(actual) - parseTime(start);
+						if (diff < 0) diff += 24 * 60;
+						const hours = Math.floor(diff / 60);
+						const minutes = Math.round(diff % 60);
+						setTimeTakenHour(hours.toString());
+						setTimeTakenMinute(minutes.toString());
+						const decimal = hours + minutes / 60;
+						form.setValue("time_taken", Number(decimal.toFixed(2)));
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_taken: "Start and Actual Time is required to calculate Time Taken" }));
+					}
+					break;
+				}
+				case "delay": {
+					const est = Number(values.time_estimate);
+					const taken = Number(values.time_taken);
+					console.log(est, taken);
+					if (est && taken) {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_delay: "" }));
+						let delay = taken - est;
+						if (delay > 0) {
+							const hours = Math.floor(delay);
+							const minutes = Math.round((delay % 1) * 60);
+							setDelayHour(hours.toString());
+							setDelayMinute(minutes.toString());
+							form.setValue("delay", Number(delay.toFixed(2)));
+						} else {
+							setDelayHour(0);
+							setDelayMinute(0);
+							// form.setValue("delay", 0);
+						}
+					} else {
+						setAutoCalculateErrors((prev) => ({ ...prev, time_delay: "Estimate and Taken Time is required to calculate Delay" }));
+					}
+					break;
+				}
+				default:
+					break;
 			}
-		} else {
-			setDelayError("Time Estimate and Time Taken is requred to calculate Delay");
+		} catch (e) {
+			console.log(e);
 		}
 	};
 
@@ -687,11 +762,22 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 												<FormLabel>
 													<div className="flex flex-row justify-between">
 														<span>Days Estimate</span>
-														<Sparkles size={16} className="text-muted-foreground hover:text-primary hover:cursor-pointer" />
+														<Sparkles
+															size={16}
+															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
+															onClick={() => calculateField("days_estimate")}
+														/>
 													</div>
 												</FormLabel>
 												<FormControl>
-													<Input disabled={!isEditable} type="number" step="any" placeholder="Days estimate" {...field} />
+													<div>
+														<Input disabled={!isEditable} type="number" step="any" placeholder="Days estimate" {...field} />
+														{autoCalculateErrors.days_estimate !== "" ? (
+															<span className="text-destructive">{autoCalculateErrors.days_estimate}</span>
+														) : (
+															""
+														)}
+													</div>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -727,12 +813,19 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 														<Sparkles
 															size={16}
 															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
-															// onClick={() => calculateDelay()}
+															onClick={() => calculateField("days_taken")}
 														/>
 													</div>
 												</FormLabel>
 												<FormControl>
-													<Input disabled={!isEditable} type="number" step="any" placeholder="Days taken" {...field} />
+													<div>
+														<Input disabled={!isEditable} type="number" step="any" placeholder="Days taken" {...field} />
+														{autoCalculateErrors.days_taken !== "" ? (
+															<span className="text-destructive">{autoCalculateErrors.days_taken}</span>
+														) : (
+															""
+														)}
+													</div>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -751,12 +844,19 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 														<Sparkles
 															size={16}
 															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
-															// onClick={() => calculateDelay()}
+															onClick={() => calculateField("delay_days")}
 														/>
 													</div>
 												</FormLabel>
 												<FormControl>
-													<Input disabled={!isEditable} type="number" step="any" placeholder="Days delayed" {...field} />
+													<div>
+														<Input disabled={!isEditable} type="number" step="any" placeholder="Days delayed" {...field} />
+														{autoCalculateErrors.delay_days !== "" ? (
+															<span className="text-destructive">{autoCalculateErrors.delay_days}</span>
+														) : (
+															""
+														)}
+													</div>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -828,7 +928,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 													<Sparkles
 														size={16}
 														className="text-muted-foreground text-xs hover:text-primary hover:cursor-pointer"
-														onClick={() => calculateEstimate()}
+														onClick={() => calculateField("time_estimate")}
 													/>
 												</div>
 											</FormLabel>
@@ -869,7 +969,11 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 														{/* <span>min</span> */}
 													</div>
 												</div>
-												{estimateError !== "" ? <span className="text-destructive">{estimateError}</span> : ""}
+												{autoCalculateErrors.time_estimate !== "" ? (
+													<span className="text-destructive">{autoCalculateErrors.time_estimate}</span>
+												) : (
+													""
+												)}
 												<FormMessage /> {/* ✅ Now linked to time_estimate */}
 											</div>
 										</FormItem>
@@ -901,45 +1005,66 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 								/>
 							</div>
 							<div className="flex flex-col md:flex-row justify-between gap-4">
-								<FormItem className="w-full">
-									<FormLabel>
-										<div className="flex flex-row justify-between">
-											<span>Time Taken</span>
-											<Sparkles size={16} className="text-muted-foreground hover:text-primary hover:cursor-pointer" />
-										</div>
-									</FormLabel>
-									<div className="flex gap-2">
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											placeholder="hr"
-											value={timeTakenHour}
-											onChange={(e) => {
-												const val = e.target.value.replace(/[^0-9]/g, "");
-												setTimeTakenHour(val);
-											}}
-											className="w-full"
-										/>
-										{/* <span>hr</span> */}
-										<Input
-											disabled={!isEditable}
-											type="number"
-											min="0"
-											max="59"
-											placeholder="min"
-											value={timeTakenMinute}
-											onChange={(e) => {
-												let val = e.target.value.replace(/[^0-9]/g, "");
-												if (parseInt(val, 10) > 59) val = "59";
-												setTimeTakenMinute(val);
-											}}
-											className="w-full"
-										/>
-										{/* <span>min</span> */}
-									</div>
-									<FormMessage />
-								</FormItem>
+								<FormField
+									control={form.control}
+									name="time_taken"
+									render={({ field }) => (
+										<FormItem className="w-full">
+											<FormLabel>
+												<div className="flex flex-row justify-between">
+													<span>Time Taken</span>
+													<Sparkles
+														size={16}
+														className="text-muted-foreground hover:text-primary hover:cursor-pointer"
+														onClick={() => calculateField("time_taken")}
+													/>
+												</div>
+											</FormLabel>
+											<div>
+												<div className="flex gap-2">
+													<Input
+														disabled={!isEditable}
+														type="number"
+														min="0"
+														placeholder="hr"
+														value={timeTakenHour}
+														onChange={(e) => {
+															const val = e.target.value.replace(/[^0-9]/g, "");
+															setTimeTakenHour(val);
+															const decimal = parseInt(val || "0", 10) + parseInt(timeTakenMinute || "0", 10) / 60;
+															field.onChange(val || timeTakenMinute ? Number(decimal.toFixed(2)) : "");
+														}}
+														className="w-full"
+													/>
+													{/* <span>hr</span> */}
+													<Input
+														disabled={!isEditable}
+														type="number"
+														min="0"
+														max="59"
+														placeholder="min"
+														value={timeTakenMinute}
+														onChange={(e) => {
+															let val = e.target.value.replace(/[^0-9]/g, "");
+															if (parseInt(val, 10) > 59) val = "59";
+															setTimeTakenMinute(val);
+															const decimal = parseInt(val || "0", 10) + parseInt(timeTakenHour || "0", 10) / 60;
+															field.onChange(val || timeTakenHour ? Number(decimal.toFixed(2)) : "");
+														}}
+														className="w-full"
+													/>
+													{/* <span>min</span> */}
+												</div>
+												{autoCalculateErrors.time_taken !== "" ? (
+													<span className="text-destructive">{autoCalculateErrors.time_taken}</span>
+												) : (
+													""
+												)}
+											</div>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 								<FormItem className="w-full">
 									<FormLabel>
 										<div className="flex flex-row justify-between">
@@ -947,7 +1072,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 											<Sparkles
 												size={16}
 												className="text-muted-foreground hover:text-primary hover:cursor-pointer"
-												onClick={() => calculateDelay()}
+												onClick={() => calculateField("delay")}
 											/>
 										</div>
 									</FormLabel>
@@ -984,7 +1109,11 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 												{/* <span>min</span> */}
 											</div>
 										</div>
-										{delayError !== "" ? <span className="text-destructive">{delayError}</span> : ""}
+										{autoCalculateErrors.time_delay !== "" ? (
+											<span className="text-destructive">{autoCalculateErrors.time_delay}</span>
+										) : (
+											""
+										)}
 									</div>
 								</FormItem>
 							</div>
