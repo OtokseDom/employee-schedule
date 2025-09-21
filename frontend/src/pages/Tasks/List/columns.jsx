@@ -224,6 +224,53 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 				},
 			},
 			{
+				id: "actual date",
+				accessorKey: "actual_date",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Actual Date <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
+					);
+				},
+				// Keep raw value for sorting
+				accessorFn: (row) => row.actual_date,
+				// Use cell renderer to format for display
+				cell: ({ row }) => {
+					const { actual_date, days_estimate, days_taken, delay_days } = row.original;
+					return (
+						<div>
+							{actual_date ? format(new Date(actual_date), "MMM-dd yyyy") : "-"}
+							<br />
+							{days_estimate && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Estimate:</span> {days_estimate} days
+									</span>
+									<br />
+								</>
+							)}
+							{days_taken && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Taken:</span> {days_taken} days
+									</span>
+									<br />
+								</>
+							)}
+							{delay_days && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Delay:</span> {delay_days} days
+									</span>
+									<br />
+								</>
+							)}
+						</div>
+					);
+				},
+			},
+			{
 				id: "start time",
 				accessorKey: "start_time",
 				header: ({ column }) => {
@@ -246,6 +293,58 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 					);
 				},
 				accessorFn: (row) => (row.end_time ? format(new Date(`1970-01-01T${row.end_time}`), "h:mm a") : ""),
+			},
+			{
+				id: "actual time",
+				accessorKey: "actual_time",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Actual Time <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
+					);
+				},
+				// Keep raw value for sorting
+				accessorFn: (row) => row.actual_time,
+				// Use cell renderer to format for display
+				cell: ({ row }) => {
+					const { actual_time, time_estimate, time_taken, delay } = row.original;
+					const timeEstimate = row.original.time_estimate;
+					if (typeof timeEstimate !== "number" || isNaN(timeEstimate)) return "";
+					const hrs = Math.floor(timeEstimate);
+					const mins = Math.round((timeEstimate - hrs) * 60);
+					const timeEstimateFormatted = `${hrs} hr${hrs !== 1 ? "s" : ""}${mins ? ` ${mins} min${mins !== 1 ? "s" : ""}` : ""}`;
+					return (
+						<div>
+							{actual_time ? format(new Date(`1970-01-01T${actual_time}`), "h:mm a") : "-"}
+							<br />
+							{time_estimate && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Estimate:</span> {`${timeEstimateFormatted}`}
+									</span>
+									<br />
+								</>
+							)}
+							{time_taken && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Taken:</span> {`${time_taken}`}
+									</span>
+									<br />
+								</>
+							)}
+							{delay && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Delay:</span> {`${delay}`}
+									</span>
+									<br />
+								</>
+							)}
+						</div>
+					);
+				},
 			},
 			{
 				id: "time estimate",
