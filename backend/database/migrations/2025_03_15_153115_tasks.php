@@ -24,14 +24,18 @@ return new class extends Migration
             $table->text('expected_output')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->double('days_estimate')->nullable(); // in days
+            $table->double('days_taken')->nullable(); // in days
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->double('time_estimate')->nullable(); // in hours
             $table->double('time_taken')->nullable(); // in hours
             $table->double('delay')->nullable(); // in hours
+            $table->double('delay_days')->nullable(); // in hours
             $table->text('delay_reason')->nullable();
             $table->integer('performance_rating')->nullable();
             $table->text('remarks')->nullable();
+            $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent', 'Critical'])->nullable();
             $table->integer('position'); //kanban
             $table->timestamps();
             $table->unique(['project_id', 'status_id', 'position']);
