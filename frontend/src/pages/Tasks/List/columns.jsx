@@ -177,18 +177,18 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 					return category?.name;
 				},
 			},
-			{
-				id: "expected output",
-				accessorKey: "expected_output",
-				meta: { hidden: true },
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Expected Output <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-			},
+			// {
+			// 	id: "expected output",
+			// 	accessorKey: "expected_output",
+			// 	meta: { hidden: true },
+			// 	header: ({ column }) => {
+			// 		return (
+			// 			<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+			// 				Expected Output <ArrowUpDown className="ml-2 h-4 w-4" />
+			// 			</button>
+			// 		);
+			// 	},
+			// },
 			{
 				id: "start date",
 				accessorKey: "start_date",
@@ -344,60 +344,6 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 							)}
 						</div>
 					);
-				},
-			},
-			{
-				id: "time estimate",
-				accessorKey: "time_estimate",
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Time Estimate <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-				cell: ({ row }) => {
-					const timeEstimate = row.original.time_estimate;
-					if (typeof timeEstimate !== "number" || isNaN(timeEstimate)) return "";
-					const hrs = Math.floor(timeEstimate);
-					const mins = Math.round((timeEstimate - hrs) * 60);
-					return `${hrs} hr${hrs !== 1 ? "s" : ""}${mins ? ` ${mins} min${mins !== 1 ? "s" : ""}` : ""}`;
-				},
-			},
-			{
-				id: "time taken",
-				accessorKey: "time_taken",
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Time Taken (hrs) <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-				cell: ({ row }) => {
-					const timeTaken = row.original.time_taken;
-					if (typeof timeTaken !== "number" || isNaN(timeTaken)) return "";
-					const hrs = Math.floor(timeTaken);
-					const mins = Math.round((timeTaken - hrs) * 60);
-					return `${hrs} hr${hrs !== 1 ? "s" : ""}${mins ? ` ${mins} min${mins !== 1 ? "s" : ""}` : ""}`;
-				},
-			},
-			{
-				id: "delay",
-				accessorKey: "delay",
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Delay <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-				cell: ({ row }) => {
-					const delay = row.original.delay;
-					if (typeof delay !== "number" || isNaN(delay)) return "";
-					const hrs = Math.floor(delay);
-					const mins = Math.round((delay - hrs) * 60);
-					return `${hrs} hr${hrs !== 1 ? "s" : ""}${mins ? ` ${mins} min${mins !== 1 ? "s" : ""}` : ""}`;
 				},
 			},
 			{
