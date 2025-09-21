@@ -42,7 +42,7 @@ const formSchema = z.object({
 	actual_date: z.date().optional(),
 	days_estimate: z.coerce.number().optional(),
 	days_taken: z.coerce.number().optional(),
-	days_delay: z.coerce.number().optional(),
+	delay_days: z.coerce.number().optional(),
 	start_time: z.string().optional(),
 	end_time: z.string().optional(),
 	actual_time: z.string().optional(),
@@ -136,7 +136,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				actual_date,
 				days_estimate,
 				days_taken,
-				days_delay,
+				delay_days,
 				start_time,
 				end_time,
 				actual_time,
@@ -162,7 +162,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				actual_date: typeof actual_date === "string" ? parseISO(actual_date) : actual_date || undefined,
 				days_estimate: days_estimate || "",
 				days_taken: days_taken || "",
-				days_delay: days_delay || "",
+				delay_days: delay_days || "",
 				start_time: start_time || "",
 				end_time: end_time || "",
 				actual_time: actual_time || "",
@@ -727,7 +727,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 														<Sparkles
 															size={16}
 															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
-															onClick={() => calculateDelay()}
+															// onClick={() => calculateDelay()}
 														/>
 													</div>
 												</FormLabel>
@@ -741,22 +741,22 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 								/>
 								<FormField
 									control={form.control}
-									name="days_delay"
+									name="delay_days"
 									render={({ field }) => {
 										return (
 											<FormItem className="w-full">
 												<FormLabel>
 													<div className="flex flex-row justify-between">
-														<span>Days Delay</span>
+														<span>Days Delayed</span>
 														<Sparkles
 															size={16}
 															className="text-muted-foreground hover:text-primary hover:cursor-pointer"
-															onClick={() => calculateDelay()}
+															// onClick={() => calculateDelay()}
 														/>
 													</div>
 												</FormLabel>
 												<FormControl>
-													<Input disabled={!isEditable} type="number" step="any" placeholder="Days delay" {...field} />
+													<Input disabled={!isEditable} type="number" step="any" placeholder="Days delayed" {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
