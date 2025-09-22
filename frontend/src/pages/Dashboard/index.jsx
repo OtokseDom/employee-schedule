@@ -23,7 +23,7 @@ import { useTaskHelpers } from "@/utils/taskHelpers";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users } = useUsersStore();
-	const { projects } = useProjectsStore();
+	const { projects, projectsLoaded } = useProjectsStore();
 	const { reports, setReports, userFilter, projectFilter, filters, setFilters, selectedProjects, setSelectedProjects, selectedUsers, setSelectedUsers } =
 		useDashboardStore();
 	// Fetch Hooks
@@ -35,7 +35,7 @@ export default function UserProfile() {
 		document.title = "Task Management";
 		if (!reports || Object.keys(reports).length === 0) fetchReports();
 		if (!users || users.length === 0) fetchUsers();
-		if (projects === null) fetchProjects();
+		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly
