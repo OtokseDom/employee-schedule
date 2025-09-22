@@ -8,7 +8,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Skeleton } from "../ui/skeleton";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
-export function ChartBarMultiple({ report, variant }) {
+export function ChartBarMultiple({ report, variant, type }) {
 	var chartConfig = null;
 	if (variant == "dashboard") {
 		chartConfig = {
@@ -37,9 +37,15 @@ export function ChartBarMultiple({ report, variant }) {
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
 			<CardHeader className="">
-				<CardTitle>{variant == "dashboard" ? "Task Underruns vs Overruns per Category" : "Estimate vs Actual Time"}</CardTitle>
+				<CardTitle>
+					{variant == "dashboard"
+						? type == "category"
+							? "Time Overruns vs Underruns per Category"
+							: "Days Overruns vs Underruns per User"
+						: "Estimate vs Actual Time"}
+				</CardTitle>
 				<CardDescription>
-					Showing {report?.task_count} {variant == "dashboard" ? "categories" : "most recent tasks "}
+					Showing {report?.data_count} {variant == "dashboard" ? (type == "category" ? "categories" : "users") : "most recent tasks "}
 					{report?.filters?.from && report?.filters?.to
 						? `(${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
 								report.filters.to
@@ -56,17 +62,17 @@ export function ChartBarMultiple({ report, variant }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
-					) : report?.task_count == 0 ? (
+					) : report?.data_count == 0 ? (
 						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart accessibilityLayer data={report?.chart_data}>
 							<CartesianGrid vertical={false} />
 							<XAxis
-								dataKey={variant == "dashboard" ? "category" : "task"}
+								dataKey={variant == "dashboard" ? (type == "category" ? "category" : "assignee") : "task"}
 								tickLine={false}
 								tickMargin={10}
 								axisLine={false}
-								tickFormatter={(value) => value.slice(0, 3)}
+								tickFormatter={(value) => value.slice(0, 5)}
 							/>
 							<ChartTooltip cursor={true} content={<ChartTooltipContent indicator="line" />} />
 							{variant == "dashboard" ? (
@@ -90,7 +96,7 @@ export function ChartBarMultiple({ report, variant }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
-				) : report?.task_count == 0 ? (
+				) : report?.data_count == 0 ? (
 					""
 				) : (
 					<>
