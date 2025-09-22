@@ -39,8 +39,8 @@ export default function History({ selectedTaskHistory }) {
 											return <span>{val}</span>;
 										};
 										return (
-											<span key={key} className="flex flex-col gap-1">
-												<span className="text-muted-foreground">{formattedLabel}:</span>
+											<span key={key}>
+												<span className="text-muted-foreground">{formattedLabel}: </span>
 												{renderValue(value.from)}
 											</span>
 										);
@@ -72,8 +72,8 @@ export default function History({ selectedTaskHistory }) {
 											return <span>{val}</span>;
 										};
 										return (
-											<span key={key} className="flex flex-col gap-1">
-												<span className="text-muted-foreground">{formattedLabel}:</span>
+											<span key={key}>
+												<span className="text-muted-foreground">{formattedLabel}: </span>
 												{renderValue(value.to)}
 											</span>
 										);
