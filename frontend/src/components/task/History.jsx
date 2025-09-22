@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-
+// TODO: format description markup
 export default function History({ selectedTaskHistory }) {
 	return (
 		<div className="flex flex-col text-sm">
@@ -29,10 +29,19 @@ export default function History({ selectedTaskHistory }) {
 											: key;
 
 										const formattedLabel = label.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
+										const renderValue = (val) => {
+											if (!val) return null;
 
+											if (key === "description") {
+												return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: val }} />;
+											}
+
+											return <span>{val}</span>;
+										};
 										return (
-											<span key={key}>
-												<span className="text-muted-foreground">{formattedLabel}:</span> {value.from}
+											<span key={key} className="flex flex-col gap-1">
+												<span className="text-muted-foreground">{formattedLabel}:</span>
+												{renderValue(value.from)}
 											</span>
 										);
 									})}
@@ -45,10 +54,27 @@ export default function History({ selectedTaskHistory }) {
 											: key;
 
 										const formattedLabel = label.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
+										const renderValue = (val) => {
+											if (!val) return null;
 
+											if (key === "description") {
+												return (
+													<div
+														className="prose prose-sm max-w-none
+												 			[&_ul]:list-disc [&_ul]:pl-6
+															[&_ol]:list-decimal [&_ol]:pl-6
+															[&_li]:my-1"
+														dangerouslySetInnerHTML={{ __html: val }}
+													/>
+												);
+											}
+
+											return <span>{val}</span>;
+										};
 										return (
-											<span key={key}>
-												<span className="text-muted-foreground">{formattedLabel}:</span> {value.to}
+											<span key={key} className="flex flex-col gap-1">
+												<span className="text-muted-foreground">{formattedLabel}:</span>
+												{renderValue(value.to)}
 											</span>
 										);
 									})}
