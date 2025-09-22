@@ -372,7 +372,6 @@ class ReportService
         return apiResponse($data, "Performance rating trend report fetched successfully");
     }
 
-    // TODO: Overrun vs Underrun per User based on start_date and end_date - Multi Bar chart
     public function estimateVsActualDate($filter)
     {
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
@@ -386,7 +385,7 @@ class ReportService
             })
             ->where('users.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('tasks.parent_id') // include subtasks
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
                         $subQuery->whereNull('tasks.parent_id')
                             ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
@@ -407,9 +406,7 @@ class ReportService
         }
         if ($filter && isset($filter['users'])) {
             $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
+            $query->whereIn('users.id', $userIds);
         }
         $chart_data = $query->groupBy('users.name')
             ->get();
@@ -531,7 +528,7 @@ class ReportService
             })
             ->where('categories.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('tasks.parent_id') // include subtasks
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
                         $subQuery->whereNull('tasks.parent_id')
                             ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
@@ -662,7 +659,7 @@ class ReportService
             })
             ->where('users.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('tasks.parent_id') // include subtasks
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
                         $subQuery->whereNull('tasks.parent_id')
                             ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
@@ -725,7 +722,7 @@ class ReportService
             })
             ->where('users.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('tasks.parent_id') // include subtasks
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
                         $subQuery->whereNull('tasks.parent_id')
                             ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
@@ -781,7 +778,7 @@ class ReportService
             ->where('tasks.organization_id', $this->organization_id)
             ->where('categories.organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('tasks.parent_id') // include subtasks
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
                         $subQuery->whereNull('tasks.parent_id')
                             ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
