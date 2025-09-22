@@ -133,9 +133,13 @@ export default function UserProfile() {
 				<PieChartDonut report={reports?.tasks_by_status} variant="dashboard" />
 			</div>
 
-			{/* Multi Bar Chart */}
+			{/* Multi Bar Chart Category time*/}
+			{/* <div className="md:col-span-4">
+				<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" type={"category"} />
+			</div> */}
+			{/* Multi Bar Chart User date */}
 			<div className="md:col-span-4">
-				<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" />
+				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
 			</div>
 
 			{/* Line Chart */}
