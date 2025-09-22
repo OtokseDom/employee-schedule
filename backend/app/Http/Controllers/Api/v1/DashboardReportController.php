@@ -21,6 +21,7 @@ class DashboardReportController extends Controller
             'tasks_by_status' => $this->report_service->tasksByStatus(null, "dashboard", $filter),
             'users_task_load' => $this->report_service->usersTaskLoad($filter),
             'estimate_vs_actual' => $this->report_service->estimateVsActual($filter),
+            'estimate_vs_actual_date' => $this->report_service->estimateVsActualDate($filter),
             'performance_leaderboard' => $this->report_service->performanceLeaderboard($filter),
             'performance_rating_trend' => $this->report_service->performanceRatingTrend(null, "dashboard", $filter),
             'section_cards' => $this->report_service->sectionCards(null, $filter),

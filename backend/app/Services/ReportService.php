@@ -29,9 +29,7 @@ class ReportService
         $this->organization_id = Auth::user()->organization_id;
     }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
-    /**
-     * Display reports for section cards. Section Cards
-     */
+    // Overall Progress
     public function overallProgress($id = null, $filter)
     {
         $progress_query = $this->task
@@ -82,9 +80,7 @@ class ReportService
 
         return apiResponse($data, "Progress report fetched successfully");
     }
-    /**
-     * Display reports for section cards. Section Cards
-     */
+    // Section Cards
     public function sectionCards($id = null, $filter)
     {
         /* ------------------------- // Average Performance ------------------------- */
@@ -376,6 +372,70 @@ class ReportService
         return apiResponse($data, "Performance rating trend report fetched successfully");
     }
 
+    // TODO: Overrun vs Underrun per User based on start_date and end_date - Multi Bar chart
+    public function estimateVsActualDate($filter)
+    {
+        // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
+        $query = $this->user
+            ->leftJoin('task_assignees', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id');
+            })
+            ->leftJoin('tasks', function ($join) {
+                $join->on('tasks.id', '=', 'task_assignees.task_id')
+                    ->where('tasks.organization_id', $this->organization_id);
+            })
+            ->where('users.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            })
+            ->select(
+                'users.name as assignee',
+                DB::raw('ROUND(SUM(days_taken - days_estimate),2) as net_difference'),
+                DB::raw('ROUND(SUM(CASE WHEN days_taken > days_estimate THEN days_taken - days_estimate ELSE 0 END),2) as overrun'),
+                DB::raw('ROUND(SUM(CASE WHEN days_taken < days_estimate THEN days_estimate - days_taken ELSE 0 END),2) as underrun')
+            );
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['projects'])) {
+            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
+            $query->whereIn('project_id', $projectIds);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $query->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
+        }
+        $chart_data = $query->groupBy('users.name')
+            ->get();
+
+        $runs = [
+            'over' => round($chart_data->sum('overrun'), 2),
+            'under' => round($chart_data->sum('underrun'), 2),
+            'net' => round($chart_data->sum('percentage_difference'), 2),
+        ];
+
+        $userCount = count($chart_data);
+
+        $data = [
+            'chart_data' => $chart_data,
+            'runs' => $runs,
+            'data_count' => $userCount, //data_count is used by the chart
+            'filters' => $filter
+        ];
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch estimate vs actual report', false, 404);
+        }
+
+        return apiResponse($data, "Estimate vs actual report fetched successfully");
+    }
+
     /* ------------------------------ USER REPORTS ------------------------------ */
     // User Taskload. Area chart
     public function taskActivityTimeline($id, $filter)
@@ -511,9 +571,8 @@ class ReportService
 
         return apiResponse($data, "Rating per category report fetched successfully");
     }
-    /**
-     * Display report for 10 recent tasks estimate vs actual. Bar chart multiple
-     */
+
+    // 10 recent tasks estimate vs actual. Bar chart multiple
     public function userEstimateVsActual($id, $filter)
     {
         // Fetch the 10 most recent tasks for the user
@@ -577,7 +636,7 @@ class ReportService
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'task_count' => $taskCount,
+            'data_count' => $taskCount,
             'filters' => $filter
         ];
 
@@ -589,9 +648,7 @@ class ReportService
     }
 
     /* ---------------------------- DASHBOARD REPORTS --------------------------- */
-    /**
-     * Display report for users activity load. Horizontal Bar chart
-     */
+    // Users activity load. Horizontal Bar chart
     public function usersTaskLoad($filter)
     {
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
@@ -653,9 +710,8 @@ class ReportService
 
         return apiResponse($data, "Users task load report fetched successfully");
     }
-    /**
-     * Display report for leaderboards. Datatable
-     */
+
+    // Leaderboards. Datatable
     public function performanceLeaderboard($filter)
     {
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
@@ -710,7 +766,7 @@ class ReportService
         return apiResponse($data, "Performance leaderbord fetched successfully");
     }
 
-    // estimate vs actual. Bar chart multiple
+    // Underrun vs Overruns based on time. Bar chart multiple
     public function estimateVsActual($filter)
     {
         // Fetch overall estimate and actual time
@@ -723,6 +779,7 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN time_taken < time_estimate THEN time_estimate - time_taken ELSE 0 END),2) as underrun')
             )
             ->where('tasks.organization_id', $this->organization_id)
+            ->where('categories.organization_id', $this->organization_id)
             ->where(function ($query) {
                 $query->whereNotNull('tasks.parent_id') // include subtasks
                     ->orWhere(function ($subQuery) {
@@ -757,7 +814,7 @@ class ReportService
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'task_count' => $categoryCount,
+            'data_count' => $categoryCount,
             'filters' => $filter
         ];
 
