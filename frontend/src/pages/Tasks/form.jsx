@@ -52,6 +52,7 @@ const formSchema = z.object({
 	delay_reason: z.string().optional(),
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
 	remarks: z.string().optional(),
+	priority: z.string().optional(),
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
@@ -151,6 +152,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				delay,
 				delay_reason,
 				performance_rating,
+				priority,
 				remarks,
 			} = updateData;
 			form.reset({
@@ -178,6 +180,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				delay_reason: delay_reason || "",
 				performance_rating: performance_rating || "",
 				remarks: remarks || "",
+				priority: priority || "",
 			});
 			// Set hour/minute fields for time_estimate, actual_time, and delay
 			if (typeof time_estimate === "number" || (typeof time_estimate === "string" && time_estimate !== "")) {
@@ -516,6 +519,43 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 											))
 										) : (
 											<></>
+										)}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
+				/>
+				<FormField
+					control={form.control}
+					name="priority"
+					render={({ field }) => {
+						const priorities = [
+							{ id: 1, name: "Low" },
+							{ id: 2, name: "Medium" },
+							{ id: 3, name: "High" },
+							{ id: 4, name: "Urgent" },
+							{ id: 5, name: "Critical" },
+						];
+						return (
+							<FormItem>
+								<FormLabel>Priority</FormLabel>
+								<Select disabled={!isEditable} onValueChange={field.onChange} defaultValue={updateData?.priority || field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select priority"></SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Array.isArray(priorities) && priorities.length > 0 ? (
+											priorities?.map((priority) => (
+												<SelectItem key={priority?.id} value={priority?.name}>
+													{priority?.name}
+												</SelectItem>
+											))
+										) : (
+											<SelectItem disabled>No priority available</SelectItem>
 										)}
 									</SelectContent>
 								</Select>
