@@ -176,7 +176,7 @@ export const statusColors = {
 export const priorityColors = {
 	Low: "bg-gray-100 border border-gray-800 border-2 text-foreground bg-opacity-20",
 	Medium: "bg-yellow-100 border border-yellow-800 border-2 text-foreground bg-opacity-20",
-	High: "bg-orange-100 border border-orange-800 border-2 text-foreground bg-opacity-20",
-	Urgent: "bg-red-100 border border-red-800 border-2 text-foreground bg-opacity-20",
-	Critical: "bg-purple-100 border border-purple-800 border-2 text-foreground bg-opacity-20",
+	High: "bg-purple-100 border border-purple-800 border-2 text-foreground bg-opacity-20",
+	Urgent: "bg-orange-100 border border-orange-800 border-2 text-foreground bg-opacity-20",
+	Critical: "bg-red-100 border border-red-800 border-2 text-foreground bg-opacity-20",
 };
