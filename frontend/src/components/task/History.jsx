@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-// TODO: format description markup
 export default function History({ selectedTaskHistory }) {
 	return (
 		<div className="flex flex-col text-sm">

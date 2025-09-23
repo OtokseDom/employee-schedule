@@ -11,7 +11,7 @@ import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useToast } from "@/contexts/ToastContextProvider";
 import axiosClient from "@/axios.client";
 import { API } from "@/constants/api";
-import { statusColors } from "@/utils/taskHelpers";
+import { statusColors, priorityColors } from "@/utils/taskHelpers";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogOpen, setDialogOpen }) => {
 	const { loading, setLoading } = useLoadContext();
@@ -43,14 +43,6 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 		setUpdateData(project);
 	};
 
-	// Define color classes based on status value
-	const priorityColors = {
-		Low: "bg-gray-100 border border-gray-800 border-2 text-foreground bg-opacity-20",
-		Medium: "bg-yellow-100 border border-yellow-800 border-2 text-foreground bg-opacity-20",
-		High: "bg-orange-100 border border-orange-800 border-2 text-foreground bg-opacity-20",
-		Urgent: "bg-red-100 border border-red-800 border-2 text-foreground bg-opacity-20",
-		Critical: "bg-purple-100 border border-purple-800 border-2 text-foreground bg-opacity-20",
-	};
 	const baseColumns = useMemo(
 		() => [
 			{
