@@ -20,6 +20,7 @@ import { useUsersStore } from "@/store/users/usersStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
+import { ChartBarLabel } from "@/components/chart/bar-chart-label";
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users } = useUsersStore();
@@ -137,6 +138,17 @@ export default function UserProfile() {
 			{/* <div className="md:col-span-4">
 				<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" type={"category"} />
 			</div> */}
+
+			{/* Horizontal Bar Chart */}
+			<div className="md:col-span-4">
+				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
+			</div>
+
+			{/* Bar Chart */}
+			<div className="md:col-span-4">
+				<ChartBarLabel report={reports?.delay_per_user} variant="dashboard" />
+			</div>
+
 			{/* Multi Bar Chart User date */}
 			<div className="md:col-span-4">
 				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
@@ -147,13 +159,8 @@ export default function UserProfile() {
 				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
 			</div>
 
-			{/* Horizontal Bar Chart */}
-			<div className="md:col-span-6">
-				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
-			</div>
-
 			{/* Datatable */}
-			<div className="md:col-span-6 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
+			<div className="md:col-span-4 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
 				<CardHeader>
 					<CardTitle>
 						{reports?.performance_leaderboard?.filters?.from && reports?.performance_leaderboard?.filters?.to
