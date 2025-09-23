@@ -16,7 +16,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { statusColors } from "@/utils/taskHelpers";
+import { priorityColors, statusColors } from "@/utils/taskHelpers";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useMemo, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
@@ -122,6 +122,32 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 							<span className={`px-2 py-1 text-center whitespace-nowrap rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
 								{status?.name || "-"}
 							</span>
+						</div>
+					);
+				},
+			},
+			{
+				id: "priority",
+				accessorKey: "priority",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Priority <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
+					);
+				},
+				cell: ({ row }) => {
+					const priority = row.original.priority;
+
+					return (
+						<div className=" min-w-24">
+							{priority ? (
+								<span className={`px-2 py-1 w-full text-center rounded text-xs ${priorityColors[priority] || "bg-gray-200 text-gray-800"}`}>
+									{priority?.replace("_", " ")}
+								</span>
+							) : (
+								"-"
+							)}
 						</div>
 					);
 				},
