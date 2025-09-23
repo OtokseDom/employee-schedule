@@ -227,12 +227,8 @@ class ReportService
         return apiResponse($data, "Active users report fetched successfully");
     }
     // Task status - Pie donut chart
-    public function tasksByStatus($id, $variant = "", $filter)
+    public function tasksByStatus($id = null, $variant = "", $filter)
     {
-        if (!is_numeric($id) && $variant == "") {
-            return apiResponse(null, 'Invalid user ID', false, 400);
-        }
-
         // Fetch statuses from DB (only id & name)
         $statuses = $this->task_status->select('id', 'name')->where('organization_id', $this->organization_id)->get();
 
@@ -289,7 +285,7 @@ class ReportService
     }
 
     // Performance Trend - Line chart label
-    public function performanceRatingTrend($id, $variant = "", $filter)
+    public function performanceRatingTrend($id = null, $variant = "", $filter)
     {
 
         // Calculate the last 6 months (including current)
@@ -372,7 +368,8 @@ class ReportService
         return apiResponse($data, "Performance rating trend report fetched successfully");
     }
 
-    public function estimateVsActualDate($filter)
+    // Underrun vs Overruns based on date. Bar chart multiple
+    public function estimateVsActualDate($id = null, $filter)
     {
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
@@ -397,6 +394,12 @@ class ReportService
                 DB::raw('ROUND(SUM(CASE WHEN days_taken > days_estimate THEN days_taken - days_estimate ELSE 0 END),2) as overrun'),
                 DB::raw('ROUND(SUM(CASE WHEN days_taken < days_estimate THEN days_estimate - days_taken ELSE 0 END),2) as underrun')
             );
+
+        // if ($id && $variant !== 'dashboard') {
+        //     $query->whereHas('assignees', function ($q) use ($id) {
+        //         $q->where('users.id', $id);
+        //     });
+        // }
         if ($filter && $filter['from'] && $filter['to']) {
             $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
         }
@@ -431,6 +434,71 @@ class ReportService
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");
+    }
+
+    public function delaysPerUser($id = null, $filter)
+    {
+        // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
+        $query = $this->user
+            ->leftJoin('task_assignees', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id');
+            })
+            ->leftJoin('tasks', function ($join) {
+                $join->on('tasks.id', '=', 'task_assignees.task_id')
+                    ->where('tasks.organization_id', $this->organization_id);
+            })
+            ->where('users.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            })
+            ->select(
+                'users.name as assignee',
+                DB::raw('SUM(CASE WHEN delay_days > 0 THEN delay_days ELSE 0 END) as delay'),
+            );
+
+        // if ($id && $variant !== 'dashboard') {
+        //     $query->whereHas('assignees', function ($q) use ($id) {
+        //         $q->where('users.id', $id);
+        //     });
+        // }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['projects'])) {
+            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
+            $query->whereIn('project_id', $projectIds);
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $query->whereIn('users.id', $userIds);
+        }
+        $chart_data = $query->groupBy('users.name')
+            ->get();
+
+        $runs = [
+            'delay' => $chart_data->sum('delay'),
+        ];
+
+        $userCount = count($chart_data);
+
+        $data = [
+            'chart_data' => $chart_data,
+            // get row with highest and lowest delay including user name
+            'highest_delay' => $chart_data->sortByDesc('delay')->first(),
+            'lowest_delay' => $chart_data->sortBy('delay')->first(),
+            'data_count' => $userCount, //data_count is used by the chart
+            'filters' => $filter
+        ];
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch delay per user report', false, 404);
+        }
+
+        return apiResponse($data, "Delay per user report fetched successfully");
     }
 
     /* ------------------------------ USER REPORTS ------------------------------ */
