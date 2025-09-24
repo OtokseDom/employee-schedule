@@ -28,6 +28,64 @@ class ReportService
         $this->user = $user;
         $this->organization_id = Auth::user()->organization_id;
     }
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
+
+
+    /**
+     * Apply common filters to query builder
+     */
+    private function applyFilters($query, $id, $filter)
+    {
+        // User ID filter
+        if ($id) {
+            $query->whereHas('assignees', function ($q) use ($id) {
+                $q->where('users.id', $id);
+            });
+        }
+
+        if (!$filter) {
+            return $query;
+        }
+
+        // Multiple users filter
+        if (isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']);
+            $query->whereHas('assignees', function ($q) use ($userIds) {
+                $q->whereIn('users.id', $userIds);
+            });
+        }
+
+        // Date range filter
+        if (!empty($filter['from']) && !empty($filter['to'])) {
+            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+
+        // Projects filter
+        if (isset($filter['projects'])) {
+            $projectIds = explode(',', $filter['projects']);
+            $query->whereIn('project_id', $projectIds);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Calculate completion rate from base query
+     */
+    private function calculateCompletionRate($query, $completed)
+    {
+        $totalTasks = (clone $query)->count();
+
+        if ($totalTasks === 0) {
+            return 0;
+        }
+
+        $completedTasks = (clone $query)->where('status_id', $completed)->count();
+
+        return round(($completedTasks / $totalTasks) * 100, 2);
+    }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
     // Overall Progress
     public function overallProgress($id = null, $filter)
@@ -83,180 +141,65 @@ class ReportService
     // Section Cards
     public function sectionCards($id = null, $filter)
     {
-        /* ------------------------- // Average Performance ------------------------- */
-        $avg_performance_query = $this->task->where('organization_id', $this->organization_id)
+        // Get completed status ID once
+        $completed = $this->task_status->where('name', 'completed')
+            ->where('organization_id', $this->organization_id)
+            ->value('id');
+
+        // Base query builder with common filters
+        $baseQuery = $this->task->where('organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
                     $subQuery->whereNull('parent_id')->whereDoesntHave('children');
                 });
             });
 
-        if ($id) {
-            $avg_performance_query->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $avg_performance_query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $avg_performance_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $avg_performance_query->whereIn('project_id', $projectIds);
-        }
-        $avg_performance = $avg_performance_query->avg('performance_rating');
-        /* ----------------------------- // Task at Risk ---------------------------- */
-        $completed = $this->task_status->where('name', 'completed')->where('organization_id', $this->organization_id)->value('id');
-        $task_at_risk_query = $this->task
+        // Apply common filters to base query
+        $baseQuery = $this->applyFilters($baseQuery, $id, $filter);
+
+        // Clone base query for different metrics
+        $avgPerformanceQuery = clone $baseQuery;
+        $timeEfficiencyQuery = (clone $baseQuery)->where('status_id', $completed);
+        $taskCompletionQuery = clone $baseQuery;
+        $delayedTasksQuery = clone $baseQuery;
+
+        // Tasks at risk query (has unique conditions)
+        $taskAtRiskQuery = (clone $baseQuery)
             ->where('status_id', '!=', $completed)
-            ->where('organization_id', $this->organization_id)
-            ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
-            })
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
-        if ($id) {
-            $task_at_risk_query->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $task_at_risk_query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $task_at_risk_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $task_at_risk_query->whereIn('project_id', $projectIds);
-        }
-        $task_at_risk = $task_at_risk_query->count();
-        /* ----------------------- // Average Completion Time ----------------------- */
-        $avg_completion_time = $this->task
-            ->where('status_id', $completed)
-            ->where('organization_id', $this->organization_id)
-            ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
-            })
-            ->avg('time_taken');
-        /* --------------------------- // Time Efficiency --------------------------- */
-        $time_efficiency_query = $this->task
-            ->where('status_id', $completed)
-            ->where('organization_id', $this->organization_id)
-            ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
-            });
-        if ($id) {
-            $time_efficiency_query->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $time_efficiency_query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $time_efficiency_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $time_efficiency_query->whereIn('project_id', $projectIds);
-        }
-        $time_efficiency = $time_efficiency_query->avg(DB::raw('time_estimate / time_taken * 100'));
-        /* ------------------------- // Task Completion Rate ------------------------ */
-        $task_completion_query = $this->task
-            ->where('organization_id', $this->organization_id)
-            ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
-            });
-        if ($id) {
-            $task_completion_query->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $task_completion_query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $task_completion_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $task_completion_query->whereIn('project_id', $projectIds);
-        }
-        $total_tasks = (clone $task_completion_query)->count();
-        $completed_tasks = (clone $task_completion_query)
-            ->where('status_id', $completed)
-            ->count();
-        $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
-        /* -------------------------- Average Delayed Days -------------------------- */
-        $delayed_tasks = $this->task
-            ->where('organization_id', $this->organization_id)
-            ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
-                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
-                });
-            });
-        if ($id) {
-            $delayed_tasks->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $delayed_tasks->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $delayed_tasks->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $delayed_tasks->whereIn('project_id', $projectIds);
-        }
-        $total_tasks = (clone $delayed_tasks)->count();
-        $average_delay_days = (clone $delayed_tasks)
-            ->where('status_id', $completed)
-            ->average('delay_days');
 
+        // Execute all queries
         $data = [
-            // 'user_count' => $user_count,
-            'avg_performance' => round($avg_performance, 2),
-            'task_at_risk' => $task_at_risk,
-            'avg_completion_time' => round($avg_completion_time, 2),
-            'time_efficiency' => round($time_efficiency, 2),
-            'completion_rate' => round($completion_rate, 2),
-            'average_delay_days' => round($average_delay_days, 2),
+            'avg_performance' => round($avgPerformanceQuery->avg('performance_rating'), 2),
+            'task_at_risk' => $taskAtRiskQuery->count(),
+            'avg_completion_time' => round(
+                $this->task->where('status_id', $completed)
+                    ->where('organization_id', $this->organization_id)
+                    ->where(function ($query) {
+                        $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
+                            $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                        });
+                    })
+                    ->avg('time_taken'),
+                2
+            ),
+            'time_efficiency' => round($timeEfficiencyQuery->avg(DB::raw('time_estimate / time_taken * 100')), 2),
+            'completion_rate' => $this->calculateCompletionRate($taskCompletionQuery, $completed),
+            'average_delay_days' => round(
+                (clone $delayedTasksQuery)->where('status_id', $completed)->avg('delay_days'),
+                2
+            ),
             'filters' => $filter
         ];
-        if (empty($data)) {
+
+        if (empty(array_filter($data, fn($value) => !is_null($value) && $value !== 'filters'))) {
             return apiResponse(null, 'Failed to fetch active users report', false, 404);
         }
 
         return apiResponse($data, "Active users report fetched successfully");
     }
+
     // Task status - Pie donut chart
     public function tasksByStatus($id = null, $variant = "", $filter)
     {
