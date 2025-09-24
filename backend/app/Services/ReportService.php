@@ -93,29 +93,11 @@ class ReportService
         $progress_query = $this->task
             ->where('organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
                     $subQuery->whereNull('parent_id')->whereDoesntHave('children');
                 });
             });
-
-        if ($id) {
-            $progress_query->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            });
-        }
-        if ($filter && isset($filter['users'])) {
-            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-            $progress_query->whereHas('assignees', function ($query) use ($userIds) {
-                $query->whereIn('users.id', $userIds);
-            });
-        }
-        if ($filter && $filter['from'] && $filter['to']) {
-            $progress_query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $progress_query->whereIn('project_id', $projectIds);
-        }
+        $progress_query = $this->applyFilters($progress_query, $id, $filter);
         $cancelled = $this->task_status->where('name', 'cancelled')->where('organization_id', $this->organization_id)->value('id');
         $completed = $this->task_status->where('name', 'completed')->where('organization_id', $this->organization_id)->value('id');
         // Total tasks excluding cancelled
@@ -215,32 +197,12 @@ class ReportService
                 ->where('organization_id', $this->organization_id)
                 ->where('status_id', $status->id)
                 ->where(function ($query) {
-                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
                         $subQuery->whereNull('parent_id')->whereDoesntHave('children');
                     });
                 });
-
-            if ($id && $variant !== 'dashboard') {
-                $query->whereHas('assignees', function ($q) use ($id) {
-                    $q->where('users.id', $id);
-                });
-            }
-            if ($filter && isset($filter['users']) && $variant === 'dashboard') {
-                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-                $query->whereHas('assignees', function ($query) use ($userIds) {
-                    $query->whereIn('users.id', $userIds);
-                });
-            }
-            if ($filter && $filter['from'] && $filter['to']) {
-                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-            }
-
-            if ($filter && isset($filter['projects'])) {
-                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10,9]
-                $query->whereIn('project_id', $projectIds);
-            }
-
-
+            // Only apply filters for dashboard variant (to match previous logic)
+            $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
             $chart_data[$index]['tasks'] = $query->count();
             $chart_data[$index]['fill'] = 'var(--color-' . str($status->name)->slug('_') . ')';
             // turns "In Progress" → "in_progress"
@@ -283,28 +245,11 @@ class ReportService
                 ->whereMonth('start_date', $m['month_num'])
                 ->where('organization_id', $this->organization_id)
                 ->where(function ($query) {
-                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
                         $subQuery->whereNull('parent_id')->whereDoesntHave('children');
                     });
                 });
-            if ($id && $variant !== 'dashboard') {
-                $query->whereHas('assignees', function ($q) use ($id) {
-                    $q->where('users.id', $id);
-                });
-            }
-            if ($filter && isset($filter['users']) && $variant === 'dashboard') {
-                $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
-                $query->whereHas('assignees', function ($query) use ($userIds) {
-                    $query->whereIn('users.id', $userIds);
-                });
-            }
-            if ($filter && $filter['from'] && $filter['to']) {
-                $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-            }
-            if ($filter && isset($filter['projects'])) {
-                $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-                $query->whereIn('project_id', $projectIds);
-            }
+            $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
             $rating = $query->select(
                 DB::raw('AVG(performance_rating) as average_rating'),
                 DB::raw('COUNT(id) as task_count')
@@ -616,22 +561,13 @@ class ReportService
     {
         // Fetch the 10 most recent tasks for the user
         $query = $this->task
-            ->whereHas('assignees', function ($query) use ($id) {
-                $query->where('users.id', $id);
-            })
             ->where('organization_id', $this->organization_id)
             ->where(function ($query) {
-                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
                     $subQuery->whereNull('parent_id')->whereDoesntHave('children');
                 });
             });
-        if ($filter && $filter['from'] && $filter['to']) {
-            $query->whereBetween('start_date', [$filter['from'], $filter['to']]);
-        }
-        if ($filter && isset($filter['projects'])) {
-            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
-            $query->whereIn('project_id', $projectIds);
-        }
+        $query = $this->applyFilters($query, $id, $filter);
         $tasks = $query->orderBy('start_date', 'desc')
             ->take(10)
             ->get(['title', 'time_estimate', 'time_taken', 'start_date']);
