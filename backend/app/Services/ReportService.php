@@ -210,6 +210,36 @@ class ReportService
             ->where('status_id', $completed)
             ->count();
         $completion_rate = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
+        /* -------------------------- Average Delayed Days -------------------------- */
+        $delayed_tasks = $this->task
+            ->where('organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) { // dont include parent tasks in metrics
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
+            });
+        if ($id) {
+            $delayed_tasks->whereHas('assignees', function ($query) use ($id) {
+                $query->where('users.id', $id);
+            });
+        }
+        if ($filter && isset($filter['users'])) {
+            $userIds = explode(',', $filter['users']); // turns "10,9" into [10, 9]
+            $delayed_tasks->whereHas('assignees', function ($query) use ($userIds) {
+                $query->whereIn('users.id', $userIds);
+            });
+        }
+        if ($filter && $filter['from'] && $filter['to']) {
+            $delayed_tasks->whereBetween('start_date', [$filter['from'], $filter['to']]);
+        }
+        if ($filter && isset($filter['projects'])) {
+            $projectIds = explode(',', $filter['projects']); // turns "10,9" into [10, 9]
+            $delayed_tasks->whereIn('project_id', $projectIds);
+        }
+        $total_tasks = (clone $delayed_tasks)->count();
+        $average_delay_days = (clone $delayed_tasks)
+            ->where('status_id', $completed)
+            ->average('delay_days');
 
         $data = [
             // 'user_count' => $user_count,
@@ -218,6 +248,7 @@ class ReportService
             'avg_completion_time' => round($avg_completion_time, 2),
             'time_efficiency' => round($time_efficiency, 2),
             'completion_rate' => round($completion_rate, 2),
+            'average_delay_days' => round($average_delay_days, 2),
             'filters' => $filter
         ];
         if (empty($data)) {
