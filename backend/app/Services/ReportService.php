@@ -19,6 +19,10 @@ class ReportService
     protected Category $category;
     protected User $user;
     protected $organization_id;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
     public function __construct(Task $task, TaskHistory $task_history, TaskStatus $task_status, Category $category, User $user)
     {
         $this->task = $task;
@@ -28,14 +32,8 @@ class ReportService
         $this->user = $user;
         $this->organization_id = Auth::user()->organization_id;
     }
-    /* -------------------------------------------------------------------------- */
-    /*                                   HELPERS                                  */
-    /* -------------------------------------------------------------------------- */
 
-
-    /**
-     * Apply common filters to query builder
-     */
+    // Apply common filters to query builder
     private function applyFilters($query, $id, $filter)
     {
         // User ID filter
@@ -71,21 +69,6 @@ class ReportService
         return $query;
     }
 
-    /**
-     * Calculate completion rate from base query
-     */
-    private function calculateCompletionRate($query, $completed)
-    {
-        $totalTasks = (clone $query)->count();
-
-        if ($totalTasks === 0) {
-            return 0;
-        }
-
-        $completedTasks = (clone $query)->where('status_id', $completed)->count();
-
-        return round(($completedTasks / $totalTasks) * 100, 2);
-    }
     /* ----------------------------- SHARED REPORTS ----------------------------- */
     // Overall Progress
     public function overallProgress($id = null, $filter)
@@ -120,6 +103,7 @@ class ReportService
 
         return apiResponse($data, "Progress report fetched successfully");
     }
+
     // Section Cards
     public function sectionCards($id = null, $filter)
     {
@@ -142,7 +126,6 @@ class ReportService
         // Clone base query for different metrics
         $avgPerformanceQuery = clone $baseQuery;
         $timeEfficiencyQuery = (clone $baseQuery)->where('status_id', $completed);
-        $taskCompletionQuery = clone $baseQuery;
         $delayedTasksQuery = clone $baseQuery;
 
         // Tasks at risk query (has unique conditions)
@@ -150,6 +133,15 @@ class ReportService
             ->where('status_id', '!=', $completed)
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
+
+        // Task Completion query (has unique conditions)
+        $taskCompletionQuery = 0;
+        $totalTasks = (clone $baseQuery)->count();
+        if ($totalTasks !== 0) {
+            $completedTasks = (clone $baseQuery)->where('status_id', $completed)->count();
+
+            $taskCompletionQuery = round(($completedTasks / $totalTasks) * 100, 2);
+        }
 
         // Execute all queries
         $data = [
@@ -167,7 +159,7 @@ class ReportService
                 2
             ),
             'time_efficiency' => round($timeEfficiencyQuery->avg(DB::raw('time_estimate / time_taken * 100')), 2),
-            'completion_rate' => $this->calculateCompletionRate($taskCompletionQuery, $completed),
+            'completion_rate' => $taskCompletionQuery,
             'average_delay_days' => round(
                 (clone $delayedTasksQuery)->where('status_id', $completed)->avg('delay_days'),
                 2
