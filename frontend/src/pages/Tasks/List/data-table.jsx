@@ -18,7 +18,7 @@ import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import UpdateDialog from "./updateDialog";
 import DeleteDialog from "./deleteDialog";
-
+// TODO: call dashboard report on bulk update.
 export function DataTableTasks({
 	columns,
 	data,
