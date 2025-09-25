@@ -107,6 +107,7 @@ class ReportService
     // Section Cards
     public function sectionCards($id = null, $filter)
     {
+        // TODO: total delays for all tasks
         // Get completed status ID once
         $completed = $this->task_status->where('name', 'completed')
             ->where('organization_id', $this->organization_id)
