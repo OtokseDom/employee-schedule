@@ -127,7 +127,6 @@ class ReportService
         // Clone base query for different metrics
         $avgPerformanceQuery = clone $baseQuery;
         $timeEfficiencyQuery = (clone $baseQuery)->where('status_id', $completed);
-        $delayedTasksQuery = clone $baseQuery;
 
         // Tasks at risk query (has unique conditions)
         $taskAtRiskQuery = (clone $baseQuery)
@@ -162,7 +161,11 @@ class ReportService
             'time_efficiency' => round($timeEfficiencyQuery->avg(DB::raw('time_estimate / time_taken * 100')), 2),
             'completion_rate' => $taskCompletionQuery,
             'average_delay_days' => round(
-                (clone $delayedTasksQuery)->where('status_id', $completed)->avg('delay_days'),
+                (clone $baseQuery)->where('status_id', $completed)->avg('delay_days'),
+                2
+            ),
+            'total_delay_days' => round(
+                (clone $baseQuery)->where('status_id', $completed)->sum('delay_days'),
                 2
             ),
             'filters' => $filter
