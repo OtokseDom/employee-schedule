@@ -128,6 +128,7 @@ export default function UserProfile() {
 				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
 				<SectionCard description="Tasks Due Soon" showBadge={false} value={reports?.section_cards?.task_at_risk} variant="dashboard" />
 				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
+				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
 			</div>
 
 			{/* Pie Chart */}
