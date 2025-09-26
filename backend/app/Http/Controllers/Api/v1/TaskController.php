@@ -153,20 +153,17 @@ class TaskController extends Controller
         $request->validate([
             'image' => 'required|image|max:5120', // 5MB
         ]);
+
         $org_id = $this->userData->organization_id;
-        $path = "images/{$org_id}";
         $file = $request->file('image');
         $filename = uniqid('taskimg_') . '.' . $file->getClientOriginalExtension();
 
-        // Ensure directory exists
-        Storage::makeDirectory($path);
+        // Save into public/tasks/{org}
+        $path = "tasks/{$org_id}";
+        $file->move(public_path($path), $filename);
 
-        // Save to storage/app/images/{org}
-        $file->storeAs($path, $filename);
+        $url = url("$path/$filename"); // direct public URL
 
-        // Return full URL (including API prefix) so frontend doesn’t need to guess
-        $url = url("api/v1/tasks/images/{$org_id}/{$filename}");
-        // Return a URL for the frontend to access (you may need a download endpoint)
         return response()->json([
             'success' => true,
             'url' => $url,
@@ -175,38 +172,22 @@ class TaskController extends Controller
         ]);
     }
 
-    // Optional: Serve images securely (not public)
-    public function getTaskImage($org, $filename)
-    {
-        $path = "images/{$org}/{$filename}";
-        if (!Storage::exists($path)) {
-            Log::error("Image not found: $path");
-            abort(404);
-        }
-        $mime = Storage::mimeType($path);
-        $file = Storage::get($path);
-        return response($file, 200)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Content-Type', $mime)
-            ->header('Cache-Control', 'public, max-age=86400');
-    }
-
     public function deleteTaskImage(Request $request)
     {
         $url = $request->input('url');
-        if (!$url) return response()->json(['error' => 'No URL provided'], 400);
-
-        // Match /api/v1/tasks/images/{org}/{filename}
-        $matches = [];
-        if (preg_match('#/api/v1/tasks/images/([^/]+)/([^/]+)$#', $url, $matches)) {
-            $org = $matches[1];
-            $filename = $matches[2];
-            $path = "images/{$org}/{$filename}";
-            if (Storage::exists($path)) {
-                Storage::delete($path);
-                return response()->json(['success' => true]);
-            }
+        if (!$url) {
+            return response()->json(['error' => 'No URL provided'], 400);
         }
+
+        // Extract relative path from URL
+        $relativePath = str_replace(url('/'), '', $url);
+        $fullPath = public_path($relativePath);
+
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+            return response()->json(['success' => true]);
+        }
+
         return response()->json(['error' => 'File not found'], 404);
     }
 }

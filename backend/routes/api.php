@@ -48,7 +48,6 @@ Route::prefix('v1')->group(function () {
         Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
         Route::delete('/tasks/bulk-delete', [TaskController::class, 'bulkDelete']);
         Route::post('/tasks/upload-image', [TaskController::class, 'uploadTaskImage']);
-        Route::get('/tasks/images/{org}/{filename}', [TaskController::class, 'getTaskImage']);
         Route::delete('/tasks/delete-image', [TaskController::class, 'deleteTaskImage']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
         Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
