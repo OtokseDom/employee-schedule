@@ -161,7 +161,7 @@ class ReportService
             'completion_rate' => $taskCompletionQuery,
             'average_delay_days' => round(
                 (clone $baseQuery)->where('status_id', $completed)->avg('delay_days'),
-                2
+                0
             ),
             'total_delay_days' => round(
                 (clone $baseQuery)->where('status_id', $completed)->sum('delay_days'),
