@@ -20,7 +20,7 @@ export function SectionCard({ description, value, showBadge = true, percentage, 
 							</Badge>
 						)}
 					</div>
-					<CardTitle className="text-4xl font-semibold tabular-nums">
+					<CardTitle className="text-3xl font-semibold tabular-nums">
 						{loading ? (
 							<div className="flex flex-col gap-2 items-center justify-center h-full w-full">
 								<Skeleton className=" w-full h-4" />
