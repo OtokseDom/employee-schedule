@@ -207,29 +207,12 @@ export default function UserProfile() {
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
-					<SectionCard
-						variant=""
-						description="Performance Rating (10)"
-						showBadge={false}
-						value={`${userReports?.section_cards?.avg_performance}`}
-						percentage={12.2}
-					/>
-					<SectionCard
-						variant=""
-						description="Time Efficiency"
-						showBadge={false}
-						value={`${userReports?.section_cards?.time_efficiency}%`}
-						percentage={12.2}
-					/>
-					<SectionCard
-						variant=""
-						description="Completion Rate"
-						showBadge={false}
-						value={`${userReports?.section_cards?.completion_rate}%`}
-						percentage={12.2}
-					/>
-					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
-					<SectionCard variant="" description="Overdue Tasks" showBadge={false} value={userReports?.section_cards?.task_at_risk} percentage={12.2} />
+					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} />
+					<SectionCard variant="" description="Performance Rating (10)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} />
+					<SectionCard variant="" description="Time Efficiency" showBadge={false} value={`${userReports?.section_cards?.time_efficiency}%`} />
+					<SectionCard variant="" description="Completion Rate" showBadge={false} value={`${userReports?.section_cards?.completion_rate}%`} />
+					<SectionCard variant="" description="Avg Delayed Days" showBadge={false} value={userReports?.section_cards?.average_delay_days} />
+					<SectionCard variant="" description="Total Delayed Days" showBadge={false} value={userReports?.section_cards?.total_delay_days} />
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
