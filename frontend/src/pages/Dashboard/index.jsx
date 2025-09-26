@@ -126,7 +126,7 @@ export default function UserProfile() {
 				<SectionCard description="Members Avg Performance (10)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
 				<SectionCard description="Avg Time Efficiency" showBadge={false} value={`${reports?.section_cards?.time_efficiency}%`} variant="dashboard" />
 				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
-				<SectionCard description="Tasks Due Soon" showBadge={false} value={reports?.section_cards?.task_at_risk} variant="dashboard" />
+				{/* <SectionCard description="Tasks Due Soon" showBadge={false} value={reports?.section_cards?.task_at_risk} variant="dashboard" /> */}
 				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
 				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
 			</div>
