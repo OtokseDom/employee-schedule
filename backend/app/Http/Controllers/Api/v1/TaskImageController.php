@@ -23,7 +23,7 @@ class TaskImageController extends Controller
     {
         $file = $request->file('image');
 
-        $path = $file->store('task_images', 'public'); // saves to storage/app/public/task_images
+        $path = $file->store('task_images/' . $this->userData->organization_id, 'public'); // saves to storage/app/public/task_images
 
         $taskImage = TaskImage::create([
             'task_id'       => $request->task_id,
