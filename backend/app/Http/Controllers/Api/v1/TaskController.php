@@ -147,47 +147,4 @@ class TaskController extends Controller
 
         return apiResponse($result, 'Tasks deleted successfully');
     }
-
-    public function uploadTaskImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|image|max:5120', // 5MB
-        ]);
-
-        $org_id = $this->userData->organization_id;
-        $file = $request->file('image');
-        $filename = uniqid('taskimg_') . '.' . $file->getClientOriginalExtension();
-
-        // Save into public/tasks/{org}
-        $path = "tasks/{$org_id}";
-        $file->move(public_path($path), $filename);
-
-        $url = url("$path/$filename"); // direct public URL
-
-        return response()->json([
-            'success' => true,
-            'url' => $url,
-            'filename' => $filename,
-            'org' => $org_id,
-        ]);
-    }
-
-    public function deleteTaskImage(Request $request)
-    {
-        $url = $request->input('url');
-        if (!$url) {
-            return response()->json(['error' => 'No URL provided'], 400);
-        }
-
-        // Extract relative path from URL
-        $relativePath = str_replace(url('/'), '', $url);
-        $fullPath = public_path($relativePath);
-
-        if (file_exists($fullPath)) {
-            unlink($fullPath);
-            return response()->json(['success' => true]);
-        }
-
-        return response()->json(['error' => 'File not found'], 404);
-    }
 }
