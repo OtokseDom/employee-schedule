@@ -21,20 +21,24 @@ class TaskImageController extends Controller
     }
     public function store(StoreTaskImageRequest $request)
     {
-        $file = $request->file('image');
+        $savedImages = [];
 
-        $path = $file->store('task_images/' . $this->userData->organization_id, 'public'); // saves to storage/app/public/task_images
+        foreach ($request->file('images') as $file) {
+            $path = $file->store('task_images/' . $this->userData->organization_id, 'public');
 
-        $taskImage = TaskImage::create([
-            'task_id'       => $request->task_id,
-            'filename'      => $path,
-            'original_name' => $file->getClientOriginalName(),
-            'mime_type'     => $file->getClientMimeType(),
-            'size'          => $file->getSize(),
-            'url'           => asset('storage/' . $path), // optional if using CDN
-        ]);
+            $taskImage = TaskImage::create([
+                'task_id'       => $request->task_id,
+                'filename'      => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type'     => $file->getClientMimeType(),
+                'size'          => $file->getSize(),
+                'url'           => asset('storage/' . $path),
+            ]);
 
-        return new TaskImageResource($taskImage);
+            $savedImages[] = $taskImage;
+        }
+
+        return TaskImageResource::collection($savedImages);
     }
 
     public function destroy(TaskImage $taskImage)

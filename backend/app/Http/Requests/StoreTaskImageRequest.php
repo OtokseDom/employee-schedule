@@ -22,8 +22,9 @@ class StoreTaskImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'task_id' => 'required|exists:tasks,id',
-            'image'   => 'required|image|max:5120', // 5MB limit
+            'task_id'      => 'required|exists:tasks,id',
+            'images'       => 'required|array',
+            'images.*'     => 'image|max:5120', // each file max 5MB
         ];
     }
 }
