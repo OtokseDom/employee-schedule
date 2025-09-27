@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\RelationCheckerController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
+use App\Http\Controllers\Api\v1\TaskImageController;
 use App\Http\Controllers\Api\v1\TaskStatusController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\UserReportController;
@@ -47,8 +48,8 @@ Route::prefix('v1')->group(function () {
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
         Route::delete('/tasks/bulk-delete', [TaskController::class, 'bulkDelete']);
-        Route::post('/tasks/upload-image', [TaskController::class, 'uploadTaskImage']);
-        Route::delete('/tasks/delete-image', [TaskController::class, 'deleteTaskImage']);
+        Route::post('/task-images', [TaskImageController::class, 'store']);
+        Route::delete('/task-images/{taskImage}', [TaskImageController::class, 'destroy']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
         Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
