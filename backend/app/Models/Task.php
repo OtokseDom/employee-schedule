@@ -59,6 +59,12 @@ class Task extends Model
             ->withTimestamps();
     }
 
+    // Relationship with Task Images
+    public function images()
+    {
+        return $this->hasMany(TaskImage::class);
+    }
+
     // Relationship with Project
     public function project()
     {
