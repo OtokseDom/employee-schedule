@@ -19,5 +19,5 @@ export const API = (version = "v1") => ({
 	task_bulk_update: () => `/${version}/tasks/bulk-update`,
 	task_bulk_delete: () => `/${version}/tasks/bulk-delete`,
 	task_upload_image: () => `/${version}/task-images`,
-	task_delete_image: (image = "") => `/${version}/tasks-images/${image}`,
+	task_delete_image: (image = "") => `/${version}/task-images/${image}`,
 });
