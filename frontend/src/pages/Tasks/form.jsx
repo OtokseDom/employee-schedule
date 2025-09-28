@@ -25,6 +25,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useUserStore } from "@/store/user/userStore";
 import RichTextEditor from "@/components/ui/RichTextEditor";
+import ImageUpload from "@/components/ui/image-upload";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -70,6 +71,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 	const parentTasks = () => {
 		return tasks.filter((task) => task.parent_id == null && task.id !== updateData?.id) || [];
 	};
+	const [taskImages, setTaskImages] = useState([]);
 
 	// State for time_estimate and delay hour/minute fields
 	const [timeEstimateHour, setTimeEstimateHour] = useState("");
@@ -251,7 +253,26 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				parsedForm.position = maxPosition + 1;
 
 				const taskResponse = await axiosClient.post(API().task(), parsedForm);
-				// cannot update stores, need to update parent task
+				// Upload any temporary images to the newly created task
+				if (taskImages.length > 0) {
+					const tempImages = taskImages.filter((img) => img.isTemp);
+					if (tempImages.length > 0) {
+						const formData = new FormData();
+						formData.append("task_id", taskResponse.data.data.task.id);
+						tempImages.forEach((img) => {
+							formData.append("images[]", img.file);
+						});
+
+						try {
+							await axiosClient.post(API().task_upload_image(), formData, {
+								headers: { "Content-Type": "multipart/form-data" },
+							});
+						} catch (error) {
+							console.error("Failed to upload images:", error);
+							showToast("Warning", "Task created but some images failed to upload.", 3000, "warning");
+						}
+					}
+				}
 				fetchData();
 				showToast("Success!", "Task added.", 3000);
 				// if add subtask, don't close sheet
@@ -283,7 +304,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				await axiosClient.post(API().task(), parsedForm);
 				// cannot update stores, need to update parent task
 				fetchData();
-				showToast("Success!", "Task added to calendar.", 3000);
+				showToast("Success!", "Task added.", 3000);
 				setIsOpen(false);
 				// setTaskAdded(true);
 			} else if (updateData?.kanban_add) {
@@ -739,6 +760,16 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						</FormItem>
 					)}
 				/>
+				<div className="space-y-2">
+					<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Images</label>
+					<ImageUpload
+						taskId={updateData?.id} // Pass the task ID if editing, undefined if creating
+						initialImages={updateData?.images || []} // Pass existing images if editing
+						onChange={setTaskImages}
+						disabled={!isEditable}
+						maxFiles={10}
+					/>
+				</div>
 				{/* <FormField
 					control={form.control}
 					name="description"
