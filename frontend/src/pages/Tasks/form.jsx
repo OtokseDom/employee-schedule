@@ -244,7 +244,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				delay: delayDecimal !== undefined ? Number(delayDecimal.toFixed(2)) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
-			if (Object.keys(updateData).length === 0) {
+			if (Object.keys(updateData).length === 0 || updateData?.calendar_add || updateData?.kanban_add) {
 				// ADD
 
 				// Calculate new position
@@ -293,34 +293,20 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						});
 					}
 				}
-			} else if (updateData?.calendar_add) {
-				// ADD but in calendar
+				// } else if (updateData?.calendar_add || updateData?.kanban_add) {
+				// 	// ADD but in calendar
 
-				// Calculate new position
-				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
-				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
-				parsedForm.position = maxPosition + 1;
+				// 	// Calculate new position
+				// 	const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
+				// 	const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
+				// 	parsedForm.position = maxPosition + 1;
 
-				await axiosClient.post(API().task(), parsedForm);
-				// cannot update stores, need to update parent task
-				fetchData();
-				showToast("Success!", "Task added.", 3000);
-				setIsOpen(false);
-				// setTaskAdded(true);
-			} else if (updateData?.kanban_add) {
-				// ADD but in kanban
-
-				// Calculate new position
-				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
-				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
-				parsedForm.position = maxPosition + 1;
-
-				await axiosClient.post(API().task(), parsedForm);
-				// cannot update stores, need to update parent task
-				fetchData();
-				showToast("Success!", "Task added to kanban.", 3000);
-				setIsOpen(false);
-				// setTaskAdded(true);
+				// 	await axiosClient.post(API().task(), parsedForm);
+				// 	// cannot update stores, need to update parent task
+				// 	fetchData();
+				// 	showToast("Success!", "Task added.", 3000);
+				// 	setIsOpen(false);
+				// 	// setTaskAdded(true);
 			} else {
 				// UPDATE
 
