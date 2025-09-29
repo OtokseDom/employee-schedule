@@ -8,6 +8,7 @@ use App\Services\TaskHistoryService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Task extends Model
 {
@@ -356,11 +357,21 @@ class Task extends Model
                 $groups[$t->project_id][$t->status_id][] = $t->position;
             }
 
-            // 4️⃣ Delete all tasks in one query
+            // 4️⃣ Delete all images on disk
+            foreach ($allTasks as $task) {
+                foreach ($task->images as $image) {
+                    if (Storage::disk('public')->exists($image->filename)) {
+                        Storage::disk('public')->delete($image->filename);
+                    }
+                }
+            }
+
+
+            // 5️⃣ Delete all tasks in one query
             $idsToDelete = $allTasks->pluck('id')->toArray();
             self::whereIn('id', $idsToDelete)->delete();
 
-            // 5️⃣ Shift remaining tasks per column
+            // 6️⃣ Shift remaining tasks per column
             foreach ($groups as $projectId => $statuses) {
                 foreach ($statuses as $statusId => $positions) {
                     $minPosition = min($positions);
@@ -641,6 +652,16 @@ class Task extends Model
                 $allIdsToDelete = array_merge($allIdsToDelete, $idsToDelete);
             }
             $allIdsToDelete = array_unique($allIdsToDelete);
+
+            // Delete all images on disk
+            foreach ($allIdsToDelete as $task) {
+                foreach ($task->images as $image) {
+                    if (Storage::disk('public')->exists($image->filename)) {
+                        Storage::disk('public')->delete($image->filename);
+                    }
+                }
+            }
+
 
             // Group by project/status for position shifting
             $grouped = self::whereIn('id', $allIdsToDelete)

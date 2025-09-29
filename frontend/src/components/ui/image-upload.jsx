@@ -184,6 +184,7 @@ const ImageUpload = ({ taskId, initialImages = [], onChange, disabled = false, m
 
 										{/* Delete Button */}
 										<Button
+											type="button"
 											size="sm"
 											variant="destructive"
 											className="h-6 w-6 p-0 opacity-80 hover:opacity-100"

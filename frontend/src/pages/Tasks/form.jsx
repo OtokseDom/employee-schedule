@@ -221,8 +221,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 
 	// Image drop/paste handler in rich text
 	const handleImageDropFromEditor = async (files) => {
-		console.log("Image drop handler called with files:", files); // Debug log
-
 		if (!files || files.length === 0) return;
 
 		// Validate file types
