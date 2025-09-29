@@ -7,9 +7,10 @@ import { TableRow } from "@tiptap/extension-table-row";
 import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { Button } from "./button";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { List, ListOrdered } from "lucide-react";
-export default function RichTextEditor({ value, onChange }) {
+
+export default function RichTextEditor({ value, onChange, onImageDrop }) {
 	const editor = useEditor({
 		extensions: [
 			StarterKit,
@@ -22,17 +23,52 @@ export default function RichTextEditor({ value, onChange }) {
 		],
 		content: value,
 		onUpdate: ({ editor }) => {
-			// Replace all blob URLs in HTML with their mapped API URLs before saving
-			let html = editor.getHTML();
-			// Replace <img src="blob:..."> with <img src="api-url">
-			html = html.replace(/<img([^>]+)src=["'](blob:[^"']+)["']/g, (match, pre, blobUrl) => {
-				const apiUrl = blobToApiUrlMapRef.current.get(blobUrl);
-				if (apiUrl) {
-					return `<img${pre}src="${apiUrl}"`;
+			onChange(editor.getHTML());
+		},
+		editorProps: {
+			handleDrop(view, event, _slice, moved) {
+				// Don't handle if this is a move operation within the editor
+				if (moved) return false;
+
+				// Check if there are files being dropped
+				if (!event.dataTransfer || !event.dataTransfer.files) return false;
+
+				const files = Array.from(event.dataTransfer.files);
+				const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+				if (imageFiles.length > 0 && onImageDrop) {
+					event.preventDefault();
+					event.stopPropagation();
+
+					// Call the parent handler
+					onImageDrop(imageFiles);
+					return true;
 				}
-				return match;
-			});
-			onChange(html);
+
+				return false;
+			},
+			handlePaste(view, event) {
+				// Check if there are clipboard items
+				if (!event.clipboardData || !event.clipboardData.items) return false;
+
+				const items = Array.from(event.clipboardData.items);
+				const imageItems = items.filter((item) => item.type.startsWith("image/"));
+
+				if (imageItems.length > 0 && onImageDrop) {
+					event.preventDefault();
+					event.stopPropagation();
+
+					const files = imageItems.map((item) => item.getAsFile()).filter((file) => file !== null);
+
+					if (files.length > 0) {
+						// Call the parent handler
+						onImageDrop(files);
+					}
+					return true;
+				}
+
+				return false;
+			},
 		},
 	});
 
@@ -50,60 +86,58 @@ export default function RichTextEditor({ value, onChange }) {
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleBold().run()}
-					variant={editor.isActive("bold") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleBold().run()}
+					variant={editor?.isActive("bold") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					B
 				</Button>
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleItalic().run()}
-					variant={editor.isActive("italic") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleItalic().run()}
+					variant={editor?.isActive("italic") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					I
 				</Button>
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleUnderline().run()}
-					variant={editor.isActive("underline") ? "default" : "outline"}
-				>
-					U
-				</Button>
-				<Button
-					type="button"
-					size="sm"
-					onClick={() => editor.chain().focus().toggleStrike().run()}
-					variant={editor.isActive("strike") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleStrike().run()}
+					variant={editor?.isActive("strike") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					S
 				</Button>
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleHighlight().run()}
-					variant={editor.isActive("highlight") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleHighlight().run()}
+					variant={editor?.isActive("highlight") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					H
 				</Button>
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleBulletList().run()}
-					variant={editor.isActive("bulletList") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleBulletList().run()}
+					variant={editor?.isActive("bulletList") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					<List />
 				</Button>
 				<Button
 					type="button"
 					size="sm"
-					onClick={() => editor.chain().focus().toggleOrderedList().run()}
-					variant={editor.isActive("orderedList") ? "default" : "outline"}
+					onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+					variant={editor?.isActive("orderedList") ? "default" : "outline"}
+					// disabled={!editor}
 				>
 					<ListOrdered />
 				</Button>
-				<Button type="button" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()} variant="outline">
+				<Button type="button" size="sm" onClick={() => editor?.chain().focus().setHorizontalRule().run()} variant="outline" disabled={!editor}>
 					—
 				</Button>
 			</div>
@@ -139,6 +173,9 @@ export default function RichTextEditor({ value, onChange }) {
 				</style>
 				<EditorContent editor={editor} />
 			</div>
+			{onImageDrop && (
+				<p className="text-xs text-muted-foreground mt-1">💡 You can drag & drop or paste images here - they'll be added to the image gallery below</p>
+			)}
 		</div>
 	);
 }

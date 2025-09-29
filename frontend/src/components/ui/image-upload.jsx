@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,10 @@ const ImageUpload = ({ taskId, initialImages = [], onChange, disabled = false, m
 	const [uploading, setUploading] = useState(false);
 	const [deletingIds, setDeletingIds] = useState(new Set());
 	const showToast = useToast();
+
+	useEffect(() => {
+		setImages(initialImages);
+	}, [initialImages]);
 
 	const handleFileSelect = async (event) => {
 		const files = Array.from(event.target.files);

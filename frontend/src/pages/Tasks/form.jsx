@@ -209,8 +209,87 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				setDelayHour("");
 				setDelayMinute("");
 			}
+
+			// Load images
+			if (updateData.images && Array.isArray(updateData.images)) {
+				setTaskImages(updateData.images);
+			} else {
+				setTaskImages([]); // Reset for new tasks
+			}
 		}
 	}, [updateData, form, projects, users, categories]);
+
+	// Image drop/paste handler in rich text
+	const handleImageDropFromEditor = async (files) => {
+		console.log("Image drop handler called with files:", files); // Debug log
+
+		if (!files || files.length === 0) return;
+
+		// Validate file types
+		const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+		const invalidFiles = files.filter((file) => !validTypes.includes(file.type));
+
+		if (invalidFiles.length > 0) {
+			showToast("Error", "Only image files (JPEG, PNG, GIF, WebP) are allowed", 3000, "fail");
+			return;
+		}
+
+		// Check file limit
+		if (taskImages.length + files.length > 10) {
+			showToast("Error", "Maximum 10 images allowed", 3000, "fail");
+			return;
+		}
+
+		// Check file sizes (5MB limit per file)
+		const maxSize = 5 * 1024 * 1024;
+		const oversizedFiles = files.filter((file) => file.size > maxSize);
+
+		if (oversizedFiles.length > 0) {
+			showToast("Error", "Each image must be smaller than 5MB", 3000, "fail");
+			return;
+		}
+
+		if (!updateData?.id) {
+			// No taskId yet - store as temporary images
+			const tempImages = files.map((file) => ({
+				id: `temp-${Date.now()}-${Math.random()}`,
+				file,
+				url: URL.createObjectURL(file),
+				original_name: file.name,
+				isTemp: true,
+			}));
+
+			const newImages = [...taskImages, ...tempImages];
+			setTaskImages(newImages);
+			showToast("Success", `${files.length} image(s) added (will upload when task is saved)`, 3000);
+			return;
+		}
+
+		// Task exists - upload immediately
+		setLoading(true);
+		try {
+			const formData = new FormData();
+			formData.append("task_id", updateData.id);
+			files.forEach((file) => {
+				formData.append("images[]", file);
+			});
+
+			const response = await axiosClient.post(API().task_upload_image(), formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+
+			const uploadedImages = response.data.data;
+			const newImages = [...taskImages, ...uploadedImages];
+			setTaskImages(newImages);
+
+			showToast("Success", `${files.length} image(s) uploaded successfully`, 3000);
+		} catch (error) {
+			console.error("Upload error:", error);
+			showToast("Error", error.response?.data?.message || "Failed to upload images", 3000, "fail");
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const handleSubmit = async (formData) => {
 		setLoading(true);
@@ -293,20 +372,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						});
 					}
 				}
-				// } else if (updateData?.calendar_add || updateData?.kanban_add) {
-				// 	// ADD but in calendar
-
-				// 	// Calculate new position
-				// 	const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
-				// 	const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
-				// 	parsedForm.position = maxPosition + 1;
-
-				// 	await axiosClient.post(API().task(), parsedForm);
-				// 	// cannot update stores, need to update parent task
-				// 	fetchData();
-				// 	showToast("Success!", "Task added.", 3000);
-				// 	setIsOpen(false);
-				// 	// setTaskAdded(true);
 			} else {
 				// UPDATE
 
@@ -735,12 +800,8 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						<FormItem>
 							<FormLabel>Description</FormLabel>
 							<FormControl>
-								<RichTextEditor
-									value={field.value || ""}
-									onChange={field.onChange}
-									orgName={user_auth?.data?.organization_name}
-									skipImageCleanup={!isOpen}
-								/>
+								{/* <RichTextEditor value={field.value || ""} onChange={field.onChange} /> */}
+								<RichTextEditor value={field.value || ""} onChange={field.onChange} onImageDrop={handleImageDropFromEditor} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -750,27 +811,12 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Images</label>
 					<ImageUpload
 						taskId={updateData?.id} // Pass the task ID if editing, undefined if creating
-						initialImages={updateData?.images || []} // Pass existing images if editing
+						initialImages={taskImages || []} // Pass existing images if editing
 						onChange={setTaskImages}
 						disabled={!isEditable}
 						maxFiles={10}
 					/>
 				</div>
-				{/* <FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => {
-						return (
-							<FormItem>
-								<FormLabel>Description</FormLabel>
-								<FormControl>
-									<Textarea disabled={!isEditable} placeholder="Description" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						);
-					}}
-				/> */}
 				{showMore || updateData.calendar_add ? (
 					<>
 						<div className="flex flex-col gap-4 bg-secondary p-4 rounded-lg">
