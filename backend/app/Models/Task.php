@@ -113,6 +113,7 @@ class Task extends Model
             // 'assignee:id,name,email,role,position',
             'assignees:id,name,email,role,position',
             'category',
+            'images',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -122,7 +123,8 @@ class Task extends Model
                         // 'assignee:id,name,email,role,position',
                         'assignees:id,name,email,role,position',
                         'project:id,title',
-                        'category'
+                        'category',
+                        'images'
                     ]);
             },
         ])
@@ -148,6 +150,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             // 'assignee:id,name,email',
             'category',
+            'images',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -157,7 +160,8 @@ class Task extends Model
                         'assignees:id,name,email,role,position',
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
-                        'category'
+                        'category',
+                        'images'
                     ]);
             },
         ]);
@@ -185,6 +189,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
+            'images',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -194,7 +199,8 @@ class Task extends Model
                         'assignees:id,name,email,role,position',
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
-                        'category'
+                        'category',
+                        'images'
                     ]);
             },
         ])
@@ -309,6 +315,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
+            'images',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -316,7 +323,8 @@ class Task extends Model
                     'status:id,name,color',
                     'assignees:id,name,email,role,position',
                     'project:id,title',
-                    'category'
+                    'category',
+                    'images'
                 ]);
             },
         ]);
@@ -480,6 +488,7 @@ class Task extends Model
                 // 'assignee:id,name,email,role,position',
                 'assignees:id,name,email,role,position',
                 'category',
+                'images',
                 'project:id,title',
                 'parent:id,title',
                 'children' => function ($query) {
@@ -489,7 +498,8 @@ class Task extends Model
                             // 'assignee:id,name,email,role,position',
                             'assignees:id,name,email,role,position',
                             'project:id,title',
-                            'category'
+                            'category',
+                            'images'
                         ]);
                 },
             ])
@@ -612,6 +622,7 @@ class Task extends Model
                 'project:id,title',
                 'parent:id,title',
                 'children',
+                'images'
             ])->get();
     }
 
