@@ -642,19 +642,21 @@ class Task extends Model
         $tasks = self::whereIn('id', $ids)->where('organization_id', $organization_id)->get();
 
         return DB::transaction(function () use ($tasks, $deleteSubtasks, $organization_id) {
-            $allIdsToDelete = [];
+            $allTasksToDelete = collect();
+
             foreach ($tasks as $task) {
-                $idsToDelete = [$task->id];
+                $tasksToDelete = collect([$task]);
                 if ($deleteSubtasks) {
-                    $childIds = self::where('parent_id', $task->id)->pluck('id')->toArray();
-                    $idsToDelete = array_merge($idsToDelete, $childIds);
+                    $childTasks = self::where('parent_id', $task->id)->get();
+                    $tasksToDelete = $tasksToDelete->concat($childTasks);
                 }
-                $allIdsToDelete = array_merge($allIdsToDelete, $idsToDelete);
+                $allTasksToDelete = $allTasksToDelete->concat($tasksToDelete);
             }
-            $allIdsToDelete = array_unique($allIdsToDelete);
+
+            $allTasksToDelete = $allTasksToDelete->unique('id');
 
             // Delete all images on disk
-            foreach ($allIdsToDelete as $task) {
+            foreach ($allTasksToDelete as $task) {
                 foreach ($task->images as $image) {
                     if (Storage::disk('public')->exists($image->filename)) {
                         Storage::disk('public')->delete($image->filename);
@@ -662,18 +664,15 @@ class Task extends Model
                 }
             }
 
-
-            // Group by project/status for position shifting
-            $grouped = self::whereIn('id', $allIdsToDelete)
-                ->get()
-                ->groupBy(function ($t) {
-                    return $t->project_id . '-' . $t->status_id;
-                });
-
-            // Delete all
-            self::whereIn('id', $allIdsToDelete)->delete();
+            // Delete all tasks (DB cascade handles task_images records)
+            $idsToDelete = $allTasksToDelete->pluck('id')->toArray();
+            self::whereIn('id', $idsToDelete)->delete();
 
             // Shift positions
+            $grouped = $allTasksToDelete->groupBy(function ($t) {
+                return $t->project_id . '-' . $t->status_id;
+            });
+
             foreach ($grouped as $group) {
                 $projectId = $group->first()->project_id;
                 $statusId = $group->first()->status_id;
