@@ -57,7 +57,7 @@ const formSchema = z.object({
 	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
-	const { fetchReports, fetchUserReports } = useTaskHelpers();
+	const { fetchTasks, fetchReports, fetchUserReports } = useTaskHelpers();
 	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const { users } = useUsersStore();
@@ -350,7 +350,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 						}
 					}
 				}
-				fetchData();
+				fetchTasks();
 				showToast("Success!", "Task added.", 3000);
 				// if add subtask, don't close sheet
 				if (!parentId) setIsOpen(false);
@@ -394,7 +394,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 
 				await axiosClient.put(API().task(updateData?.id), parsedForm);
 				// cannot update stores, need to update parent task
-				fetchData();
+				fetchTasks();
 				showToast("Success!", "Task updated.", 3000);
 				setIsOpen(false);
 				setUpdateData({});
