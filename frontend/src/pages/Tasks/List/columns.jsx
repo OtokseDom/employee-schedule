@@ -7,6 +7,7 @@ import {
 	FileQuestion,
 	FileQuestionIcon,
 	FolderKanbanIcon,
+	ImagesIcon,
 	Text,
 	Trash2Icon,
 	UserCheck2,
@@ -89,14 +90,17 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 					);
 				},
 				cell: ({ row }) => {
-					const { title, description, depth } = row.original;
+					const { title, description, images, depth } = row.original;
 					return (
 						<div className="flex flex-row min-w-52 gap-2" style={{ paddingLeft: depth * 20 }}>
 							<span className="text-primary">{depth == 1 ? <CornerDownRight size={18} /> : ""}</span>
 							<div>
 								{title}
 								<br />
-								{description && <Text className="text-sm text-gray-500" size={14} />}
+								<span className="flex gap-2">
+									{description && <Text className="text-sm text-gray-500" size={14} />}
+									{images && images.length > 0 && <ImagesIcon className="text-sm text-gray-500" size={14} />}
+								</span>
 								{/* <span className="text-sm text-gray-500">{description}</span> */}
 							</div>
 						</div>
