@@ -26,7 +26,6 @@ export function DataTableTasks({
 	setIsOpen,
 	updateData,
 	setUpdateData,
-	fetchData,
 	showLess = true,
 	parentId,
 	setParentId,
@@ -207,7 +206,6 @@ export function DataTableTasks({
 										setIsOpen={setIsOpen}
 										updateData={updateData}
 										setUpdateData={setUpdateData}
-										fetchData={fetchData}
 									/>
 								)}
 							</SheetContent>

@@ -12,14 +12,13 @@ import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 
-export default function Month({ days, currentMonth, getTaskForDate, fetchData }) {
+export default function Month({ days, currentMonth, getTaskForDate }) {
 	const { loading } = useLoadContext();
 	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab, selectedUser } = useTasksStore();
 
 	// const [tasks, setTasks] = useState(tasks);
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
-	const [taskAdded, setTaskAdded] = useState(false);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
 
 	useEffect(() => {
@@ -139,20 +138,11 @@ export default function Month({ days, currentMonth, getTaskForDate, fetchData })
 								<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
 							) : (
 								<TaskForm
-									// tasks={flattenTasks(tasks)}
-									// projects={projects}
-									// users={users}
-									// categories={categories}
 									isOpen={isDialogOpen}
 									setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 									updateData={updateData}
 									setUpdateData={setUpdateData}
-									fetchData={fetchData}
-									setTaskAdded={setTaskAdded}
-									// setRelations={setRelations}
 									parentId={parentId}
-									// selectedTaskHistory={selectedTaskHistory}
-									// setActiveTab={setActiveTab}
 								/>
 							)}
 						</SheetContent>

@@ -56,7 +56,7 @@ const formSchema = z.object({
 	priority: z.string().optional(),
 	calendar_add: z.boolean().optional(),
 });
-export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData, fetchData }) {
+export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData }) {
 	const { fetchTasks, fetchReports, fetchUserReports } = useTaskHelpers();
 	const { tasks, relations, setRelations, addRelation, selectedUser, setActiveTab, options } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();

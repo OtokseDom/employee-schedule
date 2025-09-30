@@ -30,7 +30,7 @@ export default function ScheduleCalendar() {
 	const { categories } = useCategoriesStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	// Fetch Hooks
-	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
+	const { fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
@@ -215,15 +215,9 @@ export default function ScheduleCalendar() {
 			{/* Calendar/Week View */}
 			<div className="bg-background overflow-x-auto">
 				{selectedView === "month" ? (
-					<Month days={days} fetchData={fetchTasks} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
+					<Month days={days} currentMonth={currentMonth} getTaskForDate={getTaskForDate} />
 				) : (
-					<Week
-						fetchData={fetchTasks}
-						getWeekDays={getWeekDays}
-						getTimeSlots={getTimeSlots}
-						weekstart_date={weekstart_date}
-						isInTimeSlot={isInTimeSlot}
-					/>
+					<Week getWeekDays={getWeekDays} getTimeSlots={getTimeSlots} weekstart_date={weekstart_date} isInTimeSlot={isInTimeSlot} />
 				)}
 			</div>
 		</div>

@@ -12,19 +12,7 @@ import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 
-export default function Week({
-	// data,
-	// projects,
-	// users,
-	// categories,
-	fetchData,
-	getWeekDays,
-	getTimeSlots,
-	weekstart_date: weekStartDate,
-	isInTimeSlot,
-	// selectedUser,
-	// taskHistory,
-}) {
+export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekStartDate, isInTimeSlot }) {
 	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab, selectedUser } = useTasksStore();
 
 	const { loading, setLoading } = useLoadContext();
@@ -32,15 +20,7 @@ export default function Week({
 	const timeSlots = getTimeSlots();
 	const [openDialogIndex, setOpenDialogIndex] = useState(null);
 	const [updateData, setUpdateData] = useState({});
-	const [taskAdded, setTaskAdded] = useState(false);
 	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
-
-	useEffect(() => {
-		if (taskAdded) {
-			fetchData();
-			setTaskAdded(false);
-		}
-	}, [taskAdded]);
 
 	useEffect(() => {
 		if (!openDialogIndex) {
@@ -196,8 +176,6 @@ export default function Week({
 										setIsOpen={(open) => setOpenDialogIndex(open ? index : null)}
 										updateData={updateData}
 										setUpdateData={setUpdateData}
-										fetchData={fetchData}
-										setTaskAdded={setTaskAdded}
 										parentId={parentId}
 									/>
 								)}

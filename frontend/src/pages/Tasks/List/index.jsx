@@ -86,7 +86,6 @@ export default function Tasks() {
 							setParentId={setParentId}
 							projectId={projectId}
 							setProjectId={setProjectId}
-							fetchData={fetchTasks}
 						/>
 						{dialog}
 						{bulkDialog}
