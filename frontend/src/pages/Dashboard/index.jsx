@@ -146,9 +146,9 @@ export default function UserProfile() {
 				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
 			</div>
 
-			{/* Bar Chart */}
+			{/* Line Chart */}
 			<div className="md:col-span-4">
-				<ChartBarLabel report={reports?.delay_per_user} variant="dashboard" />
+				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
 			</div>
 
 			{/* Multi Bar Chart User date */}
@@ -156,9 +156,9 @@ export default function UserProfile() {
 				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
 			</div>
 
-			{/* Line Chart */}
+			{/* Bar Chart */}
 			<div className="md:col-span-4">
-				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
+				<ChartBarLabel report={reports?.delay_per_user} variant="dashboard" />
 			</div>
 
 			{/* Datatable */}
