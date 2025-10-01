@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\v1\OrganizationController;
 use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\RelationCheckerController;
 use App\Http\Controllers\Api\v1\TaskController;
+use App\Http\Controllers\Api\v1\TaskDiscussionController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
 use App\Http\Controllers\Api\v1\TaskImageController;
 use App\Http\Controllers\Api\v1\TaskStatusController;
@@ -40,6 +41,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/category', CategoryController::class);
         Route::apiResource('/task', TaskController::class);
         Route::apiResource('/task-history', TaskHistoryController::class);
+        Route::apiResource('/task-discussion', TaskDiscussionController::class);
 
         /* --------------------------------- Reports -------------------------------- */
         Route::get('/user/{id}/reports', [UserReportController::class, 'userReports']);
