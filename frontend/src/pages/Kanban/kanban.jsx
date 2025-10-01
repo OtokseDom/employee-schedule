@@ -11,9 +11,6 @@ import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore"
 import { API } from "@/constants/api";
 import axiosClient from "@/axios.client";
 
-// TODO: mobile responsiveness
-// TODO: open details on click
-// TODO: Add task on selected status
 // TODO: Status menu - sorting options
 export default function KanbanBoard() {
 	const { tasks, taskHistory, updateTaskPosition, addTaskHistory, mergeTaskPositions } = useTasksStore();
