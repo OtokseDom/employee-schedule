@@ -11,7 +11,7 @@ import { useToast } from "@/contexts/ToastContextProvider";
 export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, selectedTaskId, selectedTasks = [], clearSelection }) {
 	const { loading, setLoading } = useLoadContext();
 	const showToast = useToast();
-	const { fetchTasks } = useTaskHelpers();
+	const { fetchTasks, fetchReports } = useTaskHelpers();
 
 	const ids = selectedTasks.map((t) => t.id);
 	const isBulk = ids.length > 1;
@@ -30,6 +30,7 @@ export default function DeleteDialog({ dialogOpen, setDialogOpen, hasRelation, s
 				});
 			}
 			fetchTasks();
+			fetchReports();
 			showToast("Success!", "Task(s) deleted.", 3000);
 			if (clearSelection) clearSelection(); // <-- Only clear after success
 		} catch (e) {

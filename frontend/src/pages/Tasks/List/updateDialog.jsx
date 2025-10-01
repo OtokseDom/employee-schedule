@@ -33,7 +33,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 	const { projects } = useProjectsStore();
 	const { categories } = useCategoriesStore();
 	const [selectedAssignees, setSelectedAssignees] = useState(Array.from(new Set(selectedTasks?.flatMap((t) => t.assignees?.map((a) => a.id)) || [])));
-	const { fetchTasks } = useTaskHelpers();
+	const { fetchTasks, fetchReports } = useTaskHelpers();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -69,6 +69,7 @@ export default function UpdateDialog({ open, onClose, action, selectedTasks = []
 				value,
 			});
 			fetchTasks();
+			fetchReports();
 			showToast("Success!", "Tasks' " + action.toUpperCase() + " updated.", 3000);
 		} catch (e) {
 			// Optionally show error toast
