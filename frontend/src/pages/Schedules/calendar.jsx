@@ -30,7 +30,7 @@ export default function ScheduleCalendar() {
 	const { categories } = useCategoriesStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	// Fetch Hooks
-	const { fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
+	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses } = useTaskHelpers();
 
 	useEffect(() => {
 		document.title = "Task Management | Calendar";
