@@ -18,6 +18,7 @@ import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import UpdateDialog from "./updateDialog";
 import DeleteDialog from "./deleteDialog";
+import { TaskDiscussions } from "@/components/task/Discussion";
 export function DataTableTasks({
 	columns,
 	data,
@@ -197,6 +198,8 @@ export function DataTableTasks({
 									<History selectedTaskHistory={selectedTaskHistory} />
 								) : activeTab == "relations" ? (
 									<Relations setUpdateData={setUpdateData} setParentId={setParentId} setProjectId={setProjectId} />
+								) : activeTab == "discussions" ? (
+									<TaskDiscussions taskId={updateData?.id} />
 								) : (
 									<TaskForm
 										parentId={parentId}
