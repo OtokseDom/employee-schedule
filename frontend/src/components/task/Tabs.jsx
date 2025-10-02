@@ -9,11 +9,14 @@ export default function Tabs({ loading, updateData, activeTab, setActiveTab, par
 						<div className={`w-fit py-2 px-5 ${activeTab == "update" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
 							<button onClick={() => setActiveTab("update")}>Update Task</button>
 						</div>
-						<div className={`w-fit py-2 px-5 ${activeTab == "history" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
-							<button onClick={() => setActiveTab("history")}>History</button>
-						</div>
 						<div className={`w-fit py-2 px-5 ${activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
 							<button onClick={() => setActiveTab("relations")}>Relations</button>
+						</div>
+						<div className={`w-fit py-2 px-5 ${activeTab == "relations" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
+							<button onClick={() => setActiveTab("discussions")}>Discussions</button>
+						</div>
+						<div className={`w-fit py-2 px-5 ${activeTab == "history" ? "bg-secondary" : "text-muted-foreground"} rounded-t`}>
+							<button onClick={() => setActiveTab("history")}>History</button>
 						</div>
 					</div>
 					<span>{loading && <Loader2 className="animate-spin" />}</span>
