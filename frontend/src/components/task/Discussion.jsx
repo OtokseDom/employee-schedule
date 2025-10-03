@@ -96,8 +96,9 @@ export const TaskDiscussions = ({ taskId }) => {
 												<div className="flex flex-wrap gap-2 mt-2">
 													{discussion.attachments.map((att) => {
 														const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+														const extension = att.original_name.split(".").pop().toUpperCase();
 														return (
-															<div key={att.id} className="w-32">
+															<div key={att.id}>
 																{isImage ? (
 																	<Dialog>
 																		<DialogTrigger asChild>
@@ -128,9 +129,9 @@ export const TaskDiscussions = ({ taskId }) => {
 																		href={att.file_url}
 																		target="_blank"
 																		rel="noopener noreferrer"
-																		className="text-blue-600 underline text-sm"
+																		className="flex items-center justify-center w-20 aspect-square rounded-md border bg-secondary text-sm font-semibold text-foreground hover:bg-secondary/70 transition"
 																	>
-																		{att.original_name}
+																		{extension}
 																	</a>
 																)}
 															</div>
