@@ -3,7 +3,7 @@ export const createTaskDiscussionsSlice = (set) => ({
 	selectedTaskDiscussion: {},
 	taskDiscussionsLoaded: false, // flag to know if fetched
 
-	setTaskDiscussions: (taskDiscussions) => set({ taskDiscussions }),
+	setTaskDiscussions: (taskDiscussions) => set({ taskDiscussions, taskDiscussionsLoaded: true }),
 	setSelectedTaskDiscussion: (selectedTaskDiscussion) => set({ selectedTaskDiscussion }),
 	setTaskDiscussionsLoaded: (loaded) => set({ taskDiscussionsLoaded: loaded }),
 
