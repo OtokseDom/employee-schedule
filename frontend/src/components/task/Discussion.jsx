@@ -17,20 +17,12 @@ import { Input } from "@/components/ui/input";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 
 export const TaskDiscussions = ({ taskId }) => {
-	const { taskDiscussions, taskDiscussionsLoaded, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
-	const { fetchTaskDiscussions } = useTaskHelpers();
+	const { taskDiscussions, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
 	const [newContent, setNewContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
 	const { loading } = useLoadContext();
 
-	// useEffect(() => {
-	// 	if ((!taskDiscussions || taskDiscussions.length === 0) && !taskDiscussionsLoaded) {
-	// 		fetchTaskDiscussions();
-	// 	}
-	// }, []);
-
 	// TODO: Update store on add/update/delete
-	// TODO:
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
