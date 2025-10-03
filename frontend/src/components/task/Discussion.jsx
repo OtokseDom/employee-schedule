@@ -2,20 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { useTaskDiscussionsStore } from "@/store/taskDiscussions/taskDiscussionsStore";
 import { fetchTaskDiscussions, storeTaskDiscussion, deleteTaskDiscussion } from "@/utils/taskDiscussionHelpers";
+import { useTaskHelpers } from "@/utils/taskHelpers";
 
 export const TaskDiscussions = ({ taskId }) => {
-	const { taskDiscussions, setTaskDiscussions, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
-
+	const { taskDiscussions, taskDiscussionsLoaded, setTaskDiscussions, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
+	const { fetchTaskDiscussions } = useTaskHelpers();
 	const [newContent, setNewContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
 
 	useEffect(() => {
-		const loadDiscussions = async () => {
-			const discussions = await fetchTaskDiscussions();
-			setTaskDiscussions(discussions);
-		};
-		loadDiscussions();
-	}, [setTaskDiscussions]);
+		if ((!taskDiscussions || taskDiscussions.length === 0) && !taskDiscussionsLoaded) fetchTaskDiscussions();
+	}, []);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
