@@ -6,6 +6,7 @@ import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useKanbanColumnsStore } from "@/store/kanbanColumns/kanbanColumnsStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
+import { useTaskDiscussionsStore } from "@/store/taskDiscussions/taskDiscussionsStore";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useUserStore } from "@/store/user/userStore";
@@ -15,6 +16,7 @@ export const useTaskHelpers = () => {
 	const { setLoading } = useLoadContext();
 	const { projectFilter, setProjectFilter, userFilter, setUserFilter, setReports } = useDashboardStore();
 	const { setTasks, setTaskHistory, setOptions, setSelectedUser } = useTasksStore();
+	const { setTaskDiscussions } = useTaskDiscussionsStore();
 	const { projects, setProjects, setSelectedProject } = useProjectsStore();
 	const { users, setUsers } = useUsersStore();
 	const { setCategories } = useCategoriesStore();
@@ -28,6 +30,18 @@ export const useTaskHelpers = () => {
 			const res = await axiosClient.get(API().task());
 			setTasks(res?.data?.data?.tasks);
 			setTaskHistory(res?.data?.data?.task_history);
+		} catch (e) {
+			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchTaskDiscussions = async () => {
+		setLoading(true);
+		try {
+			const res = await axiosClient.get(API().task_discussion());
+			setTaskDiscussions(res?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
@@ -127,6 +141,7 @@ export const useTaskHelpers = () => {
 
 	return {
 		fetchTasks,
+		fetchTaskDiscussions,
 		fetchProjects,
 		fetchUsers,
 		fetchCategories,
