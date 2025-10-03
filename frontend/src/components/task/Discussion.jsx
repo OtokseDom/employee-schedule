@@ -23,13 +23,14 @@ export const TaskDiscussions = ({ taskId }) => {
 	const [attachments, setAttachments] = useState([]);
 	const { loading } = useLoadContext();
 
-	useEffect(() => {
-		if ((!taskDiscussions || taskDiscussions.length === 0) && !taskDiscussionsLoaded) {
-			fetchTaskDiscussions();
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if ((!taskDiscussions || taskDiscussions.length === 0) && !taskDiscussionsLoaded) {
+	// 		fetchTaskDiscussions();
+	// 	}
+	// }, []);
 
 	// TODO: Update store on add/update/delete
+	// TODO:
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
@@ -64,7 +65,7 @@ export const TaskDiscussions = ({ taskId }) => {
 					taskDiscussions
 						.filter((d) => d.task_id === taskId)
 						.map((discussion) => (
-							<div className="flex flex-col w-full gap-2 items-start">
+							<div key={discussion.id} className="flex flex-col w-full gap-2 items-start">
 								<div className="flex items-center gap-2">
 									<div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary text-lg font-semibold text-background">
 										{discussion.user?.name
@@ -87,7 +88,7 @@ export const TaskDiscussions = ({ taskId }) => {
 										</span>
 									</div>
 								</div>
-								<Card key={discussion.id} className="shadow-sm bg-secondary/50 w-full">
+								<Card className="shadow-sm bg-secondary/50 w-full">
 									<CardContent className="p-3 space-y-2">
 										<p className="text-sm whitespace-pre-line">{discussion.content}</p>
 
@@ -159,7 +160,7 @@ export const TaskDiscussions = ({ taskId }) => {
 			{/* </ScrollArea> */}
 
 			{/* Sticky Input Area */}
-			<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150">
+			<div className="sticky bottom-0 pt-4 backdrop-blur-sm bg-background/30 backdrop-saturate-150">
 				<form onSubmit={handleSubmit} className="flex flex-col gap-2">
 					<Textarea
 						value={newContent}
@@ -174,7 +175,7 @@ export const TaskDiscussions = ({ taskId }) => {
 							type="file"
 							multiple
 							onChange={(e) => setAttachments(Array.from(e.target.files))}
-							className="cursor-pointer bg-secondary/50 text-foreground"
+							className="cursor-pointer bg-secondary text-foreground"
 						/>
 						<Button type="submit">Submit</Button>
 					</div>
