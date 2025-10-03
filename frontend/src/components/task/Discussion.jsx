@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // shadcn/ui components
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -52,9 +52,8 @@ export const TaskDiscussions = ({ taskId }) => {
 
 	return (
 		<div className="flex flex-col h-full">
-			{/* Discussions Scroll Area */}
 			<ScrollArea className="flex-1 pr-2">
-				<div className="space-y-4 pb-32">
+				<div className="space-y-8 pb-32">
 					{loading ? (
 						<div className="flex flex-col space-y-3 w-full">
 							{Array.from({ length: 4 }).map((_, i) => (
@@ -65,67 +64,89 @@ export const TaskDiscussions = ({ taskId }) => {
 						taskDiscussions
 							.filter((d) => d.task_id === taskId)
 							.map((discussion) => (
-								<Card key={discussion.id} className="shadow-sm bg-secondary/50">
-									<CardHeader className="flex flex-row items-center justify-between p-3 border-b">
-										<div className="font-semibold text-sm">{discussion.user?.name}</div>
-										<Button
-											variant="ghost"
-											size="sm"
-											onClick={() => handleDelete(discussion.id)}
-											className="text-red-500 hover:text-red-600"
-										>
-											Delete
-										</Button>
-									</CardHeader>
-									<CardContent className="p-3 space-y-2">
-										<p className="text-sm whitespace-pre-line">{discussion.content}</p>
+								<div className="flex flex-col w-full gap-2 items-start">
+									<div className="flex items-center gap-2">
+										<div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary text-lg font-semibold text-background">
+											{discussion.user?.name
+												?.split(" ")
+												.map((n) => n[0])
+												.join("")
+												.slice(0, 2)
+												.toUpperCase()}
+										</div>
+										<div className="flex flex-col items-start gap-0">
+											<span className="text-muted-foreground font-semibold">{discussion.user?.name}</span>
+											<span className="text-xs text-blue-500/90">
+												{new Date(discussion.created_at).toLocaleString("en-US", {
+													month: "long",
+													day: "numeric",
+													year: "numeric",
+													hour: "numeric",
+													minute: "numeric",
+												})}
+											</span>
+										</div>
+									</div>
+									<Card key={discussion.id} className="shadow-sm bg-secondary/50 w-full">
+										<CardContent className="p-3 space-y-2">
+											<p className="text-sm whitespace-pre-line">{discussion.content}</p>
 
-										{/* Attachments */}
-										{discussion.attachments?.length > 0 && (
-											<div className="flex flex-wrap gap-2 mt-2">
-												{discussion.attachments.map((att) => {
-													const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-													return (
-														<div key={att.id} className="w-32">
-															{isImage ? (
-																<Dialog>
-																	<DialogTrigger asChild>
-																		<img
-																			src={att.file_url}
-																			alt={att.original_name}
-																			className="rounded border w-32 h-24 object-cover hover:cursor-pointer"
-																		/>
-																	</DialogTrigger>
-																	<DialogContent className="max-w-4xl">
-																		<DialogHeader>
-																			<DialogTitle>{att.original_name}</DialogTitle>
-																		</DialogHeader>
-																		<div className="flex justify-center">
+											{/* Attachments */}
+											{discussion.attachments?.length > 0 && (
+												<div className="flex flex-wrap gap-2 mt-2">
+													{discussion.attachments.map((att) => {
+														const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+														return (
+															<div key={att.id} className="w-32">
+																{isImage ? (
+																	<Dialog>
+																		<DialogTrigger asChild>
 																			<img
 																				src={att.file_url}
 																				alt={att.original_name}
-																				className="max-w-full max-h-[70vh] object-contain"
+																				className="rounded border w-32 h-24 object-cover hover:cursor-pointer"
 																			/>
-																		</div>
-																	</DialogContent>
-																</Dialog>
-															) : (
-																<a
-																	href={`/storage/${att.file_url}`}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	className="text-blue-600 underline text-sm"
-																>
-																	{att.original_name}
-																</a>
-															)}
-														</div>
-													);
-												})}
-											</div>
-										)}
-									</CardContent>
-								</Card>
+																		</DialogTrigger>
+																		<DialogContent className="max-w-4xl">
+																			<DialogHeader>
+																				<DialogTitle>{att.original_name}</DialogTitle>
+																				<DialogDescription className="sr-only">
+																					Navigate through the app using the options below.
+																				</DialogDescription>
+																			</DialogHeader>
+																			<div className="flex justify-center">
+																				<img
+																					src={att.file_url}
+																					alt={att.original_name}
+																					className="max-w-full max-h-[70vh] object-contain"
+																				/>
+																			</div>
+																		</DialogContent>
+																	</Dialog>
+																) : (
+																	<a
+																		href={att.file_url}
+																		target="_blank"
+																		rel="noopener noreferrer"
+																		className="text-blue-600 underline text-sm"
+																	>
+																		{att.original_name}
+																	</a>
+																)}
+															</div>
+														);
+													})}
+												</div>
+											)}
+										</CardContent>
+									</Card>
+									<div className="flex gap-3 text-foreground/50">
+										<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
+										<span className="hover:cursor-pointer hover:text-foreground" onClick={() => handleDelete(discussion.id)}>
+											Delete
+										</span>
+									</div>
+								</div>
 							))
 					)}
 				</div>
