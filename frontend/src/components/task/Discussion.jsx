@@ -52,106 +52,111 @@ export const TaskDiscussions = ({ taskId }) => {
 
 	return (
 		<div className="flex flex-col h-full">
-			<ScrollArea className="flex-1 pr-2">
-				<div className="space-y-8 pb-32">
-					{loading ? (
-						<div className="flex flex-col space-y-3 w-full">
-							{Array.from({ length: 4 }).map((_, i) => (
-								<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
-							))}
-						</div>
-					) : (
-						taskDiscussions
-							.filter((d) => d.task_id === taskId)
-							.map((discussion) => (
-								<div className="flex flex-col w-full gap-2 items-start">
-									<div className="flex items-center gap-2">
-										<div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary text-lg font-semibold text-background">
-											{discussion.user?.name
-												?.split(" ")
-												.map((n) => n[0])
-												.join("")
-												.slice(0, 2)
-												.toUpperCase()}
-										</div>
-										<div className="flex flex-col items-start gap-0">
-											<span className="text-muted-foreground font-semibold">{discussion.user?.name}</span>
-											<span className="text-xs text-blue-500/90">
-												{new Date(discussion.created_at).toLocaleString("en-US", {
-													month: "long",
-													day: "numeric",
-													year: "numeric",
-													hour: "numeric",
-													minute: "numeric",
-												})}
-											</span>
-										</div>
+			{/* <ScrollArea className="flex-1 pr-2"> */}
+			<div className="space-y-8 pb-32">
+				{loading ? (
+					<div className="flex flex-col space-y-3 w-full">
+						{Array.from({ length: 4 }).map((_, i) => (
+							<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
+						))}
+					</div>
+				) : (
+					taskDiscussions
+						.filter((d) => d.task_id === taskId)
+						.map((discussion) => (
+							<div className="flex flex-col w-full gap-2 items-start">
+								<div className="flex items-center gap-2">
+									<div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary text-lg font-semibold text-background">
+										{discussion.user?.name
+											?.split(" ")
+											.map((n) => n[0])
+											.join("")
+											.slice(0, 2)
+											.toUpperCase()}
 									</div>
-									<Card key={discussion.id} className="shadow-sm bg-secondary/50 w-full">
-										<CardContent className="p-3 space-y-2">
-											<p className="text-sm whitespace-pre-line">{discussion.content}</p>
+									<div className="flex flex-col items-start gap-0">
+										<span className="text-muted-foreground font-semibold">{discussion.user?.name}</span>
+										<span className="text-xs text-blue-500/90">
+											{new Date(discussion.created_at).toLocaleString("en-US", {
+												month: "long",
+												day: "numeric",
+												year: "numeric",
+												hour: "numeric",
+												minute: "numeric",
+											})}
+										</span>
+									</div>
+								</div>
+								<Card key={discussion.id} className="shadow-sm bg-secondary/50 w-full">
+									<CardContent className="p-3 space-y-2">
+										<p className="text-sm whitespace-pre-line">{discussion.content}</p>
 
-											{/* Attachments */}
-											{discussion.attachments?.length > 0 && (
-												<div className="flex flex-wrap gap-2 mt-2">
-													{discussion.attachments.map((att) => {
-														const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-														const extension = att.original_name.split(".").pop().toUpperCase();
-														return (
-															<div key={att.id}>
-																{isImage ? (
-																	<Dialog>
-																		<DialogTrigger asChild>
+										{/* Attachments */}
+										{discussion.attachments?.length > 0 && (
+											<div className="flex flex-wrap gap-2 mt-2">
+												{discussion.attachments.map((att) => {
+													const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+													const extension = att.original_name.split(".").pop().toUpperCase();
+													return (
+														<div key={att.id} className="overflow-hidden">
+															{isImage ? (
+																<Dialog>
+																	<DialogTrigger asChild>
+																		<img
+																			src={att.file_url}
+																			alt={att.original_name}
+																			className="rounded border w-32 h-24 object-cover hover:cursor-pointer"
+																		/>
+																	</DialogTrigger>
+																	<DialogContent className="max-w-4xl">
+																		<DialogHeader>
+																			<DialogTitle>{att.original_name}</DialogTitle>
+																			<DialogDescription className="sr-only">
+																				Navigate through the app using the options below.
+																			</DialogDescription>
+																		</DialogHeader>
+																		<div className="flex justify-center">
 																			<img
 																				src={att.file_url}
 																				alt={att.original_name}
-																				className="rounded border w-32 h-24 object-cover hover:cursor-pointer"
+																				className="max-w-full max-h-[70vh] object-contain"
 																			/>
-																		</DialogTrigger>
-																		<DialogContent className="max-w-4xl">
-																			<DialogHeader>
-																				<DialogTitle>{att.original_name}</DialogTitle>
-																				<DialogDescription className="sr-only">
-																					Navigate through the app using the options below.
-																				</DialogDescription>
-																			</DialogHeader>
-																			<div className="flex justify-center">
-																				<img
-																					src={att.file_url}
-																					alt={att.original_name}
-																					className="max-w-full max-h-[70vh] object-contain"
-																				/>
-																			</div>
-																		</DialogContent>
-																	</Dialog>
-																) : (
+																		</div>
+																	</DialogContent>
+																</Dialog>
+															) : (
+																<div className="flex items-center gap-2 group hover:cursor-pointer">
 																	<a
 																		href={att.file_url}
 																		target="_blank"
 																		rel="noopener noreferrer"
-																		className="flex items-center justify-center w-20 aspect-square rounded-md border bg-secondary text-sm font-semibold text-foreground hover:bg-secondary/70 transition"
+																		className="flex items-center justify-center min-w-16 aspect-square rounded-md border bg-secondary text-sm font-semibold text-foreground"
 																	>
 																		{extension}
 																	</a>
-																)}
-															</div>
-														);
-													})}
-												</div>
-											)}
-										</CardContent>
-									</Card>
-									<div className="flex gap-3 text-foreground/50">
-										<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
-										<span className="hover:cursor-pointer hover:text-foreground" onClick={() => handleDelete(discussion.id)}>
-											Delete
-										</span>
-									</div>
+																	<span className="font-semibold text-muted-foreground group-hover:text-foreground">
+																		{att.original_name}
+																	</span>
+																</div>
+															)}
+														</div>
+													);
+												})}
+											</div>
+										)}
+									</CardContent>
+								</Card>
+								<div className="flex gap-3 text-foreground/50">
+									<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
+									<span className="hover:cursor-pointer hover:text-foreground" onClick={() => handleDelete(discussion.id)}>
+										Delete
+									</span>
 								</div>
-							))
-					)}
-				</div>
-			</ScrollArea>
+							</div>
+						))
+				)}
+			</div>
+			{/* </ScrollArea> */}
 
 			{/* Sticky Input Area */}
 			<div className="sticky bottom-0 backdrop-blur-sm bg-background/30 backdrop-saturate-150">
