@@ -27,10 +27,10 @@ export const useTaskHelpers = () => {
 	const fetchTasks = async () => {
 		setLoading(true);
 		try {
+			const res_discussion = await axiosClient.get(API().task_discussion());
 			const res = await axiosClient.get(API().task());
 			setTasks(res?.data?.data?.tasks);
 			setTaskHistory(res?.data?.data?.task_history);
-			const res_discussion = await axiosClient.get(API().task_discussion());
 			setTaskDiscussions(res_discussion?.data?.data);
 		} catch (e) {
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
