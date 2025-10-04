@@ -9,7 +9,7 @@ export const createTaskDiscussionsSlice = (set) => ({
 
 	addTaskDiscussion: (discussion) =>
 		set((state) => ({
-			taskDiscussions: [...state.taskDiscussions, discussion],
+			taskDiscussions: [discussion, ...state.taskDiscussions],
 		})),
 
 	updateTaskDiscussion: (id, updates) =>
