@@ -27,13 +27,13 @@ export const updateTaskDiscussion = async (id, payload) => {
 	if (payload.attachments?.length) {
 		payload.attachments.forEach((file) => formData.append("attachments[]", file));
 	}
-	const res = await axiosClient.post(API(id), formData, {
+	const res = await axiosClient.post(API().task_discussion(id), formData, {
 		headers: { "Content-Type": "multipart/form-data" },
 	});
 	return res?.data?.data;
 };
 
 export const deleteTaskDiscussion = async (id) => {
-	const res = await axiosClient.delete(API(id));
+	const res = await axiosClient.delete(API().task_discussion(id));
 	return res?.data;
 };
