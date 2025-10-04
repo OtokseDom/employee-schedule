@@ -25,6 +25,7 @@ export const TaskDiscussions = ({ taskId }) => {
 	const showToast = useToast();
 
 	// TODO: Update store on update
+	// TODO: prevent edit/delete on other user comments
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
