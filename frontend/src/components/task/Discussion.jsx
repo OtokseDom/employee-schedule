@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // shadcn/ui components
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,9 +46,9 @@ export const TaskDiscussions = ({ taskId }) => {
 	};
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col">
 			{/* <ScrollArea className="flex-1 pr-2"> */}
-			<div className="space-y-8 pb-32 h-full">
+			<div className="space-y-8 pb-32">
 				{loading ? (
 					<div className="flex flex-col space-y-3 w-full">
 						{Array.from({ length: 4 }).map((_, i) => (
@@ -145,9 +145,27 @@ export const TaskDiscussions = ({ taskId }) => {
 								</Card>
 								<div className="flex gap-3 text-foreground/50">
 									<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
-									<span className="hover:cursor-pointer hover:text-foreground" onClick={() => handleDelete(discussion.id)}>
-										Delete
-									</span>
+									<Dialog modal={true}>
+										<DialogTrigger>
+											<span className="hover:cursor-pointer hover:text-foreground">Delete</span>
+										</DialogTrigger>
+										<DialogContent>
+											<DialogHeader>
+												<DialogTitle>Are you absolutely sure?</DialogTitle>
+												<DialogDescription>This action cannot be undone.</DialogDescription>
+											</DialogHeader>
+											<DialogFooter>
+												<DialogClose asChild>
+													<Button type="button" variant="secondary">
+														Close
+													</Button>
+												</DialogClose>
+												<Button disabled={loading} variant="destructive" onClick={() => handleDelete(discussion.id)}>
+													Delete comment
+												</Button>
+											</DialogFooter>
+										</DialogContent>
+									</Dialog>
 								</div>
 							</div>
 						))
