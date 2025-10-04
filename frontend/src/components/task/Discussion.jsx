@@ -14,24 +14,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { useLoadContext } from "@/contexts/LoadContextProvider";
+import { useToast } from "@/contexts/ToastContextProvider";
+import { Loader2 } from "lucide-react";
 
 export const TaskDiscussions = ({ taskId }) => {
 	const { taskDiscussions, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
 	const [newContent, setNewContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
-	const { loading } = useLoadContext();
+	const [loading, setLoading] = useState(false);
+	const showToast = useToast();
 
-	// TODO: Update store on add/update/delete
+	// TODO: Update store on update
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
 
-		const discussion = await storeTaskDiscussion({
-			content: newContent,
-			task_id: taskId,
-			attachments,
-		});
+		const discussion = await storeTaskDiscussion(
+			{
+				content: newContent,
+				task_id: taskId,
+				attachments,
+			},
+			setLoading,
+			showToast
+		);
 
 		// force type correction
 		discussion.task_id = Number(discussion.task_id);
@@ -41,7 +47,7 @@ export const TaskDiscussions = ({ taskId }) => {
 	};
 
 	const handleDelete = async (id) => {
-		await deleteTaskDiscussion(id);
+		await deleteTaskDiscussion(id, setLoading, showToast);
 		removeTaskDiscussion(id);
 	};
 
@@ -49,13 +55,7 @@ export const TaskDiscussions = ({ taskId }) => {
 		<div className="flex flex-col">
 			{/* <ScrollArea className="flex-1 pr-2"> */}
 			<div className="space-y-8 pb-32">
-				{loading ? (
-					<div className="flex flex-col space-y-3 w-full">
-						{Array.from({ length: 4 }).map((_, i) => (
-							<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
-						))}
-					</div>
-				) : taskDiscussions.filter((d) => d.task_id === taskId).length == 0 ? (
+				{taskDiscussions.filter((d) => d.task_id === taskId).length == 0 ? (
 					<div className="w-full h-full text-muted-foreground text-lg text-center p-4">No Discussions</div>
 				) : (
 					taskDiscussions
@@ -151,7 +151,9 @@ export const TaskDiscussions = ({ taskId }) => {
 										</DialogTrigger>
 										<DialogContent>
 											<DialogHeader>
-												<DialogTitle>Are you absolutely sure?</DialogTitle>
+												<DialogTitle className="flex gap-4">
+													Are you absolutely sure? {loading && <Loader2 className="animate-spin text-foreground" />}
+												</DialogTitle>
 												<DialogDescription>This action cannot be undone.</DialogDescription>
 											</DialogHeader>
 											<DialogFooter>
@@ -191,7 +193,9 @@ export const TaskDiscussions = ({ taskId }) => {
 							onChange={(e) => setAttachments(Array.from(e.target.files))}
 							className="cursor-pointer bg-secondary text-foreground"
 						/>
-						<Button type="submit">Submit</Button>
+						<Button type="submit" className="w-24" disabled={loading}>
+							{loading ? <Loader2 className="animate-spin text-background" /> : "Submit"}
+						</Button>
 					</div>
 				</form>
 			</div>
