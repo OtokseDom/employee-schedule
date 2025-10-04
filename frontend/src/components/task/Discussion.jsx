@@ -33,6 +33,8 @@ export const TaskDiscussions = ({ taskId }) => {
 			attachments,
 		});
 
+		// force type correction
+		discussion.task_id = Number(discussion.task_id);
 		addTaskDiscussion(discussion);
 		setNewContent("");
 		setAttachments([]);
@@ -46,13 +48,15 @@ export const TaskDiscussions = ({ taskId }) => {
 	return (
 		<div className="flex flex-col h-full">
 			{/* <ScrollArea className="flex-1 pr-2"> */}
-			<div className="space-y-8 pb-32">
+			<div className="space-y-8 pb-32 h-full">
 				{loading ? (
 					<div className="flex flex-col space-y-3 w-full">
 						{Array.from({ length: 4 }).map((_, i) => (
 							<Skeleton key={i} index={i * 0.9} className="h-24 w-full" />
 						))}
 					</div>
+				) : taskDiscussions.filter((d) => d.task_id === taskId).length == 0 ? (
+					<div className="w-full h-full text-muted-foreground text-lg text-center p-4">No Discussions</div>
 				) : (
 					taskDiscussions
 						.filter((d) => d.task_id === taskId)
