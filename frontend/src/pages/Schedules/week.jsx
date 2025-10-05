@@ -44,7 +44,7 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 		<div className="overflow-x-auto">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
-					openDialogIndex ? "opacity-100" : "opacity-0"
+					openDialogIndex !== null ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
@@ -72,13 +72,13 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 
 					return (
 						<Sheet key={index} open={isDialogOpen} onOpenChange={(open) => setOpenDialogIndex(open ? index : null)} modal={false}>
-							<SheetTrigger
-								asChild
-								onClick={() => {
-									setOpenDialogIndex(index);
-								}}
-							>
-								<div key={index} className="col-span-1 min-w-32 text-left cursor-pointer">
+							<SheetTrigger asChild>
+								<div
+									className="col-span-1 min-w-32 text-left cursor-pointer"
+									onClick={() => {
+										setOpenDialogIndex(index);
+									}}
+								>
 									<div className={`h-12 p-2 text-center font-medium ${isToday ? "text-blue-600" : ""}`}>
 										<div>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day.getDay()]}</div>
 										<div className="text-sm">{day.getDate()}</div>
@@ -126,9 +126,8 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 													return (
 														<div
 															key={task.id}
-															onClick={(e) => {
+															onClick={() => {
 																//set update data when a task is clicked
-																e.stopPropagation();
 																setUpdateData(task);
 																setOpenDialogIndex(index);
 																const filteredHistory = taskHistory.filter((th) => th.task_id === task.id);
