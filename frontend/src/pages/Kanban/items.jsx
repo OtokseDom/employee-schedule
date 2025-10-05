@@ -12,6 +12,7 @@ import TaskForm from "../Tasks/form";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { useTasksStore } from "@/store/tasks/tasksStore";
 import Tabs from "@/components/task/Tabs";
+import { TaskDiscussions } from "@/components/task/Discussion";
 
 const Items = ({ item }) => {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -156,6 +157,8 @@ const Items = ({ item }) => {
 					<History selectedTaskHistory={selectedTaskHistory} />
 				) : activeTab == "relations" ? (
 					<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
+				) : activeTab == "discussions" ? (
+					<TaskDiscussions taskId={updateData?.id} />
 				) : (
 					<TaskForm isOpen={isDialogOpen} setIsOpen={setDialogOpen} updateData={updateData} setUpdateData={setUpdateData} parentId={parentId} />
 				)}

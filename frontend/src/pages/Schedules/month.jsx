@@ -11,6 +11,7 @@ import { flattenTasks, statusColors } from "@/utils/taskHelpers";
 import Relations from "@/components/task/Relations";
 import Tabs from "@/components/task/Tabs";
 import { useTasksStore } from "@/store/tasks/tasksStore";
+import { TaskDiscussions } from "@/components/task/Discussion";
 
 export default function Month({ days, currentMonth, getTaskForDate }) {
 	const { loading } = useLoadContext();
@@ -136,6 +137,8 @@ export default function Month({ days, currentMonth, getTaskForDate }) {
 								<History selectedTaskHistory={selectedTaskHistory} />
 							) : activeTab == "relations" ? (
 								<Relations setUpdateData={setUpdateData} setParentId={setParentId} />
+							) : activeTab == "discussions" ? (
+								<TaskDiscussions taskId={updateData?.id} />
 							) : (
 								<TaskForm
 									isOpen={isDialogOpen}
