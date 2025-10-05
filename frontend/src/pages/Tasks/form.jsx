@@ -54,7 +54,6 @@ const formSchema = z.object({
 	performance_rating: z.coerce.number().min(0).max(10).optional(),
 	remarks: z.string().optional(),
 	priority: z.string().optional(),
-	calendar_add: z.boolean().optional(),
 });
 export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updateData, setUpdateData }) {
 	const { fetchTasks, fetchReports, fetchUserReports } = useTaskHelpers();

@@ -28,6 +28,15 @@ export default function Month({ days, currentMonth, getTaskForDate }) {
 			setActiveTab("update");
 			setParentId(null);
 		}
+		if (openDialogIndex !== null && !updateData.id) {
+			setUpdateData({
+				calendar_add: true,
+				assignee: selectedUser.id !== "undefined" ? selectedUser : null,
+				assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
+				start_date: format(days[openDialogIndex], "yyyy-MM-dd"),
+				end_date: format(days[openDialogIndex], "yyyy-MM-dd"),
+			});
+		}
 	}, [openDialogIndex]);
 	return (
 		<div className="grid grid-cols-7 gap-0 md:gap-1">
@@ -53,13 +62,6 @@ export default function Month({ days, currentMonth, getTaskForDate }) {
 						<SheetTrigger
 							asChild
 							onClick={() => {
-								setUpdateData({
-									calendar_add: true,
-									assignee: selectedUser.id !== "undefined" ? selectedUser : null,
-									assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
-									start_date: format(day, "yyyy-MM-dd"),
-									end_date: format(day, "yyyy-MM-dd"),
-								});
 								setOpenDialogIndex(index);
 							}}
 						>

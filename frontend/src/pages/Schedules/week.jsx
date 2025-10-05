@@ -29,6 +29,16 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 			setActiveTab("update");
 			setParentId(null);
 		}
+		if (openDialogIndex !== null && !updateData.id) {
+			const day = weekDays[openDialogIndex];
+			setUpdateData({
+				calendar_add: true,
+				assignee: selectedUser.id !== "undefined" ? selectedUser : null,
+				assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
+				start_date: format(day, "yyyy-MM-dd"),
+				end_date: format(day, "yyyy-MM-dd"),
+			});
+		}
 	}, [openDialogIndex]);
 	return (
 		<div className="overflow-x-auto">
@@ -65,13 +75,6 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 							<SheetTrigger
 								asChild
 								onClick={() => {
-									setUpdateData({
-										calendar_add: true,
-										assignee: selectedUser.id !== "undefined" ? selectedUser : null,
-										assignee_id: selectedUser.id !== "undefined" ? selectedUser.id : null,
-										start_date: format(day, "yyyy-MM-dd"),
-										end_date: format(day, "yyyy-MM-dd"),
-									});
 									setOpenDialogIndex(index);
 								}}
 							>
