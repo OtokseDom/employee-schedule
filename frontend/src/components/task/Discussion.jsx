@@ -16,16 +16,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/contexts/ToastContextProvider";
 import { Loader2 } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 export const TaskDiscussions = ({ taskId }) => {
+	const { user } = useAuthContext();
 	const { taskDiscussions, addTaskDiscussion, removeTaskDiscussion } = useTaskDiscussionsStore();
 	const [newContent, setNewContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const showToast = useToast();
-
 	// TODO: Update store on update
-	// TODO: prevent edit/delete on other user comments
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
@@ -144,32 +144,34 @@ export const TaskDiscussions = ({ taskId }) => {
 										)}
 									</CardContent>
 								</Card>
-								<div className="flex gap-3 text-foreground/50">
-									<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
-									<Dialog modal={true}>
-										<DialogTrigger>
-											<span className="hover:cursor-pointer hover:text-foreground">Delete</span>
-										</DialogTrigger>
-										<DialogContent>
-											<DialogHeader>
-												<DialogTitle className="flex gap-4">
-													Are you absolutely sure? {loading && <Loader2 className="animate-spin text-foreground" />}
-												</DialogTitle>
-												<DialogDescription>This action cannot be undone.</DialogDescription>
-											</DialogHeader>
-											<DialogFooter>
-												<DialogClose asChild>
-													<Button type="button" variant="secondary">
-														Close
+								{user.data.id === discussion.user.id && (
+									<div className="flex gap-3 text-foreground/50">
+										<span className="hover:cursor-pointer hover:text-foreground">Edit</span>
+										<Dialog modal={true}>
+											<DialogTrigger>
+												<span className="hover:cursor-pointer hover:text-foreground">Delete</span>
+											</DialogTrigger>
+											<DialogContent>
+												<DialogHeader>
+													<DialogTitle className="flex gap-4">
+														Are you absolutely sure? {loading && <Loader2 className="animate-spin text-foreground" />}
+													</DialogTitle>
+													<DialogDescription>This action cannot be undone.</DialogDescription>
+												</DialogHeader>
+												<DialogFooter>
+													<DialogClose asChild>
+														<Button type="button" variant="secondary">
+															Close
+														</Button>
+													</DialogClose>
+													<Button disabled={loading} variant="destructive" onClick={() => handleDelete(discussion.id)}>
+														Delete comment
 													</Button>
-												</DialogClose>
-												<Button disabled={loading} variant="destructive" onClick={() => handleDelete(discussion.id)}>
-													Delete comment
-												</Button>
-											</DialogFooter>
-										</DialogContent>
-									</Dialog>
-								</div>
+												</DialogFooter>
+											</DialogContent>
+										</Dialog>
+									</div>
+								)}
 							</div>
 						))
 				)}
