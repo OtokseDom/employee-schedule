@@ -66,6 +66,11 @@ class Task extends Model
         return $this->hasMany(TaskImage::class);
     }
 
+    public function discussions()
+    {
+        return $this->hasMany(TaskDiscussion::class);
+    }
+
     // Relationship with Project
     public function project()
     {
@@ -114,6 +119,7 @@ class Task extends Model
             // 'assignee:id,name,email,role,position',
             'assignees:id,name,email,role,position',
             'category',
+            'discussions',
             'images',
             'project:id,title',
             'parent:id,title',
@@ -125,6 +131,7 @@ class Task extends Model
                         'assignees:id,name,email,role,position',
                         'project:id,title',
                         'category',
+                        'discussions',
                         'images'
                     ]);
             },
@@ -151,6 +158,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             // 'assignee:id,name,email',
             'category',
+            'discussions',
             'images',
             'project:id,title',
             'parent:id,title',
@@ -162,6 +170,7 @@ class Task extends Model
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category',
+                        'discussions',
                         'images'
                     ]);
             },
@@ -190,6 +199,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
+            'discussions',
             'images',
             'project:id,title',
             'parent:id,title',
@@ -201,6 +211,7 @@ class Task extends Model
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category',
+                        'discussions',
                         'images'
                     ]);
             },
@@ -316,6 +327,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
+            'discussions',
             'images',
             'project:id,title',
             'parent:id,title',
@@ -325,6 +337,7 @@ class Task extends Model
                     'assignees:id,name,email,role,position',
                     'project:id,title',
                     'category',
+                    'discussions',
                     'images'
                 ]);
             },
@@ -365,7 +378,6 @@ class Task extends Model
                     }
                 }
             }
-
 
             // 5️⃣ Delete all tasks in one query
             $idsToDelete = $allTasks->pluck('id')->toArray();
@@ -499,6 +511,7 @@ class Task extends Model
                 // 'assignee:id,name,email,role,position',
                 'assignees:id,name,email,role,position',
                 'category',
+                'discussions',
                 'images',
                 'project:id,title',
                 'parent:id,title',
@@ -510,6 +523,7 @@ class Task extends Model
                             'assignees:id,name,email,role,position',
                             'project:id,title',
                             'category',
+                            'discussions',
                             'images'
                         ]);
                 },
@@ -633,6 +647,7 @@ class Task extends Model
                 'project:id,title',
                 'parent:id,title',
                 'children',
+                'discussions',
                 'images'
             ])->get();
     }
