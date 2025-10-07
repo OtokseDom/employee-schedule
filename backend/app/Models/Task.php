@@ -700,6 +700,27 @@ class Task extends Model
                 }
             }
 
+            // Delete all task discussion attachments from disk (DB will cascade)
+            foreach ($allTasksToDelete as $task) {
+                foreach ($task->discussions as $discussion) {
+                    // Discussion attachments
+                    foreach ($discussion->attachments as $attachment) {
+                        if (Storage::disk('public')->exists($attachment->file_path)) {
+                            Storage::disk('public')->delete($attachment->file_path);
+                        }
+                    }
+
+                    // Reply attachments (if threaded)
+                    foreach ($discussion->replies as $reply) {
+                        foreach ($reply->attachments as $attachment) {
+                            if (Storage::disk('public')->exists($attachment->file_path)) {
+                                Storage::disk('public')->delete($attachment->file_path);
+                            }
+                        }
+                    }
+                }
+            }
+
             // Delete all tasks (DB cascade handles task_images records)
             $idsToDelete = $allTasksToDelete->pluck('id')->toArray();
             self::whereIn('id', $idsToDelete)->delete();
