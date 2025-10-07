@@ -379,6 +379,27 @@ class Task extends Model
                 }
             }
 
+            // 🧩 4.1️⃣ Delete all discussions & attachments for these tasks
+            foreach ($allTasks as $task) {
+                foreach ($task->discussions as $discussion) {
+                    // Delete attachments (file + db)
+                    foreach ($discussion->attachments as $attachment) {
+                        if (Storage::disk('public')->exists($attachment->file_path)) {
+                            Storage::disk('public')->delete($attachment->file_path);
+                        }
+                    }
+
+                    // Delete replies' attachments too (if you have threaded discussions)
+                    foreach ($discussion->replies as $reply) {
+                        foreach ($reply->attachments as $attachment) {
+                            if (Storage::disk('public')->exists($attachment->file_path)) {
+                                Storage::disk('public')->delete($attachment->file_path);
+                            }
+                        }
+                    }
+                }
+            }
+
             // 5️⃣ Delete all tasks in one query
             $idsToDelete = $allTasks->pluck('id')->toArray();
             self::whereIn('id', $idsToDelete)->delete();
