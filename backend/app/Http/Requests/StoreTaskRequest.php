@@ -69,6 +69,7 @@ class StoreTaskRequest extends FormRequest
             'delay_reason' => 'nullable|string',
             'performance_rating' => 'nullable|integer|min:0|max:10',
             'remarks' => 'nullable|string',
+            'attachments.*' => 'nullable|file|max:5120', // each attachment max 5MB
             'priority' => [
                 'nullable',
                 Rule::in(['Low', 'Medium', 'High', 'Urgent', 'Critical']),
