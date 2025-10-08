@@ -25,51 +25,51 @@ export default function RichTextEditor({ value, onChange, onImageDrop }) {
 		onUpdate: ({ editor }) => {
 			onChange(editor.getHTML());
 		},
-		editorProps: {
-			handleDrop(view, event, _slice, moved) {
-				// Don't handle if this is a move operation within the editor
-				if (moved) return false;
+		// editorProps: {
+		// 	handleDrop(view, event, _slice, moved) {
+		// 		// Don't handle if this is a move operation within the editor
+		// 		if (moved) return false;
 
-				// Check if there are files being dropped
-				if (!event.dataTransfer || !event.dataTransfer.files) return false;
+		// 		// Check if there are files being dropped
+		// 		if (!event.dataTransfer || !event.dataTransfer.files) return false;
 
-				const files = Array.from(event.dataTransfer.files);
-				const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+		// 		const files = Array.from(event.dataTransfer.files);
+		// 		const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-				if (imageFiles.length > 0 && onImageDrop) {
-					event.preventDefault();
-					event.stopPropagation();
+		// 		if (imageFiles.length > 0 && onImageDrop) {
+		// 			event.preventDefault();
+		// 			event.stopPropagation();
 
-					// Call the parent handler
-					onImageDrop(imageFiles);
-					return true;
-				}
+		// 			// Call the parent handler
+		// 			onImageDrop(imageFiles);
+		// 			return true;
+		// 		}
 
-				return false;
-			},
-			handlePaste(view, event) {
-				// Check if there are clipboard items
-				if (!event.clipboardData || !event.clipboardData.items) return false;
+		// 		return false;
+		// 	},
+		// 	handlePaste(view, event) {
+		// 		// Check if there are clipboard items
+		// 		if (!event.clipboardData || !event.clipboardData.items) return false;
 
-				const items = Array.from(event.clipboardData.items);
-				const imageItems = items.filter((item) => item.type.startsWith("image/"));
+		// 		const items = Array.from(event.clipboardData.items);
+		// 		const imageItems = items.filter((item) => item.type.startsWith("image/"));
 
-				if (imageItems.length > 0 && onImageDrop) {
-					event.preventDefault();
-					event.stopPropagation();
+		// 		if (imageItems.length > 0 && onImageDrop) {
+		// 			event.preventDefault();
+		// 			event.stopPropagation();
 
-					const files = imageItems.map((item) => item.getAsFile()).filter((file) => file !== null);
+		// 			const files = imageItems.map((item) => item.getAsFile()).filter((file) => file !== null);
 
-					if (files.length > 0) {
-						// Call the parent handler
-						onImageDrop(files);
-					}
-					return true;
-				}
+		// 			if (files.length > 0) {
+		// 				// Call the parent handler
+		// 				onImageDrop(files);
+		// 			}
+		// 			return true;
+		// 		}
 
-				return false;
-			},
-		},
+		// 		return false;
+		// 	},
+		// },
 	});
 
 	// Populate richtext editor on update
@@ -173,9 +173,9 @@ export default function RichTextEditor({ value, onChange, onImageDrop }) {
 				</style>
 				<EditorContent editor={editor} />
 			</div>
-			{onImageDrop && (
+			{/* {onImageDrop && (
 				<p className="text-xs text-muted-foreground mt-1">💡 You can drag & drop or paste images here - they'll be added to the image gallery below</p>
-			)}
+			)} */}
 		</div>
 	);
 }
