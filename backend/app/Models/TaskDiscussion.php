@@ -95,7 +95,6 @@ class TaskDiscussion extends Model
         return $discussion->fresh(['user', 'attachments', 'replies']);
     }
 
-    // TODO: Delete attachment when task is deleted
     // Delete discussion (cascade replies & attachments)
     public function deleteDiscussion($discussion, $user)
     {
