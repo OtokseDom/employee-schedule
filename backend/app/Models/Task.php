@@ -60,10 +60,10 @@ class Task extends Model
             ->withTimestamps();
     }
 
-    // Relationship with Task Images
-    public function images()
+    // Relationship with Task Attachments
+    public function attachments()
     {
-        return $this->hasMany(TaskImage::class);
+        return $this->hasMany(TaskAttachment::class);
     }
 
     public function discussions()
@@ -120,7 +120,7 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'category',
             'discussions',
-            'images',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -132,7 +132,7 @@ class Task extends Model
                         'project:id,title',
                         'category',
                         'discussions',
-                        'images'
+                        'attachments'
                     ]);
             },
         ])
@@ -142,7 +142,7 @@ class Task extends Model
 
     public function storeTask($request, $userData)
     {
-        if ($request->organization_id !== $userData->organization_id) {
+        if (intval($request->organization_id) !== $userData->organization_id) {
             return "not found";
         }
 
@@ -152,6 +152,9 @@ class Task extends Model
         if ($request->has('assignees')) {
             $task->assignees()->attach($request->input('assignees'));
         }
+        if ($request->hasFile('attachments')) {
+            $task->addAttachments($request->file('attachments'), $userData->organization_id);
+        }
 
         $task->load([
             'status:id,name,color',
@@ -159,7 +162,7 @@ class Task extends Model
             // 'assignee:id,name,email',
             'category',
             'discussions',
-            'images',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -171,7 +174,7 @@ class Task extends Model
                         'project:id,title',
                         'category',
                         'discussions',
-                        'images'
+                        'attachments'
                     ]);
             },
         ]);
@@ -200,7 +203,7 @@ class Task extends Model
             'status:id,name,color',
             'category',
             'discussions',
-            'images',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -212,7 +215,7 @@ class Task extends Model
                         'project:id,title',
                         'category',
                         'discussions',
-                        'images'
+                        'attachments'
                     ]);
             },
         ])
@@ -266,6 +269,10 @@ class Task extends Model
             // Sync assignees if provided
             if (isset($validated['assignees'])) {
                 $task->assignees()->sync($validated['assignees']);
+            }
+            // Update attachment record
+            if (isset($validated['attachments'])) {
+                $task->addAttachments($validated->file('attachments'));
             }
 
             // Build task history changes
@@ -328,7 +335,7 @@ class Task extends Model
             'status:id,name,color',
             'category',
             'discussions',
-            'images',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -338,7 +345,7 @@ class Task extends Model
                     'project:id,title',
                     'category',
                     'discussions',
-                    'images'
+                    'attachments'
                 ]);
             },
         ]);
@@ -370,11 +377,11 @@ class Task extends Model
                 $groups[$t->project_id][$t->status_id][] = $t->position;
             }
 
-            // 4️⃣ Delete all images on disk
+            // 4️⃣ Delete all attachments on disk
             foreach ($allTasks as $task) {
-                foreach ($task->images as $image) {
-                    if (Storage::disk('public')->exists($image->filename)) {
-                        Storage::disk('public')->delete($image->filename);
+                foreach ($task->attachments as $attachment) {
+                    if (Storage::disk('public')->exists($attachment->file_path)) {
+                        Storage::disk('public')->delete($attachment->file_path);
                     }
                 }
             }
@@ -533,7 +540,7 @@ class Task extends Model
                 'assignees:id,name,email,role,position',
                 'category',
                 'discussions',
-                'images',
+                'attachments',
                 'project:id,title',
                 'parent:id,title',
                 'children' => function ($query) {
@@ -545,7 +552,7 @@ class Task extends Model
                             'project:id,title',
                             'category',
                             'discussions',
-                            'images'
+                            'attachments'
                         ]);
                 },
             ])
@@ -669,7 +676,7 @@ class Task extends Model
                 'parent:id,title',
                 'children',
                 'discussions',
-                'images'
+                'attachments'
             ])->get();
     }
 
@@ -691,11 +698,11 @@ class Task extends Model
 
             $allTasksToDelete = $allTasksToDelete->unique('id');
 
-            // Delete all images on disk
+            // Delete all attachments on disk
             foreach ($allTasksToDelete as $task) {
-                foreach ($task->images as $image) {
-                    if (Storage::disk('public')->exists($image->filename)) {
-                        Storage::disk('public')->delete($image->filename);
+                foreach ($task->attachments as $attachment) {
+                    if (Storage::disk('public')->exists($attachment->file_path)) {
+                        Storage::disk('public')->delete($attachment->file_path);
                     }
                 }
             }
@@ -721,7 +728,7 @@ class Task extends Model
                 }
             }
 
-            // Delete all tasks (DB cascade handles task_images records)
+            // Delete all tasks (DB cascade handles task_attachments records)
             $idsToDelete = $allTasksToDelete->pluck('id')->toArray();
             self::whereIn('id', $idsToDelete)->delete();
 
@@ -748,5 +755,24 @@ class Task extends Model
 
             return true;
         });
+    }
+
+    // Add attachments helper
+    public function addAttachments(array $files, $organization_id)
+    {
+        if (!$organization_id) {
+            return apiResponse(null, 'Organization not found', false, 404);
+        }
+
+        foreach ($files as $file) {
+            $path = $file->store("task_attachments/{$organization_id}", 'public');
+
+            $this->attachments()->create([
+                'file_path'     => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'file_type'     => $file->getClientMimeType(),
+                'file_size'     => $file->getSize(),
+            ]);
+        }
     }
 }
