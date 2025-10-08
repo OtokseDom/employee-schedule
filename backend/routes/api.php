@@ -50,8 +50,8 @@ Route::prefix('v1')->group(function () {
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
         Route::delete('/tasks/bulk-delete', [TaskController::class, 'bulkDelete']);
-        Route::post('/task-images', [TaskImageController::class, 'store']);
-        Route::delete('/task-images/{taskImage}', [TaskImageController::class, 'destroy']);
+        // Route::post('/task-images', [TaskImageController::class, 'store']);
+        // Route::delete('/task-images/{taskImage}', [TaskImageController::class, 'destroy']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
         Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
         Route::patch('/organization/{organization}/generate-code', [OrganizationController::class, 'generateCode']);
