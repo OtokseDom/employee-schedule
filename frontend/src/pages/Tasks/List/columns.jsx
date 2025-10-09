@@ -9,6 +9,7 @@ import {
 	FolderKanbanIcon,
 	ImagesIcon,
 	MessageSquareMore,
+	Paperclip,
 	Text,
 	Trash2Icon,
 	UserCheck2,
@@ -93,7 +94,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 					);
 				},
 				cell: ({ row }) => {
-					const { id, title, description, images, depth } = row.original;
+					const { id, title, description, attachments, depth } = row.original;
 					return (
 						<div className="flex flex-row min-w-52 gap-2" style={{ paddingLeft: depth * 20 }}>
 							<span className="text-primary">{depth == 1 ? <CornerDownRight size={18} /> : ""}</span>
@@ -102,7 +103,7 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 								<br />
 								<span className="flex gap-2">
 									{description && <Text className="text-sm text-gray-500" size={14} />}
-									{images && images.length > 0 && <ImagesIcon className="text-sm text-gray-500" size={14} />}
+									{attachments && attachments.length > 0 && <Paperclip className="text-sm text-gray-500" size={14} />}
 									{taskDiscussions?.filter((d) => d.task_id === id).length > 0 && (
 										<MessageSquareMore className="text-sm text-gray-500" size={14} />
 									)}
