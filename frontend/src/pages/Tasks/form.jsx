@@ -326,13 +326,18 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 
 					const maxPosition = tasksInNewColumn.length ? Math.max(...tasksInNewColumn.map((t) => t.position || 0)) : 0;
 
-					parsedForm.position = maxPosition + 1;
+					// parsedForm.position = maxPosition + 1;
+					formDataToSend.append("position", maxPosition + 1);
 				} else {
 					// Keep current position if column didn't change
-					parsedForm.position = updateData.position;
+					// parsedForm.position = updateData.position;
+					formDataToSend.append("position", updateData.position);
 				}
-
-				await axiosClient.put(API().task(updateData?.id), parsedForm);
+				console.log(formDataToSend);
+				// await axiosClient.put(API().task(updateData?.id), parsedForm);
+				await axiosClient.post(API().task(updateData.id) + "?_method=PUT", formDataToSend, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
 				// cannot update stores, need to update parent task
 				fetchTasks();
 				showToast("Success!", "Task updated.", 3000);
