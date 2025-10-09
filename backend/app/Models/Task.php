@@ -230,7 +230,7 @@ class Task extends Model
     // TODO: update attachments
     public function updateTask($request, $task, $userData)
     {
-        if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
+        if ($task->organization_id !== $userData->organization_id || intval($request->organization_id) !== $userData->organization_id) {
             return null;
         }
 
@@ -273,7 +273,7 @@ class Task extends Model
             }
             // Update attachment record
             if (isset($validated['attachments'])) {
-                $task->addAttachments($validated->file('attachments'));
+                $task->addAttachments($validated['attachments'], $userData->organization_id);
             }
 
             // Build task history changes
