@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\v1\KanbanColumnController;
 use App\Http\Controllers\Api\v1\OrganizationController;
 use App\Http\Controllers\Api\v1\ProjectController;
 use App\Http\Controllers\Api\v1\RelationCheckerController;
+use App\Http\Controllers\Api\v1\TaskAttachmentController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskDiscussionController;
 use App\Http\Controllers\Api\v1\TaskHistoryController;
@@ -50,6 +51,7 @@ Route::prefix('v1')->group(function () {
         /* ---------------------------------- OTHER --------------------------------- */
         Route::patch('/tasks/bulk-update', [TaskController::class, 'bulkUpdate']);
         Route::delete('/tasks/bulk-delete', [TaskController::class, 'bulkDelete']);
+        Route::delete('/tasks/attachments/{id}', [TaskAttachmentController::class, 'destroy']);
         // Route::post('/task-images', [TaskImageController::class, 'store']);
         // Route::delete('/task-images/{taskImage}', [TaskImageController::class, 'destroy']);
         Route::patch('/kanban-column/{kanban_column}', [KanbanColumnController::class, 'update']);
