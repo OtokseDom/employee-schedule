@@ -27,6 +27,7 @@ import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useUserStore } from "@/store/user/userStore";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import ImageUpload from "@/components/ui/image-upload";
+import TaskAttachments from "@/components/task/Attachment";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -220,76 +221,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 		}
 	}, [updateData, form, projects, users, categories]);
 
-	// Image drop/paste handler in rich text
-	// const handleImageDropFromEditor = async (files) => {
-	// 	if (!files || files.length === 0) return;
-
-	// 	// Validate file types
-	// 	const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-	// 	const invalidFiles = files.filter((file) => !validTypes.includes(file.type));
-
-	// 	if (invalidFiles.length > 0) {
-	// 		showToast("Error", "Only image files (JPEG, PNG, GIF, WebP) are allowed", 3000, "fail");
-	// 		return;
-	// 	}
-
-	// 	// Check file limit
-	// 	if (taskImages.length + files.length > 10) {
-	// 		showToast("Error", "Maximum 10 images allowed", 3000, "fail");
-	// 		return;
-	// 	}
-
-	// 	// Check file sizes (5MB limit per file)
-	// 	const maxSize = 5 * 1024 * 1024;
-	// 	const oversizedFiles = files.filter((file) => file.size > maxSize);
-
-	// 	if (oversizedFiles.length > 0) {
-	// 		showToast("Error", "Each image must be smaller than 5MB", 3000, "fail");
-	// 		return;
-	// 	}
-
-	// 	if (!updateData?.id) {
-	// 		// No taskId yet - store as temporary images
-	// 		const tempImages = files.map((file) => ({
-	// 			id: `temp-${Date.now()}-${Math.random()}`,
-	// 			file,
-	// 			url: URL.createObjectURL(file),
-	// 			original_name: file.name,
-	// 			isTemp: true,
-	// 		}));
-
-	// 		const newImages = [...taskImages, ...tempImages];
-	// 		setTaskImages(newImages);
-	// 		showToast("Success", `${files.length} image(s) added (will upload when task is saved)`, 3000);
-	// 		return;
-	// 	}
-
-	// 	// Task exists - upload immediately
-	// 	setLoading(true);
-	// 	try {
-	// 		const formData = new FormData();
-	// 		formData.append("task_id", updateData.id);
-	// 		files.forEach((file) => {
-	// 			formData.append("images[]", file);
-	// 		});
-
-	// 		const response = await axiosClient.post(API().task_upload_image(), formData, {
-	// 			headers: { "Content-Type": "multipart/form-data" },
-	// 		});
-
-	// 		const uploadedImages = response.data.data;
-	// 		const newImages = [...taskImages, ...uploadedImages];
-	// 		setTaskImages(newImages);
-
-	// 		showToast("Success", `${files.length} image(s) uploaded successfully`, 3000);
-	// 	} catch (error) {
-	// 		console.error("Upload error:", error);
-	// 		showToast("Error", error.response?.data?.message || "Failed to upload images", 3000, "fail");
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
-
 	const handleSubmit = async (formData) => {
 		setLoading(true);
 		try {
@@ -345,7 +276,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					formDataToSend.append("attachments[]", file);
 				});
 			}
-			console.log(formDataToSend);
 			if (Object.keys(updateData).length === 0 || updateData?.calendar_add || updateData?.kanban_add) {
 				// ADD
 
@@ -359,26 +289,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				const taskResponse = await axiosClient.post(API().task(), formDataToSend, {
 					headers: { "Content-Type": "multipart/form-data" },
 				});
-				// Upload any temporary images to the newly created task
-				// if (taskImages.length > 0) {
-				// 	const tempImages = taskImages.filter((img) => img.isTemp);
-				// 	if (tempImages.length > 0) {
-				// 		const formData = new FormData();
-				// 		formData.append("task_id", taskResponse.data.data.task.id);
-				// 		tempImages.forEach((img) => {
-				// 			formData.append("images[]", img.file);
-				// 		});
 
-				// 		try {
-				// 			await axiosClient.post(API().task_upload_image(), formData, {
-				// 				headers: { "Content-Type": "multipart/form-data" },
-				// 			});
-				// 		} catch (error) {
-				// 			console.error("Failed to upload images:", error);
-				// 			showToast("Warning", "Task created but some images failed to upload.", 3000, "warning");
-				// 		}
-				// 	}
-				// }
 				fetchTasks();
 				showToast("Success!", "Task added.", 3000);
 				// if add subtask, don't close sheet
@@ -846,80 +757,12 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					className="cursor-pointer bg-secondary text-foreground"
 				/>
 				{/* Display existing attachments from database */}
-				{existingAttachments.length > 0 && (
-					<div className="flex flex-wrap gap-2 mt-2">
-						<span className="text-sm text-muted-foreground w-full">Existing Attachments:</span>
-						{existingAttachments.map((att) => {
-							const isImage = att.original_name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-							const extension = att.original_name.split(".").pop().toUpperCase();
-							return (
-								<div key={att.id} className="overflow-hidden">
-									{isImage ? (
-										<Dialog>
-											<DialogTrigger asChild>
-												<img
-													src={att.file_url}
-													alt={att.original_name}
-													className="rounded border w-32 h-24 object-cover hover:cursor-pointer"
-												/>
-											</DialogTrigger>
-											<DialogContent className="max-w-4xl">
-												<DialogHeader>
-													<DialogTitle>{att.original_name}</DialogTitle>
-													<DialogDescription className="sr-only">View attachment</DialogDescription>
-												</DialogHeader>
-												<div className="flex justify-center">
-													<img src={att.file_url} alt={att.original_name} className="max-w-full max-h-[70vh] object-contain" />
-												</div>
-											</DialogContent>
-										</Dialog>
-									) : (
-										<div className="flex items-center gap-2 group hover:cursor-pointer">
-											<a
-												href={att.file_url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center justify-center min-w-16 aspect-square rounded-md border bg-secondary text-sm font-semibold text-foreground"
-											>
-												{extension}
-											</a>
-											<span className="font-semibold text-muted-foreground group-hover:text-foreground">{att.original_name}</span>
-										</div>
-									)}
-								</div>
-							);
-						})}
-					</div>
-				)}
-
-				{/* Display newly selected files (before upload) */}
-				{attachments.length > 0 && (
-					<div className="flex flex-wrap gap-2 mt-2">
-						<span className="text-sm text-muted-foreground w-full">Files to upload:</span>
-						{attachments.map((file, idx) => (
-							<div key={idx} className="flex items-center gap-2 p-2 bg-secondary rounded">
-								<span className="text-sm">{file.name}</span>
-								<button
-									type="button"
-									onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
-									className="text-destructive hover:text-destructive/80"
-								>
-									✕
-								</button>
-							</div>
-						))}
-					</div>
-				)}
-				{/* <div className="space-y-2">
-					<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Images</label>
-					<ImageUpload
-						taskId={updateData?.id} // Pass the task ID if editing, undefined if creating
-						initialImages={taskImages || []} // Pass existing images if editing
-						onChange={setTaskImages}
-						disabled={!isEditable}
-						maxFiles={10}
-					/>
-				</div> */}
+				<TaskAttachments
+					existingAttachments={existingAttachments}
+					setExistingAttachments={setExistingAttachments}
+					attachments={attachments}
+					setAttachments={setAttachments}
+				/>
 				{showMore || updateData.calendar_add ? (
 					<>
 						<div className="flex flex-col gap-4 bg-secondary p-4 rounded-lg">
