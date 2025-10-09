@@ -60,10 +60,15 @@ class Task extends Model
             ->withTimestamps();
     }
 
-    // Relationship with Task Images
-    public function images()
+    // Relationship with Task Attachments
+    public function attachments()
     {
-        return $this->hasMany(TaskImage::class);
+        return $this->hasMany(TaskAttachment::class);
+    }
+
+    public function discussions()
+    {
+        return $this->hasMany(TaskDiscussion::class);
     }
 
     // Relationship with Project
@@ -114,7 +119,8 @@ class Task extends Model
             // 'assignee:id,name,email,role,position',
             'assignees:id,name,email,role,position',
             'category',
-            'images',
+            'discussions',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -125,7 +131,8 @@ class Task extends Model
                         'assignees:id,name,email,role,position',
                         'project:id,title',
                         'category',
-                        'images'
+                        'discussions',
+                        'attachments'
                     ]);
             },
         ])
@@ -135,7 +142,7 @@ class Task extends Model
 
     public function storeTask($request, $userData)
     {
-        if ($request->organization_id !== $userData->organization_id) {
+        if (intval($request->organization_id) !== $userData->organization_id) {
             return "not found";
         }
 
@@ -145,13 +152,17 @@ class Task extends Model
         if ($request->has('assignees')) {
             $task->assignees()->attach($request->input('assignees'));
         }
+        if ($request->hasFile('attachments')) {
+            $task->addAttachments($request->file('attachments'), $userData->organization_id);
+        }
 
         $task->load([
             'status:id,name,color',
             'assignees:id,name,email,role,position',
             // 'assignee:id,name,email',
             'category',
-            'images',
+            'discussions',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -162,7 +173,8 @@ class Task extends Model
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category',
-                        'images'
+                        'discussions',
+                        'attachments'
                     ]);
             },
         ]);
@@ -190,7 +202,8 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
-            'images',
+            'discussions',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -201,7 +214,8 @@ class Task extends Model
                         // 'assignee:id,name,email,role,position',
                         'project:id,title',
                         'category',
-                        'images'
+                        'discussions',
+                        'attachments'
                     ]);
             },
         ])
@@ -215,7 +229,7 @@ class Task extends Model
 
     public function updateTask($request, $task, $userData)
     {
-        if ($task->organization_id !== $userData->organization_id || $request->organization_id !== $userData->organization_id) {
+        if ($task->organization_id !== $userData->organization_id || intval($request->organization_id) !== $userData->organization_id) {
             return null;
         }
 
@@ -255,6 +269,10 @@ class Task extends Model
             // Sync assignees if provided
             if (isset($validated['assignees'])) {
                 $task->assignees()->sync($validated['assignees']);
+            }
+            // Update attachment record
+            if (isset($validated['attachments'])) {
+                $task->addAttachments($validated['attachments'], $userData->organization_id);
             }
 
             // Build task history changes
@@ -316,7 +334,8 @@ class Task extends Model
             'assignees:id,name,email,role,position',
             'status:id,name,color',
             'category',
-            'images',
+            'discussions',
+            'attachments',
             'project:id,title',
             'parent:id,title',
             'children' => function ($query) {
@@ -325,7 +344,8 @@ class Task extends Model
                     'assignees:id,name,email,role,position',
                     'project:id,title',
                     'category',
-                    'images'
+                    'discussions',
+                    'attachments'
                 ]);
             },
         ]);
@@ -357,15 +377,35 @@ class Task extends Model
                 $groups[$t->project_id][$t->status_id][] = $t->position;
             }
 
-            // 4️⃣ Delete all images on disk
+            // 4️⃣ Delete all attachments on disk
             foreach ($allTasks as $task) {
-                foreach ($task->images as $image) {
-                    if (Storage::disk('public')->exists($image->filename)) {
-                        Storage::disk('public')->delete($image->filename);
+                foreach ($task->attachments as $attachment) {
+                    if (Storage::disk('public')->exists($attachment->file_path)) {
+                        Storage::disk('public')->delete($attachment->file_path);
                     }
                 }
             }
 
+            // 🧩 4.1️⃣ Delete all discussions & attachments for these tasks
+            foreach ($allTasks as $task) {
+                foreach ($task->discussions as $discussion) {
+                    // Delete attachments (file + db)
+                    foreach ($discussion->attachments as $attachment) {
+                        if (Storage::disk('public')->exists($attachment->file_path)) {
+                            Storage::disk('public')->delete($attachment->file_path);
+                        }
+                    }
+
+                    // Delete replies' attachments too (if you have threaded discussions)
+                    foreach ($discussion->replies as $reply) {
+                        foreach ($reply->attachments as $attachment) {
+                            if (Storage::disk('public')->exists($attachment->file_path)) {
+                                Storage::disk('public')->delete($attachment->file_path);
+                            }
+                        }
+                    }
+                }
+            }
 
             // 5️⃣ Delete all tasks in one query
             $idsToDelete = $allTasks->pluck('id')->toArray();
@@ -499,7 +539,8 @@ class Task extends Model
                 // 'assignee:id,name,email,role,position',
                 'assignees:id,name,email,role,position',
                 'category',
-                'images',
+                'discussions',
+                'attachments',
                 'project:id,title',
                 'parent:id,title',
                 'children' => function ($query) {
@@ -510,7 +551,8 @@ class Task extends Model
                             'assignees:id,name,email,role,position',
                             'project:id,title',
                             'category',
-                            'images'
+                            'discussions',
+                            'attachments'
                         ]);
                 },
             ])
@@ -633,7 +675,8 @@ class Task extends Model
                 'project:id,title',
                 'parent:id,title',
                 'children',
-                'images'
+                'discussions',
+                'attachments'
             ])->get();
     }
 
@@ -655,16 +698,37 @@ class Task extends Model
 
             $allTasksToDelete = $allTasksToDelete->unique('id');
 
-            // Delete all images on disk
+            // Delete all attachments on disk
             foreach ($allTasksToDelete as $task) {
-                foreach ($task->images as $image) {
-                    if (Storage::disk('public')->exists($image->filename)) {
-                        Storage::disk('public')->delete($image->filename);
+                foreach ($task->attachments as $attachment) {
+                    if (Storage::disk('public')->exists($attachment->file_path)) {
+                        Storage::disk('public')->delete($attachment->file_path);
                     }
                 }
             }
 
-            // Delete all tasks (DB cascade handles task_images records)
+            // Delete all task discussion attachments from disk (DB will cascade)
+            foreach ($allTasksToDelete as $task) {
+                foreach ($task->discussions as $discussion) {
+                    // Discussion attachments
+                    foreach ($discussion->attachments as $attachment) {
+                        if (Storage::disk('public')->exists($attachment->file_path)) {
+                            Storage::disk('public')->delete($attachment->file_path);
+                        }
+                    }
+
+                    // Reply attachments (if threaded)
+                    foreach ($discussion->replies as $reply) {
+                        foreach ($reply->attachments as $attachment) {
+                            if (Storage::disk('public')->exists($attachment->file_path)) {
+                                Storage::disk('public')->delete($attachment->file_path);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Delete all tasks (DB cascade handles task_attachments records)
             $idsToDelete = $allTasksToDelete->pluck('id')->toArray();
             self::whereIn('id', $idsToDelete)->delete();
 
@@ -691,5 +755,24 @@ class Task extends Model
 
             return true;
         });
+    }
+
+    // Add attachments helper
+    public function addAttachments(array $files, $organization_id)
+    {
+        if (!$organization_id) {
+            return apiResponse(null, 'Organization not found', false, 404);
+        }
+
+        foreach ($files as $file) {
+            $path = $file->store("task_attachments/{$organization_id}", 'public');
+
+            $this->attachments()->create([
+                'file_path'     => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'file_type'     => $file->getClientMimeType(),
+                'file_size'     => $file->getSize(),
+            ]);
+        }
     }
 }

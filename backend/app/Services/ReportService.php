@@ -19,7 +19,7 @@ class ReportService
     protected Category $category;
     protected User $user;
     protected $organization_id;
-
+    // TODO: Tasks completed this week, completed today, comparison on previous
     /* -------------------------------------------------------------------------- */
     /*                                   HELPERS                                  */
     /* -------------------------------------------------------------------------- */

@@ -26,6 +26,7 @@ export const TaskDiscussions = ({ taskId }) => {
 	const [loading, setLoading] = useState(false);
 	const showToast = useToast();
 	// TODO: Update store on update
+	// TODO: Replies
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;

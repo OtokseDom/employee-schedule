@@ -7,7 +7,6 @@ import { useUsersStore } from "@/store/users/usersStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useCategoriesStore } from "@/store/categories/categoriesStore";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
-// TODO: Task discussion/comment section
 export default function Tasks() {
 	const { tasks, tasksLoaded, setRelations, setActiveTab } = useTasksStore();
 	const { users } = useUsersStore();

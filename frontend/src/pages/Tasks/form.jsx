@@ -3,6 +3,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +27,7 @@ import { useTaskHelpers } from "@/utils/taskHelpers";
 import { useUserStore } from "@/store/user/userStore";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import ImageUpload from "@/components/ui/image-upload";
+import TaskAttachments from "@/components/task/Attachment";
 
 const formSchema = z.object({
 	parent_id: z.number().optional(),
@@ -70,7 +72,9 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 	const parentTasks = () => {
 		return tasks.filter((task) => task.parent_id == null && task.id !== updateData?.id) || [];
 	};
-	const [taskImages, setTaskImages] = useState([]);
+	// const [taskImages, setTaskImages] = useState([]);
+	const [attachments, setAttachments] = useState([]);
+	const [existingAttachments, setExistingAttachments] = useState([]);
 
 	// State for time_estimate and delay hour/minute fields
 	const [timeEstimateHour, setTimeEstimateHour] = useState("");
@@ -208,85 +212,14 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				setDelayHour("");
 				setDelayMinute("");
 			}
-
-			// Load images
-			if (updateData.images && Array.isArray(updateData.images)) {
-				setTaskImages(updateData.images);
+			// Load attachments for existing tasks
+			if (updateData.attachments && Array.isArray(updateData.attachments)) {
+				setExistingAttachments(updateData.attachments);
 			} else {
-				setTaskImages([]); // Reset for new tasks
+				setExistingAttachments([]); // Reset for new tasks
 			}
 		}
 	}, [updateData, form, projects, users, categories]);
-
-	// Image drop/paste handler in rich text
-	const handleImageDropFromEditor = async (files) => {
-		if (!files || files.length === 0) return;
-
-		// Validate file types
-		const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-		const invalidFiles = files.filter((file) => !validTypes.includes(file.type));
-
-		if (invalidFiles.length > 0) {
-			showToast("Error", "Only image files (JPEG, PNG, GIF, WebP) are allowed", 3000, "fail");
-			return;
-		}
-
-		// Check file limit
-		if (taskImages.length + files.length > 10) {
-			showToast("Error", "Maximum 10 images allowed", 3000, "fail");
-			return;
-		}
-
-		// Check file sizes (5MB limit per file)
-		const maxSize = 5 * 1024 * 1024;
-		const oversizedFiles = files.filter((file) => file.size > maxSize);
-
-		if (oversizedFiles.length > 0) {
-			showToast("Error", "Each image must be smaller than 5MB", 3000, "fail");
-			return;
-		}
-
-		if (!updateData?.id) {
-			// No taskId yet - store as temporary images
-			const tempImages = files.map((file) => ({
-				id: `temp-${Date.now()}-${Math.random()}`,
-				file,
-				url: URL.createObjectURL(file),
-				original_name: file.name,
-				isTemp: true,
-			}));
-
-			const newImages = [...taskImages, ...tempImages];
-			setTaskImages(newImages);
-			showToast("Success", `${files.length} image(s) added (will upload when task is saved)`, 3000);
-			return;
-		}
-
-		// Task exists - upload immediately
-		setLoading(true);
-		try {
-			const formData = new FormData();
-			formData.append("task_id", updateData.id);
-			files.forEach((file) => {
-				formData.append("images[]", file);
-			});
-
-			const response = await axiosClient.post(API().task_upload_image(), formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			});
-
-			const uploadedImages = response.data.data;
-			const newImages = [...taskImages, ...uploadedImages];
-			setTaskImages(newImages);
-
-			showToast("Success", `${files.length} image(s) uploaded successfully`, 3000);
-		} catch (error) {
-			console.error("Upload error:", error);
-			showToast("Error", error.response?.data?.message || "Failed to upload images", 3000, "fail");
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	const handleSubmit = async (formData) => {
 		setLoading(true);
@@ -320,35 +253,43 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				delay: delayDecimal !== undefined ? Number(delayDecimal.toFixed(2)) : undefined,
 				performance_rating: formData.performance_rating ? parseInt(formData.performance_rating, 10) : null,
 			};
+
+			// Convert to FormData before sending
+			const formDataToSend = new FormData();
+			for (const [key, value] of Object.entries(parsedForm)) {
+				if (key === "attachments" && Array.isArray(value)) {
+					value.forEach((file) => formDataToSend.append("attachments[]", file));
+				} else if (value !== null && value !== undefined) {
+					formDataToSend.append(key, value);
+				}
+			}
+			// Append assignees array (important: Laravel needs it as assignees[])
+			if (selectedUsers && selectedUsers.length > 0) {
+				selectedUsers.forEach((userId) => {
+					formDataToSend.append("assignees[]", userId);
+				});
+			}
+
+			// ✅ Append attachment files
+			if (attachments.length > 0) {
+				attachments.forEach((file) => {
+					formDataToSend.append("attachments[]", file);
+				});
+			}
 			if (Object.keys(updateData).length === 0 || updateData?.calendar_add || updateData?.kanban_add) {
 				// ADD
 
 				// Calculate new position
 				const tasksInColumn = tasks.filter((t) => t.project_id === parsedForm.project_id && t.status_id === parsedForm.status_id);
 				const maxPosition = tasksInColumn.length ? Math.max(...tasksInColumn.map((t) => t.position || 0)) : 0;
-				parsedForm.position = maxPosition + 1;
+				// parsedForm.position = maxPosition + 1;
+				formDataToSend.append("position", maxPosition + 1);
 
-				const taskResponse = await axiosClient.post(API().task(), parsedForm);
-				// Upload any temporary images to the newly created task
-				if (taskImages.length > 0) {
-					const tempImages = taskImages.filter((img) => img.isTemp);
-					if (tempImages.length > 0) {
-						const formData = new FormData();
-						formData.append("task_id", taskResponse.data.data.task.id);
-						tempImages.forEach((img) => {
-							formData.append("images[]", img.file);
-						});
+				// const taskResponse = await axiosClient.post(API().task(), parsedForm);
+				const taskResponse = await axiosClient.post(API().task(), formDataToSend, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
 
-						try {
-							await axiosClient.post(API().task_upload_image(), formData, {
-								headers: { "Content-Type": "multipart/form-data" },
-							});
-						} catch (error) {
-							console.error("Failed to upload images:", error);
-							showToast("Warning", "Task created but some images failed to upload.", 3000, "warning");
-						}
-					}
-				}
 				fetchTasks();
 				showToast("Success!", "Task added.", 3000);
 				// if add subtask, don't close sheet
@@ -385,13 +326,18 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 
 					const maxPosition = tasksInNewColumn.length ? Math.max(...tasksInNewColumn.map((t) => t.position || 0)) : 0;
 
-					parsedForm.position = maxPosition + 1;
+					// parsedForm.position = maxPosition + 1;
+					formDataToSend.append("position", maxPosition + 1);
 				} else {
 					// Keep current position if column didn't change
-					parsedForm.position = updateData.position;
+					// parsedForm.position = updateData.position;
+					formDataToSend.append("position", updateData.position);
 				}
-
-				await axiosClient.put(API().task(updateData?.id), parsedForm);
+				console.log(formDataToSend);
+				// await axiosClient.put(API().task(updateData?.id), parsedForm);
+				await axiosClient.post(API().task(updateData.id) + "?_method=PUT", formDataToSend, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
 				// cannot update stores, need to update parent task
 				fetchTasks();
 				showToast("Success!", "Task updated.", 3000);
@@ -413,6 +359,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 		} finally {
 			setLoading(false);
 			fetchReports();
+			setAttachments([]);
 			if (user?.id && Array.isArray(formData.assignees) && formData.assignees.includes(user.id)) {
 				fetchUserReports(user.id);
 			}
@@ -798,22 +745,29 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 							<FormLabel>Description</FormLabel>
 							<FormControl>
 								{/* <RichTextEditor value={field.value || ""} onChange={field.onChange} /> */}
-								<RichTextEditor value={field.value || ""} onChange={field.onChange} onImageDrop={handleImageDropFromEditor} />
+								<RichTextEditor
+									value={field.value || ""}
+									onChange={field.onChange}
+									// onImageDrop={handleImageDropFromEditor}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
-				<div className="space-y-2">
-					<label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Images</label>
-					<ImageUpload
-						taskId={updateData?.id} // Pass the task ID if editing, undefined if creating
-						initialImages={taskImages || []} // Pass existing images if editing
-						onChange={setTaskImages}
-						disabled={!isEditable}
-						maxFiles={10}
-					/>
-				</div>
+				<Input
+					type="file"
+					multiple
+					onChange={(e) => setAttachments(Array.from(e.target.files))}
+					className="cursor-pointer bg-secondary text-foreground"
+				/>
+				{/* Display existing attachments from database */}
+				<TaskAttachments
+					existingAttachments={existingAttachments}
+					setExistingAttachments={setExistingAttachments}
+					attachments={attachments}
+					setAttachments={setAttachments}
+				/>
 				{showMore || updateData.calendar_add ? (
 					<>
 						<div className="flex flex-col gap-4 bg-secondary p-4 rounded-lg">

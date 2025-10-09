@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TaskImage extends Model
+class TaskAttachment extends Model
 {
     use HasFactory;
     protected $fillable = [
         'task_id',
-        'filename',
+        'file_path',
         'original_name',
-        'mime_type',
-        'size',
-        'url',
+        'file_type',
     ];
 
     public function task()

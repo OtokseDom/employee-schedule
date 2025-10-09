@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TaskImageResource extends JsonResource
+class TaskAttachmentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,11 +17,9 @@ class TaskImageResource extends JsonResource
         // return parent::toArray($request);
         return [
             'id'            => $this->id,
-            'task_id'       => $this->task_id,
-            'url'           => $this->url ?? asset('storage/' . $this->filename),
+            'file_url'      => url('storage/' . $this->file_path),
             'original_name' => $this->original_name,
-            'mime_type'     => $this->mime_type,
-            'size'          => $this->size,
+            'file_type'     => $this->file_type,
             'created_at'    => $this->created_at,
         ];
     }
