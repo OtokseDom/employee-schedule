@@ -227,7 +227,6 @@ class Task extends Model
         return new TaskResource($task);
     }
 
-    // TODO: update attachments
     public function updateTask($request, $task, $userData)
     {
         if ($task->organization_id !== $userData->organization_id || intval($request->organization_id) !== $userData->organization_id) {
