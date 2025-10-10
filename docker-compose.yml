@@ -22,7 +22,7 @@ services:
             APP_ENV: production
             APP_DEBUG: false
             APP_TIMEZONE: Asia/Dubai
-            APP_URL: http://otokse_service.lidta.com
+            APP_URL: https://otokse_service.lidta.com
             DB_CONNECTION: mysql
             DB_HOST: db
             DB_PORT: 3306
@@ -44,7 +44,7 @@ services:
         expose:
             - "3000"
         environment:
-            REACT_APP_API_URL: http://otokse_service.lidta.com/api
+            REACT_APP_API_URL: https://otokse_service.lidta.com/api
         depends_on:
             - backend
         volumes:
