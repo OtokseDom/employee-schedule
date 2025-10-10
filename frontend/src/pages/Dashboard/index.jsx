@@ -21,6 +21,9 @@ import { useDashboardStore } from "@/store/dashboard/dashboardStore";
 import { useProjectsStore } from "@/store/projects/projectsStore";
 import { useTaskHelpers } from "@/utils/taskHelpers";
 import { ChartBarLabel } from "@/components/chart/bar-chart-label";
+
+// TODO: Export report with filter
+// TODO: Notification
 export default function UserProfile() {
 	const { loading, setLoading } = useLoadContext();
 	const { users } = useUsersStore();
