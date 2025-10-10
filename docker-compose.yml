@@ -1,56 +1,60 @@
-version: "3.9"
+version: "3.8"
 
 services:
-    db:
-        image: mysql:8
-        container_name: otokse_mysql_db
+    mysql:
+        image: mysql:8.0
+        container_name: otokse_mysql
         restart: unless-stopped
         environment:
-            MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: v2
-            MYSQL_USER: root
-            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
         volumes:
-            - db_data:/var/lib/mysql
+            - mysql_data:/var/lib/mysql
+        networks:
+            - otokse_network
 
     backend:
-        build: ./backend
-        container_name: otokse_laravel_app
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: otokse_backend
         restart: unless-stopped
-        expose:
-            - "80" # expose only internal port for reverse proxy
         environment:
-            APP_NAME: Laravel
-            APP_ENV: production
-            APP_DEBUG: false
-            APP_TIMEZONE: Asia/Dubai
-            APP_URL: https://otokse_service.lidta.com
-            DB_CONNECTION: mysql
-            DB_HOST: db
-            DB_PORT: 3306
-            DB_DATABASE: v2
-            DB_USERNAME: root
-            DB_PASSWORD: root
-            SESSION_DRIVER: database
-            CACHE_STORE: database
-            QUEUE_CONNECTION: database
+            - APP_ENV=production
+            - APP_DEBUG=false
+            - APP_URL=https://otokse_service.lidta.com
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=v2
+            - DB_USERNAME=root
+            - DB_PASSWORD=root
         depends_on:
-            - db
-        volumes:
-            - ./backend:/var/www/html
+            - mysql
+        networks:
+            - otokse_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.backend.rule=Host(`otokse_service.lidta.com`)"
+            - "traefik.http.services.backend.loadbalancer.server.port=80"
 
     frontend:
-        build: ./frontend
-        container_name: otokse_react_app
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        container_name: otokse_frontend
         restart: unless-stopped
-        expose:
-            - "80" # internal port only, reverse proxy handles public access
-        environment:
-            REACT_APP_API_URL: https://otokse_service.lidta.com/api
         depends_on:
             - backend
-        volumes:
-            - ./frontend:/app
+        networks:
+            - otokse_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.frontend.rule=Host(`otokse.lidta.com`)"
+            - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 volumes:
-    db_data:
+    mysql_data:
+
+networks:
+    otokse_network:
+        driver: bridge

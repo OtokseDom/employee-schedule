@@ -1,29 +1,45 @@
-# Stage 1: PHP + Composer
-FROM php:8.2-fpm-alpine AS base
+FROM php:8.2-fpm
 
-RUN apk add --no-cache \
-    bash git unzip curl libzip-dev oniguruma-dev autoconf gcc g++ make mysql-client
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    nginx
 
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-WORKDIR /var/www/html
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY . .
+# Set working directory
+WORKDIR /var/www
 
+# Copy existing application directory
+COPY . /var/www
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Copy nginx config
+COPY docker/nginx.conf /etc/nginx/sites-available/default
 
-# Stage 2: Nginx
-FROM nginx:alpine AS production
-
-COPY --from=base /var/www/html /var/www/html
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+# Start script
+COPY docker/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+CMD ["/usr/local/bin/start.sh"]
