@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
     db:
         image: mysql:8
@@ -16,7 +18,7 @@ services:
         container_name: laravel_app
         restart: unless-stopped
         expose:
-            - "80" # expose to other containers or reverse proxy
+            - "80" # expose only internal port for reverse proxy
         environment:
             APP_NAME: Laravel
             APP_ENV: production
@@ -42,7 +44,7 @@ services:
         container_name: react_app
         restart: unless-stopped
         expose:
-            - "3000"
+            - "80" # internal port only, reverse proxy handles public access
         environment:
             REACT_APP_API_URL: https://otokse_service.lidta.com/api
         depends_on:
