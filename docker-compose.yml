@@ -3,7 +3,7 @@ version: "3.9"
 services:
     db:
         image: mysql:8
-        container_name: mysql_db
+        container_name: otokse_mysql_db
         restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: root
@@ -15,7 +15,7 @@ services:
 
     backend:
         build: ./backend
-        container_name: laravel_app
+        container_name: otokse_laravel_app
         restart: unless-stopped
         expose:
             - "80" # expose only internal port for reverse proxy
@@ -41,7 +41,7 @@ services:
 
     frontend:
         build: ./frontend
-        container_name: react_app
+        container_name: otokse_react_app
         restart: unless-stopped
         expose:
             - "80" # internal port only, reverse proxy handles public access
