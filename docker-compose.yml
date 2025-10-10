@@ -19,6 +19,8 @@ services:
             dockerfile: Dockerfile
         container_name: otokse_backend
         restart: unless-stopped
+        ports:
+            - "8001:80"
         environment:
             - APP_ENV=production
             - APP_DEBUG=false
@@ -32,10 +34,6 @@ services:
             - mysql
         networks:
             - otokse_network
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.backend.rule=Host(`otokse_service.lidta.com`)"
-            - "traefik.http.services.backend.loadbalancer.server.port=80"
 
     frontend:
         build:
@@ -43,14 +41,12 @@ services:
             dockerfile: Dockerfile
         container_name: otokse_frontend
         restart: unless-stopped
+        ports:
+            - "8002:80"
         depends_on:
             - backend
         networks:
             - otokse_network
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.frontend.rule=Host(`otokse.lidta.com`)"
-            - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 volumes:
     mysql_data:
