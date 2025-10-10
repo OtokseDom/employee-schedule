@@ -22,7 +22,7 @@ RUN chown -R www-data:www-data /var/www/html \
 FROM nginx:alpine AS production
 
 COPY --from=base /var/www/html /var/www/html
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
