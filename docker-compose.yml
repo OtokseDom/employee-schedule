@@ -20,7 +20,7 @@ services:
         container_name: laravel_app
         restart: unless-stopped
         ports:
-            - "8080:80"
+            - "8089:80"
         env_file:
             - ./backend/.env.production
         depends_on:
