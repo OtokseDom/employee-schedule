@@ -26,6 +26,7 @@ export const TaskDiscussions = ({ taskId }) => {
 	const [loading, setLoading] = useState(false);
 	const showToast = useToast();
 	// TODO: Update store on update
+	// TODO: Edit comments
 	// TODO: Replies
 	const handleSubmit = async (e) => {
 		e.preventDefault();
