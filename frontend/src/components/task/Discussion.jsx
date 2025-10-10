@@ -28,6 +28,7 @@ export const TaskDiscussions = ({ taskId }) => {
 	// TODO: Update store on update
 	// TODO: Edit comments
 	// TODO: Replies
+	// TODO: Mention users
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!newContent.trim()) return;
