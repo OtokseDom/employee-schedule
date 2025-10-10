@@ -1,21 +1,29 @@
-FROM richarvey/nginx-php-fpm:latest
+# Stage 1: PHP + Composer
+FROM php:8.2-fpm-alpine AS base
+
+RUN apk add --no-cache \
+    bash git unzip curl libzip-dev oniguruma-dev autoconf gcc g++ make mysql-client
+
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
 
 COPY . .
 
-# Image config
-ENV SKIP_COMPOSER=1
-ENV WEBROOT=/var/www/html/public
-ENV PHP_ERRORS_STDERR=1
-ENV RUN_SCRIPTS=1
-ENV REAL_IP_HEADER=1
+RUN composer install --no-dev --optimize-autoloader
 
-# Laravel config
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV LOG_CHANNEL=stderr
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
+# Stage 2: Nginx
+FROM nginx:alpine AS production
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER=1
+COPY --from=base /var/www/html /var/www/html
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
-CMD ["/start.sh"]
+EXPOSE 80
+
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

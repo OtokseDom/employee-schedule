@@ -19,29 +19,21 @@ services:
         build: ./backend
         container_name: laravel_app
         restart: unless-stopped
-        env_file: ./backend/.env.production
+        ports:
+            - "8080:80"
+        env_file:
+            - ./backend/.env.production
         depends_on:
             - db
         volumes:
             - ./backend:/var/www/html
-
-    nginx:
-        image: nginx:stable-alpine
-        container_name: laravel_nginx
-        restart: unless-stopped
-        ports:
-            - "8080:80"
-        volumes:
-            - ./nginx/laravel.conf:/etc/nginx/conf.d/default.conf
-        depends_on:
-            - backend
 
     frontend:
         build: ./frontend
         container_name: react_app
         restart: unless-stopped
         ports:
-            - "3000:80" # host port 3000 maps to container nginx port 80
+            - "3000:80"
         depends_on:
             - backend
 
