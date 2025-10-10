@@ -41,11 +41,9 @@ services:
         container_name: react_app
         restart: unless-stopped
         ports:
-            - "3000:80"
-        environment:
-            REACT_APP_API_URL: http://142.44.139.217:8080/api
+            - "3000:80" # host port 3000 maps to container nginx port 80
         depends_on:
-            - nginx
+            - backend
 
 volumes:
     db_data:
