@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosClient = axios.create({
 	// where port is running via .env
-	baseURL: `${import.meta.env.VITE_API_BASE_URL}`,
+	baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
 });
 
 // interceptors executed before request is sent or after response is received
