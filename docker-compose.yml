@@ -11,7 +11,7 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         networks:
-            - otokse_network
+            - shared_backend
 
     backend:
         build:
@@ -33,7 +33,7 @@ services:
         depends_on:
             - mysql
         networks:
-            - otokse_network
+            - shared_backend
 
     frontend:
         build:
@@ -46,11 +46,11 @@ services:
         depends_on:
             - backend
         networks:
-            - otokse_network
+            - shared_backend
 
 volumes:
     mysql_data:
 
 networks:
-    otokse_network:
-        driver: bridge
+    shared_backend:
+        network: true
