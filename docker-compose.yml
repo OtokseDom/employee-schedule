@@ -25,7 +25,7 @@ services:
             - APP_ENV=production
             - APP_DEBUG=false
             - APP_URL=https://otokse_service.lidta.com
-            - DB_HOST=mysql
+            - DB_HOST=otokse_mysql
             - DB_PORT=3306
             - DB_DATABASE=v2
             - DB_USERNAME=root
