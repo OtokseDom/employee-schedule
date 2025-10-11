@@ -78,11 +78,15 @@ export default function Login() {
 		<div className="inset-0 flex items-center justify-center min-h-screen overflow-hidden">
 			<div className="flex flex-col text-center mb-8 gap-10">
 				<h1 className={`text-3xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>Access my website at</h1>
-				<a href="https://otokse.lidta.com">
-					<Button size="lg" className="text-2xl">
-						otokse.lidta.com ↗️
-					</Button>
-				</a>
+				<Button
+					size="lg"
+					className="text-2xl"
+					onClick={() => {
+						window.open("https://otokse.lidta.com", "_blank");
+					}}
+				>
+					otokse.lidta.com ↗️
+				</Button>
 				<p className="text-lg">for Faster and Improved user experience 😁</p>
 			</div>
 		</div>
