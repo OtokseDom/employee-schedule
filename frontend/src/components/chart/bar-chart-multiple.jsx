@@ -63,7 +63,7 @@ export function ChartBarMultiple({ report, variant, type }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
 					) : report?.data_count == 0 ? (
-						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
+						<div className="flex items-center justify-center fw-full h-full text-lg text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart accessibilityLayer data={report?.chart_data}>
 							<CartesianGrid vertical={false} />

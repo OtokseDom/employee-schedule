@@ -193,7 +193,7 @@ export default function UserProfile() {
 				{reports?.performance_leaderboard?.data_count ? (
 					<DataTable columns={columns} data={reports?.performance_leaderboard?.chart_data} />
 				) : (
-					<div className="flex items-center justify-center fw-full h-fit text-3xl text-gray-500">No Tasks Yet</div>
+					<div className="flex items-center justify-center fw-full h-full max-h-44 text-lg text-gray-500">No Tasks Yet</div>
 				)}
 			</div>
 		</div>
