@@ -125,6 +125,7 @@ export default function Week({ getWeekDays, getTimeSlots, weekstart_date: weekSt
 													const duration = endHour - startHour + (endMin - startMin) / 60;
 													return (
 														<div
+															title={task.title}
 															key={task.id}
 															onClick={() => {
 																//set update data when a task is clicked

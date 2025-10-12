@@ -97,6 +97,7 @@ export default function Month({ days, currentMonth, getTaskForDate }) {
 										<div className="mt-1 space-y-1 overflow-y-auto max-h-20">
 											{(dayTasks || []).slice(0, 3).map((task) => (
 												<div
+													title={task.title}
 													key={task.id}
 													onClick={(e) => {
 														//set update tasks when a task is clicked
