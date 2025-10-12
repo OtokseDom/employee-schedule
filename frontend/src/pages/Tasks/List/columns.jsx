@@ -3,6 +3,7 @@ import {
 	ArrowUpDown,
 	Copy,
 	CornerDownRight,
+	Eye,
 	FileCheck,
 	FileQuestion,
 	FileQuestionIcon,
@@ -426,114 +427,121 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 					const task = row.original;
 					const selectedCount = table.getSelectedRowModel().rows.length;
 					return (
-						<DropdownMenu modal={false}>
-							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
-									<span className="sr-only">Open menu</span>
-									<MoreHorizontal className="h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem
-									className="cursor-pointer"
-									onClick={(e) => {
-										e.stopPropagation();
-										handleUpdate(task);
-									}}
-								>
-									<View /> View and Update Task
-								</DropdownMenuItem>
-								{table.getFilteredSelectedRowModel().rows.length === 0 && (
-									<>
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												const clonedTask = {
-													...task,
-													id: undefined,
-													title: task.title + " (Clone)",
-													calendar_add: true,
-												};
-												setUpdateData(clonedTask);
-												setIsOpen(true);
-											}}
-										>
-											<Copy /> Clone Task
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
+						<div className="flex justify-center items-center">
+							<Button
+								variant="ghost"
+								title="View and update task"
+								className="h-8 w-8 p-0 cursor-pointer pointer-events-auto"
+								onClick={(e) => {
+									e.stopPropagation();
+									handleUpdate(task);
+								}}
+							>
+								<Eye size={16} />
+							</Button>
+							<Button
+								variant="ghost"
+								title="Clone task"
+								className="h-8 w-8 p-0 cursor-pointer pointer-events-auto"
+								onClick={(e) => {
+									e.stopPropagation();
+									const clonedTask = {
+										...task,
+										id: undefined,
+										title: task.title + " (Clone)",
+										calendar_add: true,
+									};
+									setUpdateData(clonedTask);
+									setIsOpen(true);
+								}}
+							>
+								<Copy size={16} />
+							</Button>
+							<DropdownMenu modal={false}>
+								<DropdownMenuTrigger asChild>
+									<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+										<span className="sr-only">Open menu</span>
+										<MoreHorizontal className="h-4 w-4" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									{table.getFilteredSelectedRowModel().rows.length === 0 && (
+										<>
+											<DropdownMenuItem
+												className="cursor-pointer"
+												onClick={(e) => {
+													e.stopPropagation();
+													let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+													if (selected.length === 0) selected = [row.original];
 
-												setSelectedTasks(selected);
-												setBulkAction("status");
-											}}
-										>
-											<FileCheck /> Update Status
-										</DropdownMenuItem>
+													setSelectedTasks(selected);
+													setBulkAction("status");
+												}}
+											>
+												<FileCheck /> Update Status
+											</DropdownMenuItem>
 
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
+											<DropdownMenuItem
+												className="cursor-pointer"
+												onClick={(e) => {
+													e.stopPropagation();
+													let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+													if (selected.length === 0) selected = [row.original];
 
-												setSelectedTasks(selected);
-												setBulkAction("assignees");
-											}}
-										>
-											<UserCheck2 /> Update Assignees
-										</DropdownMenuItem>
+													setSelectedTasks(selected);
+													setBulkAction("assignees");
+												}}
+											>
+												<UserCheck2 /> Update Assignees
+											</DropdownMenuItem>
 
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
+											<DropdownMenuItem
+												className="cursor-pointer"
+												onClick={(e) => {
+													e.stopPropagation();
+													let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+													if (selected.length === 0) selected = [row.original];
 
-												setSelectedTasks(selected);
-												setBulkAction("project");
-											}}
-										>
-											<FolderKanbanIcon /> Update Project
-										</DropdownMenuItem>
+													setSelectedTasks(selected);
+													setBulkAction("project");
+												}}
+											>
+												<FolderKanbanIcon /> Update Project
+											</DropdownMenuItem>
 
-										<DropdownMenuItem
-											className="cursor-pointer"
-											onClick={(e) => {
-												e.stopPropagation();
-												let selected = table.getSelectedRowModel().rows.map((r) => r.original);
-												if (selected.length === 0) selected = [row.original];
+											<DropdownMenuItem
+												className="cursor-pointer"
+												onClick={(e) => {
+													e.stopPropagation();
+													let selected = table.getSelectedRowModel().rows.map((r) => r.original);
+													if (selected.length === 0) selected = [row.original];
 
-												setSelectedTasks(selected);
-												setBulkAction("category");
-											}}
-										>
-											<FileQuestionIcon /> Update Category
-										</DropdownMenuItem>
-									</>
-								)}
-								<DropdownMenuItem
-									className="w-full text-left cursor-pointer"
-									onClick={(e) => {
-										e.stopPropagation();
-										const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);
-										if (selectedRows.length > 0) {
-											openDialog(selectedRows);
-										} else {
-											openDialog([task]);
-										}
-									}}
-								>
-									<Trash2Icon className="text-destructive" /> Delete Task
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+													setSelectedTasks(selected);
+													setBulkAction("category");
+												}}
+											>
+												<FileQuestionIcon /> Update Category
+											</DropdownMenuItem>
+										</>
+									)}
+									<hr />
+									<DropdownMenuItem
+										className="w-full text-left cursor-pointer"
+										onClick={(e) => {
+											e.stopPropagation();
+											const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);
+											if (selectedRows.length > 0) {
+												openDialog(selectedRows);
+											} else {
+												openDialog([task]);
+											}
+										}}
+									>
+										<Trash2Icon className="text-destructive" /> Delete Task
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
 					);
 				},
 			},
