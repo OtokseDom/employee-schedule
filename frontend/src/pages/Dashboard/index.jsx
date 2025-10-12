@@ -68,7 +68,7 @@ export default function UserProfile() {
 	};
 
 	return (
-		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-4 auto-rows-auto ">
+		<div className="w-screen container md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-4 auto-rows-auto ">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
 					isOpen ? "opacity-100" : "opacity-0"
