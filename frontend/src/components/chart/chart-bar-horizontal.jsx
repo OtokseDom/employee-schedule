@@ -54,7 +54,7 @@ export function ChartBarHorizontal({ report, variant }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
-					) : totalTasks == 0 ? (
+					) : report?.data_count == 0 ? (
 						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart
@@ -91,7 +91,7 @@ export function ChartBarHorizontal({ report, variant }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
-				) : totalTasks == 0 ? (
+				) : report?.data_count == 0 ? (
 					""
 				) : (
 					<>
@@ -103,7 +103,7 @@ export function ChartBarHorizontal({ report, variant }) {
 							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest?.user}</b> has the lowest task load of{" "}
 							<b> {report?.lowest?.task}</b> tasks
 						</div>
-						<div className="text-muted-foreground leading-none">Showing all {report?.count} users</div>
+						<div className="text-muted-foreground leading-none">Showing all {report?.data_count} users</div>
 					</>
 				)}
 			</CardFooter>

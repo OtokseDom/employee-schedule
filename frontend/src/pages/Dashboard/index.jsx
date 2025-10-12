@@ -190,7 +190,11 @@ export default function UserProfile() {
 							: ""}
 					</CardDescription>
 				</CardHeader>
-				<DataTable columns={columns} data={reports?.performance_leaderboard?.chart_data} />
+				{reports?.performance_leaderboard?.data_count ? (
+					<DataTable columns={columns} data={reports?.performance_leaderboard?.chart_data} />
+				) : (
+					<div className="flex items-center justify-center fw-full h-fit text-3xl text-gray-500">No Tasks Yet</div>
+				)}
 			</div>
 		</div>
 	);

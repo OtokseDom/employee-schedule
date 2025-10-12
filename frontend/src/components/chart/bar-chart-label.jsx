@@ -59,7 +59,7 @@ export function ChartBarLabel({ report, variant }) {
 							<Skeleton className=" w-full h-10 rounded-full" />
 						</div>
 					) : report?.data_count == 0 ? (
-						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Users Yet</div>
+						<div className="flex items-center justify-center fw-full h-full text-3xl text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart
 							accessibilityLayer
@@ -84,6 +84,8 @@ export function ChartBarLabel({ report, variant }) {
 						<Skeleton className=" w-full h-4 rounded-full" />
 						<Skeleton className=" w-full h-4 rounded-full" />
 					</div>
+				) : report?.data_count == 0 ? (
+					""
 				) : (
 					<>
 						<div className="leading-none font-medium">
