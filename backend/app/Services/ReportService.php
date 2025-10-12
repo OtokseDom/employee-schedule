@@ -285,6 +285,7 @@ class ReportService
     // Underrun vs Overruns based on date. Bar chart multiple
     public function estimateVsActualDate($id = null, $filter)
     {
+        $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
             ->leftJoin('task_assignees', function ($join) {
@@ -339,7 +340,7 @@ class ReportService
         $data = [
             'chart_data' => $chart_data,
             'runs' => $runs,
-            'data_count' => $userCount, //data_count is used by the chart
+            'data_count' => $taskCount, //data_count is used by the chart
             'filters' => $filter
         ];
 
@@ -352,6 +353,7 @@ class ReportService
 
     public function delaysPerUser($id = null, $filter)
     {
+        $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
             ->leftJoin('task_assignees', function ($join) {
@@ -404,7 +406,7 @@ class ReportService
             // get row with highest and lowest delay including user name
             'highest_delay' => $chart_data->sortByDesc('delay')->first(),
             'lowest_delay' => $chart_data->sortBy('delay')->first(),
-            'data_count' => $userCount, //data_count is used by the chart
+            'data_count' => $taskCount,
             'filters' => $filter
         ];
 
@@ -621,6 +623,8 @@ class ReportService
     // Users activity load. Horizontal Bar chart
     public function usersTaskLoad($filter)
     {
+        $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
+
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
             ->leftJoin('task_assignees', function ($join) {
@@ -670,7 +674,7 @@ class ReportService
             'chart_data' => $chart_data,
             'highest' => $highest,
             'lowest' => $lowest,
-            'count' => $chart_data->count(),
+            'data_count' => $taskCount,
             'filters' => $filter
         ];
 
@@ -684,6 +688,7 @@ class ReportService
     // Leaderboards. Datatable
     public function performanceLeaderboard($filter)
     {
+        $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
         $query = $this->user
             ->leftJoin('task_assignees', function ($join) {
@@ -726,6 +731,7 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
+            'data_count' => $taskCount,
             'filters' => $filter
         ];
 
