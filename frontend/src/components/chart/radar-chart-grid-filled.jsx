@@ -17,7 +17,7 @@ const chartConfig = {
 export function RadarChartGridFilled({ report }) {
 	const { loading, setLoading } = useLoadContext();
 	return (
-		<Card className="flex flex-col relative h-full justify-between">
+		<Card className="flex flex-col relative h-full rounded-2xl justify-between">
 			<CardHeader className="items-center text-center pb-4">
 				<CardTitle>AVG Rating Per Category</CardTitle>
 				<CardDescription>Showing all categories</CardDescription>

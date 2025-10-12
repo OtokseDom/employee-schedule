@@ -19,8 +19,8 @@ const chartConfig = {
 export function ChartLineLabel({ report, variant }) {
 	const { loading, setLoading } = useLoadContext();
 	return (
-		<Card className={`flex flex-col relative h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
-			<CardHeader>
+		<Card className={`flex flex-col relative h-full justify-between rounded-2xl`}>
+			<CardHeader className="text-center">
 				<CardTitle>Performance Trends</CardTitle>
 				<CardDescription>
 					Performance Rating for{" "}

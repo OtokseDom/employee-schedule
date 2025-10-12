@@ -34,8 +34,8 @@ export function ChartBarHorizontal({ report, variant }) {
 		},
 	};
 	return (
-		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
-			<CardHeader>
+		<Card className={`flex flex-col relative w-full h-full justify-between rounded-2xl`}>
+			<CardHeader className="text-center">
 				<CardTitle>User Task Load</CardTitle>
 				<CardDescription>
 					{report?.filters?.from && report?.filters?.to

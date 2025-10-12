@@ -35,8 +35,8 @@ export function ChartBarMultiple({ report, variant, type }) {
 	}
 	const { loading } = useLoadContext();
 	return (
-		<Card className={`flex flex-col relative w-full h-full justify-between ${variant == "dashboard" ? "bg-primary-foreground rounded-md" : ""}`}>
-			<CardHeader className="">
+		<Card className={`flex flex-col relative w-full h-full justify-between rounded-2xl`}>
+			<CardHeader className="text-center">
 				<CardTitle>
 					{variant == "dashboard"
 						? type == "category"
