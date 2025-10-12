@@ -211,7 +211,7 @@ export function AppSidebar() {
 									<Link key={item.title} to={item.url} onClick={() => setCurrentPath(item.url)}>
 										<SidebarMenuItem key={item.title}>
 											<SidebarMenuButton isActive={currentPath === item.url || currentPath.startsWith(item.url + "/")} asChild>
-												<span>
+												<span title={item.title}>
 													<item.icon />
 													{item.title}
 												</span>
@@ -223,7 +223,7 @@ export function AppSidebar() {
 										<SidebarMenuItem>
 											<CollapsibleTrigger asChild>
 												<SidebarMenuButton isActive={currentPath === item.url || currentPath.startsWith(item.url + "/")} asChild>
-													<span className="flex flex-row justify-between">
+													<span title={item.title} className="flex flex-row justify-between">
 														<span className="flex items-center gap-2">
 															<item.icon size={16} />
 															{item.title}
