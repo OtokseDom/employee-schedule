@@ -9,12 +9,12 @@ export default function Relations({ setUpdateData, setParentId, setProjectId }) 
 	const { relations, setActiveTab, taskHistory, setSelectedTaskHistory } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
 	const subTasksCount = relations?.children?.length ?? 0;
-	const completedCount = relations?.children?.filter((child) => child.status === "Completed").length ?? 0;
 	const findStatus = (status_id) => {
 		const name = taskStatuses.find((status) => status.id === status_id)?.name || "Unknown";
 		const color = taskStatuses.find((status) => status.id === status_id)?.color || "gray";
 		return { name, color };
 	};
+	const completedCount = relations?.children?.filter((child) => findStatus(child.status_id).name === "Completed").length ?? 0;
 	const getSubtaskProgress = () => {
 		return completedCount + "/" + subTasksCount + " subtasks completed";
 	};

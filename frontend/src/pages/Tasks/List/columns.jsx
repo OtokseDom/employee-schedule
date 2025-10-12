@@ -3,18 +3,16 @@ import {
 	ArrowUpDown,
 	Copy,
 	CornerDownRight,
+	Edit,
 	Eye,
 	FileCheck,
-	FileQuestion,
 	FileQuestionIcon,
 	FolderKanbanIcon,
-	ImagesIcon,
 	MessageSquareMore,
 	Paperclip,
 	Text,
 	Trash2Icon,
 	UserCheck2,
-	View,
 } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -430,14 +428,14 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 						<div className="flex justify-center items-center">
 							<Button
 								variant="ghost"
-								title="View and update task"
+								title="Update task"
 								className="h-8 w-8 p-0 cursor-pointer pointer-events-auto"
 								onClick={(e) => {
 									e.stopPropagation();
 									handleUpdate(task);
 								}}
 							>
-								<Eye size={16} />
+								<Edit size={16} />
 							</Button>
 							<Button
 								variant="ghost"
