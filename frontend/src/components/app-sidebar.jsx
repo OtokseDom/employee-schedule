@@ -195,7 +195,7 @@ export function AppSidebar() {
 			<SidebarHeader>
 				<SidebarMenu>
 					<div className="flex justify-between cursor-pointer">
-						<img src={logo} className="overflow-hidden transition-all w-20" alt="logo" onClick={() => navigate("/")} />
+						<img title="Dashboard" src={logo} className="overflow-hidden transition-all w-20" alt="logo" onClick={() => navigate("/")} />
 						<SidebarTrigger className="hidden md:flex w-8 h-8" />
 					</div>
 				</SidebarMenu>
@@ -277,12 +277,12 @@ export function AppSidebar() {
 				<SidebarMenu>
 					<SidebarMenuItem>
 						{theme == "light" ? (
-							<SidebarMenuButton onClick={toggleDark}>
+							<SidebarMenuButton title="Toggle dark mode" onClick={toggleDark}>
 								<MoonStar size={16} />
 								<span className="ml-2">Dark Mode</span>
 							</SidebarMenuButton>
 						) : (
-							<SidebarMenuButton onClick={toggleDark}>
+							<SidebarMenuButton title="Toggle light mode" onClick={toggleDark}>
 								<Sun size={16} />
 								<span className="ml-2">Light Mode</span>
 							</SidebarMenuButton>
@@ -291,7 +291,7 @@ export function AppSidebar() {
 					<SidebarMenuItem>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<SidebarMenuButton>
+								<SidebarMenuButton title={`Profile | ${user?.data?.name}`}>
 									<User2 /> {user?.data?.name}
 									<ChevronUp className="ml-auto" />
 								</SidebarMenuButton>
@@ -304,6 +304,7 @@ export function AppSidebar() {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</SidebarMenuItem>
+					{/* Somehow needed for mobile */}
 					<SidebarMenuItem className="block md:hidden">
 						{theme == "light" ? (
 							<SidebarMenuButton onClick={toggleDark}>
