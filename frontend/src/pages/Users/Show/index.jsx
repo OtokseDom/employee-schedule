@@ -206,7 +206,7 @@ export default function UserProfile() {
 					/>
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col bg-card p-4 rounded-2xl lg:flex-row justify-between gap-4 w-full items-stretch">
+				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
 					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} />
 					<SectionCard variant="" description="Performance Rating (10)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} />
 					<SectionCard variant="" description="Time Efficiency" showBadge={false} value={`${userReports?.section_cards?.time_efficiency}%`} />
@@ -216,22 +216,22 @@ export default function UserProfile() {
 				</div>
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto shadow-md">
 						<PieChartDonut report={userReports?.tasks_by_status} />
 					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto shadow-md">
 						<AreaChartGradient report={userReports?.task_activity_timeline} />
 					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto shadow-md">
 						<RadarChartGridFilled report={userReports?.rating_per_category} />
 					</div>
 				</div>
 				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
 				<div className="flex flex-col lg:flex-row gap-4 w-full items-stretch">
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto shadow-md">
 						<ChartLineLabel report={userReports?.performance_rating_trend} />
 					</div>
-					<div className="w-full overflow-auto bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div className="w-full overflow-auto shadow-md">
 						<ChartBarMultiple report={userReports?.estimate_vs_actual} />
 					</div>
 				</div>
