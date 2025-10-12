@@ -68,7 +68,7 @@ export default function UserProfile() {
 	};
 
 	return (
-		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-auto bg-background rounded-2xl p-4 md:p-10 border border-border">
+		<div className="w-screen md:w-fit grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-4 auto-rows-auto ">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
 					isOpen ? "opacity-100" : "opacity-0"
@@ -165,8 +165,8 @@ export default function UserProfile() {
 			</div>
 
 			{/* Datatable */}
-			<div className="md:col-span-4 max-h-[600px] overflow-auto scrollbar-custom bg-primary-foreground text-card-foreground border border-border rounded-md container px-4 shadow-md">
-				<CardHeader>
+			<div className="md:col-span-4 max-h-[600px] overflow-auto scrollbar-custom bg-background text-card-foreground border border-border rounded-2xl container px-4 shadow-md">
+				<CardHeader className="text-center">
 					<CardTitle>
 						{reports?.performance_leaderboard?.filters?.from && reports?.performance_leaderboard?.filters?.to
 							? `${new Date(reports.performance_leaderboard.filters.from).toLocaleDateString("en-CA", {
@@ -179,7 +179,7 @@ export default function UserProfile() {
 									year: "numeric",
 							  })}`
 							: "All Time"}{" "}
-						Top Performers
+						Rating Leaderboard
 					</CardTitle>
 					<CardDescription>
 						Showing{" "}
