@@ -19,7 +19,7 @@ export function RadarChartGridFilled({ report }) {
 	return (
 		<Card className="flex flex-col relative h-full rounded-2xl justify-between">
 			<CardHeader className="items-center text-center pb-4">
-				<CardTitle>AVG Rating Per Category</CardTitle>
+				<CardTitle className="text-lg">AVG Rating Per Category</CardTitle>
 				<CardDescription>Showing all categories</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-0">

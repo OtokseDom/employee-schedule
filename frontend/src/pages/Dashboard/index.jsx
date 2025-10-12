@@ -167,7 +167,7 @@ export default function UserProfile() {
 			{/* Datatable */}
 			<div className="md:col-span-4 max-h-[600px] overflow-auto scrollbar-custom bg-background text-card-foreground border border-border rounded-2xl container px-4 shadow-md">
 				<CardHeader className="text-center">
-					<CardTitle>
+					<CardTitle className="text-lg">
 						{reports?.performance_leaderboard?.filters?.from && reports?.performance_leaderboard?.filters?.to
 							? `${new Date(reports.performance_leaderboard.filters.from).toLocaleDateString("en-CA", {
 									month: "short",

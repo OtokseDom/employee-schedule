@@ -36,7 +36,7 @@ export function ChartBarHorizontal({ report, variant }) {
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between rounded-2xl`}>
 			<CardHeader className="text-center">
-				<CardTitle>User Task Load</CardTitle>
+				<CardTitle className="text-lg">User Task Load</CardTitle>
 				<CardDescription>
 					{report?.filters?.from && report?.filters?.to
 						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(

@@ -239,7 +239,7 @@ export default function UserProfile() {
 				<div className="flex min-h-[500px] max-h-[700px] flex-col lg:flex-row justify-between gap-4 w-full">
 					<div className="w-full overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
 						<div>
-							<h1 className=" font-extrabold text-3xl">Tasks</h1>
+							<h1 className=" font-extrabold text-xl">Tasks</h1>
 							<p>
 								View list of all tasks
 								{userReports?.user_tasks?.filters?.from && userReports?.user_tasks?.filters?.to

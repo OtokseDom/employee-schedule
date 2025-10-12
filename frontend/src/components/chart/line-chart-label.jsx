@@ -21,7 +21,7 @@ export function ChartLineLabel({ report, variant }) {
 	return (
 		<Card className={`flex flex-col relative h-full justify-between rounded-2xl`}>
 			<CardHeader className="text-center">
-				<CardTitle>Performance Trends</CardTitle>
+				<CardTitle className="text-lg">Performance Trends</CardTitle>
 				<CardDescription>
 					Performance Rating for{" "}
 					{report?.filters?.from && report?.filters?.to

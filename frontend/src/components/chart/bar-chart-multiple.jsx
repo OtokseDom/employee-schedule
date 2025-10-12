@@ -37,7 +37,7 @@ export function ChartBarMultiple({ report, variant, type }) {
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between rounded-2xl`}>
 			<CardHeader className="text-center">
-				<CardTitle>
+				<CardTitle className="text-lg">
 					{variant == "dashboard"
 						? type == "category"
 							? "Time Overruns vs Underruns per Category"
