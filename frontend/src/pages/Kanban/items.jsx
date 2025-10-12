@@ -146,7 +146,7 @@ const Items = ({ item }) => {
 					</div>
 				</div>
 			</SheetTrigger>
-			<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
+			<SheetContent side="right" className="overflow-y-auto w-full sm:w-[640px]">
 				<SheetHeader>
 					<SheetTitle>
 						<Tabs loading={loading} updateData={updateData} activeTab={activeTab} setActiveTab={setActiveTab} parentId={parentId} />
