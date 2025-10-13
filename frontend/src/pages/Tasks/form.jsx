@@ -1195,7 +1195,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 									render={({ field }) => {
 										return (
 											<FormItem>
-												<FormLabel>Rating &#40;1-10&#41;</FormLabel>
+												<FormLabel>Rating &#40;1-5&#41;</FormLabel>
 												<FormControl>
 													<Input
 														disabled={!isEditable}
