@@ -814,7 +814,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 										return (
 											<FormItem className="w-full">
 												<FormLabel>
-													<div className="flex flex-row justify-between">
+													<div title="Auto calculate days estimate" className="flex flex-row justify-between">
 														<span>Days Estimate</span>
 														<Sparkles
 															size={16}
@@ -862,7 +862,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 										return (
 											<FormItem className="w-full">
 												<FormLabel>
-													<div className="flex flex-row justify-between">
+													<div title="Auto calculate days taken" className="flex flex-row justify-between">
 														<span>Days Taken</span>
 														<Sparkles
 															size={16}
@@ -893,7 +893,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 										return (
 											<FormItem className="w-full">
 												<FormLabel>
-													<div className="flex flex-row justify-between">
+													<div title="Auto calculate days delayed" className="flex flex-row justify-between">
 														<span>Days Delayed</span>
 														<Sparkles
 															size={16}
@@ -977,7 +977,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 									render={({ field }) => (
 										<FormItem className="w-full">
 											<FormLabel>
-												<div className="flex flex-row justify-between">
+												<div title="Auto calculate time estimate" className="flex flex-row justify-between">
 													<span>Time Estimate</span>
 													<Sparkles
 														size={16}
@@ -1065,7 +1065,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 									render={({ field }) => (
 										<FormItem className="w-full">
 											<FormLabel>
-												<div className="flex flex-row justify-between">
+												<div title="Auto calculate time taken" className="flex flex-row justify-between">
 													<span>Time Taken</span>
 													<Sparkles
 														size={16}
@@ -1121,7 +1121,7 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 								/>
 								<FormItem className="w-full">
 									<FormLabel>
-										<div className="flex flex-row justify-between">
+										<div title="Auto calculate time delay" className="flex flex-row justify-between">
 											<span>Time Delay</span>
 											<Sparkles
 												size={16}
