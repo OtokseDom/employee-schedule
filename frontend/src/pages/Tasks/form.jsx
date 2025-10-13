@@ -1201,9 +1201,9 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 														disabled={!isEditable}
 														type="number"
 														min={0}
-														max={10}
+														max={5}
 														step="any"
-														placeholder="Rating &#40;1-10&#41;"
+														placeholder="Rating &#40;1-5&#41;"
 														{...field}
 													/>
 												</FormControl>
