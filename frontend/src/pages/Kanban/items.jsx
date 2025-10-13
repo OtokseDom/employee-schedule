@@ -125,7 +125,9 @@ const Items = ({ item }) => {
 							<span className="flex flex-row items-center gap-x-1 text-sm text-muted-foreground">
 								<span
 									className={`flex items-center text-xs gap-x-1 p-1 rounded ${
-										endDate && isBeforeToday(endDate)
+										endDate && item.status.name === "Completed"
+											? "bg-green-300 text-black"
+											: endDate && isBeforeToday(endDate)
 											? "bg-red-300 text-black" // overdue
 											: endDate && isTodayOrTomorrow(endDate)
 											? "bg-yellow-700 text-black" // near due

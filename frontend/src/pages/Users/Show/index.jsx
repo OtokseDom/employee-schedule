@@ -208,7 +208,7 @@ export default function UserProfile() {
 				{/* ---------------------------- Task and Insight ---------------------------- */}
 				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
 					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} />
-					<SectionCard variant="" description="Performance Rating (10)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} />
+					<SectionCard variant="" description="Performance Rating (5)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} />
 					<SectionCard variant="" description="Time Efficiency" showBadge={false} value={`${userReports?.section_cards?.time_efficiency}%`} />
 					<SectionCard variant="" description="Completion Rate" showBadge={false} value={`${userReports?.section_cards?.completion_rate}%`} />
 					<SectionCard variant="" description="Avg Delayed Days" showBadge={false} value={userReports?.section_cards?.average_delay_days} />
