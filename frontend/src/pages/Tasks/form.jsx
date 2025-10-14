@@ -40,9 +40,9 @@ const formSchema = z.object({
 	}),
 	description: z.string().optional(),
 	// expected_output: z.string().optional(),
-	start_date: z.date().optional(),
-	end_date: z.date().optional(),
-	actual_date: z.date().optional(),
+	start_date: z.date().nullable(),
+	end_date: z.date().nullable(),
+	actual_date: z.date().nullable(),
 	days_estimate: z.coerce.number().optional(),
 	days_taken: z.coerce.number().optional(),
 	delay_days: z.coerce.number().optional(),
@@ -112,10 +112,12 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 			project_id: undefined,
 			category: undefined,
 			expected_output: "",
-			start_date: undefined,
-			end_date: undefined,
+			start_date: null,
+			end_date: null,
+			actual_date: null,
 			start_time: "",
 			end_time: "",
+			actual_time: "",
 			time_estimate: "",
 			time_taken: "",
 			delay: "",
@@ -170,9 +172,9 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				project_id: project_id || projectId || undefined,
 				category_id: category_id || undefined,
 				// expected_output: expected_output || "",
-				start_date: typeof start_date === "string" ? parseISO(start_date) : start_date || undefined,
-				end_date: typeof end_date === "string" ? parseISO(end_date) : end_date || undefined,
-				actual_date: typeof actual_date === "string" ? parseISO(actual_date) : actual_date || undefined,
+				start_date: typeof start_date === "string" ? parseISO(start_date) : start_date || null,
+				end_date: typeof end_date === "string" ? parseISO(end_date) : end_date || null,
+				actual_date: typeof actual_date === "string" ? parseISO(actual_date) : actual_date || null,
 				days_estimate: days_estimate || "",
 				days_taken: days_taken || "",
 				delay_days: delay_days || "",
@@ -261,6 +263,8 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					value.forEach((file) => formDataToSend.append("attachments[]", file));
 				} else if (value !== null && value !== undefined) {
 					formDataToSend.append(key, value);
+				} else {
+					formDataToSend.append(key, "");
 				}
 			}
 			// Append assignees array (important: Laravel needs it as assignees[])
@@ -333,7 +337,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 					// parsedForm.position = updateData.position;
 					formDataToSend.append("position", updateData.position);
 				}
-				console.log(formDataToSend);
 				// await axiosClient.put(API().task(updateData?.id), parsedForm);
 				await axiosClient.post(API().task(updateData.id) + "?_method=PUT", formDataToSend, {
 					headers: { "Content-Type": "multipart/form-data" },
@@ -460,7 +463,6 @@ export default function TaskForm({ parentId, projectId, isOpen, setIsOpen, updat
 				case "delay": {
 					const est = Number(values.time_estimate);
 					const taken = Number(values.time_taken);
-					console.log(est, taken);
 					if (est && taken) {
 						setAutoCalculateErrors((prev) => ({ ...prev, time_delay: "" }));
 						let delay = taken - est;
