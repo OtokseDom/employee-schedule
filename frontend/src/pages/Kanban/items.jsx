@@ -28,7 +28,7 @@ const Items = ({ item }) => {
 		id: parseInt(item.id.split("-")[1]),
 	};
 	const { loading } = useLoadContext();
-	const { taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab } = useTasksStore();
+	const { tasks, taskHistory, selectedTaskHistory, setSelectedTaskHistory, setRelations, activeTab, setActiveTab } = useTasksStore();
 
 	// const [tasks, setTasks] = useState(tasks);
 	const [isDialogOpen, setDialogOpen] = useState(null);
@@ -73,7 +73,7 @@ const Items = ({ item }) => {
 					if (!item.parent_id) {
 						setRelations(itemFormatted);
 					} else {
-						const filteredRelations = itemFormatted.filter((t) => t.id == item.parent_id);
+						const filteredRelations = tasks.filter((t) => t.id == item.parent_id);
 						setRelations(...filteredRelations);
 					}
 				}}
