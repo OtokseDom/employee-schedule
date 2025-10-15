@@ -17,7 +17,7 @@ export default function Relations({ setUpdateData, setParentId, setProjectId }) 
 	const completedCount = relations?.children?.filter((child) => findStatus(child.status_id).name === "Completed").length ?? 0;
 	const completionPercentage = subTasksCount > 0 ? (completedCount / subTasksCount) * 100 : 0;
 	const getSubtaskProgress = () => {
-		return completedCount + "/" + subTasksCount + " subtasks completed (" + completionPercentage + "%)";
+		return completedCount + "/" + subTasksCount + " subtasks completed (" + completionPercentage.toFixed(2) + "%)";
 	};
 	const getSubtaskProgressPercentage = () => {
 		return Math.round((completedCount / subTasksCount) * 100, 2);
