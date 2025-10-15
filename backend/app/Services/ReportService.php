@@ -137,7 +137,7 @@ class ReportService
         $taskCompletionQuery = 0;
         $totalTasks = (clone $baseQuery)->count();
         if ($totalTasks !== 0) {
-            $completedTasks = (clone $baseQuery)->where('status_id', $completed)->count();
+            $completedTasks = (clone $baseQuery)->where('status_id', $completed)->where('end_date', '<=', now())->count();
 
             $taskCompletionQuery = round(($completedTasks / $totalTasks) * 100, 2);
         }
