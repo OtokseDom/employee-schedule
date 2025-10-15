@@ -135,8 +135,12 @@ export function DataTableTasks({
 			/>
 		);
 	}
-
-	// 👇 toggle actions column automatically
+	// Keep "All" selection synced with data length
+	useEffect(() => {
+		const { pageSize } = table.getState().pagination;
+		if (pageSize === data.length - 1) table.setPageSize(data.length);
+	}, [data.length]);
+	// toggle actions column automatically
 	useEffect(() => {
 		const hasSelection = table.getSelectedRowModel().rows.length > 0;
 
@@ -270,20 +274,28 @@ export function DataTableTasks({
 				<div className="flex items-center space-x-2">
 					<p className="text-sm font-medium">Show</p>
 					<Select
-						value={`${table.getState().pagination.pageSize}`}
+						value={table.getState().pagination.pageSize === data.length ? "all" : `${table.getState().pagination.pageSize}`}
 						onValueChange={(value) => {
-							table.setPageSize(Number(value));
+							if (value === "all") {
+								table.setPageSize(data.length);
+							} else {
+								table.setPageSize(Number(value));
+							}
 						}}
 					>
 						<SelectTrigger className="h-8 w-[90px]">
-							<SelectValue placeholder={table.getState().pagination.pageSize} />
+							{/* <SelectValue placeholder={table.getState().pagination.pageSize} /> */}
+							<SelectValue
+								placeholder={table.getState().pagination.pageSize === data.length ? "All" : `${table.getState().pagination.pageSize}`}
+							/>
 						</SelectTrigger>
 						<SelectContent side="top">
-							{Array.from(new Set([10, 20, 30, 40, 50, data.length])).map((pageSize) => (
+							{[10, 20, 30, 40, 50].map((pageSize) => (
 								<SelectItem key={pageSize} value={`${pageSize}`}>
-									{pageSize === data.length ? "All" : pageSize}
+									{pageSize}
 								</SelectItem>
 							))}
+							<SelectItem value="all">All</SelectItem>
 						</SelectContent>
 					</Select>
 
