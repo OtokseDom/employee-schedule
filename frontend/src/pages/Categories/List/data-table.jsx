@@ -46,14 +46,14 @@ export function DataTableCategories({ columns, isOpen, setIsOpen, updateData, se
 				}`}
 				aria-hidden="true"
 			/>
-			<div className="flex py-4">
+			<div className="flex flex-col md:flex-row py-4">
 				<Input
 					placeholder={"filter name..."}
 					value={table.getColumn("name")?.getFilterValue() || ""}
 					onChange={(category) => table.getColumn("name")?.setFilterValue(category.target.value)}
 					className="max-w-sm"
 				/>
-				<div className="flex gap-2 ml-auto">
+				<div className="w-full md:w-fit flex flex-row justify-between gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						{loading ||
 							(user?.data?.role !== "Employee" && (
