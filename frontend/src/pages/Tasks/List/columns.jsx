@@ -262,42 +262,52 @@ export const columnsTask = ({ dialogOpen, setDialogOpen, setIsOpen, setUpdateDat
 			{
 				id: "actual date",
 				accessorKey: "actual_date",
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Actual Date <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-				// Keep raw value for sorting
+				header: ({ column }) => (
+					<button className="flex items-center" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Actual Date <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				),
+				// keep raw value for sorting
 				accessorFn: (row) => row.actual_date,
-				// Use cell renderer to format for display
+				// display formatted
 				cell: ({ row }) => {
 					const { actual_date, days_estimate, days_taken, delay_days } = row.original;
+
+					const hasEstimate = days_estimate !== null && days_estimate !== undefined && days_estimate !== 0;
+					const hasTaken = days_taken !== null && days_taken !== undefined && days_taken !== 0;
+					const hasDelay = delay_days !== null && delay_days !== undefined && delay_days !== 0;
+
 					return (
 						<div>
+							{/* Date */}
 							{actual_date ? format(new Date(actual_date), "MMM-dd yyyy") : "-"}
 							<br />
-							{days_estimate && (
+
+							{/* Estimate */}
+							{hasEstimate && (
 								<>
 									<span className="text-xs text-muted-foreground">
-										<span className="font-semibold">Estimate:</span> {days_estimate} days
+										<span className="font-semibold">Estimate:</span> {days_estimate}
 									</span>
 									<br />
 								</>
 							)}
-							{days_taken && (
+
+							{/* Taken */}
+							{hasTaken && (
 								<>
 									<span className="text-xs text-muted-foreground">
-										<span className="font-semibold">Taken:</span> {days_taken} days
+										<span className="font-semibold">Taken:</span> {days_taken}
 									</span>
 									<br />
 								</>
 							)}
-							{delay_days && (
+
+							{/* Delay */}
+							{hasDelay && (
 								<>
 									<span className="text-xs text-muted-foreground">
-										<span className="font-semibold">Delay:</span> {delay_days} days
+										<span className="font-semibold">Delay:</span> {delay_days}
 									</span>
 									<br />
 								</>
