@@ -16,9 +16,14 @@ export function PieChartDonut({ report, variant }) {
 		tasks: {
 			label: "Tasks",
 		},
+		completed: {
+			label: "Completed",
+			color: "hsl(270 70% 50%)", // Purple
+			// color: "hsl(160 60% 45%)", // Green
+		},
 		pending: {
 			label: "Pending",
-			color: "hsl(270 70% 50%)", // Purple
+			color: "hsl(var(--chart-5))",
 			// color: "hsl(30 80% 55%)", // Yellow
 		},
 		in_progress: {
@@ -30,11 +35,6 @@ export function PieChartDonut({ report, variant }) {
 			label: "For Review",
 			color: "hsl(var(--chart-3))",
 			// color: "hsl(220 70% 50%)", // Blue
-		},
-		completed: {
-			label: "Completed",
-			color: "hsl(var(--chart-5))",
-			// color: "hsl(160 60% 45%)", // Green
 		},
 		delayed: {
 			label: "Delayed",
