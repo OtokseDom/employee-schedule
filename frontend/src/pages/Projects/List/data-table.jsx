@@ -48,14 +48,14 @@ export function DataTableProjects({ columns, isOpen, setIsOpen, updateData, setU
 				}`}
 				aria-hidden="true"
 			/>
-			<div className="flex py-4">
+			<div className="flex flex-col md:flex-row py-4">
 				<Input
 					placeholder={"filter project title..."}
 					value={table.getColumn("title")?.getFilterValue() || ""}
 					onChange={(category) => table.getColumn("title")?.setFilterValue(category.target.value)}
 					className="max-w-sm"
 				/>
-				<div className="flex gap-2 ml-auto">
+				<div className="w-full md:w-fit flex flex-row justify-between gap-2 ml-auto">
 					<Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
 						{!loading && (
 							<SheetTrigger asChild>
