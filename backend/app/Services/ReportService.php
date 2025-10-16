@@ -306,8 +306,8 @@ class ReportService
             ->select(
                 'users.name as assignee',
                 DB::raw('ROUND(SUM(days_taken - days_estimate),2) as net_difference'),
-                DB::raw('ROUND(SUM(CASE WHEN days_taken IS NOT NULL AND days_estimate IS NOT NULL AND days_taken > days_estimate THEN days_taken - days_estimate ELSE 0 END),2) as overrun'),
-                DB::raw('ROUND(SUM(CASE WHEN days_taken IS NOT NULL AND days_estimate IS NOT NULL AND days_taken < days_estimate THEN days_estimate - days_taken ELSE 0 END),2) as underrun')
+                DB::raw('ROUND(SUM(CASE WHEN days_taken > 0 AND days_estimate IS NOT NULL AND days_taken > days_estimate THEN days_taken - days_estimate ELSE 0 END), 2) as overrun'),
+                DB::raw('ROUND(SUM(CASE WHEN days_taken > 0 AND days_estimate IS NOT NULL AND days_taken < days_estimate THEN days_estimate - days_taken ELSE 0 END), 2) as underrun')
             );
 
         // if ($id && $variant !== 'dashboard') {
