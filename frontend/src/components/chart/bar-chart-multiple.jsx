@@ -13,11 +13,11 @@ export function ChartBarMultiple({ report, variant, type }) {
 	if (variant == "dashboard") {
 		chartConfig = {
 			underrun: {
-				label: "Underrun (hr) ",
+				label: "Underrun (days) ",
 				color: "hsl(var(--chart-1))",
 			},
 			overrun: {
-				label: "Overrun (hr) ",
+				label: "Overrun (days) ",
 				color: "hsl(270 70% 50%)", // Purple
 			},
 		};
@@ -103,7 +103,7 @@ export function ChartBarMultiple({ report, variant, type }) {
 						{/* Underruns */}
 						{Math.abs(report?.runs["under"]) > 0 ? (
 							<div className="flex gap-2 leading-none font-medium">
-								Total Underruns (hrs):
+								Total Underruns ({variant == "dashboard" ? "days" : "hrs"}):
 								<span className="flex flex-row gap-4 text-green-500">
 									{Math.abs(report.runs["under"])} <Zap className="h-4 w-4" />
 								</span>
@@ -117,7 +117,7 @@ export function ChartBarMultiple({ report, variant, type }) {
 						{/* Overruns */}
 						{(variant == "dashboard" && report?.runs["over"] > 0) || (variant != "dashboard" && report?.runs["over"] < 0) ? (
 							<div className="flex gap-2 leading-none font-medium">
-								Total Overruns (hrs):
+								Total Overruns ({variant == "dashboard" ? "days" : "hrs"}):
 								<span className="flex flex-row gap-4 text-red-500">
 									{report.runs["over"]} <ClockAlert className="h-4 w-4" />
 								</span>
