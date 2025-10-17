@@ -41,6 +41,7 @@ export default function UserProfile() {
 		if (!users || users.length === 0) fetchUsers();
 		if ((!projects || projects.length === 0) && !projectsLoaded) fetchProjects();
 	}, []);
+
 	const handleRemoveFilter = async (key) => {
 		// Deep copy filters to avoid mutating state directly
 		const updated = {
@@ -67,6 +68,27 @@ export default function UserProfile() {
 		}
 	};
 
+	// Section Title Component
+	const SectionTitle = ({ children, icon }) => (
+		<div className="md:col-span-12 mt-6 mb-2">
+			<h2 className="text-xl font-bold flex items-center gap-2 text-foreground border-b border-border pb-2">
+				{icon && <span>{icon}</span>}
+				{children}
+			</h2>
+		</div>
+	);
+
+	// Placeholder Chart Component
+	const PlaceholderChart = ({ title }) => (
+		<div className="bg-background text-card-foreground border border-border rounded-2xl p-6 shadow-md flex items-center justify-center min-h-[300px]">
+			<div className="text-center">
+				<div className="text-4xl mb-2">📊</div>
+				<div className="text-lg font-semibold text-muted-foreground">{title}</div>
+				<div className="text-sm text-muted-foreground mt-1">Coming Soon</div>
+			</div>
+		</div>
+	);
+
 	return (
 		<div className="w-screen md:w-fit container p-5 md:p-0 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-4 auto-rows-auto ">
 			<div
@@ -89,7 +111,6 @@ export default function UserProfile() {
 									<DialogTitle>Select filter</DialogTitle>
 									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
 								</DialogHeader>
-								{/* <FilterForm setIsOpen={setIsOpen} /> */}
 								<FilterForm
 									setIsOpen={setIsOpen}
 									setReports={setReports}
@@ -110,6 +131,7 @@ export default function UserProfile() {
 			<div className="md:col-span-12 flex flex-wrap justify-end gap-2">
 				<FilterTags filters={filters.display} onRemove={handleRemoveFilter} />
 			</div>
+
 			{/* Overall Progress */}
 			<div className="md:col-span-12 w-full">
 				<GalaxyProgressBar
@@ -123,48 +145,144 @@ export default function UserProfile() {
 					className="w-full"
 				/>
 			</div>
-			{/* Section Cards */}
+
+			{/* ========================================== */}
+			{/* 1️⃣ WORK OUTPUT & VOLUME */}
+			{/* ========================================== */}
+			<SectionTitle icon="🫙">Work Output & Volume</SectionTitle>
+
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-				{/* <SectionCard description={`Active Members`} showBadge={false} value={reports?.section_cards?.user_count} variant="dashboard" /> */}
-				<SectionCard description="Members Avg Performance (5)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
-				<SectionCard description="Avg Time Efficiency" showBadge={false} value={`${reports?.section_cards?.time_efficiency}%`} variant="dashboard" />
-				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
-				{/* <SectionCard description="Tasks Due Soon" showBadge={false} value={reports?.section_cards?.task_at_risk} variant="dashboard" /> */}
-				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
-				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
+				<SectionCard description="📊 Tasks Completed per Period" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Avg Tasks Completed per Day" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Subtasks per Parent Task" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
 
-			{/* Pie Chart */}
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Tasks Completed per User" />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Completion Velocity Trend" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 2️⃣ EFFICIENCY METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="🌟">Efficiency Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="Avg Time Efficiency" showBadge={false} value={`${reports?.section_cards?.time_efficiency}%`} variant="dashboard" />
+				<SectionCard description="📊 Avg Days Taken per Task" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Tasks Ahead of Schedule" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Overrun/Underrun Ratio" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Avg Time per Category/Project" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 3️⃣ TIMELINESS & DELAY METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="⌛">Timeliness & Delay Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
+				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
+				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
+				<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Delay Frequency %" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
 			<div className="md:col-span-4">
 				<PieChartDonut report={reports?.tasks_by_status} variant="dashboard" />
 			</div>
 
-			{/* Multi Bar Chart Category time*/}
-			{/* <div className="md:col-span-4">
-				<ChartBarMultiple report={reports?.estimate_vs_actual} variant="dashboard" type={"category"} />
-			</div> */}
-
-			{/* Horizontal Bar Chart */}
-			<div className="md:col-span-4">
-				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
-			</div>
-
-			{/* Line Chart */}
-			<div className="md:col-span-4">
-				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
-			</div>
-
-			{/* Multi Bar Chart User date */}
-			<div className="md:col-span-4">
-				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
-			</div>
-
-			{/* Bar Chart */}
 			<div className="md:col-span-4">
 				<ChartBarLabel report={reports?.delay_per_user} variant="dashboard" />
 			</div>
 
-			{/* Datatable */}
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Projected Delay for Ongoing Tasks" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 4️⃣ QUALITY & CONSISTENCY METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="💯">Quality & Consistency Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="Members Avg Performance (5)" showBadge={false} value={reports?.section_cards?.avg_performance} variant="dashboard" />
+				<SectionCard description="📊 Performance Variance" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<ChartLineLabel report={reports?.performance_rating_trend} variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Delayed vs Performance Correlation" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 5️⃣ WORKLOAD & BALANCE METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="💪">Workload & Balance Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="📊 Avg Estimated Days per User" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Avg Actual Days per User" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Workload Balance Index" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Utilization Rate" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Active Tasks per User" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 6️⃣ TREND & PROGRESS METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="📈">Trend & Progress Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="📊 Productivity Trend (WoW)" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard description="📊 Delay Trend Status" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Performance Trend by Month" />
+			</div>
+
+			<div className="md:col-span-6">
+				<PlaceholderChart title="Velocity Trend per Project/Team" />
+			</div>
+
+			{/* ========================================== */}
+			{/* 7️⃣ COMPARATIVE METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="📊">Comparative Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="📊 Most Improved Users" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-4">
+				<PlaceholderChart title="User Efficiency Ranking" />
+			</div>
+
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Category Efficiency Comparison" />
+			</div>
+
 			<div className="md:col-span-4 max-h-[600px] overflow-auto scrollbar-custom bg-background text-card-foreground border border-border rounded-2xl container px-4 shadow-md">
 				<CardHeader className="text-center">
 					<CardTitle className="text-lg">
@@ -179,7 +297,7 @@ export default function UserProfile() {
 									year: "numeric",
 							  })}`
 							: "All Time"}{" "}
-						Rating Leaderboard
+						Top Performers
 					</CardTitle>
 					<CardDescription>
 						Showing{" "}
