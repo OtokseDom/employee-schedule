@@ -11,7 +11,8 @@ import { Skeleton } from "../ui/skeleton";
 const chartConfig = {
 	task: {
 		label: "Task",
-		color: "hsl(var(--chart-1))",
+		// color: "hsl(var(--chart-1))",
+		color: "hsl(270 70% 50%)", // Purple
 	},
 };
 

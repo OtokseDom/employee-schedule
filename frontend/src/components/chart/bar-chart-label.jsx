@@ -32,8 +32,8 @@ export function ChartBarLabel({ report, variant }) {
 	const chartConfig = {
 		delay: {
 			label: "Delay",
-			color: "hsl(var(--chart-1))",
-			// color: "hsl(270 70% 50%)", // Purple
+			// color: "hsl(var(--chart-1))",
+			color: "hsl(270 70% 50%)", // Purple
 		},
 	};
 	return (

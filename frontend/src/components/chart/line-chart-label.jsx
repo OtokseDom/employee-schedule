@@ -12,7 +12,8 @@ export const description = "A line chart with a label";
 const chartConfig = {
 	rating: {
 		label: "Rating",
-		color: "hsl(var(--chart-1))",
+		// color: "hsl(var(--chart-1))",
+		color: "hsl(270 70% 50%)", // Purple
 	},
 };
 
