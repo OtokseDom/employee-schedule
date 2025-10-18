@@ -152,9 +152,18 @@ export default function UserProfile() {
 			<SectionTitle icon="🫙">Work Output & Volume</SectionTitle>
 
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-				<SectionCard description="📊 Tasks Completed per Period" showBadge={false} value="Coming Soon" variant="dashboard" />
 				<SectionCard description="📊 Avg Tasks Completed per Day" showBadge={false} value="Coming Soon" variant="dashboard" />
 				<SectionCard description="📊 Subtasks per Parent Task" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Tasks Completed - Last 7 Days" />
+			</div>
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Tasks Completed - Last 8 Weeks" />
+			</div>
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Tasks Completed - Last 6 Months" />
 			</div>
 
 			<div className="md:col-span-6">
