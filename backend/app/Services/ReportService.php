@@ -283,6 +283,57 @@ class ReportService
         return apiResponse($data, "Tasks completed in the last 8 weeks fetched successfully");
     }
 
+    // Tasks completed - Last 6 Months - Bar chart
+    public function tasksCompletedLast6Months($id = null, $variant = "", $filter)
+    {
+        $endDate = now();
+        $startDate = now()->subMonths(5)->startOfMonth(); // total 6 months including current
+
+        $query = $this->task
+            ->where('organization_id', $this->organization_id)
+            ->whereHas('status', function ($q) {
+                $q->where('name', 'Completed');
+            })
+            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+
+        // Apply filters
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
+
+        // Group by month and year
+        $tasks = $query
+            ->selectRaw('YEAR(actual_date) as year, MONTH(actual_date) as month, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+        // Prepare chart data (fill missing months)
+        $chart_data = [];
+        for ($i = 0; $i < 6; $i++) {
+            $monthDate = $startDate->copy()->addMonths($i);
+            $year = $monthDate->year;
+            $month = $monthDate->month;
+
+            $monthData = $tasks->firstWhere(fn($t) => $t->year == $year && $t->month == $month);
+
+            $chart_data[] = [
+                'month' => $monthDate->format('M Y'),
+                'tasks_completed' => $monthData ? $monthData->count : 0
+            ];
+        }
+
+        $data = [
+            'chart_data' => $chart_data,
+            'filters' => $filter
+        ];
+
+        if (empty($data['chart_data'])) {
+            return apiResponse(null, 'No tasks completed in the last 6 months', false, 404);
+        }
+
+        return apiResponse($data, "Tasks completed in the last 6 months fetched successfully");
+    }
+
 
     // Task status - Pie donut chart
     public function tasksByStatus($id = null, $variant = "", $filter)
