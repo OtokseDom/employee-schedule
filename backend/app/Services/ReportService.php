@@ -177,6 +177,54 @@ class ReportService
         return apiResponse($data, "Active users report fetched successfully");
     }
 
+    // Tasks completed - Last 7 Days - Bar chart
+    public function tasksCompletedLast7Days($id = null, $variant = "", $filter)
+    {
+        $endDate = now();
+        $startDate = now()->subDays(6); // includes today, total 7 days
+
+        // Base query: only completed tasks
+        $query = $this->task
+            ->where('organization_id', $this->organization_id)
+            ->whereHas('status', function ($q) {
+                $q->where('name', 'Completed'); // or use status_id if you have a constant for it
+            })
+            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+
+        // Apply filters
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
+
+        // Group by date
+        $tasks = $query
+            ->selectRaw('DATE(actual_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
+
+        // Prepare chart data (fill missing days)
+        $chart_data = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
+            $dayData = $tasks->firstWhere('date', $date);
+
+            $chart_data[] = [
+                'date' => $date,
+                'tasks_completed' => $dayData ? $dayData->count : 0
+            ];
+        }
+
+        $data = [
+            'chart_data' => $chart_data,
+            'filters' => $filter
+        ];
+
+        if (empty($data['chart_data'])) {
+            return apiResponse(null, 'No tasks completed in the last 7 days', false, 404);
+        }
+
+        return apiResponse($data, "Tasks completed in the last 7 days fetched successfully");
+    }
+
     // Task status - Pie donut chart
     public function tasksByStatus($id = null, $variant = "", $filter)
     {
