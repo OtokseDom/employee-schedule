@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Models\TaskStatus;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -224,6 +225,64 @@ class ReportService
 
         return apiResponse($data, "Tasks completed in the last 7 days fetched successfully");
     }
+
+    // Tasks completed - Last 8 Weeks - Bar chart (Sunday as start of week)
+    public function tasksCompletedLast8Weeks($id = null, $variant = "", $filter)
+    {
+        $endDate = now();
+        // Go back 7 weeks from current week’s Sunday → gives total 8 weeks including current
+        $startDate = now()->startOfWeek(Carbon::MONDAY)->subWeeks(7);
+
+        $query = $this->task
+            ->where('organization_id', $this->organization_id)
+            ->whereHas('status', function ($q) {
+                $q->where('name', 'Completed');
+            })
+            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+
+        // Apply filters
+        $query = $this->applyFilters(
+            $query,
+            ($variant !== 'dashboard' ? $id : null),
+            ($variant === 'dashboard' ? $filter : null)
+        );
+
+        // MySQL WEEK(date, 0) → week starts on Sunday
+        $tasks = $query
+            ->selectRaw('YEAR(actual_date) as year, WEEK(actual_date, 0) as week, COUNT(*) as count')
+            ->groupBy('year', 'week')
+            ->orderBy('year')
+            ->orderBy('week')
+            ->get();
+
+        // Prepare chart data (fill missing weeks)
+        $chart_data = [];
+        for ($i = 0; $i < 8; $i++) {
+            $weekStart = $startDate->copy()->addWeeks($i)->startOfWeek(Carbon::SUNDAY);
+            $year = $weekStart->year;
+            // Use MySQL-compatible week number (Sunday-start week)
+            $week = $weekStart->format('W');
+
+            $weekData = $tasks->firstWhere(fn($t) => $t->year == $year && (int)$t->week == (int)$week);
+
+            $chart_data[] = [
+                'week' => 'Week ' . $week . ' (' . $weekStart->format('M d') . ')',
+                'tasks_completed' => $weekData ? $weekData->count : 0
+            ];
+        }
+
+        $data = [
+            'chart_data' => $chart_data,
+            'filters' => $filter
+        ];
+
+        if (empty($data['chart_data'])) {
+            return apiResponse(null, 'No tasks completed in the last 8 weeks', false, 404);
+        }
+
+        return apiResponse($data, "Tasks completed in the last 8 weeks fetched successfully");
+    }
+
 
     // Task status - Pie donut chart
     public function tasksByStatus($id = null, $variant = "", $filter)
