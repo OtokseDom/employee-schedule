@@ -184,13 +184,15 @@ class ReportService
         $endDate = now();
         $startDate = now()->subDays(6); // includes today, total 7 days
 
-        // Base query: only completed tasks
         $query = $this->task
             ->where('organization_id', $this->organization_id)
-            ->whereHas('status', function ($q) {
-                $q->where('name', 'Completed'); // or use status_id if you have a constant for it
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
             })
-            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+            ->whereHas('status', fn($q) => $q->where('name', 'Completed'))
+            ->whereBetween('actual_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         // Apply filters
         $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
@@ -202,52 +204,52 @@ class ReportService
             ->orderBy('date', 'ASC')
             ->get();
 
-        // Prepare chart data (fill missing days)
+        // Prepare chart data (Mon–Sun labels)
         $chart_data = [];
+        $total = 0;
+
         for ($i = 0; $i < 7; $i++) {
-            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
-            $dayData = $tasks->firstWhere('date', $date);
+            $date = $startDate->copy()->addDays($i);
+            $dayData = $tasks->firstWhere('date', $date->format('Y-m-d'));
+            $count = $dayData ? $dayData->count : 0;
+            $total += $count;
 
             $chart_data[] = [
-                'date' => $date,
-                'tasks_completed' => $dayData ? $dayData->count : 0
+                'label' => $date->format('D'), // Mon, Tue, ..., Sun
+                'tasks_completed' => $count,
             ];
         }
 
         $data = [
             'chart_data' => $chart_data,
-            'filters' => $filter
+            'total_tasks' => $total,
+            'filters' => $filter,
         ];
-
-        if (empty($data['chart_data'])) {
-            return apiResponse(null, 'No tasks completed in the last 7 days', false, 404);
-        }
 
         return apiResponse($data, "Tasks completed in the last 7 days fetched successfully");
     }
 
-    // Tasks completed - Last 8 Weeks - Bar chart (Sunday as start of week)
-    public function tasksCompletedLast8Weeks($id = null, $variant = "", $filter)
+
+
+    // Tasks completed - Last 8 Weeks - Bar chart
+    public function tasksCompletedLast6Weeks($id = null, $variant = "", $filter)
     {
         $endDate = now();
-        // Go back 7 weeks from current week’s Sunday → gives total 8 weeks including current
-        $startDate = now()->startOfWeek(Carbon::MONDAY)->subWeeks(7);
+        $startDate = now()->startOfWeek(Carbon::SUNDAY)->subWeeks(5);
 
         $query = $this->task
             ->where('organization_id', $this->organization_id)
-            ->whereHas('status', function ($q) {
-                $q->where('name', 'Completed');
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
             })
-            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+            ->whereHas('status', fn($q) => $q->where('name', 'Completed'))
+            ->whereBetween('actual_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         // Apply filters
-        $query = $this->applyFilters(
-            $query,
-            ($variant !== 'dashboard' ? $id : null),
-            ($variant === 'dashboard' ? $filter : null)
-        );
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
 
-        // MySQL WEEK(date, 0) → week starts on Sunday
         $tasks = $query
             ->selectRaw('YEAR(actual_date) as year, WEEK(actual_date, 0) as week, COUNT(*) as count')
             ->groupBy('year', 'week')
@@ -255,51 +257,54 @@ class ReportService
             ->orderBy('week')
             ->get();
 
-        // Prepare chart data (fill missing weeks)
         $chart_data = [];
-        for ($i = 0; $i < 8; $i++) {
+        $total = 0;
+
+        for ($i = 0; $i < 6; $i++) {
             $weekStart = $startDate->copy()->addWeeks($i)->startOfWeek(Carbon::SUNDAY);
             $year = $weekStart->year;
-            // Use MySQL-compatible week number (Sunday-start week)
             $week = $weekStart->format('W');
 
             $weekData = $tasks->firstWhere(fn($t) => $t->year == $year && (int)$t->week == (int)$week);
+            $count = $weekData ? $weekData->count : 0;
+            $total += $count;
 
             $chart_data[] = [
-                'week' => 'Week ' . $week . ' (' . $weekStart->format('M d') . ')',
-                'tasks_completed' => $weekData ? $weekData->count : 0
+                'label' => 'Week ' . $week, // e.g. Week 40
+                'tasks_completed' => $count,
             ];
         }
 
         $data = [
             'chart_data' => $chart_data,
-            'filters' => $filter
+            'total_tasks' => $total,
+            'filters' => $filter,
         ];
-
-        if (empty($data['chart_data'])) {
-            return apiResponse(null, 'No tasks completed in the last 8 weeks', false, 404);
-        }
 
         return apiResponse($data, "Tasks completed in the last 8 weeks fetched successfully");
     }
+
+
 
     // Tasks completed - Last 6 Months - Bar chart
     public function tasksCompletedLast6Months($id = null, $variant = "", $filter)
     {
         $endDate = now();
-        $startDate = now()->subMonths(5)->startOfMonth(); // total 6 months including current
+        $startDate = now()->subMonths(5)->startOfMonth();
 
         $query = $this->task
             ->where('organization_id', $this->organization_id)
-            ->whereHas('status', function ($q) {
-                $q->where('name', 'Completed');
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')->orWhere(function ($subQuery) {
+                    $subQuery->whereNull('parent_id')->whereDoesntHave('children');
+                });
             })
-            ->whereBetween('actual_date', [$startDate->startOfDay(), $endDate->endOfDay()]);
+            ->whereHas('status', fn($q) => $q->where('name', 'Completed'))
+            ->whereBetween('actual_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         // Apply filters
         $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
 
-        // Group by month and year
         $tasks = $query
             ->selectRaw('YEAR(actual_date) as year, MONTH(actual_date) as month, COUNT(*) as count')
             ->groupBy('year', 'month')
@@ -307,29 +312,29 @@ class ReportService
             ->orderBy('month')
             ->get();
 
-        // Prepare chart data (fill missing months)
         $chart_data = [];
+        $total = 0;
+
         for ($i = 0; $i < 6; $i++) {
             $monthDate = $startDate->copy()->addMonths($i);
             $year = $monthDate->year;
             $month = $monthDate->month;
 
             $monthData = $tasks->firstWhere(fn($t) => $t->year == $year && $t->month == $month);
+            $count = $monthData ? $monthData->count : 0;
+            $total += $count;
 
             $chart_data[] = [
-                'month' => $monthDate->format('M Y'),
-                'tasks_completed' => $monthData ? $monthData->count : 0
+                'label' => $monthDate->format('M'), // Jan, Feb, ...
+                'tasks_completed' => $count,
             ];
         }
 
         $data = [
             'chart_data' => $chart_data,
-            'filters' => $filter
+            'total_tasks' => $total,
+            'filters' => $filter,
         ];
-
-        if (empty($data['chart_data'])) {
-            return apiResponse(null, 'No tasks completed in the last 6 months', false, 404);
-        }
 
         return apiResponse($data, "Tasks completed in the last 6 months fetched successfully");
     }
