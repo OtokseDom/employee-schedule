@@ -157,13 +157,43 @@ export default function UserProfile() {
 			</div>
 
 			<div className="md:col-span-4">
-				<PlaceholderChart title="Tasks Completed - Last 7 Days" />
+				<ChartBarLabel
+					variant="tasks_completed"
+					report={reports?.tasks_completed_last_7_days}
+					config={{
+						title: "Tasks Completed (Last 7 Days)",
+						labelKey: "label",
+						valueKey: "tasks_completed",
+						color: "hsl(140 70% 50%)", // Green
+						total: reports?.tasks_completed_last_7_days?.total_tasks,
+					}}
+				/>
 			</div>
 			<div className="md:col-span-4">
-				<PlaceholderChart title="Tasks Completed - Last 8 Weeks" />
+				<ChartBarLabel
+					variant="tasks_completed"
+					report={reports?.tasks_completed_last_6_weeks}
+					config={{
+						title: "Tasks Completed (Last 6 Weeks)",
+						labelKey: "label",
+						valueKey: "tasks_completed",
+						color: "hsl(45 90% 55%)", // Yellow
+						total: reports?.tasks_completed_last_6_weeks?.total_tasks,
+					}}
+				/>
 			</div>
 			<div className="md:col-span-4">
-				<PlaceholderChart title="Tasks Completed - Last 6 Months" />
+				<ChartBarLabel
+					variant="tasks_completed"
+					report={reports?.tasks_completed_last_6_months}
+					config={{
+						title: "Tasks Completed (Last 6 Months)",
+						labelKey: "label",
+						valueKey: "tasks_completed",
+						color: "hsl(200 80% 55%)", // Blue
+						total: reports?.tasks_completed_last_6_months?.total_tasks,
+					}}
+				/>
 			</div>
 
 			<div className="md:col-span-6">
@@ -212,7 +242,7 @@ export default function UserProfile() {
 			</div>
 
 			<div className="md:col-span-4">
-				<ChartBarLabel report={reports?.delay_per_user} variant="dashboard" />
+				<ChartBarLabel report={reports?.delay_per_user} variant="delay" />
 			</div>
 
 			<div className="md:col-span-4">
