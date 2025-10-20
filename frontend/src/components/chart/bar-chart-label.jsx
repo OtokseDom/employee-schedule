@@ -1,104 +1,135 @@
 "use client";
 
-import { ArrowBigDownDash, ArrowBigUpDash, TrendingUp } from "lucide-react";
+import { ArrowBigDownDash, ArrowBigUpDash } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
-
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Skeleton } from "../ui/skeleton";
 
-export const description = "A bar chart with a label";
+/**
+ * Generic Bar Chart Component
+ *
+ * Props:
+ * - report: object (API response containing chart_data, filters, etc.)
+ * - variant: string (e.g., 'delay', 'tasks_completed')
+ * - config: optional object for customizing labels, colors, keys, and title
+ *
+ * Example usage:
+ * <ChartBarLabel
+ *    variant="tasks_completed"
+ *    report={tasksCompletedReport}
+ *    config={{
+ *       title: "Tasks Completed (Last 7 Days)",
+ *       labelKey: "date", // or "week", "month"
+ *       valueKey: "tasks_completed",
+ *       color: "hsl(140 70% 50%)" // green
+ *    }}
+ * />
+ */
 
-// const chartData = [
-// 	{ month: "January", desktop: 186 },
-// 	{ month: "February", desktop: 305 },
-// 	{ month: "March", desktop: 237 },
-// 	{ month: "April", desktop: 73 },
-// 	{ month: "May", desktop: 209 },
-// 	{ month: "June", desktop: 214 },
-// ];
-
-// const chartConfig = {
-// 	desktop: {
-// 		label: "Desktop",
-// 		color: "var(--chart-1)",
-// 	},
-// };
-
-export function ChartBarLabel({ report, variant }) {
+export function ChartBarLabel({ report, variant, config = {} }) {
 	const { loading } = useLoadContext();
 
-	const chartConfig = {
+	// Default configurations per variant
+	const defaultConfig = {
 		delay: {
+			title: "Delays per User",
 			label: "Delay",
-			// color: "hsl(var(--chart-1))",
+			labelKey: "assignee",
+			valueKey: "delay",
 			color: "hsl(270 70% 50%)", // Purple
 		},
+		tasks_completed: {
+			title: config.title || "Tasks Completed",
+			label: "Tasks Completed",
+			labelKey: config.labelKey || "date",
+			valueKey: config.valueKey || "tasks_completed",
+			color: "hsl(270 70% 50%)", // Purple
+			total: report?.data_count || 0,
+			// color: config.color || "hsl(140 70% 50%)", // Green
+		},
 	};
+
+	const chartConfig = defaultConfig[variant] || config;
+
+	const chartData = report?.chart_data || [];
+	const filters = report?.filters || {};
+	const valueKey = chartConfig.valueKey;
+	const labelKey = chartConfig.labelKey;
+
 	return (
-		<Card className={`flex flex-col relative h-full justify-between rounded-2xl`}>
+		<Card className="flex flex-col relative h-full justify-between rounded-2xl">
 			<CardHeader className="text-center">
-				<CardTitle className="text-lg">Delays per User</CardTitle>
+				<CardTitle className="text-lg">{chartConfig.title}</CardTitle>
 				<CardDescription>
-					Encountered delays{" "}
-					{report?.filters?.from && report?.filters?.to
-						? `${new Date(report.filters.from).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} - ${new Date(
-								report.filters.to
-						  ).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}`
-						: "all time"}
+					{filters?.from && filters?.to
+						? `${new Date(filters.from).toLocaleDateString("en-CA", {
+								month: "short",
+								day: "numeric",
+								year: "numeric",
+						  })} - ${new Date(filters.to).toLocaleDateString("en-CA", {
+								month: "short",
+								day: "numeric",
+								year: "numeric",
+						  })}`
+						: "All Time"}
 				</CardDescription>
 			</CardHeader>
+
 			<CardContent>
 				<ChartContainer config={chartConfig}>
 					{loading ? (
 						<div className="flex flex-col gap-2 items-center justify-center h-full w-full p-8">
-							<Skeleton className=" w-full h-10 rounded-full" />
-							<Skeleton className=" w-full h-10 rounded-full" />
-							<Skeleton className=" w-full h-10 rounded-full" />
-							<Skeleton className=" w-full h-10 rounded-full" />
+							{Array.from({ length: 4 }).map((_, i) => (
+								<Skeleton key={i} className="w-full h-10 rounded-full" />
+							))}
 						</div>
-					) : report?.data_count == 0 ? (
-						<div className="flex items-center justify-center fw-full h-full text-lg text-gray-500">No Tasks Yet</div>
+					) : !chartData?.length ? (
+						<div className="flex items-center justify-center w-full h-full text-lg text-gray-500">No Data</div>
 					) : (
-						<BarChart
-							accessibilityLayer
-							data={report?.chart_data}
-							margin={{
-								top: 20,
-							}}
-						>
+						<BarChart accessibilityLayer data={chartData} margin={{ top: 20 }}>
 							<CartesianGrid vertical={false} />
-							<XAxis dataKey="assignee" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 5)} />
+							<XAxis
+								dataKey={labelKey}
+								tickLine={false}
+								tickMargin={10}
+								axisLine={false}
+								tickFormatter={(value) => (value?.length > 8 ? value.slice(0, 8) + "…" : value)}
+							/>
 							<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-							<Bar dataKey="delay" fill="var(--color-delay)" radius={8}>
+							<Bar dataKey={valueKey} fill={chartConfig.color} radius={8}>
 								<LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
 							</Bar>
 						</BarChart>
 					)}
 				</ChartContainer>
 			</CardContent>
+
+			{/* Optional footer (only for delay variant) */}
 			<CardFooter className="flex-col items-start gap-2 text-sm">
 				{loading ? (
 					<div className="flex flex-col gap-2 items-center justify-center h-full w-full">
-						<Skeleton className=" w-full h-4 rounded-full" />
-						<Skeleton className=" w-full h-4 rounded-full" />
+						<Skeleton className="w-full h-4 rounded-full" />
+						<Skeleton className="w-full h-4 rounded-full" />
 					</div>
-				) : report?.data_count == 0 ? (
-					""
-				) : (
+				) : variant === "tasks_completed" ? (
+					<div className="leading-none font-medium">
+						Total Tasks Completed: <b>{report?.total_tasks ?? report?.chart_data?.reduce((sum, item) => sum + (item.tasks_completed || 0), 0)}</b>
+					</div>
+				) : variant === "delay" && report?.data_count > 0 ? (
 					<>
 						<div className="leading-none font-medium">
-							<ArrowBigUpDash size={16} className="inline text-green-500" /> <b> {report?.highest_delay?.assignee}</b> has the most delays
-							encountered (<b>{report?.highest_delay?.delay}</b> days)
+							<ArrowBigUpDash size={16} className="inline text-green-500" /> <b>{report?.highest_delay?.assignee}</b> has the most delays (
+							<b>{report?.highest_delay?.delay}</b> days)
 						</div>
 						<div className="leading-none font-medium">
-							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest_delay?.assignee}</b> has the least delays
-							encountered (<b>{report?.lowest_delay?.delay}</b> days)
+							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest_delay?.assignee}</b> has the least delays (
+							<b>{report?.lowest_delay?.delay}</b> days)
 						</div>
 						<div className="text-muted-foreground leading-none">Showing all {report?.data_count} users</div>
 					</>
-				)}
+				) : null}
 			</CardFooter>
 		</Card>
 	);
