@@ -35,6 +35,7 @@ export function ChartBarLabel({ report, variant, config = {} }) {
 	const filters = report?.filters || {};
 	const valueKey = chartConfig.valueKey;
 	const labelKey = chartConfig.labelKey;
+	const dataCount = report?.data_count ?? 0;
 
 	return (
 		<Card className="flex flex-col relative h-full justify-between rounded-2xl">
@@ -63,8 +64,8 @@ export function ChartBarLabel({ report, variant, config = {} }) {
 								<Skeleton key={i} className="w-full h-10 rounded-full" />
 							))}
 						</div>
-					) : !chartData?.length ? (
-						<div className="flex items-center justify-center w-full h-full text-lg text-gray-500">No Data</div>
+					) : dataCount === 0 ? (
+						<div className="flex items-center justify-center fw-full h-full text-lg text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart accessibilityLayer data={chartData} margin={{ top: 20 }}>
 							<CartesianGrid vertical={false} />
@@ -91,9 +92,11 @@ export function ChartBarLabel({ report, variant, config = {} }) {
 						<Skeleton className="w-full h-4 rounded-full" />
 						<Skeleton className="w-full h-4 rounded-full" />
 					</div>
+				) : dataCount === 0 ? (
+					""
 				) : variant === "tasks_completed" ? (
 					<div className="leading-none font-medium">
-						Total Tasks Completed: <b>{report?.total_tasks ?? report?.chart_data?.reduce((sum, item) => sum + (item.tasks_completed || 0), 0)}</b>
+						Total Tasks Completed: <b>{report?.data_count ?? report?.chart_data?.reduce((sum, item) => sum + (item.tasks_completed || 0), 0)}</b>
 					</div>
 				) : variant === "delay" && report?.data_count > 0 ? (
 					<>
@@ -105,7 +108,7 @@ export function ChartBarLabel({ report, variant, config = {} }) {
 							<ArrowBigDownDash size={16} className="inline text-red-500" /> <b>{report?.lowest_delay?.assignee}</b> has the least delays (
 							<b>{report?.lowest_delay?.delay}</b> days)
 						</div>
-						<div className="text-muted-foreground leading-none">Showing all {report?.data_count} users</div>
+						<div className="text-muted-foreground leading-none">Showing all {report?.data_count} tasks</div>
 					</>
 				) : null}
 			</CardFooter>
