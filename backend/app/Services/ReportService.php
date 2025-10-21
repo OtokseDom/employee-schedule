@@ -178,6 +178,66 @@ class ReportService
         return apiResponse($data, "Active users report fetched successfully");
     }
 
+    // Task status - Pie donut chart
+    public function tasksCompletedPerUser($id = null, $variant = "", $filter)
+    {
+        $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
+        // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
+        $query = $this->user
+            ->leftJoin('task_assignees', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id');
+            })
+            ->leftJoin('tasks', function ($join) {
+                $join->on('tasks.id', '=', 'task_assignees.task_id')
+                    ->where('tasks.organization_id', $this->organization_id);
+            })
+            ->leftJoin('task_statuses', 'tasks.status_id', '=', 'task_statuses.id') //
+            ->where('users.organization_id', $this->organization_id)
+            ->where(function ($query) {
+                $query->whereNotNull('tasks.parent_id') // include only subtasks
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereNull('tasks.parent_id')
+                            ->whereRaw('NOT EXISTS (SELECT 1 FROM tasks t WHERE t.parent_id = tasks.id)');
+                    });
+            });
+
+        // Apply filters
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
+
+        $query->where('task_statuses.name', '=', 'Completed');
+
+        $chart_data = $query->select(
+            'users.name as user',
+            DB::raw('COUNT(tasks.id) as task')
+        )
+            ->groupBy('users.name')->get();
+
+
+        // Get users with highest and lowest task completed
+        $highest = null;
+        $lowest = null;
+        foreach ($chart_data as $item) {
+            if (!$highest || $item->task > $highest->task)
+                $highest = $item;
+            if (!$lowest || $item->task < $lowest->task)
+                $lowest = $item;
+        }
+
+        $data = [
+            'chart_data' => $chart_data,
+            'highest' => $highest,
+            'lowest' => $lowest,
+            'data_count' => $taskCount,
+            'filters' => $filter
+        ];
+
+        if (empty($data)) {
+            return apiResponse(null, 'Failed to fetch tasks completed per user', false, 404);
+        }
+
+        return apiResponse($data, "Tasks completed per user report fetched successfully");
+    }
+
     // Tasks completed - Last 7 Days - Bar chart
     public function tasksCompletedLast7Days($id = null, $variant = "", $filter)
     {
@@ -228,8 +288,6 @@ class ReportService
 
         return apiResponse($data, "Tasks completed in the last 7 days fetched successfully");
     }
-
-
 
     // Tasks completed - Last 8 Weeks - Bar chart
     public function tasksCompletedLast6Weeks($id = null, $variant = "", $filter)
@@ -284,8 +342,6 @@ class ReportService
         return apiResponse($data, "Tasks completed in the last 8 weeks fetched successfully");
     }
 
-
-
     // Tasks completed - Last 6 Months - Bar chart
     public function tasksCompletedLast6Months($id = null, $variant = "", $filter)
     {
@@ -338,7 +394,6 @@ class ReportService
 
         return apiResponse($data, "Tasks completed in the last 6 months fetched successfully");
     }
-
 
     // Task status - Pie donut chart
     public function tasksByStatus($id = null, $variant = "", $filter)

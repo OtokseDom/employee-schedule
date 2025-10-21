@@ -18,6 +18,7 @@ class DashboardReportController extends Controller
     {
         $filter = $request->all();
         $reports = [
+            'tasks_completed_per_user' => $this->report_service->tasksCompletedPerUser(null, "dashboard", $filter),
             'tasks_completed_last_7_days' => $this->report_service->tasksCompletedLast7Days(null, "dashboard", $filter),
             'tasks_completed_last_6_weeks' => $this->report_service->tasksCompletedLast6Weeks(null, "dashboard", $filter),
             'tasks_completed_last_6_months' => $this->report_service->tasksCompletedLast6Months(null, "dashboard", $filter),
