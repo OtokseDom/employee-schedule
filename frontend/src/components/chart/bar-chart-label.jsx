@@ -7,27 +7,6 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { Skeleton } from "../ui/skeleton";
 
-/**
- * Generic Bar Chart Component
- *
- * Props:
- * - report: object (API response containing chart_data, filters, etc.)
- * - variant: string (e.g., 'delay', 'tasks_completed')
- * - config: optional object for customizing labels, colors, keys, and title
- *
- * Example usage:
- * <ChartBarLabel
- *    variant="tasks_completed"
- *    report={tasksCompletedReport}
- *    config={{
- *       title: "Tasks Completed (Last 7 Days)",
- *       labelKey: "date", // or "week", "month"
- *       valueKey: "tasks_completed",
- *       color: "hsl(140 70% 50%)" // green
- *    }}
- * />
- */
-
 export function ChartBarLabel({ report, variant, config = {} }) {
 	const { loading } = useLoadContext();
 
@@ -47,7 +26,6 @@ export function ChartBarLabel({ report, variant, config = {} }) {
 			valueKey: config.valueKey || "tasks_completed",
 			color: "hsl(270 70% 50%)", // Purple
 			total: report?.data_count || 0,
-			// color: config.color || "hsl(140 70% 50%)", // Green
 		},
 	};
 
