@@ -282,7 +282,7 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
-            'total_tasks' => $total,
+            'data_count' => $total,
             'filters' => $filter,
         ];
 
@@ -335,7 +335,7 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
-            'total_tasks' => $total,
+            'data_count' => $total,
             'filters' => $filter,
         ];
 
@@ -388,7 +388,7 @@ class ReportService
 
         $data = [
             'chart_data' => $chart_data,
-            'total_tasks' => $total,
+            'data_count' => $total,
             'filters' => $filter,
         ];
 
