@@ -197,7 +197,7 @@ export default function UserProfile() {
 			</div>
 
 			<div className="md:col-span-6">
-				<PlaceholderChart title="Tasks Completed per User" />
+				<ChartBarHorizontal report={reports?.tasks_completed_per_user} title="Tasks Completed per User" />
 			</div>
 
 			<div className="md:col-span-6">
@@ -280,7 +280,7 @@ export default function UserProfile() {
 			</div>
 
 			<div className="md:col-span-6">
-				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" />
+				<ChartBarHorizontal report={reports?.users_task_load} variant="dashboard" title="User Task Load" />
 			</div>
 
 			<div className="md:col-span-6">
