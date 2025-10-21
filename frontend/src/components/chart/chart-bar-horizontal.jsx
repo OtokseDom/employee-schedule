@@ -19,11 +19,6 @@ export function ChartBarHorizontal({ report, title = "Report", variant }) {
 	const dataCount = report?.data_count ?? 0;
 	const filters = report?.filters ?? {};
 
-	// ✅ calculate total dynamically
-	const totalTasks = useMemo(() => {
-		return chartData.reduce((acc, curr) => acc + (curr.task || 0), 0);
-	}, [chartData]);
-
 	const chartConfig = {
 		task: {
 			label: "Task",
@@ -58,7 +53,7 @@ export function ChartBarHorizontal({ report, title = "Report", variant }) {
 								<Skeleton key={i} className="w-full h-10 rounded-full" />
 							))}
 						</div>
-					) : totalTasks === 0 ? (
+					) : dataCount === 0 ? (
 						<div className="flex items-center justify-center fw-full h-full text-lg text-gray-500">No Tasks Yet</div>
 					) : (
 						<BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ right: 16 }}>
@@ -81,7 +76,7 @@ export function ChartBarHorizontal({ report, title = "Report", variant }) {
 						<Skeleton className="w-full h-4 rounded-full" />
 						<Skeleton className="w-full h-4 rounded-full" />
 					</div>
-				) : totalTasks === 0 ? (
+				) : dataCount === 0 ? (
 					""
 				) : (
 					<>
@@ -113,7 +108,7 @@ export function ChartBarHorizontal({ report, title = "Report", variant }) {
 								)}
 							</div>
 						)}
-						<div className="text-muted-foreground leading-none">Showing {totalTasks} tasks total</div>
+						<div className="text-muted-foreground leading-none">Showing {dataCount} tasks total</div>
 					</>
 				)}
 			</CardFooter>
