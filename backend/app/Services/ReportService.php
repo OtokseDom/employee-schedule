@@ -109,7 +109,7 @@ class ReportService
     public function sectionCards($id = null, $filter)
     {
         // Get completed status ID once
-        $completed = $this->task_status->where('name', 'completed')
+        $completed = $this->task_status->where('name', 'Completed')
             ->where('organization_id', $this->organization_id)
             ->value('id');
 
@@ -166,6 +166,10 @@ class ReportService
             ),
             'total_delay_days' => round(
                 (clone $baseQuery)->where('status_id', $completed)->sum('delay_days'),
+                2
+            ),
+            'average_days_per_task' => round(
+                (clone $baseQuery)->where('status_id', $completed)->avg('days_taken'),
                 2
             ),
             'filters' => $filter
