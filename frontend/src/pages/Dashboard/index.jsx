@@ -211,7 +211,12 @@ export default function UserProfile() {
 
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
 				<SectionCard description="Avg Time Efficiency" showBadge={false} value={`${reports?.section_cards?.time_efficiency}%`} variant="dashboard" />
-				<SectionCard description="📊 Avg Days Taken per Task" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard
+					description="Avg Days Taken per Task"
+					showBadge={false}
+					value={`${reports?.section_cards?.average_days_per_task} days`}
+					variant="dashboard"
+				/>
 				<SectionCard description="📊 Tasks Ahead of Schedule" showBadge={false} value="Coming Soon" variant="dashboard" />
 				<SectionCard description="📊 Overrun/Underrun Ratio" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
