@@ -124,15 +124,15 @@ class ReportService
         // Apply common filters to base query
         $baseQuery = $this->applyFilters($baseQuery, $id, $filter);
 
-        // Clone base query for different metrics
-        $avgPerformanceQuery = clone $baseQuery;
-        $timeEfficiencyQuery = (clone $baseQuery)->where('status_id', $completed);
-
         // Tasks at risk query (has unique conditions)
         $taskAtRiskQuery = (clone $baseQuery)
             ->where('status_id', '!=', $completed)
             ->where('end_date', '<=', now()->addDays(3))
             ->where('end_date', '>=', now());
+        // Tasks at ahhead of schedule query (has unique conditions)
+        $taskAheadOfScheduleQuery = (clone $baseQuery)
+            ->where('status_id', $completed)
+            ->whereColumn('actual_date', '<', 'end_date');
 
         // Task Completion query (has unique conditions)
         $taskCompletionQuery = 0;
@@ -145,7 +145,7 @@ class ReportService
 
         // Execute all queries
         $data = [
-            'avg_performance' => round($avgPerformanceQuery->avg('performance_rating'), 2),
+            'avg_performance' => round((clone $baseQuery)->avg('performance_rating'), 2),
             'task_at_risk' => $taskAtRiskQuery->count(),
             'avg_completion_time' => round(
                 $this->task->where('status_id', $completed)
@@ -158,7 +158,7 @@ class ReportService
                     ->avg('time_taken'),
                 2
             ),
-            'time_efficiency' => round($timeEfficiencyQuery->avg(DB::raw('time_estimate / time_taken * 100')), 2),
+            'time_efficiency' => round((clone $baseQuery)->where('status_id', $completed)->avg(DB::raw('time_estimate / time_taken * 100')), 2),
             'completion_rate' => $taskCompletionQuery,
             'average_delay_days' => round(
                 (clone $baseQuery)->where('status_id', $completed)->avg('delay_days'),
@@ -172,6 +172,7 @@ class ReportService
                 (clone $baseQuery)->where('status_id', $completed)->avg('days_taken'),
                 2
             ),
+            'tasks_ahead_of_schedule' => $taskAheadOfScheduleQuery->count(),
             'filters' => $filter
         ];
 
