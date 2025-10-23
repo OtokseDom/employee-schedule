@@ -153,10 +153,25 @@ export default function UserProfile() {
 
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
 				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
-				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
-				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
+				<SectionCard
+					description="Avg Delayed Days"
+					showBadge={false}
+					value={`${reports?.section_cards?.average_delay_days} days`}
+					variant="dashboard"
+				/>
+				<SectionCard
+					description="Total Delayed Days"
+					showBadge={false}
+					value={`${reports?.section_cards?.total_delay_days} days`}
+					variant="dashboard"
+				/>
+				<SectionCard
+					description="Delay Frequency %"
+					showBadge={false}
+					value={`${reports?.section_cards?.delay_frequency_percentage}%`}
+					variant="dashboard"
+				/>
 				<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="dashboard" />
-				<SectionCard description="📊 Delay Frequency %" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
 
 			<div className="md:col-span-4">
