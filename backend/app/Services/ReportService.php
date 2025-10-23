@@ -160,19 +160,11 @@ class ReportService
             ),
             'time_efficiency' => round((clone $baseQuery)->where('status_id', $completed)->avg(DB::raw('time_estimate / time_taken * 100')), 2),
             'completion_rate' => $taskCompletionQuery,
-            'average_delay_days' => round(
-                (clone $baseQuery)->where('status_id', $completed)->avg('delay_days'),
-                0
-            ),
-            'total_delay_days' => round(
-                (clone $baseQuery)->where('status_id', $completed)->sum('delay_days'),
-                2
-            ),
-            'average_days_per_task' => round(
-                (clone $baseQuery)->where('status_id', $completed)->avg('days_taken'),
-                2
-            ),
+            'average_delay_days' => round((clone $baseQuery)->where('status_id', $completed)->avg('delay_days'), 0),
+            'total_delay_days' => round((clone $baseQuery)->where('status_id', $completed)->sum('delay_days'), 2),
+            'average_days_per_task' => round((clone $baseQuery)->where('status_id', $completed)->avg('days_taken'), 2),
             'tasks_ahead_of_schedule' => $taskAheadOfScheduleQuery->count(),
+            'average_tasks_completed_per_day' => round((clone $baseQuery)->where('status_id', $completed)->selectRaw('COUNT(*) / NULLIF(COUNT(DISTINCT DATE(actual_date)), 0) as avg_per_day')->value('avg_per_day'), 2),
             'filters' => $filter
         ];
 
