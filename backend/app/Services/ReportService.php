@@ -182,16 +182,16 @@ class ReportService
     {
         $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
-        $query = $this->user
+        $query = $this->task
             ->leftJoin('task_assignees', function ($join) {
-                $join->on('users.id', '=', 'task_assignees.assignee_id');
+                $join->on('tasks.id', '=', 'task_assignees.task_id');
             })
-            ->leftJoin('tasks', function ($join) {
-                $join->on('tasks.id', '=', 'task_assignees.task_id')
-                    ->where('tasks.organization_id', $this->organization_id);
+            ->leftJoin('users', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id')
+                    ->where('users.organization_id', $this->organization_id);
             })
-            ->leftJoin('task_statuses', 'tasks.status_id', '=', 'task_statuses.id') //
-            ->where('users.organization_id', $this->organization_id)
+            ->leftJoin('task_statuses', 'tasks.status_id', '=', 'task_statuses.id')
+            ->where('tasks.organization_id', $this->organization_id)
             ->where(function ($query) {
                 $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
