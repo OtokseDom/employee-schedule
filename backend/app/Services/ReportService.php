@@ -568,6 +568,63 @@ class ReportService
         return apiResponse($data, "Estimate vs actual report fetched successfully");
     }
 
+    // Overrun vs Underrun ratio - Pie chart
+    public function overrunUnderrunRatio($id = null, $variant = "", $filter)
+    {
+        // Only consider tasks with estimate and actual days recorded and completed
+        $completed = $this->task_status->where('name', 'Completed')->where('organization_id', $this->organization_id)->value('id');
+
+        $query = $this->task->where('organization_id', $this->organization_id)
+            ->whereNotNull('days_estimate')
+            ->where('days_estimate', '>', 0)
+            ->whereNotNull('days_taken')
+            ->where('days_taken', '>', 0)
+            ->where('status_id', $completed);
+
+        // Apply filters (dashboard variant passes filter differently)
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
+
+        $totalTasks = (clone $query)->count();
+
+        $overrunCount = (clone $query)->whereRaw('days_taken > days_estimate')->count();
+        $underrunCount = (clone $query)->whereRaw('days_taken < days_estimate')->count();
+        $onTimeCount = $totalTasks - $overrunCount - $underrunCount;
+
+        $overrunPct = $totalTasks > 0 ? round(($overrunCount / $totalTasks) * 100, 2) : 0;
+        $underrunPct = $totalTasks > 0 ? round(($underrunCount / $totalTasks) * 100, 2) : 0;
+        $onTimePct = $totalTasks > 0 ? round(($onTimeCount / $totalTasks) * 100, 2) : 0;
+
+        $chart_data = [
+            [
+                'label' => 'Underrun',
+                'value' => $underrunPct,
+                'count' => $underrunCount,
+            ],
+            [
+                'label' => 'Overrun',
+                'value' => $overrunPct,
+                'count' => $overrunCount,
+            ],
+            [
+                'label' => 'On Time',
+                'value' => $onTimePct,
+                'count' => $onTimeCount,
+            ],
+        ];
+
+        $data = [
+            'chart_data' => $chart_data,
+            'data_count' => $totalTasks > 0 ? 1 : 0,
+            'filters' => $filter ?? null,
+        ];
+
+        if (empty($data['chart_data'])) {
+            return apiResponse(null, "No data found", 200, false);
+        }
+
+        return apiResponse($data, "Overrun/Underrun ratio fetched successfully");
+    }
+
     public function delaysPerUser($id = null, $filter)
     {
         $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
