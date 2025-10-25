@@ -3,6 +3,7 @@ import axiosClient from "@/axios.client";
 import { SectionCard } from "@/components/chart/section-card";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
+import { ChartPieLabel } from "@/components/chart/pie-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 import { ChartBarHorizontal } from "@/components/chart/chart-bar-horizontal";
 import { DataTable } from "./data-table";
@@ -273,6 +274,10 @@ export default function UserProfile() {
 
 			<div className="md:col-span-6">
 				<ChartBarMultiple report={reports?.estimate_vs_actual_date} variant="dashboard" type={"user"} />
+			</div>
+
+			<div className="md:col-span-6">
+				<ChartPieLabel report={reports?.overrun_underrun_ratio} title={"Overrun / Underrun Ratio"} />
 			</div>
 
 			<div className="md:col-span-6">
