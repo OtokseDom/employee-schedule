@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { Square, TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,18 +17,15 @@ export function ChartPieLabel({ report, title = "Overrun / Underrun / On Time" }
 		},
 		underrun: {
 			label: "Underrun",
-			color: "hsl(var(--chart-1))",
-			// color: "hsl(160 60% 45%)", // Green
+			color: "hsl(0, 0%, 60%)", // Changed from solid white to gray-400
 		},
 		overrun: {
 			label: "Overrun",
-			color: "hsl(var(--chart-10))",
-			// color: "hsl(30 80% 55%)", // Yellow
+			color: "hsl(0, 0%, 40%)", // Gray-600
 		},
 		on_time: {
 			label: "On Time",
 			color: "hsl(270 70% 50%)", // Purple
-			// color: "hsl(220 70% 50%)", // Blue
 		},
 	};
 	const chartData =
@@ -42,6 +39,10 @@ export function ChartPieLabel({ report, title = "Overrun / Underrun / On Time" }
 			  }))
 			: [];
 	const total = report?.total_tasks ?? chartData.reduce((s, it) => s + (it.count || 0), 0);
+
+	const underrunCount = chartData.find((c) => c.name === chartConfig.underrun.label)?.value ?? 0;
+	const overrunCount = chartData.find((c) => c.name === chartConfig.overrun.label)?.value ?? 0;
+	const onTimeCount = chartData.find((c) => c.name === chartConfig.on_time.label)?.value ?? 0;
 
 	return (
 		<Card className={`flex flex-col relative w-full h-full justify-between rounded-2xl`}>
@@ -59,7 +60,7 @@ export function ChartPieLabel({ report, title = "Overrun / Underrun / On Time" }
 						<div className="flex items-center justify-center h-full w-full p-8">
 							<Skeleton className=" w-full h-full rounded-full" />
 						</div>
-					) : chartData.data_count == 0 ? (
+					) : total === 0 ? (
 						<div className="flex items-center justify-center fw-full h-full text-lg text-gray-500">No Tasks Yet</div>
 					) : (
 						<PieChart>
@@ -83,14 +84,24 @@ export function ChartPieLabel({ report, title = "Overrun / Underrun / On Time" }
 						<Skeleton className=" w-full h-4" />
 						<Skeleton className=" w-full h-4" />
 					</div>
-				) : chartData.data_count == 0 ? (
+				) : total === 0 ? (
 					""
 				) : (
-					<div className="flex flex-wrap justify-center items-center gap-4 leading-none text-muted-foreground">
+					<div className="flex flex-col justify-center items-center gap-4 leading-none text-muted-foreground">
+						<div className="flex items-center gap-1">
+							<div className="flex gap-8 text-sm">
+								<span className="flex gap-2">
+									<Square size={16} className="text-gray-400 bg-gray-400 rounded" /> Underrun: {underrunCount}%{" "}
+								</span>
+								<span className="flex gap-2">
+									<Square size={16} className="text-gray-600 bg-gray-600 rounded" /> Overrun: {overrunCount}%
+								</span>
+								<span className="flex gap-2">
+									<Square size={16} className="text-purple-700 bg-purple-700 rounded" /> On Time: {onTimeCount}%
+								</span>
+							</div>
+						</div>
 						<div className="flex items-center gap-2 leading-none font-medium">Total tasks: {total}</div>
-						{/* // <div key={index} className="flex items-center gap-1">
-							// 	<span className="font-bold">{data.tasks}</span> {chartConfig[data.status]?.label || data.status}
-							// </div> */}
 					</div>
 				)}
 				{/* <div className="text-muted-foreground leading-none">Showing overrun / underrun distribution</div> */}
