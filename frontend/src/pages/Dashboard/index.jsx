@@ -269,7 +269,6 @@ export default function UserProfile() {
 					value={`${reports?.section_cards?.tasks_ahead_of_schedule} tasks`}
 					variant="dashboard"
 				/>
-				<SectionCard description="📊 Overrun/Underrun Ratio" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
 
 			<div className="md:col-span-6">
