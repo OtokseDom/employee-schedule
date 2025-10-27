@@ -23,7 +23,9 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 
 	const openDialog = async (project = {}) => {
 		setLoading(true);
-		setDialogOpen(true);
+		setTimeout(() => {
+			setDialogOpen(true);
+		}, 100);
 		setSelectedProjectId(project.id);
 		try {
 			const hasRelationResponse = await axiosClient.post(API().relation_check("project", project.id));
@@ -38,9 +40,12 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 	useEffect(() => {
 		if (!dialogOpen) setHasRelation(false);
 	}, [dialogOpen]);
+
 	const handleUpdateProject = (project) => {
-		setIsOpen(true);
-		setUpdateData(project);
+		setTimeout(() => {
+			setIsOpen(true);
+			setUpdateData(project);
+		}, 100);
 	};
 
 	const baseColumns = useMemo(
