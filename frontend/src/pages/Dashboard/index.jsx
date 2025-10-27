@@ -3,6 +3,7 @@ import axiosClient from "@/axios.client";
 import { SectionCard } from "@/components/chart/section-card";
 import { useLoadContext } from "@/contexts/LoadContextProvider";
 import { PieChartDonut } from "@/components/chart/pie-chart-donut";
+import { ChartPieLabel } from "@/components/chart/pie-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
 import { ChartBarHorizontal } from "@/components/chart/chart-bar-horizontal";
 import { DataTable } from "./data-table";
@@ -147,12 +148,57 @@ export default function UserProfile() {
 			</div>
 
 			{/* ========================================== */}
+			{/* 3️⃣ TIMELINESS & DELAY METRICS */}
+			{/* ========================================== */}
+			<SectionTitle icon="⌛">Timeliness & Delay Metrics</SectionTitle>
+
+			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
+				<SectionCard
+					description="Avg Delayed Days"
+					showBadge={false}
+					value={`${reports?.section_cards?.average_delay_days} days`}
+					variant="dashboard"
+				/>
+				<SectionCard
+					description="Total Delayed Days"
+					showBadge={false}
+					value={`${reports?.section_cards?.total_delay_days} days`}
+					variant="dashboard"
+				/>
+				<SectionCard
+					description="Delay Frequency %"
+					showBadge={false}
+					value={`${reports?.section_cards?.delay_frequency_percentage}%`}
+					variant="dashboard"
+				/>
+				<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-4">
+				<PieChartDonut report={reports?.tasks_by_status} variant="dashboard" />
+			</div>
+
+			<div className="md:col-span-4">
+				<ChartBarLabel report={reports?.delay_per_user} variant="delay" />
+			</div>
+
+			<div className="md:col-span-4">
+				<PlaceholderChart title="Projected Delay for Ongoing Tasks" />
+			</div>
+
+			{/* ========================================== */}
 			{/* 1️⃣ WORK OUTPUT & VOLUME */}
 			{/* ========================================== */}
 			<SectionTitle icon="🫙">Work Output & Volume</SectionTitle>
 
 			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-				<SectionCard description="📊 Avg Tasks Completed per Day" showBadge={false} value="Coming Soon" variant="dashboard" />
+				<SectionCard
+					description="Avg Tasks Completed per Day"
+					showBadge={false}
+					value={`${reports?.section_cards?.average_tasks_completed_per_day} tasks`}
+					variant="dashboard"
+				/>
 				<SectionCard description="📊 Subtasks per Parent Task" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
 
@@ -223,7 +269,6 @@ export default function UserProfile() {
 					value={`${reports?.section_cards?.tasks_ahead_of_schedule} tasks`}
 					variant="dashboard"
 				/>
-				<SectionCard description="📊 Overrun/Underrun Ratio" showBadge={false} value="Coming Soon" variant="dashboard" />
 			</div>
 
 			<div className="md:col-span-6">
@@ -231,32 +276,11 @@ export default function UserProfile() {
 			</div>
 
 			<div className="md:col-span-6">
+				<ChartPieLabel report={reports?.overrun_underrun_ratio} title={"Overrun / Underrun Ratio"} />
+			</div>
+
+			<div className="md:col-span-6">
 				<PlaceholderChart title="Avg Time per Category/Project" />
-			</div>
-
-			{/* ========================================== */}
-			{/* 3️⃣ TIMELINESS & DELAY METRICS */}
-			{/* ========================================== */}
-			<SectionTitle icon="⌛">Timeliness & Delay Metrics</SectionTitle>
-
-			<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-				<SectionCard description="Avg Completion Rate" showBadge={false} value={`${reports?.section_cards?.completion_rate}%`} variant="dashboard" />
-				<SectionCard description="Avg Delayed Days" showBadge={false} value={reports?.section_cards?.average_delay_days} variant="dashboard" />
-				<SectionCard description="Total Delayed Days" showBadge={false} value={reports?.section_cards?.total_delay_days} variant="dashboard" />
-				<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="dashboard" />
-				<SectionCard description="📊 Delay Frequency %" showBadge={false} value="Coming Soon" variant="dashboard" />
-			</div>
-
-			<div className="md:col-span-4">
-				<PieChartDonut report={reports?.tasks_by_status} variant="dashboard" />
-			</div>
-
-			<div className="md:col-span-4">
-				<ChartBarLabel report={reports?.delay_per_user} variant="delay" />
-			</div>
-
-			<div className="md:col-span-4">
-				<PlaceholderChart title="Projected Delay for Ongoing Tasks" />
 			</div>
 
 			{/* ========================================== */}

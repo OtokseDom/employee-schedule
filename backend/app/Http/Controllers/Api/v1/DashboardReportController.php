@@ -27,6 +27,7 @@ class DashboardReportController extends Controller
             'estimate_vs_actual' => $this->report_service->estimateVsActual($filter),
             'estimate_vs_actual_date' => $this->report_service->estimateVsActualDate(null, $filter),
             'delay_per_user' => $this->report_service->delaysPerUser(null, $filter),
+            'overrun_underrun_ratio' => $this->report_service->overrunUnderrunRatio(null, 'dashboard', $filter),
             'performance_leaderboard' => $this->report_service->performanceLeaderboard($filter),
             'performance_rating_trend' => $this->report_service->performanceRatingTrend(null, "dashboard", $filter),
             'section_cards' => $this->report_service->sectionCards(null, $filter),

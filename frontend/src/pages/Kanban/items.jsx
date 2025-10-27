@@ -115,14 +115,14 @@ const Items = ({ item }) => {
 						</Button>
 					</div>
 					<div className="flex justify-start">
-						<Toggle variant="default" size="none" aria-label="Toggle" className="group h-fit py-2">
+						<Toggle onClick={(e) => e.stopPropagation()} variant="default" size="none" aria-label="Toggle" className="group h-fit py-1">
 							<div className="w-0 group-hover:w-7 group-data-[state=on]:w-7 transition-all duration-500 ease-in-out">
 								<Check className="aspect-square rounded-full border border-foreground opacity-0 group-hover:opacity-100 group-data-[state=on]:opacity-100 group-data-[state=on]:bg-green-500 transition-all duration-500 ease-in-out" />
 							</div>
 						</Toggle>
-						<div className="w-full">
+						<div className="w-full text-xs space-y-1">
 							<p>{item.title}</p>
-							<span className="flex flex-row items-center gap-x-1 text-sm text-muted-foreground">
+							<span className="flex flex-row items-center gap-x-1 text-muted-foreground">
 								<span
 									className={`flex items-center text-xs gap-x-1 p-1 rounded ${
 										endDate && item.status.name === "Completed"

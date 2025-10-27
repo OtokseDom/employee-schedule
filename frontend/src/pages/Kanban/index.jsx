@@ -29,7 +29,7 @@ export default function Kanban() {
 	}, []);
 
 	return (
-		<div className="flex flex-col gap-2 mt-5 md:mt-0 w-screen md:w-full md:max-w-[calc(100vw-20rem)] h-[calc(100vh-4rem)]">
+		<div className="flex flex-col gap-2 mt-5 md:mt-0 w-screen md:w-full md:max-w-[calc(100vw-22rem)] h-[calc(100vh-4rem)]">
 			{/* Top section: project select */}
 			<div className="flex flex-row justify-between w-[250px] ml-2 md:ml-0">
 				<Select

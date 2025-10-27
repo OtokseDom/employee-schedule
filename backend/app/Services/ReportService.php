@@ -160,19 +160,13 @@ class ReportService
             ),
             'time_efficiency' => round((clone $baseQuery)->where('status_id', $completed)->avg(DB::raw('time_estimate / time_taken * 100')), 2),
             'completion_rate' => $taskCompletionQuery,
-            'average_delay_days' => round(
-                (clone $baseQuery)->where('status_id', $completed)->avg('delay_days'),
-                0
-            ),
-            'total_delay_days' => round(
-                (clone $baseQuery)->where('status_id', $completed)->sum('delay_days'),
-                2
-            ),
-            'average_days_per_task' => round(
-                (clone $baseQuery)->where('status_id', $completed)->avg('days_taken'),
-                2
-            ),
+            'average_delay_days' => round((clone $baseQuery)->where('status_id', $completed)->avg('delay_days'), 0),
+            'total_delay_days' => round((clone $baseQuery)->where('status_id', $completed)->sum('delay_days'), 2),
+            'average_days_per_task' => round((clone $baseQuery)->where('status_id', $completed)->avg('days_taken'), 2),
             'tasks_ahead_of_schedule' => $taskAheadOfScheduleQuery->count(),
+            'average_tasks_completed_per_day' => round((clone $baseQuery)->where('status_id', $completed)->selectRaw('COUNT(*) / NULLIF(COUNT(DISTINCT DATE(actual_date)), 0) as avg_per_day')->value('avg_per_day'), 2),
+            'delay_frequency_percentage' => round((clone $baseQuery)->where('status_id', $completed)
+                ->selectRaw('(SUM(CASE WHEN delay_days > 0 THEN 1 ELSE 0 END) * 100.0) / NULLIF(COUNT(*), 0) AS delay_percent')->value('delay_percent'), 2),
             'filters' => $filter
         ];
 
@@ -188,16 +182,16 @@ class ReportService
     {
         $taskCount = $this->task->where('organization_id', $this->organization_id)->count();
         // Get all users, even without tasks, via task_assignees table relation, and get all their assigned tasks
-        $query = $this->user
+        $query = $this->task
             ->leftJoin('task_assignees', function ($join) {
-                $join->on('users.id', '=', 'task_assignees.assignee_id');
+                $join->on('tasks.id', '=', 'task_assignees.task_id');
             })
-            ->leftJoin('tasks', function ($join) {
-                $join->on('tasks.id', '=', 'task_assignees.task_id')
-                    ->where('tasks.organization_id', $this->organization_id);
+            ->leftJoin('users', function ($join) {
+                $join->on('users.id', '=', 'task_assignees.assignee_id')
+                    ->where('users.organization_id', $this->organization_id);
             })
-            ->leftJoin('task_statuses', 'tasks.status_id', '=', 'task_statuses.id') //
-            ->where('users.organization_id', $this->organization_id)
+            ->leftJoin('task_statuses', 'tasks.status_id', '=', 'task_statuses.id')
+            ->where('tasks.organization_id', $this->organization_id)
             ->where(function ($query) {
                 $query->whereNotNull('tasks.parent_id') // include only subtasks
                     ->orWhere(function ($subQuery) {
@@ -572,6 +566,63 @@ class ReportService
         }
 
         return apiResponse($data, "Estimate vs actual report fetched successfully");
+    }
+
+    // Overrun vs Underrun ratio - Pie chart
+    public function overrunUnderrunRatio($id = null, $variant = "", $filter)
+    {
+        // Only consider tasks with estimate and actual days recorded and completed
+        $completed = $this->task_status->where('name', 'Completed')->where('organization_id', $this->organization_id)->value('id');
+
+        $query = $this->task->where('organization_id', $this->organization_id)
+            ->whereNotNull('days_estimate')
+            ->where('days_estimate', '>', 0)
+            ->whereNotNull('days_taken')
+            ->where('days_taken', '>', 0)
+            ->where('status_id', $completed);
+
+        // Apply filters (dashboard variant passes filter differently)
+        $query = $this->applyFilters($query, ($variant !== 'dashboard' ? $id : null), ($variant === 'dashboard' ? $filter : null));
+
+        $totalTasks = (clone $query)->count();
+
+        $overrunCount = (clone $query)->whereRaw('days_taken > days_estimate')->count();
+        $underrunCount = (clone $query)->whereRaw('days_taken < days_estimate')->count();
+        $onTimeCount = $totalTasks - $overrunCount - $underrunCount;
+
+        $overrunPct = $totalTasks > 0 ? round(($overrunCount / $totalTasks) * 100, 2) : 0;
+        $underrunPct = $totalTasks > 0 ? round(($underrunCount / $totalTasks) * 100, 2) : 0;
+        $onTimePct = $totalTasks > 0 ? round(($onTimeCount / $totalTasks) * 100, 2) : 0;
+
+        $chart_data = [
+            [
+                'label' => 'Underrun',
+                'value' => $underrunPct,
+                'count' => $underrunCount,
+            ],
+            [
+                'label' => 'Overrun',
+                'value' => $overrunPct,
+                'count' => $overrunCount,
+            ],
+            [
+                'label' => 'On Time',
+                'value' => $onTimePct,
+                'count' => $onTimeCount,
+            ],
+        ];
+
+        $data = [
+            'chart_data' => $chart_data,
+            'data_count' => $totalTasks > 0 ? 1 : 0,
+            'filters' => $filter ?? null,
+        ];
+
+        if (empty($data['chart_data'])) {
+            return apiResponse(null, "No data found", 200, false);
+        }
+
+        return apiResponse($data, "Overrun/Underrun ratio fetched successfully");
     }
 
     public function delaysPerUser($id = null, $filter)
