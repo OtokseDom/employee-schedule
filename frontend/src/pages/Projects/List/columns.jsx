@@ -51,28 +51,6 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 	const baseColumns = useMemo(
 		() => [
 			{
-				id: "status",
-				accessorKey: "status.name",
-				header: ({ column }) => {
-					return (
-						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-							Status <ArrowUpDown className="ml-2 h-4 w-4" />
-						</button>
-					);
-				},
-				cell: ({ row }) => {
-					const status = row.original.status;
-
-					return (
-						<div className=" min-w-24">
-							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
-								{status?.name}
-							</span>
-						</div>
-					);
-				},
-			},
-			{
 				id: "title",
 				accessorKey: "title",
 				header: ({ column }) => {
@@ -95,35 +73,25 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 				},
 			},
 			{
-				id: "target_date",
-				accessorKey: "target_date",
-				header: ({ column }) => (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Target Date <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				),
-				// Keep raw value for sorting
-				accessorFn: (row) => row.target_date,
-				// Use cell renderer to format for display
-				cell: ({ row }) => {
-					const date = row.original.target_date;
-					return date ? format(new Date(date), "MMM-dd yyyy") : "";
+				id: "status",
+				accessorKey: "status.name",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Status <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
+					);
 				},
-			},
-			{
-				id: "estimated_date",
-				accessorKey: "estimated_date",
-				header: ({ column }) => (
-					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-						Estimated Date <ArrowUpDown className="ml-2 h-4 w-4" />
-					</button>
-				),
-				// Keep raw value for sorting
-				accessorFn: (row) => row.estimated_date,
-				// Use cell renderer to format for display
 				cell: ({ row }) => {
-					const date = row.original.estimated_date;
-					return date ? format(new Date(date), "MMM-dd yyyy") : "";
+					const status = row.original.status;
+
+					return (
+						<div className=" min-w-24">
+							<span className={`px-2 py-1 w-full text-center rounded-2xl text-xs ${statusColors[status?.color?.toLowerCase()] || ""}`}>
+								{status?.name}
+							</span>
+						</div>
+					);
 				},
 			},
 			{
@@ -149,6 +117,140 @@ export const columnsProject = ({ handleDelete, setIsOpen, setUpdateData, dialogO
 								"-"
 							)}
 						</div>
+					);
+				},
+			},
+			// {
+			// 	id: "target_date",
+			// 	accessorKey: "target_date",
+			// 	header: ({ column }) => (
+			// 		<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+			// 			Target Date <ArrowUpDown className="ml-2 h-4 w-4" />
+			// 		</button>
+			// 	),
+			// 	// Keep raw value for sorting
+			// 	accessorFn: (row) => row.target_date,
+			// 	// Use cell renderer to format for display
+			// 	cell: ({ row }) => {
+			// 		const date = row.original.target_date;
+			// 		return date ? format(new Date(date), "MMM-dd yyyy") : "";
+			// 	},
+			// },
+			// {
+			// 	id: "estimated_date",
+			// 	accessorKey: "estimated_date",
+			// 	header: ({ column }) => (
+			// 		<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+			// 			Estimated Date <ArrowUpDown className="ml-2 h-4 w-4" />
+			// 		</button>
+			// 	),
+			// 	// Keep raw value for sorting
+			// 	accessorFn: (row) => row.estimated_date,
+			// 	// Use cell renderer to format for display
+			// 	cell: ({ row }) => {
+			// 		const date = row.original.estimated_date;
+			// 		return date ? format(new Date(date), "MMM-dd yyyy") : "";
+			// 	},
+			// },
+			{
+				id: "start date",
+				accessorKey: "start_date",
+				header: ({ column }) => (
+					<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Start Date <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				),
+				// Keep raw value for sorting
+				accessorFn: (row) => row.start_date,
+				// Use cell renderer to format for display
+				cell: ({ row }) => {
+					const date = row.original.start_date;
+					return date ? format(new Date(date), "MMM-dd yyyy") : "";
+				},
+			},
+			{
+				id: "end date",
+				accessorKey: "end_date",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							End Date <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
+					);
+				},
+				// Keep raw value for sorting
+				accessorFn: (row) => row.end_date,
+				// Use cell renderer to format for display
+				cell: ({ row }) => {
+					const date = row.original.end_date;
+					return date ? format(new Date(date), "MMM-dd yyyy") : "";
+				},
+			},
+			{
+				id: "actual date",
+				accessorKey: "actual_date",
+				header: ({ column }) => (
+					<button className="flex items-center" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+						Actual Date <ArrowUpDown className="ml-2 h-4 w-4" />
+					</button>
+				),
+				// keep raw value for sorting
+				accessorFn: (row) => row.actual_date,
+				// display formatted
+				cell: ({ row }) => {
+					const { actual_date, days_estimate, days_taken, delay_days } = row.original;
+
+					const hasEstimate = days_estimate !== null && days_estimate !== undefined && days_estimate !== 0;
+					const hasTaken = days_taken !== null && days_taken !== undefined && days_taken !== 0;
+					const hasDelay = delay_days !== null && delay_days !== undefined && delay_days !== 0;
+
+					return (
+						<div>
+							{/* Date */}
+							{actual_date ? format(new Date(actual_date), "MMM-dd yyyy") : "-"}
+							<br />
+
+							{/* Estimate */}
+							{hasEstimate && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Estimate:</span> {days_estimate}
+									</span>
+									<br />
+								</>
+							)}
+
+							{/* Taken */}
+							{hasTaken && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Taken:</span> {days_taken}
+									</span>
+									<br />
+								</>
+							)}
+
+							{/* Delay */}
+							{hasDelay && (
+								<>
+									<span className="text-xs text-muted-foreground">
+										<span className="font-semibold">Delay:</span> {delay_days}
+									</span>
+									<br />
+								</>
+							)}
+						</div>
+					);
+				},
+			},
+			{
+				id: "delay reason",
+				accessorKey: "delay_reason",
+				header: ({ column }) => {
+					return (
+						<button className="flex" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Delay Reason <ArrowUpDown className="ml-2 h-4 w-4" />
+						</button>
 					);
 				},
 			},
