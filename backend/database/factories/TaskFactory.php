@@ -55,7 +55,6 @@ class TaskFactory extends Factory
             'time_estimate' => $this->faker->randomFloat(1, 1, 24),
             'time_taken' => $this->faker->randomFloat(1, 1, 36),
             'delay' => $this->faker->randomFloat(1, 0, 10),
-            'delay_days' => $this->faker->randomFloat(0, 0, 5),
             'delay_reason' => $this->faker->sentence,
             'performance_rating' => $this->faker->numberBetween(0, 10),
             'priority' => $this->faker->randomElement(['Low', 'Medium', 'High', 'Urgent', 'Critical']),
