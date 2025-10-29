@@ -31,8 +31,9 @@ import { useUserStore } from "@/store/user/userStore";
 import UserForm from "../form";
 import { useTaskStatusesStore } from "@/store/taskStatuses/taskStatusesStore";
 import { useDashboardStore } from "@/store/dashboard/dashboardStore";
+
 export default function UserProfile() {
-	const { id } = useParams(); // Get user ID from URL
+	const { id } = useParams();
 	const { user, setUser, userReports, setUserReports, profileFilters, setProfileFilters, profileSelectedProjects, setProfileSelectedProjects } =
 		useUserStore();
 	const { projectFilter } = useDashboardStore();
@@ -41,7 +42,6 @@ export default function UserProfile() {
 	const { categories } = useCategoriesStore();
 	const { tasks, tasksLoaded, setRelations, setActiveTab } = useTasksStore();
 	const { taskStatuses } = useTaskStatusesStore();
-	// Fetch Hooks
 	const { fetchTasks, fetchProjects, fetchUsers, fetchCategories, fetchTaskStatuses, fetchUserReports } = useTaskHelpers();
 	const { loading, setLoading } = useLoadContext();
 	const [detailsLoading, setDetailsLoading] = useState(false);
@@ -51,19 +51,14 @@ export default function UserProfile() {
 	const [isOpenFilter, setIsOpenFilter] = useState(false);
 	const [updateData, setUpdateData] = useState({});
 	const [updateDataUser, setUpdateDataUser] = useState({});
-	// datatable props
 	const [hasRelation, setHasRelation] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
-
-	const [parentId, setParentId] = useState(null); //for adding subtasks from relations tab
-
-	// Flatten tasks for datatable usage (also groups children below parent)
+	const [parentId, setParentId] = useState(null);
 	const [tableData, setTableData] = useState([]);
+
 	useEffect(() => {
-		// if (tasks !== null) {
 		const filteredUserTasks = tasks.filter((task) => Array.isArray(task.assignees) && task.assignees.some((user) => user.id === parseInt(id)));
 		setTableData(flattenTasks(filteredUserTasks));
-		// }
 	}, [tasks, id]);
 
 	useEffect(() => {
@@ -87,7 +82,6 @@ export default function UserProfile() {
 	}, []);
 
 	useEffect(() => {
-		// Because 'view account' when on profile page already does not trigger rerender
 		if (Object.keys(user).length === 0 || parseInt(user.id) !== parseInt(id)) fetchDetails();
 		if (!userReports || userReports.length === 0 || user.id != parseInt(id)) fetchUserReports(id);
 	}, [id]);
@@ -114,10 +108,10 @@ export default function UserProfile() {
 			showToast("Failed!", e.response?.data?.message, 3000, "fail");
 			if (e.message !== "Request aborted") console.error("Error fetching data:", e.message);
 		} finally {
-			// Always stop loading when done
 			setLoading(false);
 		}
 	};
+
 	const handleRemoveFilter = async (key) => {
 		const updated = {
 			values: { ...profileFilters.values },
@@ -131,7 +125,6 @@ export default function UserProfile() {
 		const projects = updated.values["Projects"] ?? "";
 		setLoading(true);
 		try {
-			// Fetch all user reports in one call
 			const reportsRes = await axiosClient.get(API().user_reports(id, from, to, projects));
 			setUserReports(reportsRes?.data?.data);
 			setLoading(false);
@@ -141,25 +134,49 @@ export default function UserProfile() {
 			setLoading(false);
 		}
 	};
-	// Add necessary reports
+
+	// Section Title Component
+	const SectionTitle = ({ children, icon }) => (
+		<div className="md:col-span-12 mt-6 mb-2">
+			<h2 className="text-xl font-bold flex items-center gap-2 text-foreground border-b border-border pb-2">
+				{icon && <span>{icon}</span>}
+				{children}
+			</h2>
+		</div>
+	);
+
+	// Placeholder Chart Component
+	const PlaceholderChart = ({ title }) => (
+		<div className="bg-background text-card-foreground border border-border rounded-2xl p-6 shadow-md flex items-center justify-center min-h-[300px]">
+			<div className="text-center">
+				<div className="text-4xl mb-2">📊</div>
+				<div className="text-lg font-semibold text-muted-foreground">{title}</div>
+				<div className="text-sm text-muted-foreground mt-1">Coming Soon</div>
+			</div>
+		</div>
+	);
+
 	return (
-		<div className={"flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10"}>
+		<div className="flex flex-col w-screen md:w-full container p-5 md:p-0 sm:text-sm -mt-10">
 			<div
 				className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300 pointer-events-none ${
 					isOpenUser || isOpenFilter || dialogOpen ? "opacity-100" : "opacity-0"
 				}`}
 				aria-hidden="true"
 			/>
-			{/* ------------------------------- Back button ------------------------------ */}
+
+			{/* Back button */}
 			<Link to="/users">
 				<Button variant="ghost" className="flex items-center">
 					<ArrowLeft />
 				</Button>
 			</Link>
-			{/* ------------------------------ User Details ------------------------------ */}
+
+			{/* User Details */}
 			<GalaxyProfileBanner>
 				<UserDetails setIsOpenUser={setIsOpenUser} setDetailsLoading={setDetailsLoading} detailsLoading={detailsLoading} />
 			</GalaxyProfileBanner>
+
 			{/* Update user Form Sheet */}
 			<Sheet open={isOpenUser} onOpenChange={setIsOpenUser} modal={false}>
 				<SheetContent side="right" className="overflow-y-auto w-[400px] sm:w-[540px]">
@@ -170,29 +187,35 @@ export default function UserProfile() {
 					<UserForm setIsOpen={setIsOpenUser} updateData={user} setUpdateData={setUpdateDataUser} userProfileId={id} />
 				</SheetContent>
 			</Sheet>
-			<div className="flex flex-col gap-4 w-full">
-				<div className="flex flex-wrap justify-start items-center gap-4">
-					<Dialog modal={false} open={isOpenFilter} onOpenChange={setIsOpenFilter}>
-						<DialogTrigger asChild>{!loading && <Button variant="default">Filter</Button>}</DialogTrigger>
-						<DialogContent>
-							<DialogHeader>
-								<DialogTitle>Select filter</DialogTitle>
-								<DialogDescription>Apply available filters to view specific reports</DialogDescription>
-							</DialogHeader>
-							<FilterForm
-								setIsOpen={setIsOpenFilter}
-								setReports={setUserReports}
-								filters={profileFilters}
-								setFilters={setProfileFilters}
-								projects={projectFilter}
-								selectedProjects={profileSelectedProjects}
-								setSelectedProjects={setProfileSelectedProjects}
-								userId={id}
-							/>
-						</DialogContent>
-					</Dialog>
-					<FilterTags filters={profileFilters.display} onRemove={handleRemoveFilter} />
+
+			{/* Main Content Grid */}
+			<div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-4 auto-rows-auto mt-4">
+				{/* Filter Section */}
+				<div className="md:col-span-12">
+					<div className="flex flex-wrap justify-start items-center gap-4">
+						<Dialog modal={false} open={isOpenFilter} onOpenChange={setIsOpenFilter}>
+							<DialogTrigger asChild>{!loading && <Button variant="default">Filter</Button>}</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Select filter</DialogTitle>
+									<DialogDescription>Apply available filters to view specific reports</DialogDescription>
+								</DialogHeader>
+								<FilterForm
+									setIsOpen={setIsOpenFilter}
+									setReports={setUserReports}
+									filters={profileFilters}
+									setFilters={setProfileFilters}
+									projects={projectFilter}
+									selectedProjects={profileSelectedProjects}
+									setSelectedProjects={setProfileSelectedProjects}
+									userId={id}
+								/>
+							</DialogContent>
+						</Dialog>
+						<FilterTags filters={profileFilters.display} onRemove={handleRemoveFilter} />
+					</div>
 				</div>
+
 				{/* Overall Progress */}
 				<div className="md:col-span-12 w-full">
 					<GalaxyProgressBar
@@ -205,87 +228,214 @@ export default function UserProfile() {
 						className="w-full"
 					/>
 				</div>
-				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
-					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} />
-					<SectionCard variant="" description="Performance Rating (5)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} />
-					<SectionCard variant="" description="Time Efficiency" showBadge={false} value={`${userReports?.section_cards?.time_efficiency}%`} />
+
+				{/* ========================================== */}
+				{/* 3️⃣ TIMELINESS & DELAY METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="⌛">Timeliness & Delay Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
 					<SectionCard variant="" description="Completion Rate" showBadge={false} value={`${userReports?.section_cards?.completion_rate}%`} />
 					<SectionCard variant="" description="Avg Delayed Days" showBadge={false} value={userReports?.section_cards?.average_delay_days} />
 					<SectionCard variant="" description="Total Delayed Days" showBadge={false} value={userReports?.section_cards?.total_delay_days} />
+					<SectionCard variant="" description="Tasks Due Soon" showBadge={false} value={userReports?.section_cards?.task_at_risk} />
+					<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="" />
 				</div>
-				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex flex-col lg:flex-row justify-between gap-4 w-full items-stretch">
-					<div className="w-full overflow-auto shadow-md">
-						<PieChartDonut report={userReports?.tasks_by_status} />
-					</div>
-					<div className="w-full overflow-auto shadow-md">
-						<AreaChartGradient report={userReports?.task_activity_timeline} />
-					</div>
-					<div className="w-full overflow-auto shadow-md">
-						<RadarChartGridFilled report={userReports?.rating_per_category} />
-					</div>
-				</div>
-				{/* ---------------------------- Performance Trend & Estimate vs Actual time ---------------------------- */}
-				<div className="flex flex-col lg:flex-row gap-4 w-full items-stretch">
-					<div className="w-full overflow-auto shadow-md">
-						<ChartLineLabel report={userReports?.performance_rating_trend} />
-					</div>
-					<div className="w-full overflow-auto shadow-md">
-						<ChartBarMultiple report={userReports?.estimate_vs_actual} />
-					</div>
-				</div>
-				{/* ---------------------------- Task and Insight ---------------------------- */}
-				<div className="flex min-h-[500px] max-h-[700px] flex-col lg:flex-row justify-between gap-4 w-full">
-					<div className="w-full overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
-						<div>
-							<h1 className=" font-extrabold text-xl">Tasks</h1>
-							<p>
-								View list of all tasks
-								{userReports?.user_tasks?.filters?.from && userReports?.user_tasks?.filters?.to
-									? ` for ${new Date(userReports?.user_tasks?.filters.from).toLocaleDateString("en-CA", {
-											month: "short",
-											day: "numeric",
-											year: "numeric",
-									  })} - ${new Date(userReports?.user_tasks?.filters.to).toLocaleDateString("en-CA", {
-											month: "short",
-											day: "numeric",
-											year: "numeric",
-									  })}`
-									: ""}
-							</p>
-						</div>
 
-						{/* Updated table to fix dialog per column issue */}
-						{(() => {
-							const { columnsTask: taskColumns, dialog } = columnsTask({
-								dialogOpen,
-								setDialogOpen,
-								hasRelation,
-								setHasRelation,
-								setIsOpen,
-								setUpdateData,
-								fetchTasks,
-							});
-							return (
-								<>
-									<DataTableTasks
-										columns={taskColumns}
-										data={tableData}
-										updateData={updateData}
-										setUpdateData={setUpdateData}
-										isOpen={isOpen}
-										setIsOpen={setIsOpen}
-										parentId={parentId}
-										setParentId={setParentId}
-										fetchData={fetchTasks}
-										showLess={true}
-									/>
-									{dialog}
-								</>
-							);
-						})()}
+				<div className="md:col-span-4">
+					<PieChartDonut report={userReports?.tasks_by_status} />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="Delay per User" />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="Projected Delay for Ongoing Tasks" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 1️⃣ WORK OUTPUT & VOLUME */}
+				{/* ========================================== */}
+				<SectionTitle icon="🫙">Work Output & Volume</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="📊 Avg Tasks Completed per Day" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Subtasks per Parent Task" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="Tasks Completed (Last 7 Days)" />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="Tasks Completed (Last 6 Weeks)" />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="Tasks Completed (Last 6 Months)" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Tasks Completed per User" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Completion Velocity Trend" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 2️⃣ EFFICIENCY METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="🌟">Efficiency Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="Time Efficiency" showBadge={false} value={`${userReports?.section_cards?.time_efficiency}%`} variant="" />
+					<SectionCard description="📊 Avg Days Taken per Task" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Tasks Ahead of Schedule" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-6">
+					<ChartBarMultiple report={userReports?.estimate_vs_actual} type={"user"} />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Overrun / Underrun Ratio" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Avg Time per Category/Project" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 4️⃣ QUALITY & CONSISTENCY METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="💯">Quality & Consistency Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="Performance Rating (5)" showBadge={false} value={`${userReports?.section_cards?.avg_performance}`} variant="" />
+					<SectionCard description="📊 Performance Variance" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-6">
+					<ChartLineLabel report={userReports?.performance_rating_trend} />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Delayed vs Performance Correlation" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 5️⃣ WORKLOAD & BALANCE METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="💪">Workload & Balance Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="📊 Avg Estimated Days per User" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Avg Actual Days per User" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Workload Balance Index" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Utilization Rate" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="User Task Load" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Active Tasks per User" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 6️⃣ TREND & PROGRESS METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="📈">Trend & Progress Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="📊 Productivity Trend (WoW)" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Delay Trend Status" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Performance Trend by Month" />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="Velocity Trend per Project/Team" />
+				</div>
+
+				{/* ========================================== */}
+				{/* 7️⃣ COMPARATIVE METRICS */}
+				{/* ========================================== */}
+				<SectionTitle icon="📊">Comparative Metrics</SectionTitle>
+
+				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
+					<SectionCard description="📊 Most Improved Users" showBadge={false} value="Coming Soon" variant="" />
+				</div>
+
+				<div className="md:col-span-4">
+					<PlaceholderChart title="User Efficiency Ranking" />
+				</div>
+
+				<div className="md:col-span-4">
+					<RadarChartGridFilled report={userReports?.rating_per_category} />
+				</div>
+
+				<div className="md:col-span-4">
+					<AreaChartGradient report={userReports?.task_activity_timeline} />
+				</div>
+
+				{/* ========================================== */}
+				{/* TASKS TABLE */}
+				{/* ========================================== */}
+				<SectionTitle icon="📋">Tasks</SectionTitle>
+
+				<div className="md:col-span-12 min-h-[500px] max-h-[700px] overflow-auto scrollbar-custom bg-card text-card-foreground border border-border rounded-2xl container p-4 md:p-10 shadow-md">
+					<div>
+						<h1 className="font-extrabold text-xl">Tasks</h1>
+						<p>
+							View list of all tasks
+							{userReports?.user_tasks?.filters?.from && userReports?.user_tasks?.filters?.to
+								? ` for ${new Date(userReports?.user_tasks?.filters.from).toLocaleDateString("en-CA", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })} - ${new Date(userReports?.user_tasks?.filters.to).toLocaleDateString("en-CA", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })}`
+								: ""}
+						</p>
 					</div>
+
+					{(() => {
+						const { columnsTask: taskColumns, dialog } = columnsTask({
+							dialogOpen,
+							setDialogOpen,
+							hasRelation,
+							setHasRelation,
+							setIsOpen,
+							setUpdateData,
+							fetchTasks,
+						});
+						return (
+							<>
+								<DataTableTasks
+									columns={taskColumns}
+									data={tableData}
+									updateData={updateData}
+									setUpdateData={setUpdateData}
+									isOpen={isOpen}
+									setIsOpen={setIsOpen}
+									parentId={parentId}
+									setParentId={setParentId}
+									fetchData={fetchTasks}
+									showLess={true}
+								/>
+								{dialog}
+							</>
+						);
+					})()}
 				</div>
 			</div>
 		</div>
