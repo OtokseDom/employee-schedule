@@ -15,6 +15,8 @@ import { AreaChartGradient } from "@/components/chart/area-chart-gradient";
 import { RadarChartGridFilled } from "@/components/chart/radar-chart-grid-filled";
 import { ChartLineLabel } from "@/components/chart/line-chart-label";
 import { ChartBarMultiple } from "@/components/chart/bar-chart-multiple";
+import { ChartBarLabel } from "@/components/chart/bar-chart-label";
+import { ChartBarHorizontal } from "@/components/chart/chart-bar-horizontal";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import UserDetails from "@/pages/Users/Show/details";
 import { SectionCard } from "@/components/chart/section-card";
@@ -265,20 +267,50 @@ export default function UserProfile() {
 				</div>
 
 				<div className="md:col-span-4">
-					<PlaceholderChart title="Tasks Completed (Last 7 Days)" />
+					<ChartBarLabel
+						variant="tasks_completed"
+						report={userReports?.tasks_completed_last_7_days}
+						config={{
+							title: "Tasks Completed (Last 7 Days)",
+							labelKey: "label",
+							valueKey: "tasks_completed",
+							color: "hsl(140 70% 50%)",
+							total: userReports?.tasks_completed_last_7_days?.data_count,
+						}}
+					/>
 				</div>
 
 				<div className="md:col-span-4">
-					<PlaceholderChart title="Tasks Completed (Last 6 Weeks)" />
+					<ChartBarLabel
+						variant="tasks_completed"
+						report={userReports?.tasks_completed_last_6_weeks}
+						config={{
+							title: "Tasks Completed (Last 6 Weeks)",
+							labelKey: "label",
+							valueKey: "tasks_completed",
+							color: "hsl(45 90% 55%)",
+							total: userReports?.tasks_completed_last_6_weeks?.data_count,
+						}}
+					/>
 				</div>
 
 				<div className="md:col-span-4">
-					<PlaceholderChart title="Tasks Completed (Last 6 Months)" />
+					<ChartBarLabel
+						variant="tasks_completed"
+						report={userReports?.tasks_completed_last_6_months}
+						config={{
+							title: "Tasks Completed (Last 6 Months)",
+							labelKey: "label",
+							valueKey: "tasks_completed",
+							color: "hsl(200 80% 55%)",
+							total: userReports?.tasks_completed_last_6_months?.data_count,
+						}}
+					/>
 				</div>
-
+				{/* 
 				<div className="md:col-span-6">
-					<PlaceholderChart title="Tasks Completed per User" />
-				</div>
+					<ChartBarHorizontal report={userReports?.tasks_completed_per_user} title="Tasks Completed per User" />
+				</div> */}
 
 				<div className="md:col-span-6">
 					<PlaceholderChart title="Completion Velocity Trend" />
