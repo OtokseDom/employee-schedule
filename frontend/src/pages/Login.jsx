@@ -167,17 +167,19 @@ export default function Login() {
 					</form>
 
 					<div className="text-center mt-6">
-						<p className={`${theme === "dark" ? "text-purple-200" : "text-gray-600"}`}>
-							Don't have an account?{" "}
-							<Link
-								to={loading ? "#" : "/signup"}
-								className={`${
-									theme === "dark" ? "text-purple-300 hover:text-white" : "text-purple-600 hover:text-purple-700"
-								} font-medium transition-colors duration-300`}
-							>
-								Sign up here
-							</Link>
-						</p>
+						{!loading && (
+							<p className={`${theme === "dark" ? "text-purple-200" : "text-gray-600"}`}>
+								Don't have an account?{" "}
+								<Link
+									to="/signup"
+									className={`${
+										theme === "dark" ? "text-purple-300 hover:text-white" : "text-purple-600 hover:text-purple-700"
+									} font-medium transition-colors duration-300`}
+								>
+									Sign up here
+								</Link>
+							</p>
+						)}
 					</div>
 				</div>
 				<div className="mt-10 text-muted-foreground text-center">© 2025 Dominic Escoto. All rights reserved.</div>
