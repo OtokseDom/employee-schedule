@@ -319,18 +319,18 @@ export function AppSidebar() {
 							</SidebarMenuButton>
 						)}
 					</SidebarMenuItem>
-					<SidebarMenuItem className="flex flex-row justify-evenly gap-4 border-t py-1 cursor-help">
+					<SidebarMenuItem className="flex flex-row justify-evenly gap-4 border-t pt-1 cursor-pointer">
 						<SidebarMenuSubButton
 							onClick={() => window.open("https://github.com/OtokseDom/otokse-project-management", "_blank")}
-							className="w-fit p-0 text-xs text-muted-foreground hover:underline"
+							className="w-fit py-0 text-xs text-muted-foreground hover:underline"
 						>
-							<span>Github Repo</span>
+							<span>About this project</span>
 						</SidebarMenuSubButton>
 						<SidebarMenuSubButton
 							onClick={() => window.open("https://github.com/OtokseDom/otokse-project-management/issues", "_blank")}
-							className="w-fit p-0 text-xs text-muted-foreground hover:underline"
+							className="w-fit py-0 text-xs text-muted-foreground hover:underline"
 						>
-							<span>Issues</span>
+							<span>Report Issues</span>
 						</SidebarMenuSubButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
