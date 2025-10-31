@@ -119,7 +119,9 @@ export default function Signup() {
 									<span className={`${theme === "dark" ? "text-purple-200" : "text-gray-700"} w-full`}>Create Organization</span>
 								</label>
 							</div>
-							<label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-purple-200" : "text-gray-700"}`}>Organization</label>
+							<label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-purple-200" : "text-gray-700"}`}>
+								{hasOrgCode ? "Organization Code" : "Organization Name"}
+							</label>
 							{hasOrgCode ? (
 								<input
 									ref={orgCodeRef}
