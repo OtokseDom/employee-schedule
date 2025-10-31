@@ -275,7 +275,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 			</SidebarContent>
 			<SidebarFooter>
-				<SidebarMenu>
+				<SidebarMenu className="mb-8 md:mb-0">
 					<SidebarMenuItem>
 						{theme == "light" ? (
 							<SidebarMenuButton title="Toggle dark mode" onClick={toggleDark}>
@@ -304,20 +304,6 @@ export function AppSidebar() {
 								<DropdownMenuItem onClick={onLogout}>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-					</SidebarMenuItem>
-					{/* Somehow needed for mobile */}
-					<SidebarMenuItem className="block md:hidden">
-						{theme == "light" ? (
-							<SidebarMenuButton onClick={toggleDark}>
-								<MoonStar size={16} />
-								<span className="ml-2">Dark Mode</span>
-							</SidebarMenuButton>
-						) : (
-							<SidebarMenuButton onClick={toggleDark}>
-								<Sun size={16} />
-								<span className="ml-2">Light Mode</span>
-							</SidebarMenuButton>
-						)}
 					</SidebarMenuItem>
 					<SidebarMenuItem className="flex flex-row justify-evenly gap-4 border-t pt-1 cursor-pointer">
 						<SidebarMenuSubButton
