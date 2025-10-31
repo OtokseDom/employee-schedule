@@ -170,7 +170,7 @@ export default function Login() {
 						<p className={`${theme === "dark" ? "text-purple-200" : "text-gray-600"}`}>
 							Don't have an account?{" "}
 							<Link
-								to="/signup"
+								to={loading ? "#" : "/signup"}
 								className={`${
 									theme === "dark" ? "text-purple-300 hover:text-white" : "text-purple-600 hover:text-purple-700"
 								} font-medium transition-colors duration-300`}
