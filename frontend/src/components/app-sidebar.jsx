@@ -32,7 +32,8 @@ import {
 	SidebarTrigger,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
-	useSidebar, // for auto closing sidebar on mobile location change
+	useSidebar,
+	SidebarMenuSubButton, // for auto closing sidebar on mobile location change
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -317,6 +318,20 @@ export function AppSidebar() {
 								<span className="ml-2">Light Mode</span>
 							</SidebarMenuButton>
 						)}
+					</SidebarMenuItem>
+					<SidebarMenuItem className="flex flex-row justify-evenly gap-4 border-t py-1 cursor-help">
+						<SidebarMenuSubButton
+							onClick={() => window.open("https://github.com/OtokseDom/otokse-project-management", "_blank")}
+							className="w-fit p-0 text-xs text-muted-foreground hover:underline"
+						>
+							<span>Github Repo</span>
+						</SidebarMenuSubButton>
+						<SidebarMenuSubButton
+							onClick={() => window.open("https://github.com/OtokseDom/otokse-project-management/issues", "_blank")}
+							className="w-fit p-0 text-xs text-muted-foreground hover:underline"
+						>
+							<span>Issues</span>
+						</SidebarMenuSubButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>

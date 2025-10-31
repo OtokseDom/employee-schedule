@@ -109,9 +109,8 @@ class ReportService
     public function sectionCards($id = null, $filter)
     {
         // Get completed status ID once
-        $completed = $this->task_status->where('name', 'Completed')
-            ->where('organization_id', $this->organization_id)
-            ->value('id');
+        $completed = $this->task_status->where('name', 'Completed')->where('organization_id', $this->organization_id)->value('id');
+        $cancelled = $this->task_status->where('name', 'Cancelled')->where('organization_id', $this->organization_id)->value('id');
 
         // Base query builder with common filters
         $baseQuery = $this->task->where('organization_id', $this->organization_id)
@@ -136,9 +135,9 @@ class ReportService
 
         // Task Completion query (has unique conditions)
         $taskCompletionQuery = 0;
-        $totalTasks = (clone $baseQuery)->count();
+        $totalTasks = (clone $baseQuery)->where('status_id', '!=', $cancelled)->where('status_id', '!=', null)->count();
         if ($totalTasks !== 0) {
-            $completedTasks = (clone $baseQuery)->where('status_id', $completed)->where('end_date', '<=', now())->count();
+            $completedTasks = (clone $baseQuery)->where('status_id', $completed)->count();
 
             $taskCompletionQuery = round(($completedTasks / $totalTasks) * 100, 2);
         }
