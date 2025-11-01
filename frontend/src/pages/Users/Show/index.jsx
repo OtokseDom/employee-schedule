@@ -343,6 +343,10 @@ export default function UserProfile() {
 				</div>
 
 				<div className="md:col-span-6">
+					<RadarChartGridFilled report={userReports?.rating_per_category} />
+				</div>
+
+				<div className="md:col-span-6">
 					<PlaceholderChart title="Overrun / Underrun Ratio" />
 				</div>
 
@@ -381,28 +385,11 @@ export default function UserProfile() {
 				</div>
 
 				<div className="md:col-span-6">
-					<PlaceholderChart title="User Task Load" />
-				</div>
-
-				{/* ========================================== */}
-				{/* 7️⃣ COMPARATIVE METRICS */}
-				{/* ========================================== */}
-				<SectionTitle icon="📊">Comparative Metrics</SectionTitle>
-
-				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-					<SectionCard description="📊 Most Improved Users" showBadge={false} value="Coming Soon" variant="" />
-				</div>
-
-				<div className="md:col-span-4">
-					<PlaceholderChart title="User Efficiency Ranking" />
-				</div>
-
-				<div className="md:col-span-4">
-					<RadarChartGridFilled report={userReports?.rating_per_category} />
-				</div>
-
-				<div className="md:col-span-4">
 					<AreaChartGradient report={userReports?.task_activity_timeline} />
+				</div>
+
+				<div className="md:col-span-6">
+					<PlaceholderChart title="User Task Load" />
 				</div>
 
 				{/* ========================================== */}
