@@ -330,7 +330,12 @@ export default function UserProfile() {
 						value={`${userReports?.section_cards?.average_days_per_task}%`}
 						variant=""
 					/>
-					<SectionCard description="📊 Tasks Ahead of Schedule" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard
+						description="📊 Tasks Ahead of Schedule"
+						showBadge={false}
+						value={`${userReports?.section_cards?.tasks_ahead_of_schedule}%`}
+						variant=""
+					/>
 				</div>
 
 				<div className="md:col-span-6">
