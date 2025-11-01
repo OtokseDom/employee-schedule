@@ -244,15 +244,11 @@ export default function UserProfile() {
 					<SectionCard description="📊 Tasks Before Deadline %" showBadge={false} value="Coming Soon" variant="" />
 				</div>
 
-				<div className="md:col-span-4">
+				<div className="md:col-span-6">
 					<PieChartDonut report={userReports?.tasks_by_status} />
 				</div>
 
-				<div className="md:col-span-4">
-					<PlaceholderChart title="Delay per User" />
-				</div>
-
-				<div className="md:col-span-4">
+				<div className="md:col-span-6">
 					<PlaceholderChart title="Projected Delay for Ongoing Tasks" />
 				</div>
 
@@ -363,36 +359,14 @@ export default function UserProfile() {
 				<SectionTitle icon="💪">Workload & Balance Metrics</SectionTitle>
 
 				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-					<SectionCard description="📊 Avg Estimated Days per User" showBadge={false} value="Coming Soon" variant="" />
-					<SectionCard description="📊 Avg Actual Days per User" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Avg Estimated Days" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard description="📊 Avg Actual Days" showBadge={false} value="Coming Soon" variant="" />
 					<SectionCard description="📊 Workload Balance Index" showBadge={false} value="Coming Soon" variant="" />
 					<SectionCard description="📊 Utilization Rate" showBadge={false} value="Coming Soon" variant="" />
 				</div>
 
 				<div className="md:col-span-6">
 					<PlaceholderChart title="User Task Load" />
-				</div>
-
-				<div className="md:col-span-6">
-					<PlaceholderChart title="Active Tasks per User" />
-				</div>
-
-				{/* ========================================== */}
-				{/* 6️⃣ TREND & PROGRESS METRICS */}
-				{/* ========================================== */}
-				<SectionTitle icon="📈">Trend & Progress Metrics</SectionTitle>
-
-				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-					<SectionCard description="📊 Productivity Trend (WoW)" showBadge={false} value="Coming Soon" variant="" />
-					<SectionCard description="📊 Delay Trend Status" showBadge={false} value="Coming Soon" variant="" />
-				</div>
-
-				<div className="md:col-span-6">
-					<PlaceholderChart title="Performance Trend by Month" />
-				</div>
-
-				<div className="md:col-span-6">
-					<PlaceholderChart title="Velocity Trend per Project/Team" />
 				</div>
 
 				{/* ========================================== */}
