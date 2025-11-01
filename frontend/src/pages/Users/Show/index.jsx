@@ -258,7 +258,12 @@ export default function UserProfile() {
 				<SectionTitle icon="🫙">Work Output & Volume</SectionTitle>
 
 				<div className="flex flex-col md:flex-row gap-4 md:col-span-12 overflow-auto">
-					<SectionCard description="📊 Avg Tasks Completed per Day" showBadge={false} value="Coming Soon" variant="" />
+					<SectionCard
+						description="📊 Avg Tasks Completed per Day"
+						showBadge={false}
+						value={`${userReports?.section_cards?.average_tasks_completed_per_day}%`}
+						variant=""
+					/>
 					<SectionCard description="📊 Subtasks per Parent Task" showBadge={false} value="Coming Soon" variant="" />
 				</div>
 
